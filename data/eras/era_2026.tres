@@ -1,0 +1,17 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/era/era_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/terrain/palupera/ortho.jpg" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "era_2026"
+display_name_key = "ERA_2026_NAME"
+year_label = "2026"
+scene_path = "res://scenes/eras/era_2026.tscn"
+terrain_texture = ExtResource("2")
+texture_strength = 1.0
+ground_tint = Color(1, 1, 1, 1)
+default_time_of_day = 17.5
+order = 2
+narrative_story = "res://assets/narrative/era_2026.ink.json"

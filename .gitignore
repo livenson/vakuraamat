@@ -8,3 +8,6 @@ data_raw/
 .DS_Store
 # Blender
 *.blend1
+
+# Node modules for the ink compiler
+tools/ink/node_modules/

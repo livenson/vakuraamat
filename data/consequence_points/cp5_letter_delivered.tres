@@ -1,0 +1,12 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/consequence/consequence_point.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "cp5_letter_delivered"
+flag_name = "letter_delivered"
+trigger_era = "era_2026"
+affected_eras = Array[String](["era_2026"])
+trigger_description_key = "CP5_LETTER_DELIVERED_TRIGGER"
+effect_description_key = "CP5_LETTER_DELIVERED_EFFECT"

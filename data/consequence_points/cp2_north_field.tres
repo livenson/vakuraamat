@@ -1,0 +1,12 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/consequence/consequence_point.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "cp2_north_field"
+flag_name = "north_field_ploughed"
+trigger_era = "era_1938"
+affected_eras = Array[String](["era_2026"])
+trigger_description_key = "CP2_NORTH_FIELD_TRIGGER"
+effect_description_key = "CP2_NORTH_FIELD_EFFECT"
