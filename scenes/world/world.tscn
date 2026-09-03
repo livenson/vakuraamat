@@ -1,0 +1,43 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/world/world.gd" id="1_world"]
+[ext_resource type="Terrain3DAssets" path="res://assets/terrain/palupera/terrain_assets.tres" id="2_assets"]
+[ext_resource type="Shader" path="res://assets/terrain/ortho_drape.gdshader" id="3_shader"]
+[ext_resource type="Script" path="res://addons/sky_3d/src/Sky3D.gd" id="4_sky3d"]
+[ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="5_player"]
+[ext_resource type="Script" path="res://scripts/ui/ui_manager.gd" id="6_ui"]
+
+[sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_ground"]
+world_background = 0
+shader_override_enabled = true
+shader_override = ExtResource("3_shader")
+
+[node name="World" type="Node3D"]
+script = ExtResource("1_world")
+
+[node name="Terrain3D" type="Terrain3D" parent="."]
+data_directory = "res://assets/terrain/palupera/data"
+material = SubResource("Terrain3DMaterial_ground")
+assets = ExtResource("2_assets")
+collision_mode = 1
+collision_radius = 64
+
+[node name="Sky3D" type="WorldEnvironment" parent="."]
+script = ExtResource("4_sky3d")
+
+[node name="Player" parent="." instance=ExtResource("5_player")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 600, 110, 415)
+
+[node name="EraLayers" type="Node3D" parent="."]
+
+[node name="UI" type="CanvasLayer" parent="."]
+script = ExtResource("6_ui")
+
+[node name="Fade" type="ColorRect" parent="UI"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.06, 0.05, 0.04, 1)

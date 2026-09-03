@@ -89,3 +89,32 @@ EX_FARM_1938,"Sama maja, uus katus, korsten. Pool juurdeehitust seisab, teine po
 EX_FARM_2026,Vundament nõgeste all. Uksekivi on alles.,A foundation under nettles. The doorstep is still there.
 EX_RUSTED_TOOL,Roostes sirp tamme juure vahel. Keegi jättis selle siia ja ei tulnud tagasi.,A rusted sickle between the oak's roots. Someone left it here and did not come back.
 EX_REGISTER_2026,"Raamat. Nahk, paks, kuiv. Kolm sissekannet selle talu kohta. Kolmas on tänavune.","A book. Leather, thick, dry. Three entries for this farm. The third is this year's."
+UI_CHAPTER,%s. peatükk,Chapter %s
+UI_EPILOGUE,Epiloog,Epilogue
+UI_REGISTER_LOCKED,Sul pole veel raamatut.,You don't have the book yet.
+UI_LEDGER_EMPTY,Veel pole midagi muutunud.,Nothing has changed yet.
+UI_PLAY_AGAIN,Mängi uuesti,Play again
+MENU_SUBTITLE,"Ühe Lõuna-Eesti mõisa maaraamat, kolm aastat, sama maa.","One South Estonian manor's land register, three years, the same ground."
+MENU_LANGUAGE,Keel / Language,Keel / Language
+MENU_CREDIT,Kaardiandmed: Maa- ja Ruumiamet 2026,Map data: Maa- ja Ruumiamet 2026
+ENDING_FOREST_TITLE,Mets,Forest
+ENDING_FURROWS_TITLE,Vaod,Furrows
+ENDING_ORCHARD_TITLE,Õunaaed,Orchard
+ENDING_FOREST,"Maa on suurema osa vaikselt tagasi võtnud. Leida istub sinuga tamme juurtel ja räägib lood niikuinii: kaev, ader, õunapuud. Asjad, mida ta mäletab, mitte asjad, mida sina näed. Vakuraamatu viimasel lehel on üks rida tema käega.","The land has quietly taken most of it back. Leida sits with you on the oak's roots and tells the stories anyway: the well, the plough, the apple trees. Things she remembers, not things you can see. The register's last page carries one line in her hand."
+ENDING_FURROWS,"Jälgi on alles: põld, kaev, kivi, mõni õunapuu. Leida viib sind iga ühe juurde, mida ta mäletab, kiirustamata, kepiga näidates. Vakuraamatu viimane leht loetleb, mis jäi.","Traces remain: a field, a well, a stone, a few apple trees. Leida walks you to each one she remembers, unhurried, pointing with her stick. The register's last page lists what was kept."
+ENDING_ORCHARD,"Leida viib sind kõige vanema õunapuu alla. Kastis on pere paberid, kolm põlve, ja pressitud õunaõis 1938. aastast. Vakuraamatu viimane leht täitub ise, sinu käekirjas. Aed õitseb.","Leida leads you to the oldest apple tree. Inside the box: the family's papers, three generations, and a pressed apple blossom from 1938. The register's last page fills itself in, in your own handwriting. The orchard is in bloom."
+ENDING_BOX_PARTIAL,"Kast leitakse, kirja ja õiega, aga ilma paberiteta. Leida kehitab õlgu: „Noh. See oligi see, mis loeb.“","The box is found, with the letter and the blossom but no papers. Leida shrugs: ""Well. That's the part that mattered."""
+ENDING_KEPT,Alles jäi %d / %d.,Kept: %d of %d.
+ITEM_REGISTER,Vakuraamat,The register
+NOTICE_REGISTER_FOUND,Vakuraamat. Kolm sissekannet selle talu kohta. Ava see (Tab) ja vali lehekülg.,The register. Three entries for this farm. Open it (Tab) and choose a page.
+EX_FIELD_1798,Ribapõllud. Iga riba on teise pere oma ja ükski pole nende endi.,Strip fields. Every strip belongs to a different family and none of them to themselves.
+UI_PROMPT_USE,Tegutse,Act
+UI_CODEX,Mis on tõsi,What's real
+CODEX_REAL_TITLE,Tõestisündinud,Attested
+CODEX_REAL,"Maa: Palupera küla ja mõisa ümbrus, Maa- ja Ruumiameti kõrgusandmete ja ortofoto järgi, meetri täpsusega. Vakuraamat (Wackenbuch) oli mõisa register taludest ja kohustustest; 1798. aastal peeti seda saksa keeles. Liivimaa talupojad said perekonnanimed 1823–1826. 1919. aasta maaseadus võõrandas mõisad ja jagas maa asundustaludeks; Palupera mõisa peahoones tegutseb 1933. aastast kool. Nimede eestistamine oli 1935. aastast tasuta ja umbes 195 000 inimest vahetas nime.","The ground: the surroundings of Palupera village and manor, from the Land Board's elevation data and orthophoto, to the metre. The vakuraamat (Wackenbuch) was a manor's register of farms and obligations; in 1798 it was kept in German. Livonian peasants received surnames in 1823–1826. The 1919 Land Act expropriated the manors and divided the land into settler farms; a school has run in Palupera manor house since 1933. Estonianising surnames was free from 1935 and about 195,000 people changed theirs."
+CODEX_INVENTED_TITLE,Välja mõeldud,Invented
+CODEX_INVENTED,"Tõrvamäe mõis, parun von Tolkenau, Kaseoja pere ja kõik inimesed selles loos. Ühtki päris peret ega mõisat ei kujutata.","Tõrvamäe manor, the baron von Tolkenau, the Kaseoja family and every person in this story. No real family or manor is depicted."
+CODEX_WORDS_TITLE,Sõnad,Words
+CODEX_WORDS,"vakuraamat – mõisa register. adramaa – maaüksus, mida haris üks ader. kubjas – mõisa ülevaataja. maarahvas – nii nimetasid eestlased end enne 19. sajandi keskpaika; sõna „eestlane“ polnud 1798. aastal käibel. asundustalu – 1919. aasta maareformiga loodud talu. Kaseoja – kase oja; Birkenbach on sama nimi saksa keeles.","vakuraamat – a manor's register. adramaa – a unit of land, as much as one plough worked. kubjas – the manor's overseer. maarahvas – 'the country people', what Estonians called themselves before the mid-19th century; the word for 'Estonian' was not in use in 1798. asundustalu – a farm created by the 1919 land reform. Kaseoja – 'birch brook'; Birkenbach is the same name in German."
+CODEX_DATA_TITLE,Andmed,Data
+CODEX_DATA,"Kaardiandmed: Maa- ja Ruumiamet 2026 (kõrgusmudel, ortofoto, taimkatte kõrgusmudel, katastrikaart 1930–1944, üheverstane kaart 1894–1922). 1798. aasta pind on Mellini atlase asemel esialgu verstakaart.","Map data: Maa- ja Ruumiamet 2026 (elevation model, orthophoto, canopy height model, cadastral map 1930–1944, one-verst map 1894–1922). The 1798 ground uses the verst map as a stand-in for Mellin's atlas for now."

@@ -17,6 +17,22 @@ var chapter: int = 0                      # 0 prologue, 1..3 chapters, 4 epilogu
 var visited_eras: Dictionary = {}         # era_id -> true
 var register_unlocked: bool = false
 var world: Node = null                    # the World scene, if running
+var pending_load := false                 # main menu asked for "Continue"
+
+
+## Fresh game state (new game from the menu).
+func reset() -> void:
+	current_era = ""
+	chapter = 0
+	visited_eras = {}
+	register_unlocked = false
+	pending_load = false
+	TimelineState.flags = {}
+	TimelineState.commit()
+	Inventory.artifacts = []
+	Inventory.local = {}
+	Journal.entries = []
+	Journal.visited = {}
 
 
 func _ready() -> void:

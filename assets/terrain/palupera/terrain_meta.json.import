@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://chbtq6q6ohahj"
+valid=false
+
+[deps]
+
+source_file="res://assets/terrain/palupera/terrain_meta.json"
+
+[params]
+
+compress=true

@@ -57,7 +57,7 @@ func load_slot(slot: String = AUTOSAVE) -> bool:
 	Inventory.from_dict(data.get("inventory", {}))
 	Journal.from_dict(data.get("journal", {}))
 	Narrative.from_dict(data.get("narrative", {}))
-	GameState.from_dict(data.get("game", {}))   # last: switches era, moves the player
+	await GameState.from_dict(data.get("game", {}))   # last: switches era, moves the player
 	dirty = false
 	return true
 

@@ -65,6 +65,7 @@ uniform sampler2D ortho_texture : source_color, filter_linear_mipmap_anisotropic
 uniform vec2 ortho_origin = vec2(0.0, 0.0);
 uniform float ortho_extent = 1024.0;
 uniform float ortho_strength : hint_range(0.0, 1.0) = 1.0;
+uniform vec4 ortho_tint : source_color = vec4(1.0);           // era colour cast (sepia for old maps)
 uniform float detail_near : hint_range(0.0, 500.0) = 40.0;   // full detail texture inside this distance
 uniform float detail_far : hint_range(0.0, 2000.0) = 400.0;  // pure orthophoto beyond this
 uniform float detail_contrast : hint_range(0.0, 2.0) = 1.0;  // how strongly detail luminance modulates the ortho
@@ -369,7 +370,7 @@ void fragment() {
 	// Apply PBR
 	// uv is world-space XZ in vertex units; convert back to metres for the orthophoto lookup.
 	vec2 ortho_uv = (uv * _vertex_spacing - ortho_origin) / ortho_extent;
-	vec3 ortho_rgb = texture(ortho_texture, ortho_uv).rgb;
+	vec3 ortho_rgb = texture(ortho_texture, ortho_uv).rgb * ortho_tint.rgb;
 	float ortho_mix = ortho_strength * float(all(greaterThanEqual(ortho_uv, vec2(0.0))) && all(lessThanEqual(ortho_uv, vec2(1.0))));
 	vec3 base_rgb = albedo_height.rgb * color_map.rgb * macrov;
 	// Near: the orthophoto supplies the colour, the detail texture supplies fine structure

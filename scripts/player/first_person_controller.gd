@@ -17,6 +17,7 @@ enum Gait { WALK, SPRINT, DASH }
 @onready var camera: Camera3D = $Camera3D
 
 var flying := false
+var input_enabled := true      # false while a UI panel or dialogue is open
 var _pitch := 0.0
 
 
@@ -25,6 +26,8 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if not input_enabled:
+		return
 	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
 		rotate_y(-event.relative.x * mouse_sensitivity)
 		_pitch = clampf(_pitch - event.relative.y * mouse_sensitivity, -PI / 2 + 0.05, PI / 2 - 0.05)
@@ -58,7 +61,7 @@ func mode_label() -> String:
 
 
 func _physics_process(delta: float) -> void:
-	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back") if input_enabled else Vector2.ZERO
 	if flying:
 		# Move along the camera's look direction so pitch gives free vertical travel.
 		var dir := (camera.global_transform.basis * Vector3(input.x, 0.0, input.y)).normalized()
