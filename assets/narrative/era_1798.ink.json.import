@@ -1,0 +1,15 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://7g8waqhfve4n"
+path="res://.godot/imported/era_1798.ink.json-c28706d0ab899eab7b0b293b2d6ec9ff.res"
+
+[deps]
+
+source_file="res://assets/narrative/era_1798.ink.json"
+dest_files=["res://.godot/imported/era_1798.ink.json-c28706d0ab899eab7b0b293b2d6ec9ff.res"]
+
+[params]
+
+compress=true

@@ -3,6 +3,7 @@
 #
 # Conventions in the .ink files:
 #   - Lines are Estonian; an English version rides in a tag:  Tere! # en: Hello!
+#   - Choice text carries both, split by %%:  * [Tere. %% Hello.]
 #   - EXTERNAL functions available to ink:
 #       flag(name)          -> bool   TimelineState flag
 #       has_item(id)        -> bool   in inventory (artifact or era-local)
@@ -11,6 +12,8 @@
 #       set_flag(name)                set a plain (non-consequence) flag
 #       end_chapter()
 #       chapter()           -> int
+#       trigger(cp_id)      -> bool   fire a consequence point that is a choice, not a delivery
+#   Tags: '# me' marks a line spoken by the player; '# speaker: KEY' overrides the speaker.
 extends Node
 
 signal line(text: String, speaker: String, tags: Array)
@@ -25,6 +28,7 @@ var _active_era: String = ""
 var _pending_states: Dictionary = {}   # era_id -> json state loaded from a save
 var _factory = preload("res://addons/inkgd/ink_player_factory.gd")
 var _externals := Externals.new()
+var default_speaker := ""         # translation key of who is talking unless a line says otherwise
 
 
 ## Functions callable from ink via EXTERNAL declarations.
@@ -44,6 +48,8 @@ class Externals:
 		GameState.end_chapter()
 	func chapter() -> int:
 		return GameState.chapter
+	func trigger(cp_id) -> bool:
+		return GameState.trigger_consequence(str(cp_id))
 
 
 func _ready() -> void:
@@ -80,7 +86,7 @@ func _player_for(era_id: String) -> Node:
 
 
 func _bind_externals(player: Node) -> void:
-	for fn in ["flag", "has_item", "give_item", "take_item", "set_flag", "end_chapter", "chapter"]:
+	for fn in ["flag", "has_item", "give_item", "take_item", "set_flag", "end_chapter", "chapter", "trigger"]:
 		player.bind_external_function(fn, _externals, fn, fn in ["flag", "has_item", "chapter"])
 
 
@@ -119,7 +125,7 @@ func _advance() -> void:
 	if _active.has_choices:
 		var opts := []
 		for c in _active.current_choices:
-			opts.append({"index": c.index, "text": _localise(c.text, c.tags if "tags" in c else [])})
+			opts.append({"index": c.index, "text": _localise_choice(c.text)})
 		choices.emit(opts)
 	else:
 		ended.emit()
@@ -137,12 +143,22 @@ func _localise(text: String, tags: Array) -> String:
 	return text
 
 
+## Choice text carries both languages: "Eesti tekst %% English text".
+func _localise_choice(text: String) -> String:
+	var parts := text.split("%%")
+	if parts.size() < 2:
+		return text
+	return parts[0].strip_edges() if TranslationServer.get_locale().begins_with("et") else parts[1].strip_edges()
+
+
 func _speaker_from(tags: Array) -> String:
 	for t in tags:
 		var s := str(t).strip_edges()
+		if s == "me":
+			return ""
 		if s.begins_with("speaker:"):
 			return s.substr(8).strip_edges()
-	return ""
+	return default_speaker
 
 
 func to_dict() -> Dictionary:
