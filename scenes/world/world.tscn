@@ -26,7 +26,7 @@ collision_radius = 64
 script = ExtResource("4_sky3d")
 
 [node name="Player" parent="." instance=ExtResource("5_player")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 600, 110, 415)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 600, 110, 415)
 
 [node name="EraLayers" type="Node3D" parent="."]
 

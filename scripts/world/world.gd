@@ -17,7 +17,7 @@ var _screenshot_path := ""
 var _screenshot_frame := 240
 var _frames := 0
 var _era_nodes: Dictionary = {}     # era_id -> EraController
-var _spawn := Vector3(600, 0, 415)  # by the ruin, 2026 prologue start
+var _spawn := Vector3(508, 0, 513)  # north of the ruin, 2026 prologue start (data/site_layout.json spawn_2026)
 
 
 func _ready() -> void:
@@ -34,6 +34,7 @@ func _ready() -> void:
 	if not GameState.current_era:
 		# New game: prologue in 2026.
 		player.global_position = _spawn
+		player.rotation.y = PI   # face south, toward the ruin
 		_snap(player, 1.0)
 		await GameState.switch_era("era_2026")
 	var tw := create_tween()
@@ -58,6 +59,8 @@ func _ready() -> void:
 
 
 func _process(_delta: float) -> void:
+	if sky and sky.tod:
+		Farming.tick_clock(sky.tod.current_time)
 	if _screenshot_path.is_empty():
 		return
 	_frames += 1

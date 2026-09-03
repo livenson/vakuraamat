@@ -24,6 +24,8 @@ Inventory="*res://scripts/autoload/inventory.gd"
 Journal="*res://scripts/autoload/journal.gd"
 Narrative="*res://scripts/autoload/narrative.gd"
 GameState="*res://scripts/autoload/game_state.gd"
+Farming="*res://scripts/farming/farming.gd"
+Hunting="*res://scripts/hunting/hunting.gd"
 
 [display]
 

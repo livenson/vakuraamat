@@ -8,7 +8,25 @@ Design and plan: `vakuraamat-implementation-plan.md` (phases, architecture rules
 `vakuraamat-maaamet-data-pipeline.md` (data sources). This README covers what exists
 in the repo right now.
 
-## Status: Phase 0 technical spike
+## Status: Phase 1 vertical slice playable
+
+The time-travel core loop is in: three eras of the Palupera square, the register as the
+era switch, five consequence points with visible changes, four artifacts, six NPCs in
+Estonian and English, the journal (ledger, blended era maps, codex), chapter commit
+points, save/continue and three endings. Content follows `vakuraamat-first-iteration-design.md`.
+
+Run the game: `godot --path .` (main menu). Headless checks:
+
+```sh
+godot --headless --path . res://tools/godot/boot_test.tscn          # autoloads, data, ink, save
+godot --headless --path . res://tools/godot/playthrough_test.tscn   # whole slice, all 5 consequences
+```
+
+Narrative: `assets/narrative/era_*.ink` (Estonian lines with `# en:` tags, choices as
+`[et %% en]`), compiled with `cd tools/ink && npm install && npm run compile`. Strings:
+`assets/i18n/strings.csv`. Press L in game to switch language.
+
+## Phase 0 technical spike (kept for reference)
 
 One walkable 1 km² of real terrain centred on Palupera village and manor (map sheet 54432,
 NW corner EPSG:3301 637036/6444541, 84 to 107 m), the 25 cm
@@ -38,7 +56,7 @@ the editor). Terrain3D's macOS binaries are unsigned; if Gatekeeper blocks them 
 ## Run
 
 ```sh
-/Applications/Godot.app/Contents/MacOS/Godot --path .        # play the spike scene
+/Applications/Godot.app/Contents/MacOS/Godot --path . res://scenes/spike/spike.tscn   # Phase 0 spike scene
 tools/verify_spike.sh                                       # windowed run, screenshot + avg FPS, quits
 ```
 

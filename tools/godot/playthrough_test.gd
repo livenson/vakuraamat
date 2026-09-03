@@ -9,11 +9,14 @@ var lines: Array = []
 var choices: Array = []
 
 
+var _failed := false
+
+
 func _check(cond: bool, msg: String) -> void:
-	if not cond:
+	if not cond and not _failed:
+		_failed = true
 		print("[play] FAILED: ", msg)
 		get_tree().quit(1)
-		await get_tree().process_frame
 
 
 func _ready() -> void:
@@ -153,5 +156,6 @@ func _run() -> void:
 	print("[play] save/load ok. Sample lines:")
 	for l in lines.slice(0, 4):
 		print("   ", l)
-	print("[play] PASSED")
+	if not _failed:
+		print("[play] PASSED")
 	get_tree().quit()
