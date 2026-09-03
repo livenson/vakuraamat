@@ -118,3 +118,48 @@ CODEX_WORDS_TITLE,Sõnad,Words
 CODEX_WORDS,"vakuraamat – mõisa register. adramaa – maaüksus, mida haris üks ader. kubjas – mõisa ülevaataja. maarahvas – nii nimetasid eestlased end enne 19. sajandi keskpaika; sõna „eestlane“ polnud 1798. aastal käibel. asundustalu – 1919. aasta maareformiga loodud talu. Kaseoja – kase oja; Birkenbach on sama nimi saksa keeles.","vakuraamat – a manor's register. adramaa – a unit of land, as much as one plough worked. kubjas – the manor's overseer. maarahvas – 'the country people', what Estonians called themselves before the mid-19th century; the word for 'Estonian' was not in use in 1798. asundustalu – a farm created by the 1919 land reform. Kaseoja – 'birch brook'; Birkenbach is the same name in German."
 CODEX_DATA_TITLE,Andmed,Data
 CODEX_DATA,"Kaardiandmed: Maa- ja Ruumiamet 2026 (kõrgusmudel, ortofoto, taimkatte kõrgusmudel, katastrikaart 1930–1944, üheverstane kaart 1894–1922). 1798. aasta pind on Mellini atlase asemel esialgu verstakaart.","Map data: Maa- ja Ruumiamet 2026 (elevation model, orthophoto, canopy height model, cadastral map 1930–1944, one-verst map 1894–1922). The 1798 ground uses the verst map as a stand-in for Mellin's atlas for now."
+FARM_PLOT,Peenar,Plot
+FARM_PLANT,Külva,Sow
+FARM_HARVEST,Lõika,Harvest
+FARM_WAIT,Oota,Wait
+FARM_EMPTY_HINT,Tühi peenar. Seemet pole kotis.,An empty plot. No seed in the bag.
+FARM_EMPTY_READY,Tühi peenar. Kotis on %s.,An empty plot. The bag has %s.
+FARM_READY_TEXT,%s on valmis.,%s is ready.
+FARM_GROWING_TEXT,"%s kasvab, %d%%.","%s is growing, %d%%."
+FARM_PLANTED,Külvatud: %s.,Sown: %s.
+FARM_HARVESTED,Lõigatud: %d × %s.,Harvested: %d × %s.
+FARM_SEED_BIN,Seemnesalv,Seed bin
+FARM_SEED_BIN_TEXT,Seemnekotid. Võta üks korraga; keegi ei loe.,Seed sacks. Take one at a time; nobody's counting.
+CROP_RYE,Rukis,Rye
+CROP_OATS,Kaer,Oats
+CROP_POTATO,Kartul,Potato
+CROP_CABBAGE,Kapsas,Cabbage
+ITEM_SEED_RYE,Rukkiseeme,Rye seed
+ITEM_SEED_RYE_DESC,Kotike. Eelmise aasta oma.,A small sack. Last year's.
+ITEM_SEED_OATS,Kaeraseeme,Oat seed
+ITEM_SEED_OATS_DESC,"Hobustele ja inimestele, selles järjekorras.","For horses and people, in that order."
+ITEM_SEED_POTATO,Seemnekartul,Seed potato
+ITEM_SEED_POTATO_DESC,Idud juba väljas.,Already sprouting.
+ITEM_SEED_CABBAGE,Kapsaseeme,Cabbage seed
+ITEM_SEED_CABBAGE_DESC,"Paberkotis, poe oma.","In a paper packet, from the shop."
+ITEM_RYE,Rukis,Rye
+ITEM_RYE_DESC,Vihk. Leib on selle sees kuskil.,A sheaf. Bread is in there somewhere.
+ITEM_OATS,Kaer,Oats
+ITEM_OATS_DESC,Vihk kaeru.,A sheaf of oats.
+ITEM_POTATOES,Kartulid,Potatoes
+ITEM_POTATOES_DESC,"Korv kartuleid, muld küljes.","A basket of potatoes, soil still on them."
+ITEM_CABBAGE,Kapsas,Cabbage
+ITEM_CABBAGE_DESC,Kaks pead. Rasked.,Two heads. Heavy.
+HUNT_PROMPT,Küti,Hunt
+HUNT_HINT,"%s. Õnnestumine umbes %d%%. Ligemale, aeglaselt.","%s. About %d%% chance. Closer, slowly."
+HUNT_SUCCESS,Saak: %s.,Taken: %s.
+HUNT_MISS,%s pääses.,The %s got away.
+ANIMAL_HARE,Jänes,Hare
+ANIMAL_ROE_DEER,Metskits,Roe deer
+ANIMAL_BLACK_GROUSE,Tedr,Black grouse
+ITEM_HARE_MEAT,Jänes,Hare
+ITEM_HARE_MEAT_DESC,Üks jänes. Kubjas ei tohi teada.,One hare. The steward must not know.
+ITEM_VENISON,Kitseliha,Venison
+ITEM_VENISON_DESC,"Metskitse liha, riidesse mässitud.","Roe deer meat, wrapped in cloth."
+ITEM_GROUSE,Tedr,Black grouse
+ITEM_GROUSE_DESC,"Must lind, raske kui kivi.","A black bird, heavy as a stone."

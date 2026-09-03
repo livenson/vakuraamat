@@ -50,6 +50,11 @@ func _init() -> void:
 		assets.set_mesh_asset(i, ma)
 		terrain.instancer.clear_by_mesh(i)
 
+	# Keep authored spots (buildings, the oak, the well...) clear: circles from data/site_layout.json.
+	var exclusions: Array = []
+	if FileAccess.file_exists("res://data/site_layout.json"):
+		var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/site_layout.json"))
+		exclusions = layout.get("exclusions", [])
 	var ctrl: Image = terrain.data.control_maps[0]
 	var size := ctrl.get_width()
 	var canopy: Image = null
@@ -65,6 +70,13 @@ func _init() -> void:
 	for y in size:
 		for x in size:
 			var id := Terrain3DUtil.get_base(Terrain3DUtil.as_uint(ctrl.get_pixel(x, y).r))
+			var excluded := false
+			for e in exclusions:
+				if Vector2(x, y).distance_to(Vector2(e[0], e[1])) < float(e[2]):
+					excluded = true
+					break
+			if excluded:
+				continue
 			var h: float = canopy.get_pixel(x, y).r if canopy else -1.0
 			for i in RULES.size():
 				var r: Dictionary = RULES[i]

@@ -7,10 +7,7 @@ const GOLD := Color(0.85, 0.68, 0.25)
 const PAPER := Color(0.93, 0.88, 0.76)
 const INK := Color(0.16, 0.12, 0.08)
 const MAP_ORDER := ["era_1798", "era_1938", "era_2026"]
-const LOCATIONS := {   # tile metres -> journal map markers
-	"LOC_OAK": Vector2(560, 520), "LOC_MANOR": Vector2(600, 450), "LOC_ORCHARD": Vector2(585, 490),
-	"LOC_FARMSTEAD": Vector2(545, 615), "LOC_WELL": Vector2(552, 570), "LOC_NORTH_FIELD": Vector2(600, 320),
-}
+var LOCATIONS := {}   # LOC_* -> tile metres, from data/site_layout.json (journal map markers)
 
 var world: Node3D
 var player: CharacterBody3D
@@ -44,6 +41,10 @@ var _open_panel: Control = null
 
 
 func _ready() -> void:
+	var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/site_layout.json"))
+	for pair in [["LOC_OAK", "oak"], ["LOC_MANOR", "manor"], ["LOC_ORCHARD", "orchard"], ["LOC_FARMSTEAD", "farm"], ["LOC_WELL", "well"], ["LOC_NORTH_FIELD", "field"]]:
+		var v: Array = layout[pair[1]]
+		LOCATIONS[pair[0]] = Vector2(v[0], v[1])
 	world = get_parent()
 	player = world.get_node("Player")
 	interactor = player.get_node("Camera3D/Interactor")
@@ -75,29 +76,29 @@ func _process(_delta: float) -> void:
 # ---------------------------------------------------------------- building
 func _build_hud() -> void:
 	hud = Control.new()
-	hud.set_anchors_preset(Control.PRESET_FULL_RECT)
+	hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(hud)
 	era_label = _label(hud, 20)
 	era_label.position = Vector2(16, 12)
 	keys_label = _label(hud, 14)
-	keys_label.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
-	keys_label.position = Vector2(16, -36)
+	keys_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, 16)
+	keys_label.grow_vertical = Control.GROW_DIRECTION_BEGIN
 	keys_label.text = tr("UI_KEYS")
 	hover_label = _label(hud, 18)
-	hover_label.set_anchors_preset(Control.PRESET_CENTER)
+	hover_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	hover_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hover_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	hover_label.custom_minimum_size = Vector2(620, 0)
 	hover_label.position = Vector2(-310, 40)
 	prompt_label = _label(hud, 18)
-	prompt_label.set_anchors_preset(Control.PRESET_CENTER)
+	prompt_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	prompt_label.custom_minimum_size = Vector2(400, 0)
 	prompt_label.position = Vector2(-200, 120)
 	prompt_label.add_theme_color_override("font_color", GOLD)
 	notice_label = _label(hud, 20)
-	notice_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	notice_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
 	notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	notice_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	notice_label.custom_minimum_size = Vector2(760, 0)
@@ -105,7 +106,7 @@ func _build_hud() -> void:
 	notice_label.modulate.a = 0.0
 	# crosshair
 	var dot := ColorRect.new()
-	dot.set_anchors_preset(Control.PRESET_CENTER)
+	dot.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	dot.size = Vector2(4, 4)
 	dot.position = Vector2(-2, -2)
 	dot.color = Color(1, 1, 1, 0.6)

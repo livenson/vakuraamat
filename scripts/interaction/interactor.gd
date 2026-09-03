@@ -11,7 +11,7 @@ var blocked := false
 
 func _ready() -> void:
 	enabled = true
-	target_position = Vector3(0, 0, -3.5)
+	target_position = Vector3(0, 0, -4.5)
 	collision_mask = 2
 	collide_with_areas = true
 

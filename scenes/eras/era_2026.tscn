@@ -1,14 +1,17 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://scripts/interaction/conditional.gd" id="1"]
-[ext_resource type="PackedScene" path="res://assets/vegetation/tree_juniper.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/props/oak.glb" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/props/examine_point.tscn" id="3"]
 [ext_resource type="Script" path="res://scripts/interaction/register_pickup.gd" id="4"]
-[ext_resource type="PackedScene" path="res://assets/vegetation/bush_jello.tscn" id="5"]
-[ext_resource type="PackedScene" path="res://assets/models/props/boundary_stone.glb" id="6"]
-[ext_resource type="PackedScene" path="res://scenes/npc/npc.tscn" id="7"]
-[ext_resource type="PackedScene" path="res://scenes/props/pickup.tscn" id="8"]
-[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="9"]
+[ext_resource type="PackedScene" path="res://assets/vegetation/tree_juniper.tscn" id="5"]
+[ext_resource type="PackedScene" path="res://assets/vegetation/bush_jello.tscn" id="6"]
+[ext_resource type="PackedScene" path="res://assets/models/props/boundary_stone.glb" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/npc/npc.tscn" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/props/pickup.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/farming/farm_plot.tscn" id="10"]
+[ext_resource type="Script" path="res://scripts/farming/seed_bin.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="12"]
 
 [sub_resource type="StandardMaterial3D" id="M1"]
 albedo_color = Color(0.550, 0.530, 0.500, 1)
@@ -45,16 +48,23 @@ roughness = 0.9
 albedo_color = Color(0.550, 0.530, 0.500, 1)
 roughness = 0.9
 
+[sub_resource type="BoxShape3D" id="SB_era_2026"]
+size = Vector3(1.4, 1.2, 1.0)
+
+[sub_resource type="StandardMaterial3D" id="M11"]
+albedo_color = Color(0.300, 0.220, 0.140, 1)
+roughness = 0.9
+
 [node name="era_2026" type="Node3D"]
-script = ExtResource("9")
+script = ExtResource("12")
 era_id = "era_2026"
 
 [node name="Oak" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 560, 0, 520)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 422, 0, 534)
 script = ExtResource("1")
 
 [node name="OakTree" parent="Oak" instance=ExtResource("2")]
-transform = Transform3D(2.1416, 0, 1.8038, 0, 2.8, 0, -1.8038, 0, 2.1416, 0, 0, 0)
+transform = Transform3D(0.760, 0, 0.640, 0, 1.0, 0, -0.640, 0, 0.760, 0, 0, 0)
 
 [node name="OakExamine" parent="Oak" instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 1.5)
@@ -63,37 +73,37 @@ location_id = "LOC_OAK"
 label_key = "LOC_OAK"
 
 [node name="Ruin" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 600, 0, 450)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 508, 0, 545)
 script = ExtResource("1")
 
 [node name="Wall0" type="CSGBox3D" parent="Ruin"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 1.2, -5.5)
-size = Vector3(22, 2.4, 0.6)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 1.2, -16.0)
+size = Vector3(24, 2.4, 0.6)
 material = SubResource("M1")
 
 [node name="Wall1" type="CSGBox3D" parent="Ruin"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 0.8, 5.5)
-size = Vector3(22, 1.6, 0.6)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 0.8, 16.0)
+size = Vector3(24, 1.6, 0.6)
 material = SubResource("M2")
 
 [node name="Wall2" type="CSGBox3D" parent="Ruin"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, -11, 1.4, 0)
-size = Vector3(0.6, 2.8, 11)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, -12.0, 1.4, 0)
+size = Vector3(0.6, 2.8, 32)
 material = SubResource("M3")
 
 [node name="Wall3" type="CSGBox3D" parent="Ruin"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 11, 0.6, -2.5)
-size = Vector3(0.6, 1.2, 6)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 12.0, 0.6, -7.04)
+size = Vector3(0.6, 1.2, 17.6)
 material = SubResource("M4")
 
 [node name="RuinExamine" parent="Ruin" instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -19.0)
 text_key = "EX_MANOR_2026"
 location_id = "LOC_MANOR"
 label_key = "LOC_MANOR"
 
 [node name="RegisterBook" type="Node3D" parent="Ruin"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, 1)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -12.0)
 script = ExtResource("4")
 
 [node name="BookMesh" type="CSGBox3D" parent="Ruin/RegisterBook"]
@@ -115,27 +125,27 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 shape = SubResource("S1")
 
 [node name="OrchardKept" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 573, 0, 490)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 469, 0, 541)
 script = ExtResource("1")
 flag = "cellar_opened"
 visible_when = true
 
-[node name="Apple0" parent="OrchardKept" instance=ExtResource("2")]
+[node name="Apple0" parent="OrchardKept" instance=ExtResource("5")]
 transform = Transform3D(0.5500, 0, 0.0000, 0, 0.55, 0, -0.0000, 0, 0.5500, 0.0, 0, 0)
 
-[node name="Apple1" parent="OrchardKept" instance=ExtResource("2")]
+[node name="Apple1" parent="OrchardKept" instance=ExtResource("5")]
 transform = Transform3D(0.2948, 0, 0.5793, 0, 0.65, 0, -0.5793, 0, 0.2948, 4.5, 0, 0)
 
-[node name="Apple2" parent="OrchardKept" instance=ExtResource("2")]
+[node name="Apple2" parent="OrchardKept" instance=ExtResource("5")]
 transform = Transform3D(-0.4414, 0, 0.6064, 0, 0.75, 0, -0.6064, 0, -0.4414, 9.0, 0, 0)
 
-[node name="Apple3" parent="OrchardKept" instance=ExtResource("2")]
+[node name="Apple3" parent="OrchardKept" instance=ExtResource("5")]
 transform = Transform3D(-0.5431, 0, -0.0868, 0, 0.55, 0, 0.0868, 0, -0.5431, 13.5, 0, 0)
 
-[node name="Apple4" parent="OrchardKept" instance=ExtResource("2")]
+[node name="Apple4" parent="OrchardKept" instance=ExtResource("5")]
 transform = Transform3D(-0.1998, 0, -0.6185, 0, 0.65, 0, 0.6185, 0, -0.1998, 18.0, 0, 0)
 
-[node name="Apple5" parent="OrchardKept" instance=ExtResource("2")]
+[node name="Apple5" parent="OrchardKept" instance=ExtResource("5")]
 transform = Transform3D(0.5315, 0, -0.5292, 0, 0.75, 0, 0.5292, 0, 0.5315, 22.5, 0, 0)
 
 [node name="OrchardExamine" parent="OrchardKept" instance=ExtResource("3")]
@@ -145,21 +155,21 @@ location_id = "LOC_ORCHARD"
 label_key = "LOC_ORCHARD"
 
 [node name="OrchardScrub" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 573, 0, 490)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 469, 0, 541)
 script = ExtResource("1")
 flag = "cellar_opened"
 visible_when = false
 
-[node name="Scrub0" parent="OrchardScrub" instance=ExtResource("5")]
+[node name="Scrub0" parent="OrchardScrub" instance=ExtResource("6")]
 transform = Transform3D(1.3000, 0, 0.0000, 0, 1.3, 0, -0.0000, 0, 1.3000, 2, 0, 1.5)
 
-[node name="Scrub1" parent="OrchardScrub" instance=ExtResource("5")]
+[node name="Scrub1" parent="OrchardScrub" instance=ExtResource("6")]
 transform = Transform3D(0.8081, 0, 1.0183, 0, 1.3, 0, -1.0183, 0, 0.8081, 8, 0, 1.5)
 
-[node name="Scrub2" parent="OrchardScrub" instance=ExtResource("5")]
+[node name="Scrub2" parent="OrchardScrub" instance=ExtResource("6")]
 transform = Transform3D(-0.2954, 0, 1.2660, 0, 1.3, 0, -1.2660, 0, -0.2954, 14, 0, 1.5)
 
-[node name="Scrub3" parent="OrchardScrub" instance=ExtResource("5")]
+[node name="Scrub3" parent="OrchardScrub" instance=ExtResource("6")]
 transform = Transform3D(-1.1753, 0, 0.5556, 0, 1.3, 0, -0.5556, 0, -1.1753, 20, 0, 1.5)
 
 [node name="ScrubExamine" parent="OrchardScrub" instance=ExtResource("3")]
@@ -169,7 +179,7 @@ location_id = "LOC_ORCHARD"
 label_key = "LOC_ORCHARD"
 
 [node name="Farm" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 545, 0, 615)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 358, 0, 551)
 script = ExtResource("1")
 
 [node name="Foundation" type="CSGBox3D" parent="Farm"]
@@ -184,7 +194,7 @@ location_id = "LOC_FARMSTEAD"
 label_key = "LOC_FARMSTEAD"
 
 [node name="WellRing" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 552, 0, 570)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 390, 0, 542)
 script = ExtResource("1")
 flag = "well_kept_open"
 visible_when = true
@@ -204,7 +214,7 @@ location_id = "LOC_WELL"
 label_key = "LOC_WELL"
 
 [node name="WellDip" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 552, 0, 570)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 390, 0, 542)
 script = ExtResource("1")
 flag = "well_kept_open"
 visible_when = false
@@ -221,7 +231,7 @@ script = ExtResource("1")
 flag = "family_recorded_1798"
 visible_when = true
 
-[node name="BoundaryStone" parent="StoneKept" instance=ExtResource("6")]
+[node name="BoundaryStone" parent="StoneKept" instance=ExtResource("7")]
 transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, 0, 0, 0)
 
 [node name="StoneExamine" parent="StoneKept" instance=ExtResource("3")]
@@ -247,112 +257,112 @@ script = ExtResource("1")
 flag = "north_field_ploughed"
 visible_when = false
 
-[node name="Young0" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young0" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.6179, 0, 0.0513, 0, 0.62, 0, -0.0513, 0, 0.6179, -34.7, 0, 4.4)
 
-[node name="Young1" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young1" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.2065, 0, -0.4444, 0, 0.49, 0, 0.4444, 0, -0.2065, 6.7, 0, 9.7)
 
-[node name="Young2" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young2" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.4462, 0, 0.1120, 0, 0.46, 0, -0.1120, 0, -0.4462, -28.4, 0, 4.2)
 
-[node name="Young3" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young3" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.3074, 0, -0.2060, 0, 0.37, 0, 0.2060, 0, 0.3074, -41.4, 0, -3.9)
 
-[node name="Young4" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young4" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.3863, 0, 0.3915, 0, 0.55, 0, -0.3915, 0, -0.3863, -0.4, 0, -20.4)
 
-[node name="Young5" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young5" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.0837, 0, -0.6244, 0, 0.63, 0, 0.6244, 0, 0.0837, -6.2, 0, 41.3)
 
-[node name="Young6" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young6" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.5775, 0, 0.2256, 0, 0.62, 0, -0.2256, 0, -0.5775, -30.7, 0, -19.9)
 
-[node name="Young7" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young7" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.3998, 0, -0.0122, 0, 0.4, 0, 0.0122, 0, -0.3998, -42.9, 0, 0.4)
 
-[node name="Young8" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young8" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.1733, 0, -0.5849, 0, 0.61, 0, 0.5849, 0, 0.1733, -3.2, 0, -33.6)
 
-[node name="Young9" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young9" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.2524, 0, 0.4660, 0, 0.53, 0, -0.4660, 0, 0.2524, -1.2, 0, 30.4)
 
-[node name="Young10" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young10" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.0472, 0, 0.6082, 0, 0.61, 0, -0.6082, 0, 0.0472, -5.8, 0, 13.2)
 
-[node name="Young11" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young11" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.3805, 0, 0.2759, 0, 0.47, 0, -0.2759, 0, 0.3805, 7.6, 0, -35.8)
 
-[node name="Young12" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young12" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.1082, 0, -0.4984, 0, 0.51, 0, 0.4984, 0, -0.1082, -30.4, 0, 13.6)
 
-[node name="Young13" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young13" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.0412, 0, -0.6387, 0, 0.64, 0, 0.6387, 0, 0.0412, 27.5, 0, -30.6)
 
-[node name="Young14" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young14" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.0114, 0, 0.4399, 0, 0.44, 0, -0.4399, 0, -0.0114, -31.7, 0, 13.0)
 
-[node name="Young15" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young15" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.3449, 0, 0.0594, 0, 0.35, 0, -0.0594, 0, -0.3449, 40.1, 0, 7.7)
 
-[node name="Young16" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young16" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.1965, 0, -0.4922, 0, 0.53, 0, 0.4922, 0, -0.1965, -27.5, 0, 26.7)
 
-[node name="Young17" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young17" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.3590, 0, 0.0274, 0, 0.36, 0, -0.0274, 0, -0.3590, -25.8, 0, -27.7)
 
-[node name="Young18" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young18" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.5693, 0, 0.1108, 0, 0.58, 0, -0.1108, 0, 0.5693, 8.1, 0, -35.7)
 
-[node name="Young19" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young19" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.0958, 0, 0.6328, 0, 0.64, 0, -0.6328, 0, 0.0958, 26.1, 0, 21.0)
 
-[node name="Young20" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young20" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.5931, 0, -0.2125, 0, 0.63, 0, 0.2125, 0, 0.5931, -3.9, 0, -31.0)
 
-[node name="Young21" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young21" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.3491, 0, 0.1738, 0, 0.39, 0, -0.1738, 0, 0.3491, 21.0, 0, 31.2)
 
-[node name="Young22" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young22" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.3776, 0, 0.1319, 0, 0.4, 0, -0.1319, 0, -0.3776, -37.0, 0, -18.5)
 
-[node name="Young23" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young23" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.3814, 0, 0.4370, 0, 0.58, 0, -0.4370, 0, -0.3814, 17.8, 0, -28.2)
 
-[node name="Young24" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young24" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.0028, 0, 0.5900, 0, 0.59, 0, -0.5900, 0, 0.0028, -30.4, 0, -29.2)
 
-[node name="Young25" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young25" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.2684, 0, -0.5254, 0, 0.59, 0, 0.5254, 0, -0.2684, 40.4, 0, -16.2)
 
-[node name="Young26" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young26" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.0824, 0, -0.3607, 0, 0.37, 0, 0.3607, 0, 0.0824, -32.3, 0, -20.8)
 
-[node name="Young27" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young27" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.2249, 0, 0.4466, 0, 0.5, 0, -0.4466, 0, 0.2249, 34.4, 0, -7.4)
 
-[node name="Young28" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young28" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.4921, 0, 0.0887, 0, 0.5, 0, -0.0887, 0, -0.4921, 37.4, 0, 8.3)
 
-[node name="Young29" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young29" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.4328, 0, -0.4439, 0, 0.62, 0, 0.4439, 0, -0.4328, -28.5, 0, 3.6)
 
-[node name="Young30" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young30" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.6399, 0, -0.1141, 0, 0.65, 0, 0.1141, 0, 0.6399, 5.2, 0, -20.7)
 
-[node name="Young31" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young31" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.1406, 0, 0.3422, 0, 0.37, 0, -0.3422, 0, 0.1406, -37.3, 0, 7.7)
 
-[node name="Young32" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young32" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.3504, 0, 0.1471, 0, 0.38, 0, -0.1471, 0, -0.3504, -42.1, 0, -15.6)
 
-[node name="Young33" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young33" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.0498, 0, -0.5277, 0, 0.53, 0, 0.5277, 0, 0.0498, -4.4, 0, -8.0)
 
-[node name="Young34" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young34" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(-0.2508, 0, -0.3736, 0, 0.45, 0, 0.3736, 0, -0.2508, 12.1, 0, 18.5)
 
-[node name="Young35" parent="FieldForest" instance=ExtResource("2")]
+[node name="Young35" parent="FieldForest" instance=ExtResource("5")]
 transform = Transform3D(0.6300, 0, 0.0060, 0, 0.63, 0, -0.0060, 0, 0.6300, 33.9, 0, 25.2)
 
 [node name="ForestExamine" parent="FieldForest" instance=ExtResource("3")]
@@ -361,16 +371,49 @@ text_key = "EX_FIELD_FOREST_2026"
 location_id = "LOC_NORTH_FIELD"
 label_key = "LOC_NORTH_FIELD"
 
-[node name="Leida" parent="." instance=ExtResource("7")]
-transform = Transform3D(-0.7374, 0, 0.6755, 0, 1, 0, -0.6755, 0, -0.7374, 556, 0, 526)
+[node name="Leida" parent="." instance=ExtResource("8")]
+transform = Transform3D(-0.7374, 0, 0.6755, 0, 1, 0, -0.6755, 0, -0.7374, 418, 0, 540)
 npc_id = "npc_leida"
 knot = "leida"
 label_key = "NPC_LEIDA"
 body_color = Color(0.450, 0.500, 0.620, 1)
 height = 1.55
 
-[node name="RustedTool" parent="." instance=ExtResource("8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 563, 0, 522)
+[node name="RustedTool" parent="." instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 425, 0, 536)
 item_id = "rusted_tool"
 era_id = "era_2026"
 examine_key = "EX_RUSTED_TOOL"
+
+[node name="Farming" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 360, 0, 565)
+script = ExtResource("1")
+
+[node name="Plot0" parent="Farming" instance=ExtResource("10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0)
+plot_id = "plot0"
+era_id = "era_2026"
+
+[node name="Plot1" parent="Farming" instance=ExtResource("10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 0)
+plot_id = "plot1"
+era_id = "era_2026"
+
+[node name="SeedBin" type="Node3D" parent="Farming"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, 0)
+script = ExtResource("11")
+era_id = "era_2026"
+seed_item_ids = Array[String](["seed_potato", "seed_cabbage"])
+
+[node name="Bin" type="CSGBox3D" parent="Farming/SeedBin"]
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 0.45, 0)
+size = Vector3(1.2, 0.9, 0.8)
+material = SubResource("M11")
+
+[node name="Body3D" type="StaticBody3D" parent="Farming/SeedBin"]
+collision_layer = 2
+collision_mask = 0
+
+[node name="Shape" type="CollisionShape3D" parent="Farming/SeedBin/Body3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
+shape = SubResource("SB_era_2026")
