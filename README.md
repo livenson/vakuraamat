@@ -8,19 +8,35 @@ Design and plan: `vakuraamat-implementation-plan.md` (phases, architecture rules
 `vakuraamat-maaamet-data-pipeline.md` (data sources). This README covers what exists
 in the repo right now.
 
-## Status: Phase 1 vertical slice playable
+## Status: all five phases playable
 
-The time-travel core loop is in: three eras of the Palupera square, the register as the
-era switch, five consequence points with visible changes, four artifacts, six NPCs in
-Estonian and English, the journal (ledger, blended era maps, codex), chapter commit
-points, save/continue and three endings. Content follows `vakuraamat-first-iteration-design.md`.
+- **Phase 1, the slice:** three eras of the Palupera square, the register as the era
+  switch, five consequence points with visible changes, four artifacts, six NPCs in
+  Estonian and English, the journal (ledger, blended era maps, codex), chapter commit
+  points, save/continue and three endings. Content follows `vakuraamat-first-iteration-design.md`.
+- **Phase 2, farming:** plots and seed bins in 1938 and 2026; four crops grow on the
+  shared day clock; harvests are era-local.
+- **Phase 3, hunting:** hare, roe deer and black grouse spawn on their land-cover class
+  (from the orthophoto + nDSM control map) in 1798 and 1938, flee, and can be taken.
+- **Phase 4, trading:** one post per era (manor granary, dairy cooperative shop, village
+  shop) with era-scoped goods and money (kopecks, cents, cents). Nothing crosses eras.
+- **Phase 5, base building:** two manors on real cadastral units (Kaseoja farm on
+  58201:002:0026, the manor park on 58201:001:0228), five structures with material and
+  money costs and prerequisites; the park unlocks from a consequence flag.
 
-Run the game: `godot --path .` (main menu). Headless checks:
+Farming, hunting, trading and building never reference the timeline, consequence or
+artifact systems; the tests check that by grepping the source.
+
+Run the game: `godot --path .` (main menu). Controls: WASD, E interact, Tab register,
+J journal, I bag, L language, Esc. Headless checks:
 
 ```sh
-godot --headless --path . res://tools/godot/boot_test.tscn          # autoloads, data, ink, save
-godot --headless --path . res://tools/godot/playthrough_test.tscn   # whole slice, all 5 consequences
+for t in boot_test playthrough_test farming_test hunting_test economy_test; do
+  godot --headless --path . res://tools/godot/$t.tscn; done
 ```
+
+Site layout lives in `data/site_layout.json` (positions found from the cadastral parcel
+and the nDSM building footprint); `tools/gen_era_scenes.py` regenerates the era scenes.
 
 Narrative: `assets/narrative/era_*.ink` (Estonian lines with `# en:` tags, choices as
 `[et %% en]`), compiled with `cd tools/ink && npm install && npm run compile`. Strings:

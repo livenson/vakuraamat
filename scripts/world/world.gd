@@ -32,7 +32,8 @@ func _ready() -> void:
 		GameState.pending_load = false
 		await SaveManager.load_slot()
 	if not GameState.current_era:
-		# New game: prologue in 2026.
+		# New game (or the scene run directly): fresh state, prologue in 2026.
+		GameState.reset()
 		player.global_position = _spawn
 		player.rotation.y = PI   # face south, toward the ruin
 		_snap(player, 1.0)

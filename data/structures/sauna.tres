@@ -1,0 +1,15 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/base_building/structure_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "sauna"
+display_name_key = "STRUCT_SAUNA"
+description_key = "STRUCT_SAUNA_DESC"
+cost_items = {"timber": 1, "nails": 1}
+cost_money = 60
+size = Vector3(4, 2.6, 3.5)
+offset = Vector2(-12, -8)
+color = Color(0.35, 0.28, 0.2, 1)
+requires = "storehouse"

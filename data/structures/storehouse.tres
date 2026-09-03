@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/base_building/structure_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "storehouse"
+display_name_key = "STRUCT_STOREHOUSE"
+description_key = "STRUCT_STOREHOUSE_DESC"
+cost_items = {"rye": 4, "timber": 1}
+cost_money = 40
+size = Vector3(5, 3.2, 4)
+offset = Vector2(-12, 6)
+color = Color(0.45, 0.35, 0.22, 1)

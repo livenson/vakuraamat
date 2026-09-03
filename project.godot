@@ -26,6 +26,8 @@ Narrative="*res://scripts/autoload/narrative.gd"
 GameState="*res://scripts/autoload/game_state.gd"
 Farming="*res://scripts/farming/farming.gd"
 Hunting="*res://scripts/hunting/hunting.gd"
+Trading="*res://scripts/trading/trading.gd"
+Manors="*res://scripts/base_building/manors.gd"
 
 [display]
 

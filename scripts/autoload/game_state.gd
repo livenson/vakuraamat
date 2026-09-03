@@ -33,6 +33,8 @@ func reset() -> void:
 	Inventory.local = {}
 	Journal.entries = []
 	Journal.visited = {}
+	Trading.money = {"era_1798": 12, "era_1938": 150, "era_2026": 2000}
+	Manors.built = {}
 
 
 func _ready() -> void:

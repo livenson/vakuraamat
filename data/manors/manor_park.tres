@@ -1,0 +1,13 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/base_building/manor_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "manor_park"
+display_name_key = "MANOR_PARK"
+era_id = "era_1938"
+cadastral_parcel_id = "58201:001:0228"
+position = Vector2(538, 555)
+unlock_condition_flag = "family_recorded_1798"
+structures = Array[String](["dairy_stand", "swing"])

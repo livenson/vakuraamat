@@ -140,6 +140,7 @@ def build_2026():
     s.npc("Leida", ".", "npc_leida", "leida", "NPC_LEIDA", (0.45, 0.5, 0.62), LEIDA[0], LEIDA[1], 1.55, 2.4)
     s.pickup("RustedTool", ".", "rusted_tool", "EX_RUSTED_TOOL", OAK[0] + 3, OAK[1] + 2)
     farm_plots(s, "era_2026", (FARM[0] + 2, FARM[1] + 14), 2, ["seed_potato", "seed_cabbage"])
+    trade_post(s, "era_2026", (MANOR[0] - MW / 2 - 12, MANOR[1] - 10), "POST_2026", (0.85, 0.85, 0.8))
     return s
 
 
@@ -228,7 +229,34 @@ def farm_plots(s, era, origin, n, seeds):
     s.node("Shape", "CollisionShape3D", "Farming/SeedBin/Body3D", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)\nshape = SubResource("SB_{era}")')
 
 
+def trade_post(s, era, pos, key, box_color):
+    """Trading (Phase 4): one post per era, era-local goods and money."""
+    sc = s.ext_res("Script", "res://scripts/trading/trade_post.gd")
+    s.sub.append(f'[sub_resource type="BoxShape3D" id="TP_{era}"]\nsize = Vector3(2.6, 2.4, 2.2)')
+    s.node("TradePost", "Node3D", ".", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {pos[0]}, 0, {pos[1]})\nscript = ExtResource("{sc}")\nera_id = "{era}"\npost_name_key = "{key}"\nintro_key = "{key}_TEXT"')
+    s.box("Stall", "TradePost", (2.4, 1.1, 1.2), 0.55, box_color)
+    s.box("Awning", "TradePost", (2.8, 0.12, 2.0), 2.2, (0.5, 0.45, 0.3), 0, -0.3)
+    s.box("PostA", "TradePost", (0.1, 2.2, 0.1), 1.1, DARKWOOD, -1.3, -1.2)
+    s.box("PostB", "TradePost", (0.1, 2.2, 0.1), 1.1, DARKWOOD, 1.3, -1.2)
+    s.node("Body3D", "StaticBody3D", "TradePost", "collision_layer = 2\ncollision_mask = 0")
+    s.node("Shape", "CollisionShape3D", "TradePost/Body3D", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)\nshape = SubResource("TP_{era}")')
+
+
+def manor_site(s, manor_id, pos):
+    """Base building (Phase 5): a marker post the player builds from."""
+    sc = s.ext_res("Script", "res://scripts/base_building/manor_controller.gd")
+    s.sub.append(f'[sub_resource type="BoxShape3D" id="MS_{manor_id}"]\nsize = Vector3(1.6, 2.4, 1.6)')
+    s.node(f"Manor_{manor_id}", "Node3D", ".", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {pos[0]}, 0, {pos[1]})\nscript = ExtResource("{sc}")\nmanor_id = "{manor_id}"')
+    s.box("Post", f"Manor_{manor_id}", (0.25, 2.0, 0.25), 1.0, DARKWOOD)
+    s.box("Sign", f"Manor_{manor_id}", (1.2, 0.5, 0.08), 1.7, (0.85, 0.8, 0.6))
+    s.node("Body3D", "StaticBody3D", f"Manor_{manor_id}", "collision_layer = 2\ncollision_mask = 0")
+    s.node("Shape", "CollisionShape3D", f"Manor_{manor_id}/Body3D", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)\nshape = SubResource("MS_{manor_id}")')
+
+
 def extras_1938(s):
+    trade_post(s, "era_1938", (FARM[0] + 22, FARM[1] - 4), "POST_1938", (0.7, 0.65, 0.5))
+    manor_site(s, "kaseoja_farm", (FARM[0] + 10, FARM[1] - 8))
+    manor_site(s, "manor_park", (MANOR[0] + 30, MANOR[1] + 10))
     farm_plots(s, "era_1938", (FARM[0] - 6, FARM[1] + 14), 3, ["seed_rye", "seed_oats", "seed_potato"])
     hunting(s, "era_1938", 6)
 
@@ -241,6 +269,7 @@ def hunting(s, era, max_animals=8):
 
 def extras_1798(s):
     hunting(s, "era_1798", 10)
+    trade_post(s, "era_1798", (MANOR[0] + MW / 2 + 8, MANOR[1] - 6), "POST_1798", (0.45, 0.35, 0.22))
 
 
 if __name__ == "__main__":
