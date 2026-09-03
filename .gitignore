@@ -1,0 +1,10 @@
+# Godot
+.godot/
+*.tmp
+export_presets.cfg
+# Raw geodata downloads (regenerate with tools/pipeline/fetch_tile.py)
+data_raw/
+# macOS
+.DS_Store
+# Blender
+*.blend1

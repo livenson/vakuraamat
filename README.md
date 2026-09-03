@@ -1,0 +1,158 @@
+# Vakuraamat
+
+A time-travel farming / hunting / trading game set on real Estonian terrain built from
+Maa-amet (Estonian Land and Spatial Development Board) open data. Godot 4.7, GDScript,
+Terrain3D.
+
+Design and plan: `vakuraamat-implementation-plan.md` (phases, architecture rules) and
+`vakuraamat-maaamet-data-pipeline.md` (data sources). This README covers what exists
+in the repo right now.
+
+## Status: Phase 0 technical spike
+
+One walkable 1 km² of real terrain centred on Palupera village and manor (map sheet 54432,
+NW corner EPSG:3301 637036/6444541, 84 to 107 m), the 25 cm
+orthophoto draped on it at full resolution, a Sky3D day/night cycle with the sun computed for
+Palmse's real latitude/longitude, one Blender-authored prop, a first-person walker and an
+FPS/coordinate HUD.
+No game systems yet, by design. The site follows `vakuraamat-first-iteration-design.md`;
+the earlier Palmse tile is kept in `assets/terrain/palmse/` as a flat-terrain comparison.
+
+## Requirements (macOS)
+
+| Tool | Version used | Install |
+|---|---|---|
+| Godot | 4.7.2 stable | `brew install --cask godot` |
+| Terrain3D | 1.0.2 stable (vendored in `addons/terrain_3d`, MIT) | already in repo |
+| Sky3D | 2.1.0 (vendored in `addons/sky_3d`, MIT, pure GDScript) | already in repo |
+| GDAL | 3.13 | `brew install gdal` |
+| Blender | 5.2 LTS (only to regenerate props) | `brew install --cask blender` |
+| Python 3 | any 3.9+ (stdlib only) | system |
+
+QGIS is not needed: the whole clip/convert step is scripted with GDAL.
+
+First open: run `godot --headless --path . --import` once (or just open the project in
+the editor). Terrain3D's macOS binaries are unsigned; if Gatekeeper blocks them run
+`xattr -dr com.apple.quarantine addons/terrain_3d`.
+
+## Run
+
+```sh
+/Applications/Godot.app/Contents/MacOS/Godot --path .        # play the spike scene
+tools/verify_spike.sh                                       # windowed run, screenshot + avg FPS, quits
+```
+
+WASD move, Shift sprint (9 m/s), Ctrl dash (20 m/s), Space jump, Esc releases the mouse.
+F toggles fly mode, a survey tool with no gravity or collision that moves where you look
+(40 m/s, Shift and Ctrl multiply). T teleports to the point you are looking at (ray-marched
+against the heightfield, so it works across the whole tile), H returns to the spawn point. Sky3D runs a 30-minute day/night cycle with the sun
+computed for the site's real latitude and longitude; the HUD shows the game clock. The HUD shows FPS and the
+player's L-EST97 (EPSG:3301) easting/northing so alignment can be checked against
+Maa-amet's map viewer.
+
+## Terrain pipeline (repeatable, two commands)
+
+```sh
+# 1. Maa-amet -> heightmap.r32 + ortho.jpg + terrain_meta.json  (needs network)
+python3 tools/pipeline/fetch_tile.py --name palupera --center 637548 6444029 --size 1024
+
+# 2. -> Terrain3D region data + assets/material resources     (headless Godot)
+/Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
+    -s res://tools/godot/import_terrain.gd -- --tile=palupera
+```
+
+What step 1 does:
+
+1. Finds the 1:10 000 map sheet for the centre point (downloads Maa-amet's `epk10T` sheet
+   grid once into `data_raw/`).
+2. POSTs the geoportal download form (`andmetyyp=dem_1m_geotiff`, `kaardiruut=<sheet>`)
+   and downloads the 1 m DTM GeoTIFF for that sheet (~74 MB, cached in `data_raw/`).
+3. Clips a `--size` m square with `gdal_translate -projwin`, fills any NoData (water) with
+   `gdal_fillnodata`, and writes a raw float32 heightmap. Raw float is used on purpose:
+   Godot's PNG loader truncates 16-bit to 8-bit and its EXR loader rejects GDAL's channel
+   names.
+4. Fetches the orthophoto for the same bbox from the `fotokaart` WMS (layer `EESTIFOTO`,
+   EPSG:3301, JPEG, max 4096 px per request; 1024 m at 4096 px = 25 cm/px).
+5. Writes `terrain_meta.json` with extent, sheet, height range, source URLs, fetch date and
+   the attribution string.
+
+What step 2 does: loads the raw heightmap as `Image.FORMAT_RF`, resamples the orthophoto
+to one texel per vertex and imports it as the Terrain3D colour map (alpha 0.5 = neutral
+roughness) over a flat white ground texture, then saves `data/terrain3d_00_00.res` and
+`terrain_assets.tres`.
+
+Step 2 also classifies every metre of the orthophoto by colour into one of four detail
+materials (meadow, field, forest floor, gravel; CC0 textures from ambientCG in
+`assets/terrain/textures/`) and writes that into the Terrain3D control map, so the ground
+has tiled detail, normals and roughness up close.
+
+Step 3 (optional): `tools/godot/scatter_vegetation.gd -- --tile=<name>` scatters trees, bushes
+and grass tufts with the Terrain3D instancer according to the same land-cover classes
+(canopy gets trees, meadow and field get grass) and saves them into the region file. The
+models come from the Forest Vegetation sample pack (MIT, Renard Noir, vendored under
+`assets/vendor/forest_vegetation`, prepared by `tools/godot/prepare_vegetation.gd`).
+
+The 1 texel/m colour map is only a fallback. The real drape is `assets/terrain/ortho_drape.gdshader`,
+Terrain3D's "lightweight" example shader plus a world-space orthophoto lookup: the scene sets
+`ortho_texture`, `ortho_origin` and `ortho_extent` from `terrain_meta.json`, so the 4096 px
+image maps exactly onto the 1024 m tile. Within `detail_near` metres the orthophoto colour is
+modulated by the detail texture's luminance (plus its normal and roughness); beyond
+`detail_far` it is the pure orthophoto. Terrain3D's texture assets cannot do this because
+`uv_scale` is clamped to 0.001 (one repeat per 1000 m) and offset by half a texel. The material lives inline in the scene (see the note in the tool about
+why it is not saved, and why `region_size` must not be set on the node). It prints probe heights that must equal
+`gdallocationinfo` on the clipped GeoTIFF.
+
+### World mapping
+
+The tile's north-west corner is Godot `(0, y, 0)`; `+X` is east, `+Z` is south, `y` is
+metres above sea level (EH2000) times `z_scale`. `scripts/terrain/terrain_georef.gd`
+converts both ways using `terrain_meta.json`. Vertical exaggeration is `z_scale`
+(default 1.0, recorded in the meta file and overridable with `--z-scale`). The Palupera
+square has 22 m of relief at 1:1; the Palmse tile had 6 m.
+
+### Limits of the current pipeline
+
+- One tile = one Terrain3D region = one map sheet. An AOI crossing sheet boundaries or
+  larger than 5 km needs a VRT mosaic (not implemented).
+- The override shader drops Terrain3D's projection/detiling/paintable-rotation features
+  (inherited from the lightweight example). Fine for a drape; revisit if painted textures
+  are needed later.
+- Only the current orthophoto and DTM. Historical layers, CHM/nDSM and cadastral data are
+  Phase 1+ and covered in the data-pipeline doc.
+
+## Layout
+
+```
+addons/terrain_3d/           Terrain3D 1.0.2 (vendored)
+addons/sky_3d/               Sky3D 2.1.0 (vendored)
+assets/terrain/ortho_drape.gdshader  Terrain3D override shader with world-aligned orthophoto
+assets/terrain/palupera/     heightmap.r32, ortho.jpg, terrain_meta.json, data/, terrain_assets.tres
+assets/terrain/palmse/       same, earlier flat placeholder tile (kept for comparison)
+assets/models/props/         boundary_stone.glb (generated by tools/blender/)
+scenes/spike/                Phase 0 scene + script
+scenes/player/               first-person walker
+scripts/player|ui|terrain/   controller, HUD, georef helper
+tools/pipeline/fetch_tile.py Maa-amet download + GDAL clip/convert
+tools/godot/import_terrain.gd  headless Terrain3D import
+tools/blender/make_boundary_stone.py  headless Blender prop generator
+tools/verify_spike.sh        acceptance run (screenshot + FPS)
+data_raw/                    downloads and intermediates (git-ignored, .gdignore)
+```
+
+## Known quirks (Godot 4.7.2 + Terrain3D 1.0.2)
+
+- Never set `region_size` on a Terrain3D node in a scene that also loads region files; it
+  segfaults on load. The region file carries its own size.
+- Don't save a `Terrain3DMaterial` from a headless run; its shader parameters come out null.
+  Define the material inline in the scene.
+- A `Terrain3D` node added from a `SceneTree` script only initialises on the next frame
+  (`await process_frame`), and its data directory must already exist.
+- Headless `--import` prints a `double_slider.gd` script error from the Terrain3D editor UI.
+  It is harmless: the editor setting it reads only exists in a real editor session, where
+  the plugin loads without errors.
+
+## Data licence
+
+Maa-amet open data, free for commercial use with attribution. In-game credit line
+(also in `terrain_meta.json`): "Map data: Maa- ja Ruumiamet (Estonian Land and Spatial
+Development Board), 2026".

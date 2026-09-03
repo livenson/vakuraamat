@@ -1,0 +1,81 @@
+# Minimal first-person walker for the Phase 0 terrain spike.
+# WASD / arrows to move, Shift to sprint, Ctrl to dash, Space to jump, Esc to release the mouse.
+# F toggles fly mode (survey tool): no gravity or collision, moves where the camera looks,
+# Shift and Ctrl still scale the speed.
+class_name FirstPersonController
+extends CharacterBody3D
+
+enum Gait { WALK, SPRINT, DASH }
+
+@export var walk_speed := 4.0
+@export var sprint_speed := 9.0
+@export var dash_speed := 20.0
+@export var fly_speed := 40.0
+@export var jump_velocity := 4.5
+@export var mouse_sensitivity := 0.0025
+
+@onready var camera: Camera3D = $Camera3D
+
+var flying := false
+var _pitch := 0.0
+
+
+func _ready() -> void:
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion and Input.mouse_mode == Input.MOUSE_MODE_CAPTURED:
+		rotate_y(-event.relative.x * mouse_sensitivity)
+		_pitch = clampf(_pitch - event.relative.y * mouse_sensitivity, -PI / 2 + 0.05, PI / 2 - 0.05)
+		camera.rotation.x = _pitch
+	elif event.is_action_pressed("toggle_mouse"):
+		Input.mouse_mode = (Input.MOUSE_MODE_VISIBLE if Input.mouse_mode == Input.MOUSE_MODE_CAPTURED
+				else Input.MOUSE_MODE_CAPTURED)
+	elif event.is_action_pressed("toggle_fly"):
+		flying = not flying
+		velocity = Vector3.ZERO
+
+
+func gait() -> Gait:
+	if Input.is_action_pressed("dash"):
+		return Gait.DASH
+	if Input.is_action_pressed("sprint"):
+		return Gait.SPRINT
+	return Gait.WALK
+
+
+func current_speed() -> float:
+	if flying:
+		return fly_speed * {Gait.WALK: 1.0, Gait.SPRINT: 2.5, Gait.DASH: 6.0}[gait()]
+	return {Gait.WALK: walk_speed, Gait.SPRINT: sprint_speed, Gait.DASH: dash_speed}[gait()]
+
+
+func mode_label() -> String:
+	if flying:
+		return "FLY %.0f m/s" % current_speed()
+	return {Gait.WALK: "walk", Gait.SPRINT: "sprint", Gait.DASH: "dash"}[gait()]
+
+
+func _physics_process(delta: float) -> void:
+	var input := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
+	if flying:
+		# Move along the camera's look direction so pitch gives free vertical travel.
+		var dir := (camera.global_transform.basis * Vector3(input.x, 0.0, input.y)).normalized()
+		global_position += dir * current_speed() * delta
+		return
+
+	if not is_on_floor():
+		velocity += get_gravity() * delta
+	elif Input.is_action_just_pressed("jump"):
+		velocity.y = jump_velocity
+
+	var dir := (transform.basis * Vector3(input.x, 0.0, input.y)).normalized()
+	var speed := current_speed()
+	if dir:
+		velocity.x = dir.x * speed
+		velocity.z = dir.z * speed
+	else:
+		velocity.x = move_toward(velocity.x, 0.0, speed)
+		velocity.z = move_toward(velocity.z, 0.0, speed)
+	move_and_slide()
