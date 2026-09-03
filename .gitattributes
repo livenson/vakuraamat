@@ -1,0 +1,11 @@
+*.glb filter=lfs diff=lfs merge=lfs -text
+*.fbx filter=lfs diff=lfs merge=lfs -text
+*.r32 filter=lfs diff=lfs merge=lfs -text
+assets/terrain/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+assets/terrain/**/*.png filter=lfs diff=lfs merge=lfs -text
+assets/textures/**/*.png filter=lfs diff=lfs merge=lfs -text
+assets/textures/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+assets/vendor/**/*.png filter=lfs diff=lfs merge=lfs -text
+addons/terrain_3d/bin/** filter=lfs diff=lfs merge=lfs -text
+addons/sky_3d/assets/**/*.png filter=lfs diff=lfs merge=lfs -text
+addons/sky_3d/assets/**/*.jpg filter=lfs diff=lfs merge=lfs -text
