@@ -1,0 +1,35 @@
+{
+  "name": "palupera",
+  "crs": "EPSG:3301",
+  "sheet": "54432",
+  "xmin": 637036,
+  "ymin": 6443517,
+  "xmax": 638060,
+  "ymax": 6444541,
+  "size_m": 1024,
+  "size_px": 1024,
+  "resolution_m": 1.0,
+  "heightmap": "heightmap.r32",
+  "heightmap_format": "float32 little-endian, row-major, row 0 = north edge (ymax), metres EH2000",
+  "z_min": 84.366,
+  "z_max": 106.916,
+  "z_scale": 1.0,
+  "texture": "ortho.jpg",
+  "texture_px": 4096,
+  "canopy": {
+    "file": "canopy.r32",
+    "source": "ndsm_rel_1m (1:2000 sheets 443637_ndsm_1m.tif,443638_ndsm_1m.tif,444637_ndsm_1m.tif,444638_ndsm_1m.tif)",
+    "max_height": 33.16,
+    "format": "float32 little-endian, row-major, row 0 = north; metres above ground; 0 = nothing"
+  },
+  "world_mapping": "Godot x = easting - xmin; Godot z = ymax - northing (north is -Z); y = height * z_scale",
+  "source": {
+    "dtm": "https://geoportaal.maaamet.ee/index.php?lang_id=1&plugin_act=otsing&kaardiruut=54432&andmetyyp=dem_1m_geotiff&dl=1&f=54432_dtm_1m.tif&no_cache=6a99dc1a4ae4b&page_id=614",
+    "dtm_file": "54432_dtm_1m.tif",
+    "ortho_wms": "https://kaart.maaamet.ee/wms/fotokaart",
+    "ortho_layer": "EESTIFOTO"
+  },
+  "fetched": "2026-09-03",
+  "attribution": "Map data: Maa- ja Ruumiamet (Estonian Land and Spatial Development Board), 2026",
+  "license": "Maa-amet open data licence (free use with attribution)"
+}
