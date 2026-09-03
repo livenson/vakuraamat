@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/vegetation/clover_mesh.res" id="1_1123n"]
+
+[node name="LOD0" type="MeshInstance3D" unique_id=1085075515]
+mesh = ExtResource("1_1123n")

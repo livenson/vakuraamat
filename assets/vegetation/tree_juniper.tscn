@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="ArrayMesh" path="res://assets/vegetation/tree_juniper_mesh.res" id="1_6ro2d"]
+
+[node name="LOD0" type="MeshInstance3D" unique_id=595655077]
+mesh = ExtResource("1_6ro2d")
