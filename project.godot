@@ -15,6 +15,16 @@ config/description="Time-travel farming/hunting/trading game on real Estonian te
 run/main_scene="res://scenes/spike/spike.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
 
+[autoload]
+
+EventBus="*res://scripts/autoload/event_bus.gd"
+TimelineState="*res://scripts/autoload/timeline_state.gd"
+SaveManager="*res://scripts/autoload/save_manager.gd"
+Inventory="*res://scripts/autoload/inventory.gd"
+Journal="*res://scripts/autoload/journal.gd"
+Narrative="*res://scripts/autoload/narrative.gd"
+GameState="*res://scripts/autoload/game_state.gd"
+
 [display]
 
 window/size/viewport_width=1600
@@ -22,7 +32,12 @@ window/size/viewport_height=900
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/sky_3d/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
+enabled=PackedStringArray("res://addons/inkgd/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
+
+[internationalization]
+
+locale/fallback="et"
+locale/translations=PackedStringArray("res://assets/i18n/strings.et.translation", "res://assets/i18n/strings.en.translation")
 
 [input]
 

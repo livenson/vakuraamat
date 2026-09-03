@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/artifact_item.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "aino_letter"
+display_name_key = "ITEM_AINO_LETTER"
+description_key = "ITEM_AINO_LETTER_DESC"
+can_cross_eras = true
+linked_consequence_point_id = "cp5_letter_delivered"
+valid_delivery_target = "npc_leida"
+origin_era = "era_1938"
+delivery_era = "era_2026"
