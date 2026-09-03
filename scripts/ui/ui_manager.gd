@@ -37,6 +37,10 @@ var map_slider: HSlider
 var map_rects: Dictionary = {}
 var map_markers: Control
 var ending: PanelContainer
+var trade: PanelContainer
+var _trade_post: TradePost = null
+var build: PanelContainer
+var _manor_ctl: ManorController = null
 var _open_panel: Control = null
 
 
@@ -55,6 +59,8 @@ func _ready() -> void:
 	inventory = _build_panel("UI_INVENTORY")
 	journal = _build_panel("UI_JOURNAL")
 	ending = _build_panel("")
+	trade = _build_panel("UI_TRADE")
+	build = _build_panel("UI_BUILD")
 	move_child($Fade, get_child_count() - 1)
 	EventBus.notice.connect(show_notice)
 	EventBus.era_changed.connect(func(_e): _refresh_era_label())
@@ -465,12 +471,136 @@ func _fill_journal() -> void:
 	body.add_child(closeb)
 
 
+# --- trading (Phase 4): era-local goods for era-local money
+func open_trade(post: TradePost) -> void:
+	_trade_post = post
+	_fill_trade()
+	_open(trade)
+
+
+func _fill_trade() -> void:
+	var era: String = _trade_post.era_id
+	var body := _clear_body(trade)
+	body.get_node("Title").text = tr(_trade_post.post_name_key)
+	var bal := Label.new()
+	bal.text = tr("UI_BALANCE") % Trading.format_money(Trading.balance(era), era)
+	bal.add_theme_font_size_override("font_size", 18)
+	bal.add_theme_color_override("font_color", GOLD)
+	body.add_child(bal)
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 24)
+	h.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_child(h)
+	for side in [["UI_SELL", true], ["UI_BUY", false]]:
+		var col := VBoxContainer.new()
+		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		h.add_child(col)
+		var t := Label.new()
+		t.text = tr(side[0])
+		t.add_theme_font_size_override("font_size", 20)
+		col.add_child(t)
+		var scroll := ScrollContainer.new()
+		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		col.add_child(scroll)
+		var list := VBoxContainer.new()
+		list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		scroll.add_child(list)
+		var bag: Array = Inventory.local_items(era)
+		for g in Trading.goods_for(era):
+			var selling: bool = side[1]
+			var price: int = g.sell_price if selling else g.buy_price
+			if price <= 0:
+				continue
+			var item := GameState.item(g.item_id)
+			var count: int = bag.count(g.item_id)
+			if selling and count == 0:
+				continue
+			var b := Button.new()
+			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+			b.text = "%s%s   %s" % [tr(item.display_name_key), ("  ×%d" % count) if selling else "", Trading.format_money(price, era)]
+			b.disabled = (not selling) and Trading.balance(era) < price
+			b.pressed.connect(_on_trade.bind(g, selling))
+			list.add_child(b)
+	var closeb := Button.new()
+	closeb.text = tr("UI_CLOSE")
+	closeb.pressed.connect(_close)
+	body.add_child(closeb)
+
+
+func _on_trade(g: TradeGood, selling: bool) -> void:
+	var era: String = _trade_post.era_id
+	var ok: bool = Trading.sell(g, era) if selling else Trading.buy(g, era)
+	if not ok:
+		show_notice(tr("TRADE_NO_MONEY") if not selling else tr("TRADE_NOTHING_TO_SELL"))
+	_fill_trade()
+
+
+# --- base building (Phase 5): one panel, no spreadsheet
+func open_build(ctl: ManorController) -> void:
+	_manor_ctl = ctl
+	_fill_build()
+	_open(build)
+
+
+func _fill_build() -> void:
+	var m: ManorDefinition = _manor_ctl.manor
+	var body := _clear_body(build)
+	body.get_node("Title").text = tr(m.display_name_key)
+	var info := Label.new()
+	info.text = tr("BUILD_LEVEL") % [tr(m.display_name_key), Manors.development_level(m.id), m.structures.size()] + "   ·   " + tr("UI_BALANCE") % Trading.format_money(Trading.balance(m.era_id), m.era_id)
+	body.add_child(info)
+	var parcel := Label.new()
+	parcel.text = "Katastritunnus / cadastral unit: " + m.cadastral_parcel_id
+	parcel.add_theme_font_size_override("font_size", 13)
+	body.add_child(parcel)
+	for sid in m.structures:
+		var st: StructureDefinition = Manors.structures[sid]
+		var row := PanelContainer.new()
+		var vb := VBoxContainer.new()
+		row.add_child(vb)
+		var h := HBoxContainer.new()
+		vb.add_child(h)
+		var n := Label.new()
+		n.text = tr(st.display_name_key)
+		n.add_theme_font_size_override("font_size", 18)
+		n.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		h.add_child(n)
+		var why := Manors.can_build(m, st)
+		var b := Button.new()
+		b.text = tr("BUILD_ALREADY") if why == "BUILD_ALREADY" else tr("BUILD_PROMPT")
+		b.disabled = why != ""
+		b.pressed.connect(func():
+			Manors.build(m, st)
+			_fill_build())
+		h.add_child(b)
+		var d := Label.new()
+		var cost := []
+		for item in st.cost_items:
+			cost.append("%d × %s" % [int(st.cost_items[item]), tr(GameState.item(item).display_name_key)])
+		cost.append(Trading.format_money(st.cost_money, m.era_id))
+		d.text = tr(st.description_key) + "\n" + tr("BUILD_COST") % ", ".join(cost) + (("   ·   " + tr(why) % tr(Manors.structures[st.requires].display_name_key)) if why == "BUILD_REQUIRES" else ("   ·   " + tr(why) if why != "" and why != "BUILD_ALREADY" else ""))
+		d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		d.add_theme_font_size_override("font_size", 14)
+		vb.add_child(d)
+		body.add_child(row)
+	var closeb := Button.new()
+	closeb.text = tr("UI_CLOSE")
+	closeb.pressed.connect(_close)
+	body.add_child(closeb)
+
+
 ## Debug hook for verification runs: open a panel by name.
 func debug_open(which: String) -> void:
 	match which:
 		"register": _toggle(register, _fill_register)
 		"journal": _toggle(journal, _fill_journal)
 		"inventory": _toggle(inventory, _fill_inventory)
+		"trade", "build":
+			var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
+			if layer:
+				var n: Node = layer.find_child("TradePost" if which == "trade" else "Manor_kaseoja_farm", true, false)
+				if n:
+					n.interact(player)
 
 
 func _update_map_blend() -> void:

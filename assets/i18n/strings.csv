@@ -163,3 +163,53 @@ ITEM_VENISON,Kitseliha,Venison
 ITEM_VENISON_DESC,"Metskitse liha, riidesse mässitud.","Roe deer meat, wrapped in cloth."
 ITEM_GROUSE,Tedr,Black grouse
 ITEM_GROUSE_DESC,"Must lind, raske kui kivi.","A black bird, heavy as a stone."
+CUR_1798,kopikat,kopecks
+CUR_1938,senti,cents
+CUR_2026,senti,cents
+TRADE_PROMPT,Kauple,Trade
+UI_TRADE,Kauplemine,Trading
+UI_BUY,Osta,Buy
+UI_SELL,Müü,Sell
+UI_BALANCE,Rahakott: %s,Purse: %s
+TRADE_NO_MONEY,Raha ei jätku.,Not enough money.
+TRADE_NOTHING_TO_SELL,"Sul pole midagi, mida siin ostetakse.",You have nothing they buy here.
+POST_1798,Mõisa ait,The manor granary
+POST_1798_TEXT,"Aidamees. Ostab vilja ja kõike, mida metsast tuuakse, ja ei küsi. Müüb seemet ja soola.","The granary keeper. Buys grain and whatever comes out of the forest, and doesn't ask. Sells seed and salt."
+POST_1938,Piimaühingu pood,The dairy cooperative shop
+POST_1938_TEXT,"Ühingu pood piimapuki juures. Naelad, petrool, seeme. Ostab kõike, mis kasvab.","The cooperative shop by the milk stand. Nails, kerosene, seed. Buys anything that grows."
+POST_2026,Külapood,The village shop
+POST_2026_TEXT,"Pood on lahti kolm tundi päevas. Kohv on kallis, kartul on odav.","The shop is open three hours a day. Coffee is dear, potatoes are cheap."
+ITEM_TALLOW_CANDLE,Rasvaküünal,Tallow candle
+ITEM_TALLOW_CANDLE_DESC,Vinab. Põleb.,Smokes. Burns.
+ITEM_SALT,Sool,Salt
+ITEM_SALT_DESC,Kotike soola. Kallim kui kõik muu.,A bag of salt. Dearer than anything else.
+ITEM_NAILS,Naelad,Nails
+ITEM_NAILS_DESC,Paberisse keeratud. Juhan loeb need üle.,Wrapped in paper. Juhan will count them.
+ITEM_TIMBER,Palgid,Timber
+ITEM_TIMBER_DESC,"Kuus palki, kooritud.","Six logs, debarked."
+ITEM_KEROSENE,Petrool,Kerosene
+ITEM_KEROSENE_DESC,Lambi jaoks.,For the lamp.
+ITEM_COFFEE,Kohv,Coffee
+ITEM_COFFEE_DESC,Pool kilo. Poemüüja imestas.,Half a kilo. The shopkeeper was surprised.
+MANOR_KASEOJA,Kaseoja talu,Kaseoja farm
+MANOR_PARK,Mõisa park,The manor park
+BUILD_PROMPT,Ehita,Build
+UI_BUILD,Ehitamine,Building
+BUILD_LEVEL,%s: %d / %d ehitatud.,%s: %d of %d built.
+BUILD_LOCKED,Siin ei saa veel midagi ehitada. Maa pole teie oma – veel.,Nothing can be built here yet. The land isn't yours – yet.
+BUILD_DONE,%s on valmis (%s).,%s is finished (%s).
+BUILD_ALREADY,Juba ehitatud.,Already built.
+BUILD_REQUIRES,Vajab enne: %s.,Needs first: %s.
+BUILD_NO_MONEY,Raha ei jätku.,Not enough money.
+BUILD_NO_MATERIALS,Materjali ei jätku.,Not enough materials.
+BUILD_COST,Hind: %s,Cost: %s
+STRUCT_STOREHOUSE,Ait,Storehouse
+STRUCT_STOREHOUSE_DESC,Vilja jaoks. Kõik algab aidast.,For the grain. Everything starts with a storehouse.
+STRUCT_SAUNA,Saun,Sauna
+STRUCT_SAUNA_DESC,Laupäeviti. Aino nõuab.,Saturdays. Aino insists.
+STRUCT_BARN,Laut,Barn
+STRUCT_BARN_DESC,"Kahele lehmale ja hobusele, kui hobune tuleb.","For two cows and a horse, if the horse comes."
+STRUCT_DAIRY_STAND,Piimapukk,Milk stand
+STRUCT_DAIRY_STAND_DESC,Pargi väravas. Ühingu auto peatub siin.,At the park gate. The cooperative's lorry stops here.
+STRUCT_SWING,Külakiik,Village swing
+STRUCT_SWING_DESC,Jaanipäevaks.,For midsummer.

@@ -1,6 +1,6 @@
 # Vakuraamat — implementation plan
 
-**Revision note (2026-09-03):** Phase 0 is built (see `README.md`). This revision aligns the plan with `vakuraamat-first-iteration-design.md`: eras are fixed as 1798 / 1938 / 2026, the site is the Palupera area, one heightmap is shared across eras, the terrain pipeline is GDAL-scripted rather than QGIS, and an ambient day/night cycle (Sky3D) is part of the base scene.
+**Revision note (2026-09-04):** Phases 0–5 are built and pass their headless tests (see `README.md`); the remaining work is content depth, playtesting the legibility criterion, and the Phase 6+ items. Earlier note (2026-09-03): Phase 0 is built. This revision aligns the plan with `vakuraamat-first-iteration-design.md`: eras are fixed as 1798 / 1938 / 2026, the site is the Palupera area, one heightmap is shared across eras, the terrain pipeline is GDAL-scripted rather than QGIS, and an ambient day/night cycle (Sky3D) is part of the base scene.
 
 **Purpose of this document:** a phased technical build plan for handing to Claude Code (or any coding agent/collaborator) to scaffold and implement the game incrementally. It captures the design decisions already made, defines a concrete architecture, and specifies what "stub" means at each phase so later phases extend rather than rewrite earlier work.
 
@@ -167,6 +167,7 @@ Each phase lists: goal, what ships playable, what's stubbed vs. fully built, exp
 - [ ] Documented, repeatable pipeline (script or step-by-step) for producing the next tile
 
 ### Phase 1 — Vertical slice: the time-travel core loop
+*Status: built 2026-09-04; `tools/godot/playthrough_test.tscn` drives all five consequence points headless. The legibility playtest is still to be run with a real player.*
 **Goal:** prove the entire TimelineState/ConsequencePoint/ArtifactItem/Journal architecture end-to-end with real (if minimal) content, per prior design research's recommended starting scope.
 **Ships:** 3 eras (1798, 1938, 2026) of one real location (the Palupera clip), 5 consequence points, 4 artifact items, a working journal, basic ink-driven dialogue, era-switching via the register. Content is specified in `vakuraamat-first-iteration-design.md`.
 **Build:**
@@ -186,6 +187,7 @@ Each phase lists: goal, what ships playable, what's stubbed vs. fully built, exp
 - [ ] Save/load preserves TimelineState correctly across a session restart
 
 ### Phase 2 — Farming (stub → real)
+*Status: built 2026-09-04 (`scripts/farming`, `tools/godot/farming_test.tscn`). Seasons/soil remain deferred.*
 **Goal:** add farming as a self-contained system without touching Phase 1's architecture.
 **Ships:** plantable plots in the present-day era (or whichever era makes narrative sense), with a small crop set, growth timers, and harvest yielding era-local inventory items.
 **Build now (real):**
@@ -208,6 +210,7 @@ class_name CropDefinition
 - [ ] Farming system has zero references to TimelineState, ConsequencePoint, or ArtifactItem in its code (architectural isolation check)
 
 ### Phase 3 — Hunting (stub → real)
+*Status: built 2026-09-04 (`scripts/hunting`, `tools/godot/hunting_test.tscn`). Spawns read the terrain control map classes.*
 **Goal:** add a wildlife/hunting system, isolated the same way.
 **Build now (real):**
 ```gdscript
@@ -229,6 +232,7 @@ Simple spawner reading real forest-cover tags from the Maa-amet data pipeline (C
 - [ ] Hunting system has zero references to TimelineState/ConsequencePoint/ArtifactItem
 
 ### Phase 4 — Trading posts (era-local only)
+*Status: built 2026-09-04 (`scripts/trading`, `tools/godot/economy_test.tscn`). Fixed prices, one post per era.*
 **Goal:** let farming and hunting yields (plus any other era-local goods) be sold/bought at fixed trade-post locations, one per era, without reopening the cross-era economy problem.
 **Build now (real):**
 ```gdscript
@@ -254,6 +258,7 @@ A trade post is a location + a buy/sell list, scoped to one `era_id`. Currency i
 - [ ] Confirm by code review: no trade-post code path can move a non-artifact item or currency across `era_id` values
 
 ### Phase 5 — Base building / manor expansion
+*Status: built 2026-09-04 (`scripts/base_building`, `tools/godot/economy_test.tscn`). Both manors are on the same tile; a second tile with travel is Phase 6+.*
 **Goal:** let the player grow influence from one base location outward to other real, cadastrally-mapped manor locations.
 **Design pattern (from prior research):** favor a **hub-plus-outposts** model (closer to Anno/Banished-style expansion) over a single-deep-city model (Frostpunk) — this maps naturally onto the real cadastral parcel data already in the pipeline, where each "manor" is a real mapped location the player travels to and gradually develops.
 **Build now (real):**
