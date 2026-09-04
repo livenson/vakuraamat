@@ -43,6 +43,8 @@ var trade: PanelContainer
 var _trade_post: TradePost = null
 var build: PanelContainer
 var _manor_ctl: ManorController = null
+var debug_map: PanelContainer
+var _debug_canvas: Control
 var _open_panel: Control = null
 
 
@@ -63,6 +65,9 @@ func _ready() -> void:
 	ending = _build_panel("")
 	trade = _build_panel("UI_TRADE")
 	build = _build_panel("UI_BUILD")
+	debug_map = _build_panel("UI_DEBUG_MAP")
+	debug_map.custom_minimum_size = Vector2(1180, 840)
+	_center_panel(debug_map)
 	move_child($Fade, get_child_count() - 1)
 	EventBus.notice.connect(show_notice)
 	EventBus.era_changed.connect(func(_e): _refresh_era_label())
@@ -254,13 +259,18 @@ func _build_dialogue() -> void:
 	v.add_child(choice_box)
 
 
+func _center_panel(p: Control) -> void:
+	p.set_anchors_and_offsets_preset(Control.PRESET_CENTER, Control.PRESET_MODE_MINSIZE)
+	p.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	p.grow_vertical = Control.GROW_DIRECTION_BOTH
+
+
 func _build_panel(title_key: String) -> PanelContainer:
 	var p := PanelContainer.new()
-	p.set_anchors_preset(Control.PRESET_CENTER)
 	p.custom_minimum_size = Vector2(760, 520)
-	p.position = Vector2(-380, -260)
 	p.visible = false
 	add_child(p)
+	_center_panel(p)
 	var v := VBoxContainer.new()
 	v.name = "Body"
 	v.add_theme_constant_override("separation", 10)
@@ -376,6 +386,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		_toggle(inventory, _fill_inventory)
 	elif event.is_action_pressed("journal"):
 		_toggle(journal, _fill_journal)
+	elif event.is_action_pressed("debug_map"):
+		_toggle(debug_map, _fill_debug_map)
 	elif event.is_action_pressed("language"):
 		var next := "en" if TranslationServer.get_locale().begins_with("et") else "et"
 		TranslationServer.set_locale(next)
@@ -390,6 +402,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _filler_for(p: Control) -> Callable:
 	if p == register: return _fill_register
 	if p == inventory: return _fill_inventory
+	if p == debug_map: return _fill_debug_map
 	return _fill_journal
 
 
@@ -701,12 +714,141 @@ func _fill_build() -> void:
 	body.add_child(closeb)
 
 
+# --- debug map (temporary): everything in the current era, click to teleport
+const DEBUG_COLORS := {
+	"NPC": Color(1.0, 0.8, 0.2), "Pickup": Color(0.4, 1.0, 0.4), "Examinable": Color(1, 1, 1),
+	"StoryPoint": Color(1.0, 0.55, 0.2), "FarmPlot": Color(0.7, 0.45, 0.2), "SeedBin": Color(0.9, 0.6, 0.3),
+	"TradePost": Color(0.3, 0.9, 1.0), "ManorController": Color(1.0, 0.4, 0.9), "Animal": Color(0.8, 0.8, 0.5),
+	"register": Color(1.0, 0.25, 0.25),
+}
+
+
+func _fill_debug_map() -> void:
+	var body := _clear_body(debug_map)
+	body.get_node("Title").text = tr("UI_DEBUG_MAP") + "   ·   " + GameState.current_era + "   ·   " + tr("UI_CHAPTER") % GameState.chapter
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 6)
+	body.add_child(row)
+	for era in GameState.eras_in_order():
+		var b := Button.new()
+		b.text = era.year_label
+		b.disabled = era.id == GameState.current_era
+		b.pressed.connect(func():
+			GameState.register_unlocked = true
+			await GameState.switch_era(era.id)
+			_fill_debug_map())
+		row.add_child(b)
+	var bc := Button.new()
+	bc.text = tr("UI_CHAPTER") % (GameState.chapter + 1) + " →"
+	bc.pressed.connect(func():
+		GameState.register_unlocked = true
+		GameState.end_chapter()
+		_fill_debug_map())
+	row.add_child(bc)
+	var ba := Button.new()
+	ba.text = "+ artifacts"
+	ba.pressed.connect(func():
+		for id in ["register_page", "ploughshare", "manor_key", "aino_letter"]:
+			if not Inventory.has(id):
+				Inventory.add(id))
+	row.add_child(ba)
+	var bf := Button.new()
+	bf.text = "+ all flags"
+	bf.pressed.connect(func():
+		for cp in GameState.consequence_points.values():
+			TimelineState.set_flag(cp.flag_name, true)
+		_fill_debug_map())
+	row.add_child(bf)
+	var bm := Button.new()
+	bm.text = "+ money/seed"
+	bm.pressed.connect(func():
+		Trading.add_money(GameState.current_era, 500)
+		for c in Farming.crops_for_era(GameState.current_era):
+			Inventory.add(c.seed_item_id))
+	row.add_child(bm)
+	var hint := Label.new()
+	hint.text = tr("UI_DEBUG_MAP_HINT")
+	hint.add_theme_font_size_override("font_size", 13)
+	row.add_child(hint)
+	var stack := Control.new()
+	stack.custom_minimum_size = Vector2(700, 700)
+	stack.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_child(stack)
+	var bg := TextureRect.new()
+	bg.texture = GameState.era("era_2026").terrain_texture
+	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	bg.modulate = Color(0.75, 0.75, 0.75)
+	stack.add_child(bg)
+	_debug_canvas = Control.new()
+	_debug_canvas.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_debug_canvas.draw.connect(_draw_debug_map)
+	_debug_canvas.gui_input.connect(_debug_map_input)
+	stack.add_child(_debug_canvas)
+
+
+func _map_frame(c: Control) -> Array:
+	var side := minf(c.size.x, c.size.y)
+	return [(c.size - Vector2(side, side)) * 0.5, side]
+
+
+func _draw_debug_map() -> void:
+	var c := _debug_canvas
+	var f := _map_frame(c)
+	var origin: Vector2 = f[0]
+	var side: float = f[1]
+	var font := ThemeDB.fallback_font
+	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
+	if layer:
+		for n in layer.find_children("*", "Interactable", true, false):
+			if not n.visible or not n.is_visible_in_tree():
+				continue
+			var kind := "Examinable"
+			for k in DEBUG_COLORS:
+				if n.get_class() == k or (n.get_script() and n.get_script().get_global_name() == k):
+					kind = k
+			if n.name == "RegisterBook":
+				kind = "register"
+			var p: Vector2 = origin + Vector2(n.global_position.x, n.global_position.z) / 1024.0 * side
+			var col: Color = DEBUG_COLORS.get(kind, Color.WHITE)
+			c.draw_circle(p, 5, col)
+			c.draw_circle(p, 5, Color.BLACK, false, 1.0)
+			var text: String = n.label() if n.label() != "" else n.name
+			c.draw_string(font, p + Vector2(7, 4), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.BLACK)
+			c.draw_string(font, p + Vector2(6, 3), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, col)
+	# the player and heading
+	var pp := origin + Vector2(player.global_position.x, player.global_position.z) / 1024.0 * side
+	var fwd := -player.global_transform.basis.z
+	c.draw_line(pp, pp + Vector2(fwd.x, fwd.z) * 18, Color.WHITE, 2.0)
+	c.draw_circle(pp, 6, Color.WHITE)
+	c.draw_circle(pp, 6, Color.BLACK, false, 1.5)
+	# north arrow and scale
+	c.draw_string(font, origin + Vector2(side - 24, 18), "N", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, GOLD)
+	c.draw_line(origin + Vector2(side - 18, 40), origin + Vector2(side - 18, 22), GOLD, 2.0)
+	c.draw_line(origin + Vector2(10, side - 10), origin + Vector2(10 + side * 100.0 / 1024.0, side - 10), Color.WHITE, 2.0)
+	c.draw_string(font, origin + Vector2(10, side - 14), "100 m", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.WHITE)
+
+
+func _debug_map_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var f := _map_frame(_debug_canvas)
+		var local: Vector2 = (event.position - f[0]) / f[1] * 1024.0
+		if local.x < 0 or local.y < 0 or local.x > 1024 or local.y > 1024:
+			return
+		player.velocity = Vector3.ZERO
+		player.global_position = Vector3(local.x, 200.0, local.y)
+		world._snap(player, 1.0)
+		_debug_canvas.queue_redraw()
+
+
 ## Debug hook for verification runs: open a panel by name.
 func debug_open(which: String) -> void:
 	match which:
 		"register": _toggle(register, _fill_register)
 		"journal": _toggle(journal, _fill_journal)
 		"inventory": _toggle(inventory, _fill_inventory)
+		"map": _toggle(debug_map, _fill_debug_map)
 		"trade", "build":
 			var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
 			if layer:

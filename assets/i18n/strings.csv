@@ -217,3 +217,6 @@ OBJ_FIND_REGISTER,Leia vakuraamat varemetest (lõuna pool) ja võta see: E.,Find
 OBJ_VISIT_ERAS,Ava vakuraamat (Tab) ja käi kõigil kolmel lehel. Esimene leht on märgitud.,Open the register (Tab) and visit all three pages. The first page is marked.
 OBJ_MEET_1938,"1938: leia Aino talu juurest, Juhan põhjapõllult, maamõõtja mõisa eest.","1938: find Aino at the farm, Juhan on the north field, the surveyor outside the manor."
 OBJ_SIT,"Kui oled valmis, mine 2026. aastasse ja istu Leidaga tamme all.","When you are ready, go to 2026 and sit with Leida under the oak."
+UI_DEBUG_MAP,Silumiskaart,Debug map
+UI_DEBUG_MAP_HINT,Klõps kaardil: teleport. M sulgeb.,Click the map to teleport. M closes.
+UI_KEYS,E tegutse   Tab vakuraamat   J päevik   I kott   L keel   M silumiskaart,E interact   Tab register   J journal   I bag   L language   M debug map
