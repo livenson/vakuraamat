@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=31 format=3]
 
 [ext_resource type="Script" path="res://scripts/interaction/conditional.gd" id="1"]
 [ext_resource type="PackedScene" path="res://assets/models/props/oak.glb" id="2"]
@@ -31,47 +31,51 @@ albedo_color = Color(0.550, 0.530, 0.500, 1)
 roughness = 0.9
 
 [sub_resource type="StandardMaterial3D" id="M5"]
-albedo_color = Color(0.350, 0.200, 0.100, 1)
-roughness = 0.7
+albedo_color = Color(0.550, 0.530, 0.500, 1)
+roughness = 0.9
 
 [sub_resource type="StandardMaterial3D" id="M6"]
-albedo_color = Color(0.550, 0.530, 0.500, 1)
+albedo_color = Color(0.450, 0.250, 0.100, 1)
+roughness = 0.6
+
+[sub_resource type="StandardMaterial3D" id="M7"]
+albedo_color = Color(0.700, 0.680, 0.620, 1)
 roughness = 0.9
 
 [sub_resource type="SphereShape3D" id="S1"]
 radius = 1.2
 
-[sub_resource type="StandardMaterial3D" id="M8"]
+[sub_resource type="StandardMaterial3D" id="M9"]
 albedo_color = Color(0.450, 0.450, 0.420, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M9"]
+[sub_resource type="StandardMaterial3D" id="M10"]
 albedo_color = Color(0.550, 0.530, 0.500, 1)
 roughness = 0.9
 
 [sub_resource type="BoxShape3D" id="SB_era_2026"]
 size = Vector3(1.4, 1.2, 1.0)
 
-[sub_resource type="StandardMaterial3D" id="M11"]
+[sub_resource type="StandardMaterial3D" id="M12"]
 albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
 [sub_resource type="BoxShape3D" id="TP_era_2026"]
 size = Vector3(2.6, 2.4, 2.2)
 
-[sub_resource type="StandardMaterial3D" id="M13"]
+[sub_resource type="StandardMaterial3D" id="M14"]
 albedo_color = Color(0.850, 0.850, 0.800, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M14"]
+[sub_resource type="StandardMaterial3D" id="M15"]
 albedo_color = Color(0.500, 0.450, 0.300, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M15"]
+[sub_resource type="StandardMaterial3D" id="M16"]
 albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M16"]
+[sub_resource type="StandardMaterial3D" id="M17"]
 albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
@@ -97,24 +101,29 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 508, 0, 545)
 script = ExtResource("1")
 
 [node name="Wall0" type="CSGBox3D" parent="Ruin"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 1.2, -16.0)
-size = Vector3(24, 2.4, 0.6)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, -7.25, 1.2, -16.0)
+size = Vector3(9.5, 2.4, 0.6)
 material = SubResource("M1")
 
 [node name="Wall1" type="CSGBox3D" parent="Ruin"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 0.8, 16.0)
-size = Vector3(24, 1.6, 0.6)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 7.25, 1.0, -16.0)
+size = Vector3(9.5, 2.0, 0.6)
 material = SubResource("M2")
 
 [node name="Wall2" type="CSGBox3D" parent="Ruin"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, -12.0, 1.4, 0)
-size = Vector3(0.6, 2.8, 32)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 0.8, 16.0)
+size = Vector3(24, 1.6, 0.6)
 material = SubResource("M3")
 
 [node name="Wall3" type="CSGBox3D" parent="Ruin"]
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, -12.0, 1.4, 0)
+size = Vector3(0.6, 2.8, 32)
+material = SubResource("M4")
+
+[node name="Wall4" type="CSGBox3D" parent="Ruin"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 12.0, 0.6, -7.04)
 size = Vector3(0.6, 1.2, 17.6)
-material = SubResource("M4")
+material = SubResource("M5")
 
 [node name="RuinExamine" parent="Ruin" instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -19.0)
@@ -123,18 +132,18 @@ location_id = "LOC_MANOR"
 label_key = "LOC_MANOR"
 
 [node name="RegisterBook" type="Node3D" parent="Ruin"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, -12.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -11.0)
 script = ExtResource("4")
 
 [node name="BookMesh" type="CSGBox3D" parent="Ruin/RegisterBook"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)
-size = Vector3(0.4, 0.12, 0.3)
-material = SubResource("M5")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)
+size = Vector3(0.45, 0.12, 0.32)
+material = SubResource("M6")
 
 [node name="Plinth" type="CSGBox3D" parent="Ruin/RegisterBook"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)
-size = Vector3(0.8, 0.5, 0.6)
-material = SubResource("M6")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
+size = Vector3(0.9, 0.9, 0.7)
+material = SubResource("M7")
 
 [node name="Body3D" type="StaticBody3D" parent="Ruin/RegisterBook"]
 collision_layer = 2
@@ -205,7 +214,7 @@ script = ExtResource("1")
 [node name="Foundation" type="CSGBox3D" parent="Farm"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 0.17, 0)
 size = Vector3(14, 0.35, 8)
-material = SubResource("M8")
+material = SubResource("M9")
 
 [node name="FarmExamine" parent="Farm" instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.5)
@@ -225,7 +234,7 @@ inner_radius = 0.8
 outer_radius = 1.2
 sides = 12
 ring_sides = 6
-material = SubResource("M9")
+material = SubResource("M10")
 
 [node name="WellExamine" parent="WellRing" instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
@@ -428,7 +437,7 @@ seed_item_ids = Array[String](["seed_potato", "seed_cabbage"])
 [node name="Bin" type="CSGBox3D" parent="Farming/SeedBin"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 0.45, 0)
 size = Vector3(1.2, 0.9, 0.8)
-material = SubResource("M11")
+material = SubResource("M12")
 
 [node name="Body3D" type="StaticBody3D" parent="Farming/SeedBin"]
 collision_layer = 2
@@ -448,22 +457,22 @@ intro_key = "POST_2026_TEXT"
 [node name="Stall" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 0.55, 0)
 size = Vector3(2.4, 1.1, 1.2)
-material = SubResource("M13")
+material = SubResource("M14")
 
 [node name="Awning" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 2.2, -0.3)
 size = Vector3(2.8, 0.12, 2.0)
-material = SubResource("M14")
+material = SubResource("M15")
 
 [node name="PostA" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, -1.3, 1.1, -1.2)
 size = Vector3(0.1, 2.2, 0.1)
-material = SubResource("M15")
+material = SubResource("M16")
 
 [node name="PostB" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 1.3, 1.1, -1.2)
 size = Vector3(0.1, 2.2, 0.1)
-material = SubResource("M16")
+material = SubResource("M17")
 
 [node name="Body3D" type="StaticBody3D" parent="TradePost"]
 collision_layer = 2

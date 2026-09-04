@@ -17,6 +17,8 @@ var hud: Control
 var prompt_label: Label
 var hover_label: Label
 var notice_label: Label
+var compass: Control
+var marker: Control
 var era_label: Label
 var keys_label: Label
 var _notice_tween: Tween
@@ -77,6 +79,86 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if era_label and world.has_method("clock_string"):
 		_refresh_era_label()
+	if compass:
+		compass.queue_redraw()
+	if marker:
+		marker.queue_redraw()
+
+
+## Heading in degrees, 0 = north (-Z), 90 = east (+X).
+func _heading_deg() -> float:
+	var fwd := -player.global_transform.basis.z
+	return fmod(rad_to_deg(atan2(fwd.x, -fwd.z)) + 360.0, 360.0)
+
+
+## World position of the current objective, or null.
+func _objective_target() -> Variant:
+	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
+	if layer == null:
+		return null
+	if not GameState.register_unlocked:
+		var n: Node = layer.find_child("RegisterBook", true, false)
+		return n.global_position + Vector3(0, 1.2, 0) if n else null
+	if GameState.chapter == 3 and GameState.current_era == "era_2026" and not TimelineState.has_flag("epilogue"):
+		var l: Node = layer.find_child("Leida", true, false)
+		return l.global_position + Vector3(0, 2.2, 0) if l else null
+	return null
+
+
+func _draw_marker() -> void:
+	var target = _objective_target()
+	if target == null:
+		return
+	var cam: Camera3D = player.camera
+	var dist: float = player.global_position.distance_to(target)
+	var size := marker.size
+	var behind := cam.is_position_behind(target)
+	var p: Vector2 = cam.unproject_position(target)
+	var on_screen := not behind and p.x > 20 and p.x < size.x - 20 and p.y > 60 and p.y < size.y - 40
+	var font := ThemeDB.fallback_font
+	if on_screen:
+		var d := 9.0
+		marker.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -d), p + Vector2(d, 0), p + Vector2(0, d), p + Vector2(-d, 0)]), GOLD)
+		marker.draw_string(font, p + Vector2(-30, -14), "%d m" % int(dist), HORIZONTAL_ALIGNMENT_CENTER, 60, 14, GOLD)
+	else:
+		# direction on the compass ring: angle from the view forward
+		var to: Vector3 = target - player.global_position
+		var fwd: Vector3 = -cam.global_transform.basis.z
+		var ang := atan2(fwd.cross(to).y, fwd.dot(Vector3(to.x, 0, to.z)))
+		var centre := size / 2
+		var r := minf(size.x, size.y) * 0.42
+		var q := centre + Vector2(sin(ang), -cos(ang)) * r
+		var dir := (q - centre).normalized()
+		var tip := q + dir * 12
+		var left := q + Vector2(-dir.y, dir.x) * 8
+		var right := q - Vector2(-dir.y, dir.x) * 8
+		marker.draw_colored_polygon(PackedVector2Array([tip, left, right]), GOLD)
+		marker.draw_string(font, q - dir * 26 + Vector2(-30, 5), "%d m" % int(dist), HORIZONTAL_ALIGNMENT_CENTER, 60, 14, GOLD)
+
+
+func _draw_compass() -> void:
+	var c := compass
+	var w := c.size.x
+	var h := c.size.y
+	var heading := _heading_deg()
+	var px_per_deg := w / 120.0            # the tape shows 120 degrees
+	c.draw_rect(Rect2(0, 0, w, h), Color(0, 0, 0, 0.35))
+	var font := ThemeDB.fallback_font
+	for d in range(-180, 181, 15):
+		var rel := fmod(d - heading + 540.0, 360.0) - 180.0
+		if absf(rel) > 60.0:
+			continue
+		var x := w / 2 + rel * px_per_deg
+		var deg := int(fmod(d + 360.0, 360.0))
+		var big := deg % 90 == 0
+		c.draw_line(Vector2(x, h - 6), Vector2(x, h - (14 if big else 10)), Color(1, 1, 1, 0.8), 1.0)
+		if big:
+			var name: String = ["N", "E", "S", "W"][deg / 90]
+			c.draw_string(font, Vector2(x - 6, 15), name, HORIZONTAL_ALIGNMENT_CENTER, 12, 15, GOLD if name == "N" else Color.WHITE)
+		elif deg % 45 == 0:
+			c.draw_string(font, Vector2(x - 12, 15), str(deg), HORIZONTAL_ALIGNMENT_CENTER, 24, 10, Color(1, 1, 1, 0.7))
+	c.draw_line(Vector2(w / 2, 2), Vector2(w / 2, h - 2), GOLD, 2.0)
+	c.draw_string(font, Vector2(w / 2 + 6, h - 8), "%d°" % int(round(heading)), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, GOLD)
 
 
 # ---------------------------------------------------------------- building
@@ -108,8 +190,23 @@ func _build_hud() -> void:
 	notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	notice_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	notice_label.custom_minimum_size = Vector2(760, 0)
-	notice_label.position = Vector2(-380, 60)
+	notice_label.position = Vector2(-380, 70)
 	notice_label.modulate.a = 0.0
+	# compass tape, top centre: north is -Z on the tile (map up)
+	compass = Control.new()
+	compass.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	compass.custom_minimum_size = Vector2(420, 34)
+	compass.size = Vector2(420, 34)
+	compass.position = Vector2(-210, 8)
+	compass.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	compass.draw.connect(_draw_compass)
+	hud.add_child(compass)
+	# objective marker: projected diamond + distance, arrow at the screen edge when off-screen
+	marker = Control.new()
+	marker.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	marker.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	marker.draw.connect(_draw_marker)
+	hud.add_child(marker)
 	# crosshair
 	var dot := ColorRect.new()
 	dot.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
