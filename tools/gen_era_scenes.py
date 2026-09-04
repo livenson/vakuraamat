@@ -67,9 +67,9 @@ class Scene:
         if label: p += f'\nlabel_key = "{label}"'
         self.node(name, None, parent, p, instance=i)
 
-    def npc(self, name, parent, npc_id, knot, label, c, x, z, height=1.7, yaw=0.0):
+    def npc(self, name, parent, npc_id, knot, label, c, x, z, height=1.7, yaw=0.0, pose="stand"):
         i = self.ext_res("PackedScene", "res://scenes/npc/npc.tscn"); cy = math.cos(yaw); sy = math.sin(yaw)
-        self.node(name, None, parent, f'transform = Transform3D({cy:.4f}, 0, {sy:.4f}, 0, 1, 0, {-sy:.4f}, 0, {cy:.4f}, {x}, 0, {z})\nnpc_id = "{npc_id}"\nknot = "{knot}"\nlabel_key = "{label}"\nbody_color = {color(c)}\nheight = {height}', instance=i)
+        self.node(name, None, parent, f'transform = Transform3D({cy:.4f}, 0, {sy:.4f}, 0, 1, 0, {-sy:.4f}, 0, {cy:.4f}, {x}, 0, {z})\nnpc_id = "{npc_id}"\nknot = "{knot}"\nlabel_key = "{label}"\nbody_color = {color(c)}\nheight = {height}\npose = "{pose}"', instance=i)
 
     def pickup(self, name, parent, item, examine, x, z):
         i = self.ext_res("PackedScene", "res://scenes/props/pickup.tscn")
@@ -78,6 +78,16 @@ class Scene:
     def tree(self, name, parent, x, z, scale, yaw=0.0, scene="res://assets/vegetation/tree_juniper.tscn"):
         i = self.ext_res("PackedScene", scene); cy = math.cos(yaw) * scale; sy = math.sin(yaw) * scale
         self.node(name, None, parent, f'transform = Transform3D({cy:.4f}, 0, {sy:.4f}, 0, {scale}, 0, {-sy:.4f}, 0, {cy:.4f}, {x}, 0, {z})', instance=i)
+
+    def building(self, name, parent, path, yaw=0.0, footprint=None, scale=1.0):
+        """A glb building at the parent's origin; optional box collider (w, h, d) so the player can't walk through."""
+        cy = math.cos(yaw) * scale; sy = math.sin(yaw) * scale
+        self.instance(name, parent, path, f'transform = Transform3D({cy:.4f}, 0, {sy:.4f}, 0, {scale}, 0, {-sy:.4f}, 0, {cy:.4f}, 0, 0, 0)')
+        if footprint:
+            w, h, d = footprint
+            self.sub.append(f'[sub_resource type="BoxShape3D" id="BS_{self.era}_{name}"]\nsize = Vector3({w}, {h}, {d})')
+            self.node(f"{name}Body", "StaticBody3D", parent, "collision_layer = 1\ncollision_mask = 0")
+            self.node("Shape", "CollisionShape3D", f"{parent}/{name}Body", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, {h / 2}, 0)\nshape = SubResource("BS_{self.era}_{name}")')
 
     def instance(self, name, parent, path, props=""):
         i = self.ext_res("PackedScene", path)
@@ -100,11 +110,7 @@ def common(s, era):
 def build_2026():
     s = Scene("era_2026"); common(s, "era_2026")
     s.group("Ruin", ".", *MANOR)
-    # north wall has a doorway in the middle so the book is visible from the spawn point
-    walls = [((MW - 5) / 2, 0.6, -(MW + 5) / 4, -MD / 2, 2.4), ((MW - 5) / 2, 0.6, (MW + 5) / 4, -MD / 2, 2.0),
-             (MW, 0.6, 0, MD / 2, 1.6), (0.6, MD, -MW / 2, 0, 2.8), (0.6, MD * 0.55, MW / 2, -MD * 0.22, 1.2)]
-    for i, (sx, sz, x, z, h) in enumerate(walls):
-        s.box(f"Wall{i}", "Ruin", (sx, h, sz), h / 2, STONE_C, x, z)
+    s.building("RuinModel", "Ruin", "res://assets/models/buildings/ruin.glb", yaw=math.pi)
     s.examine("RuinExamine", "Ruin", "EX_MANOR_2026", "LOC_MANOR", "LOC_MANOR", 0, -MD / 2 - 3)
     rp = s.ext_res("Script", "res://scripts/interaction/register_pickup.gd")
     s.node("RegisterBook", "Node3D", "Ruin", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, {-MD / 2 + 5})\nscript = ExtResource("{rp}")')
@@ -139,9 +145,16 @@ def build_2026():
         a = random.random() * math.tau; r = random.random() ** 0.5 * 45
         s.tree(f"Young{i}", "FieldForest", round(math.cos(a) * r, 1), round(math.sin(a) * r, 1), round(0.35 + random.random() * 0.3, 2), random.random() * 6.28)
     s.examine("ForestExamine", "FieldForest", "EX_FIELD_FOREST_2026", "LOC_NORTH_FIELD", "LOC_NORTH_FIELD", 0, 0)
-    s.npc("Leida", ".", "npc_leida", "leida", "NPC_LEIDA", (0.45, 0.5, 0.62), LEIDA[0], LEIDA[1], 1.55, 2.4)
+    s.npc("Leida", ".", "npc_leida", "leida", "NPC_LEIDA", (0.45, 0.5, 0.62), LEIDA[0], LEIDA[1], 1.55, 2.4, pose="holding")
     s.pickup("RustedTool", ".", "rusted_tool", "EX_RUSTED_TOOL", OAK[0] + 3, OAK[1] + 2)
     farm_plots(s, "era_2026", (FARM[0] + 2, FARM[1] + 14), 2, ["seed_potato", "seed_cabbage"])
+    # the real village: building footprints from the nDSM as simple massing (data/buildings_2026.json)
+    s.group("Village", ".", 0, 0)
+    bl = json.load(open(os.path.join(ROOT, "data/buildings_2026.json")))
+    for i, b in enumerate(bl):
+        s.group(f"B{i}", "Village", b["x"], b["z"])
+        s.box("Mass", f"Village/B{i}", (b["w"], b["h"], b["d"]), b["h"] / 2, tuple(min(1.0, k * 0.9) for k in b["color"]))
+        s.box("Roof", f"Village/B{i}", (b["w"] + 0.6, 0.25, b["d"] + 0.6), b["h"] + 0.12, tuple(k * 0.6 for k in b["color"]))
     trade_post(s, "era_2026", (MANOR[0] - MW / 2 - 12, MANOR[1] - 10), "POST_2026", (0.85, 0.85, 0.8))
     return s
 
@@ -149,14 +162,10 @@ def build_2026():
 def build_1938():
     s = Scene("era_1938"); common(s, "era_1938")
     s.group("School", ".", *MANOR)
-    s.box("House", "School", (MW, 7, MD), 3.5, PALE)
-    s.box("Roof", "School", (MW + 1, 1.2, MD + 1), 7.6, RED)
+    s.building("SchoolModel", "School", "res://assets/models/buildings/manor.glb", yaw=math.pi, footprint=(MW + 0.6, 8, MD + 0.6))
     s.examine("SchoolExamine", "School", "EX_MANOR_1938", "LOC_MANOR", "LOC_MANOR", 0, -MD / 2 - 3)
     s.group("Farm", ".", *FARM)
-    s.box("House", "Farm", (14, 3.6, 8), 1.8, DARKWOOD)
-    s.box("Roof", "Farm", (15, 1.0, 9), 4.1, (0.5, 0.42, 0.25))
-    s.box("Chimney", "Farm", (0.8, 2.2, 0.8), 5.2, RED, 3, 0)
-    s.box("Extension", "Farm", (6, 2.2, 5), 1.1, (0.6, 0.5, 0.35), 10, -1)
+    s.building("FarmModel", "Farm", "res://assets/models/buildings/farmhouse_1938.glb", footprint=(16.2, 3.5, 8.2))
     s.examine("FarmExamine", "Farm", "EX_FARM_1938", "LOC_FARMSTEAD", "LOC_FARMSTEAD", 0, 5.5)
     s.group("WellKept", ".", *WELL, flag="well_kept_open", visible_when=True)
     s.torus("Ring", "WellKept", 0.8, 1.2, STONE_C, 0.35)
@@ -179,8 +188,8 @@ def build_1938():
     s.examine("FieldExamine", "Field", "EX_FIELD_1938", "LOC_NORTH_FIELD", "LOC_NORTH_FIELD", 0, 0)
     s.group("Chapter2", ".", 0, 0, min_chapter=2)
     s.npc("Aino", "Chapter2", "npc_aino", "aino", "NPC_AINO", (0.7, 0.35, 0.3), FARM[0] + 3, FARM[1] + 6, 1.62, 3.0)
-    s.npc("Juhan", "Chapter2", "npc_juhan", "juhan", "NPC_JUHAN", (0.33, 0.36, 0.5), FIELD[0] + 3, FIELD[1] + 2, 1.8, -1.2)
-    s.npc("Villem", "Chapter2", "npc_villem", "villem", "NPC_VILLEM", (0.28, 0.28, 0.3), MANOR[0] - 9, MANOR[1] - MD / 2 - 6, 1.75, 0.8)
+    s.npc("Juhan", "Chapter2", "npc_juhan", "juhan", "NPC_JUHAN", (0.33, 0.36, 0.5), FIELD[0] + 3, FIELD[1] + 2, 1.8, -1.2, pose="holding")
+    s.npc("Villem", "Chapter2", "npc_villem", "villem", "NPC_VILLEM", (0.28, 0.28, 0.3), MANOR[0] - 9, MANOR[1] - MD / 2 - 6, 1.75, 0.8, pose="arms_folded")
     s.pickup("RegisterPage", "Chapter2", "register_page", "ITEM_REGISTER_PAGE_DESC", MANOR[0] + 9, MANOR[1] - MD / 2 - 3)
     s.pickup("AinoLetter", "Chapter2", "aino_letter", "ITEM_AINO_LETTER_DESC", FARM[0] - 5, FARM[1] + 5)
     s.pickup("ChurnLid", ".", "milk_churn_lid", "ITEM_MILK_CHURN_LID_DESC", 520, 600)
@@ -191,18 +200,16 @@ def build_1938():
 def build_1798():
     s = Scene("era_1798"); common(s, "era_1798")
     s.group("Manor", ".", *MANOR)
-    s.box("House", "Manor", (MW, 7, MD), 3.5, PALE)
-    s.box("Roof", "Manor", (MW + 1, 1.4, MD + 1), 7.7, (0.35, 0.3, 0.25))
+    s.building("ManorModel", "Manor", "res://assets/models/buildings/manor.glb", yaw=math.pi, footprint=(MW + 0.6, 8, MD + 0.6))
     s.examine("ManorExamine", "Manor", "EX_MANOR_1798", "LOC_MANOR", "LOC_MANOR", 0, -MD / 2 - 3)
     s.pickup("ManorKey", "Manor", "manor_key", "ITEM_MANOR_KEY_DESC", 4, -MD / 2 - 2.5)
-    s.npc("Hans", "Manor", "npc_hans", "hans", "NPC_HANS", (0.2, 0.2, 0.26), -6, -MD / 2 - 5, 1.72, 0.5)
+    s.npc("Hans", "Manor", "npc_hans", "hans", "NPC_HANS", (0.2, 0.2, 0.26), -6, -MD / 2 - 5, 1.72, 0.5, pose="arms_folded")
     s.group("Farm", ".", *FARM)
-    s.box("Rehielamu", "Farm", (16, 3.0, 8), 1.5, DARKWOOD)
-    s.box("Thatch", "Farm", (17, 1.6, 9), 3.8, (0.55, 0.45, 0.25))
+    s.building("FarmModel", "Farm", "res://assets/models/buildings/rehielamu.glb", footprint=(16.2, 3.0, 8.2))
     s.examine("FarmExamine", "Farm", "EX_FARM_1798", "LOC_FARMSTEAD", "LOC_FARMSTEAD", 0, 5.5)
     s.pickup("Ploughshare", "Farm", "ploughshare", "ITEM_PLOUGHSHARE_DESC", 6, 5.5)
     s.pickup("Hymnbook", "Farm", "hymnbook", "ITEM_HYMNBOOK_DESC", -4, 5.2)
-    s.npc("Mart", "Farm", "npc_mart", "mart", "NPC_MART", (0.4, 0.3, 0.2), 3, -7, 1.68, 2.8)
+    s.npc("Mart", "Farm", "npc_mart", "mart", "NPC_MART", (0.4, 0.3, 0.2), 3, -7, 1.68, 2.8, pose="holding")
     s.group("WellSite", ".", *WELL)
     s.torus("HalfRing", "WellSite", 0.8, 1.2, STONE_C, 0.15)
     sp = s.ext_res("Script", "res://scripts/interaction/story_point.gd")

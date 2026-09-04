@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://dl2wwmwu1jcee"
+valid=false
+
+[deps]
+
+source_file="res://data/buildings_2026.json"
+
+[params]
+
+compress=true

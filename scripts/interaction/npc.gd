@@ -5,8 +5,11 @@ extends Interactable
 
 @export var npc_id := ""             # e.g. "npc_leida" (matches ArtifactItem.valid_delivery_target)
 @export var knot := ""               # ink knot to start
-@export var body_color := Color(0.5, 0.4, 0.3)
+@export var body_color := Color(0.5, 0.4, 0.3)   # clothes colour
 @export var height := 1.7
+@export var pose := "stand"                       # stand | arms_folded | holding
+
+const FIGURE_HEIGHT := 1.75
 
 @onready var name_label: Label3D = $NameLabel
 @onready var mesh: MeshInstance3D = $Body
@@ -15,12 +18,19 @@ extends Interactable
 func _ready() -> void:
 	prompt_key = "UI_PROMPT_TALK"
 	name_label.text = tr(label_key)
-	var mat := StandardMaterial3D.new()
-	mat.albedo_color = body_color
-	mat.roughness = 0.9
-	mesh.material_override = mat
-	mesh.scale = Vector3(1, height / 1.8, 1)
-	mesh.position.y = height / 2.0
+	mesh.visible = false
+	var fig: Node = load("res://assets/models/figures/figure_%s.glb" % pose).instantiate()
+	add_child(fig)
+	var k := height / FIGURE_HEIGHT
+	fig.scale = Vector3(k, k, k)
+	for mi in fig.find_children("*", "MeshInstance3D", true, false):
+		for si in mi.mesh.get_surface_count():
+			var m: Material = mi.mesh.surface_get_material(si)
+			if m and m.resource_name == "Clothes":
+				var mat := StandardMaterial3D.new()
+				mat.albedo_color = body_color
+				mat.roughness = 0.9
+				mi.set_surface_override_material(si, mat)
 	name_label.position.y = height + 0.35
 
 
