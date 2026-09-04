@@ -67,8 +67,19 @@ for name, (preset, overrides, foliage, bark_rgb, height, leaf_scale) in SPECIES.
     bpy.ops.object.convert(target='MESH')
     tree = bpy.context.active_object
     tree.data.materials.clear(); tree.data.materials.append(mat_bark(bark_rgb))
+    if not tree.data.uv_layers:
+        tree.data.uv_layers.new(name="UVMap")   # join keeps the active object's UV layers only
     if leaves:
         leaves.data.materials.clear(); leaves.data.materials.append(mat_foliage(foliage))
+        # Sapling's rect leaves come without usable UVs: map each card to the full texture.
+        for lay in list(leaves.data.uv_layers):
+            leaves.data.uv_layers.remove(lay)
+        uv = leaves.data.uv_layers.new(name="UVMap")
+        corners = [(0, 0), (1, 0), (1, 1), (0, 1)]
+        for poly in leaves.data.polygons:
+            n = len(poly.loop_indices)
+            for i, li in enumerate(poly.loop_indices):
+                uv.data[li].uv = corners[i % 4] if n == 4 else [(0, 0), (1, 0), (0.5, 1)][i % 3]
     objs = [tree] + ([leaves] if leaves else [])
     bpy.ops.object.select_all(action='DESELECT')
     for o in objs: o.select_set(True)
