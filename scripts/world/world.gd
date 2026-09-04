@@ -70,6 +70,9 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	if sky and sky.tod:
 		Farming.tick_clock(sky.tod.current_time)
+		var current: EraController = _era_nodes.get(GameState.current_era)
+		if current:
+			current.set_hour(sky.tod.current_time)
 	if _screenshot_path.is_empty():
 		return
 	_frames += 1

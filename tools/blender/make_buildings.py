@@ -111,7 +111,7 @@ def export(name, objs):
 # ---------------------------------------------------------------- manor house (24 x 32, two storeys)
 reset()
 W, D, H = 24, 32, 7.2
-wall = mat("ManorWall", (1, 1, 1), texture="plaster", tile=3.0, tint=(0.92, 0.8, 0.5)); roof = mat("ManorRoof", (1, 1, 1), texture="rooftiles", tile=2.0, tint=(0.55, 0.5, 0.45)); dark = mat("Window", (0.12, 0.13, 0.16), 0.3)
+wall = mat("ManorWall", (1, 1, 1), texture="plaster", tile=3.0, tint=(0.92, 0.8, 0.5)); roof = mat("ManorRoof", (1, 1, 1), texture="rooftiles", tile=2.0, tint=(0.55, 0.5, 0.45)); dark = mat("Window", (0.10, 0.12, 0.16), 0.06)
 white = mat("Trim", (0.95, 0.93, 0.88)); stone = mat("Plinth", (1, 1, 1), texture="rock", tile=2.0, tint=(0.9, 0.88, 0.82))
 objs = [box("Body", (W, D, H), (0, 0, H / 2), wall), box("Plinth", (W + 0.4, D + 0.4, 0.8), (0, 0, 0.4), stone),
         box("Cornice", (W + 0.6, D + 0.6, 0.35), (0, 0, H + 0.17), white),
@@ -164,7 +164,7 @@ export("rehielamu", objs)
 # ---------------------------------------------------------------- 1938 farmhouse: same walls, new tiled roof, chimney, extension
 reset()
 log = mat("Log38", (1, 1, 1), texture="woodsiding", tile=2.0, tint=(0.7, 0.55, 0.35)); tile = mat("Tile", (1, 1, 1), texture="rooftiles", tile=1.5, tint=(0.95, 0.5, 0.35)); chim = mat("Chimney", (0.6, 0.35, 0.28))
-white = mat("Frame", (0.9, 0.88, 0.8)); dark = mat("Pane", (0.15, 0.17, 0.2), 0.3); door = mat("Door38", (0.25, 0.3, 0.2))
+white = mat("Frame", (0.9, 0.88, 0.8)); dark = mat("Window", (0.10, 0.12, 0.16), 0.06); door = mat("Door38", (0.25, 0.3, 0.2))
 objs = [box("Walls", (16, 8, 3.0), (0, 0, 1.5), log), hipped_roof("Roof", 16, 8, 3.0, 3.2, 0.7, tile, ridge_frac=0.5),
         box("Chimney", (0.8, 0.8, 2.4), (3, 0, 5.4), chim), box("Door", (1.2, 0.1, 2.1), (2.5, -4.05, 1.05), door),
         box("Extension", (6, 5, 2.6), (11, -1, 1.3), mat("ExtWall", (0.55, 0.45, 0.3))),
