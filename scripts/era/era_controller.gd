@@ -41,5 +41,15 @@ func _snap_list(nodes: Array, terrain: Terrain3D) -> void:
 	for c in nodes:
 		if c is Node3D:
 			var h := terrain.data.get_height(c.global_position)
+			if c.has_meta("footprint"):
+				# buildings: sit on the lowest corner so nothing hangs in the air; the skirt fills the rest
+				var fp: Vector2 = c.get_meta("footprint")
+				var basis: Basis = c.global_transform.basis
+				for sx in [-0.5, 0.5]:
+					for sz in [-0.5, 0.5]:
+						var corner: Vector3 = c.global_position + basis * Vector3(sx * fp.x, 0, sz * fp.y)
+						var hc := terrain.data.get_height(corner)
+						if not is_nan(hc):
+							h = hc if is_nan(h) else minf(h, hc)
 			if not is_nan(h):
 				c.global_position.y = h + float(c.get_meta("lift", 0.0))
