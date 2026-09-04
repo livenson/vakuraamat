@@ -51,6 +51,7 @@ func _load_dir(dir: String, into: Dictionary) -> void:
 	if d == null:
 		return
 	for f in d.get_files():
+		f = f.trim_suffix(".remap")   # exported builds list converted resources with this suffix
 		if f.ends_with(".tres") or f.ends_with(".res"):
 			var r: Resource = load(dir + f)
 			if r and "id" in r:

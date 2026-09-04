@@ -16,6 +16,7 @@ func _ready() -> void:
 		var d := DirAccess.open(pair[0])
 		if d:
 			for f in d.get_files():
+				f = f.trim_suffix(".remap")
 				if f.ends_with(".tres"):
 					var r: Resource = load(pair[0] + f)
 					pair[1][r.id] = r
