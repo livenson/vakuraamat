@@ -178,6 +178,18 @@ func _build_panel(title_key: String) -> PanelContainer:
 
 
 # ---------------------------------------------------------------- HUD
+func _objective() -> String:
+	if not GameState.register_unlocked:
+		return tr("OBJ_FIND_REGISTER")
+	if GameState.chapter == 1:
+		return tr("OBJ_VISIT_ERAS")
+	if GameState.chapter == 2:
+		return tr("OBJ_MEET_1938")
+	if GameState.chapter == 3 and not TimelineState.has_flag("epilogue"):
+		return tr("OBJ_SIT")
+	return ""
+
+
 func _refresh_era_label() -> void:
 	var era := GameState.era(GameState.current_era)
 	if era == null:
@@ -189,6 +201,9 @@ func _refresh_era_label() -> void:
 		4: chap = "  ·  " + tr("UI_EPILOGUE")
 		_: chap = "  ·  " + tr("UI_CHAPTER") % GameState.chapter
 	era_label.text = "%s  %s   %s%s" % [era.year_label, tr(era.display_name_key), world.clock_string(), chap]
+	var obj := _objective()
+	if obj != "":
+		era_label.text += "\n" + obj
 	keys_label.text = tr("UI_KEYS")
 
 

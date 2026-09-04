@@ -12,6 +12,6 @@ scene_path = "res://scenes/eras/era_1938.tscn"
 terrain_texture = ExtResource("2")
 texture_strength = 0.4
 ground_tint = Color(1.0, 0.97, 0.9, 1)
-default_time_of_day = 9.0
+default_time_of_day = 9.5
 order = 1
 narrative_story = "res://assets/narrative/era_1938.ink.json"

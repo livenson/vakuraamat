@@ -12,6 +12,6 @@ scene_path = "res://scenes/eras/era_2026.tscn"
 terrain_texture = ExtResource("2")
 texture_strength = 1.0
 ground_tint = Color(1, 1, 1, 1)
-default_time_of_day = 17.5
+default_time_of_day = 14.5
 order = 2
 narrative_story = "res://assets/narrative/era_2026.ink.json"
