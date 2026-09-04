@@ -14,6 +14,7 @@ func _ready() -> void:
 	var d := DirAccess.open(DIR)
 	if d:
 		for f in d.get_files():
+			f = f.trim_suffix(".remap")
 			if f.ends_with(".tres"):
 				goods.append(load(DIR + f))
 

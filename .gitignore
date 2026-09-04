@@ -1,7 +1,6 @@
 # Godot
 .godot/
 *.tmp
-export_presets.cfg
 # Raw geodata downloads (regenerate with tools/pipeline/fetch_tile.py)
 data_raw/
 # macOS
@@ -11,3 +10,4 @@ data_raw/
 
 # Node modules for the ink compiler
 tools/ink/node_modules/
+build/
