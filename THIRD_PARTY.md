@@ -22,6 +22,7 @@ content (writing, models, textures), with the data attribution below carried in 
 | Ink scripts, strings, design docs | ours | `assets/narrative`, `assets/i18n`, `*.md` | project's own | – | yes |
 | Godot export templates | 4.7.2 | not in repo | MIT | – | yes |
 | ambientCG LeafSet013, LeafSet019 (foliage cards) | 1K, 2026-09-04 | `assets/textures/foliage` (recomposed) | CC0 1.0 | none | yes |
+| ambientCG Plaster001, WoodSiding001, RoofingTiles006, Rock035, Bark012 (building materials) | 1K, 2026-09-04 | `assets/textures/buildings`, embedded in `assets/models/buildings/*.glb` | CC0 1.0 | none | yes |
 | Blender Sapling Tree Gen (extension) | via extensions.blender.org, 2026-09-04 | tool only (`tools/blender/make_trees.py`); trees in `assets/models/trees` are its output | GPL-2.0-or-later (the add-on); generated meshes are ours | not shipped; presets read at generation time | yes (output only) |
 
 ## Candidates under evaluation (visual upgrade plan)

@@ -10,11 +10,46 @@ os.makedirs(out_dir, exist_ok=True)
 random.seed(1938)
 
 
-def mat(name, rgb, rough=0.9):
+ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+TEX = os.path.join(ROOT, "assets/textures/buildings")
+
+
+def mat(name, rgb, rough=0.9, texture=None, tile=2.0, tint=(1, 1, 1)):
+    """Principled material; with `texture`, colour + normal maps from assets/textures/buildings,
+    box-projected at `tile` metres per repeat (see box_uv). rgb is used as a fallback/tint."""
     m = bpy.data.materials.new(name); m.use_nodes = True
-    b = m.node_tree.nodes["Principled BSDF"]
+    nt = m.node_tree; b = nt.nodes["Principled BSDF"]
     b.inputs["Base Color"].default_value = (*rgb, 1); b.inputs["Roughness"].default_value = rough
+    col_path = os.path.join(TEX, f"{texture}_color.jpg") if texture else None
+    if col_path and os.path.exists(col_path):
+        tex = nt.nodes.new("ShaderNodeTexImage"); tex.image = bpy.data.images.load(col_path)
+        mix = nt.nodes.new("ShaderNodeMix"); mix.data_type = 'RGBA'; mix.blend_type = 'MULTIPLY'; mix.inputs[0].default_value = 1.0
+        nt.links.new(tex.outputs["Color"], mix.inputs[6]); mix.inputs[7].default_value = (*tint, 1)
+        nt.links.new(mix.outputs[2], b.inputs["Base Color"])
+        nrm_path = os.path.join(TEX, f"{texture}_normal.jpg")
+        if os.path.exists(nrm_path):
+            ntex = nt.nodes.new("ShaderNodeTexImage"); ntex.image = bpy.data.images.load(nrm_path); ntex.image.colorspace_settings.name = 'Non-Color'
+            nmap = nt.nodes.new("ShaderNodeNormalMap"); nmap.inputs["Strength"].default_value = 0.8
+            nt.links.new(ntex.outputs["Color"], nmap.inputs["Color"]); nt.links.new(nmap.outputs["Normal"], b.inputs["Normal"])
+    m["tile"] = tile
     return m
+
+
+def box_uv(obj):
+    """Box-project UVs per face by dominant normal, scaled per material tile size (metres/repeat)."""
+    me = obj.data
+    if not me.uv_layers:
+        me.uv_layers.new(name="UVMap")
+    uv = me.uv_layers[0]
+    for poly in me.polygons:
+        matslot = me.materials[poly.material_index] if me.materials else None
+        tile = float(matslot.get("tile", 2.0)) if matslot else 2.0
+        n = poly.normal
+        ax = max(range(3), key=lambda i: abs(n[i]))
+        for li in poly.loop_indices:
+            co = obj.matrix_world @ me.vertices[me.loops[li].vertex_index].co if False else me.vertices[me.loops[li].vertex_index].co
+            u, v = ((co.y, co.z) if ax == 0 else (co.x, co.z) if ax == 1 else (co.x, co.y))
+            uv.data[li].uv = (u / tile, v / tile)
 
 
 def reset():
@@ -67,6 +102,7 @@ def export(name, objs):
     bpy.context.view_layer.objects.active = objs[0]
     bpy.ops.object.join()
     root = bpy.context.active_object; root.name = name
+    box_uv(root)
     path = os.path.join(out_dir, name + ".glb")
     bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', use_selection=True, export_apply=True, export_yup=True)
     print("exported", path, "faces", len(root.data.polygons))
@@ -75,8 +111,8 @@ def export(name, objs):
 # ---------------------------------------------------------------- manor house (24 x 32, two storeys)
 reset()
 W, D, H = 24, 32, 7.2
-wall = mat("ManorWall", (0.80, 0.66, 0.36)); roof = mat("ManorRoof", (0.35, 0.3, 0.27)); dark = mat("Window", (0.12, 0.13, 0.16), 0.3)
-white = mat("Trim", (0.95, 0.93, 0.88)); stone = mat("Plinth", (0.6, 0.58, 0.55))
+wall = mat("ManorWall", (1, 1, 1), texture="plaster", tile=3.0, tint=(0.92, 0.8, 0.5)); roof = mat("ManorRoof", (1, 1, 1), texture="rooftiles", tile=2.0, tint=(0.55, 0.5, 0.45)); dark = mat("Window", (0.12, 0.13, 0.16), 0.3)
+white = mat("Trim", (0.95, 0.93, 0.88)); stone = mat("Plinth", (1, 1, 1), texture="rock", tile=2.0, tint=(0.8, 0.78, 0.72))
 objs = [box("Body", (W, D, H), (0, 0, H / 2), wall), box("Plinth", (W + 0.4, D + 0.4, 0.8), (0, 0, 0.4), stone),
         box("Cornice", (W + 0.6, D + 0.6, 0.35), (0, 0, H + 0.17), white),
         hipped_roof("Roof", W, D, H + 0.3, 4.2, 0.8, roof)]
@@ -92,7 +128,7 @@ export("manor", objs)
 
 # ---------------------------------------------------------------- ruin of the same footprint
 reset()
-stone = mat("RuinStone", (0.5, 0.45, 0.38)); rubble = mat("Rubble", (0.42, 0.38, 0.32))
+stone = mat("RuinStone", (1, 1, 1), texture="rock", tile=1.6, tint=(1.15, 1.05, 0.9)); rubble = mat("Rubble", (1, 1, 1), texture="rock", tile=1.0, tint=(1.0, 0.92, 0.8))
 objs = []
 def ruined_wall(name, length, along_x, offset, base_h):
     n = int(length / 2.4)
@@ -116,7 +152,7 @@ export("ruin", objs)
 
 # ---------------------------------------------------------------- 1798 rehielamu (barn-dwelling), 16 x 8, log walls, high thatch
 reset()
-log = mat("Log", (0.26, 0.18, 0.1)); thatch = mat("Thatch", (0.48, 0.36, 0.17)); door = mat("Door", (0.22, 0.16, 0.1))
+log = mat("Log", (1, 1, 1), texture="bark", tile=1.5, tint=(0.75, 0.62, 0.45)); thatch = mat("Thatch", (1, 1, 1), texture="thatch", tile=2.5, tint=(0.85, 0.7, 0.4)) if os.path.exists(os.path.join(TEX, "thatch_color.jpg")) else mat("Thatch", (0.48, 0.36, 0.17)); door = mat("Door", (0.22, 0.16, 0.1))
 objs = [box("Walls", (16, 8, 2.6), (0, 0, 1.3), log)]
 for k in range(6):
     objs.append(box(f"LogLine{k}", (16.1, 8.1, 0.06), (0, 0, 0.35 + k * 0.42), mat(f"LogGap{k}", (0.2, 0.15, 0.1))))
@@ -127,7 +163,7 @@ export("rehielamu", objs)
 
 # ---------------------------------------------------------------- 1938 farmhouse: same walls, new tiled roof, chimney, extension
 reset()
-log = mat("Log38", (0.36, 0.27, 0.17)); tile = mat("Tile", (0.55, 0.28, 0.2)); chim = mat("Chimney", (0.6, 0.35, 0.28))
+log = mat("Log38", (1, 1, 1), texture="woodsiding", tile=2.0, tint=(0.7, 0.55, 0.35)); tile = mat("Tile", (1, 1, 1), texture="rooftiles", tile=1.5, tint=(0.95, 0.5, 0.35)); chim = mat("Chimney", (0.6, 0.35, 0.28))
 white = mat("Frame", (0.9, 0.88, 0.8)); dark = mat("Pane", (0.15, 0.17, 0.2), 0.3); door = mat("Door38", (0.25, 0.3, 0.2))
 objs = [box("Walls", (16, 8, 3.0), (0, 0, 1.5), log), hipped_roof("Roof", 16, 8, 3.0, 3.2, 0.7, tile, ridge_frac=0.5),
         box("Chimney", (0.8, 0.8, 2.4), (3, 0, 5.4), chim), box("Door", (1.2, 0.1, 2.1), (2.5, -4.05, 1.05), door),
