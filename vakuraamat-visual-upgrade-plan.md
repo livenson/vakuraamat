@@ -37,5 +37,5 @@ screenshot; 2 because the user named trees as the worst; 3–6 as time allows.
 - [x] 2 trees (Sapling birch/pine/spruce with CC0 foliage cards, own impostor baker, LOD at 110 m)
 - [x] 3 grass (procedural blade cards, wind shader, per-instance tint; own implementation, no addon)
 - [x] 4 water (ponds detected from flat DTM patches; own ripple shader with sky reflection; no addon)
-- [ ] 5 ground decals
-- [ ] 6 building textures
+- [~] 5 ground decals: skipped for now; the 25 cm orthophoto already carries roads and yards, decals add little until buildings are final
+- [x] 6 building textures (ambientCG plaster/wood/tiles/rock/bark, box-projected UVs in the Blender scripts)
