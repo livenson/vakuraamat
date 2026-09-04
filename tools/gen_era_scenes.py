@@ -100,14 +100,16 @@ def common(s, era):
 def build_2026():
     s = Scene("era_2026"); common(s, "era_2026")
     s.group("Ruin", ".", *MANOR)
-    for i, (sx, sz, x, z) in enumerate([(MW, 0.6, 0, -MD / 2), (MW, 0.6, 0, MD / 2), (0.6, MD, -MW / 2, 0), (0.6, MD * 0.55, MW / 2, -MD * 0.22)]):
-        h = [2.4, 1.6, 2.8, 1.2][i]
+    # north wall has a doorway in the middle so the book is visible from the spawn point
+    walls = [((MW - 5) / 2, 0.6, -(MW + 5) / 4, -MD / 2, 2.4), ((MW - 5) / 2, 0.6, (MW + 5) / 4, -MD / 2, 2.0),
+             (MW, 0.6, 0, MD / 2, 1.6), (0.6, MD, -MW / 2, 0, 2.8), (0.6, MD * 0.55, MW / 2, -MD * 0.22, 1.2)]
+    for i, (sx, sz, x, z, h) in enumerate(walls):
         s.box(f"Wall{i}", "Ruin", (sx, h, sz), h / 2, STONE_C, x, z)
     s.examine("RuinExamine", "Ruin", "EX_MANOR_2026", "LOC_MANOR", "LOC_MANOR", 0, -MD / 2 - 3)
     rp = s.ext_res("Script", "res://scripts/interaction/register_pickup.gd")
-    s.node("RegisterBook", "Node3D", "Ruin", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 0, {-MD / 2 + 4})\nscript = ExtResource("{rp}")')
-    s.node("BookMesh", "CSGBox3D", "Ruin/RegisterBook", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.55, 0)\nsize = Vector3(0.4, 0.12, 0.3)\nmaterial = {s.mat((0.35, 0.2, 0.1), 0.7)}')
-    s.node("Plinth", "CSGBox3D", "Ruin/RegisterBook", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.25, 0)\nsize = Vector3(0.8, 0.5, 0.6)\nmaterial = {s.mat(STONE_C)}')
+    s.node("RegisterBook", "Node3D", "Ruin", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, {-MD / 2 + 5})\nscript = ExtResource("{rp}")')
+    s.node("BookMesh", "CSGBox3D", "Ruin/RegisterBook", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)\nsize = Vector3(0.45, 0.12, 0.32)\nmaterial = {s.mat((0.45, 0.25, 0.1), 0.6)}')
+    s.node("Plinth", "CSGBox3D", "Ruin/RegisterBook", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)\nsize = Vector3(0.9, 0.9, 0.7)\nmaterial = {s.mat((0.7, 0.68, 0.62))}')
     s.node("Body3D", "StaticBody3D", "Ruin/RegisterBook", "collision_layer = 2\ncollision_mask = 0")
     s.sub.append('[sub_resource type="SphereShape3D" id="S1"]\nradius = 1.2')
     s.node("Shape", "CollisionShape3D", "Ruin/RegisterBook/Body3D", 'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)\nshape = SubResource("S1")')
