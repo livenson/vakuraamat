@@ -112,7 +112,7 @@ def export(name, objs):
 reset()
 W, D, H = 24, 32, 7.2
 wall = mat("ManorWall", (1, 1, 1), texture="plaster", tile=3.0, tint=(0.92, 0.8, 0.5)); roof = mat("ManorRoof", (1, 1, 1), texture="rooftiles", tile=2.0, tint=(0.55, 0.5, 0.45)); dark = mat("Window", (0.12, 0.13, 0.16), 0.3)
-white = mat("Trim", (0.95, 0.93, 0.88)); stone = mat("Plinth", (1, 1, 1), texture="rock", tile=2.0, tint=(0.8, 0.78, 0.72))
+white = mat("Trim", (0.95, 0.93, 0.88)); stone = mat("Plinth", (1, 1, 1), texture="rock", tile=2.0, tint=(0.9, 0.88, 0.82))
 objs = [box("Body", (W, D, H), (0, 0, H / 2), wall), box("Plinth", (W + 0.4, D + 0.4, 0.8), (0, 0, 0.4), stone),
         box("Cornice", (W + 0.6, D + 0.6, 0.35), (0, 0, H + 0.17), white),
         hipped_roof("Roof", W, D, H + 0.3, 4.2, 0.8, roof)]
@@ -128,7 +128,7 @@ export("manor", objs)
 
 # ---------------------------------------------------------------- ruin of the same footprint
 reset()
-stone = mat("RuinStone", (1, 1, 1), texture="rock", tile=1.6, tint=(1.15, 1.05, 0.9)); rubble = mat("Rubble", (1, 1, 1), texture="rock", tile=1.0, tint=(1.0, 0.92, 0.8))
+stone = mat("RuinStone", (1, 1, 1), texture="rock", tile=1.6, tint=(0.95, 0.92, 0.85)); rubble = mat("Rubble", (1, 1, 1), texture="rock", tile=1.0, tint=(0.85, 0.8, 0.72))
 objs = []
 def ruined_wall(name, length, along_x, offset, base_h):
     n = int(length / 2.4)
