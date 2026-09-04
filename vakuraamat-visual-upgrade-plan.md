@@ -39,3 +39,10 @@ screenshot; 2 because the user named trees as the worst; 3–6 as time allows.
 - [x] 4 water (ponds detected from flat DTM patches; own ripple shader with sky reflection; no addon)
 - [~] 5 ground decals: skipped for now; the 25 cm orthophoto already carries roads and yards, decals add little until buildings are final
 - [x] 6 building textures (ambientCG plaster/wood/tiles/rock/bark, box-projected UVs in the Blender scripts)
+
+## Result
+
+| | |
+|---|---|
+| ![Forest road after the tree and lighting steps](docs/screenshots/forest_road.jpg) trees, impostors, lighting | ![Manor with textures](docs/screenshots/manor_1938.jpg) building textures, levelled pad, glass windows |
+| ![Farm with pond](docs/screenshots/farm_1938.jpg) water, grass, grounded buildings | ![Barn-dwelling](docs/screenshots/barn_1798.jpg) 1798 barn-dwelling with straw and log textures |
