@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://647gokn0p7kl"
+valid=false
+
+[deps]
+
+source_file="res://data/water_2026.json"
+
+[params]
+
+compress=true

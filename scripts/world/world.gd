@@ -27,6 +27,7 @@ func _ready() -> void:
 	terrain.set_camera(player.camera)
 	_configure_sky()
 	_apply_orthophoto()
+	_place_water()
 	fade.color.a = 1.0
 	await get_tree().process_frame
 	if GameState.pending_load and SaveManager.has_save():
@@ -157,6 +158,25 @@ func _configure_environment() -> void:
 	env.adjustment_contrast = 1.05
 	env.adjustment_saturation = 1.08
 	terrain.gi_mode = GeometryInstance3D.GI_MODE_STATIC
+
+
+## Still water from data/water_2026.json (flat patches in the laser DTM): the same ponds in every era.
+func _place_water() -> void:
+	if not FileAccess.file_exists("res://data/water_2026.json"):
+		return
+	var ponds: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/water_2026.json"))
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://assets/shaders/water.gdshader")
+	mat.set_shader_parameter("normal_map", load("res://assets/textures/water_normal.png"))
+	for p in ponds:
+		var mi := MeshInstance3D.new()
+		var pm := PlaneMesh.new()
+		pm.size = Vector2(float(p.w) + 4.0, float(p.d) + 4.0)
+		mi.mesh = pm
+		mi.material_override = mat
+		mi.position = Vector3(float(p.x), float(p.level) + 0.08, float(p.z))
+		mi.name = "Pond"
+		add_child(mi)
 
 
 func _snap(node: Node3D, lift: float) -> void:

@@ -174,7 +174,7 @@ location_id = "LOC_MANOR"
 label_key = "LOC_MANOR"
 
 [node name="Farm" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 358, 0, 551)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 377, 0, 552)
 script = ExtResource("1")
 metadata/footprint = Vector2(16.2, 8.2)
 
@@ -201,7 +201,7 @@ location_id = "LOC_FARMSTEAD"
 label_key = "LOC_FARMSTEAD"
 
 [node name="WellKept" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 390, 0, 542)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 399, 0, 543)
 script = ExtResource("1")
 flag = "well_kept_open"
 visible_when = true
@@ -236,7 +236,7 @@ location_id = "LOC_WELL"
 label_key = "LOC_WELL"
 
 [node name="WellGone" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 390, 0, 542)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 399, 0, 543)
 script = ExtResource("1")
 flag = "well_kept_open"
 visible_when = false
@@ -345,7 +345,7 @@ script = ExtResource("1")
 min_chapter = 2
 
 [node name="Aino" parent="Chapter2" instance=ExtResource("7")]
-transform = Transform3D(-0.9900, 0, 0.1411, 0, 1, 0, -0.1411, 0, -0.9900, 361, 0, 557)
+transform = Transform3D(-0.9900, 0, 0.1411, 0, 1, 0, -0.1411, 0, -0.9900, 380, 0, 558)
 npc_id = "npc_aino"
 knot = "aino"
 label_key = "NPC_AINO"
@@ -378,7 +378,7 @@ era_id = "era_1938"
 examine_key = "ITEM_REGISTER_PAGE_DESC"
 
 [node name="AinoLetter" parent="Chapter2" instance=ExtResource("8")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 353, 0, 556)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 372, 0, 557)
 item_id = "aino_letter"
 era_id = "era_1938"
 examine_key = "ITEM_AINO_LETTER_DESC"
@@ -390,7 +390,7 @@ era_id = "era_1938"
 examine_key = "ITEM_MILK_CHURN_LID_DESC"
 
 [node name="TradePost" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 380, 0, 547)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 399, 0, 548)
 script = ExtResource("9")
 era_id = "era_1938"
 post_name_key = "POST_1938"
@@ -431,7 +431,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 shape = SubResource("TP_era_1938")
 
 [node name="Manor_kaseoja_farm" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 368, 0, 543)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 387, 0, 544)
 script = ExtResource("10")
 manor_id = "kaseoja_farm"
 
@@ -477,7 +477,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
 shape = SubResource("MS_manor_park")
 
 [node name="Farming" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 352, 0, 565)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 371, 0, 566)
 script = ExtResource("1")
 
 [node name="Plot0" parent="Farming" instance=ExtResource("11")]

@@ -116,7 +116,7 @@ height = 1.72
 pose = "arms_folded"
 
 [node name="Farm" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 358, 0, 551)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 377, 0, 552)
 script = ExtResource("1")
 metadata/footprint = Vector2(16.2, 8.2)
 
@@ -164,7 +164,7 @@ height = 1.68
 pose = "holding"
 
 [node name="WellSite" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 390, 0, 542)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 399, 0, 543)
 script = ExtResource("1")
 
 [node name="HalfRing" type="CSGTorus3D" parent="WellSite"]

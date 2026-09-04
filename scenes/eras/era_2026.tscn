@@ -283,7 +283,7 @@ location_id = "LOC_ORCHARD"
 label_key = "LOC_ORCHARD"
 
 [node name="Farm" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 358, 0, 551)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 377, 0, 552)
 script = ExtResource("1")
 
 [node name="Foundation" type="CSGBox3D" parent="Farm"]
@@ -298,7 +298,7 @@ location_id = "LOC_FARMSTEAD"
 label_key = "LOC_FARMSTEAD"
 
 [node name="WellRing" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 390, 0, 542)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 399, 0, 543)
 script = ExtResource("1")
 flag = "well_kept_open"
 visible_when = true
@@ -318,7 +318,7 @@ location_id = "LOC_WELL"
 label_key = "LOC_WELL"
 
 [node name="WellDip" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 390, 0, 542)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 399, 0, 543)
 script = ExtResource("1")
 flag = "well_kept_open"
 visible_when = false
@@ -491,7 +491,7 @@ era_id = "era_2026"
 examine_key = "EX_RUSTED_TOOL"
 
 [node name="Farming" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 360, 0, 565)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 379, 0, 566)
 script = ExtResource("1")
 
 [node name="Plot0" parent="Farming" instance=ExtResource("11")]
