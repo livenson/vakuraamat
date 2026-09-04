@@ -30,7 +30,15 @@ func _snap_children() -> void:
 	var terrain: Terrain3D = GameState.world.terrain if GameState.world else null
 	if terrain == null:
 		return
+	_snap_list(get_children(), terrain)
+	# one level deeper for container groups (e.g. the village massing)
 	for c in get_children():
+		if c is Node3D and c.get_child_count() > 0 and c.name == "Village":
+			_snap_list(c.get_children(), terrain)
+
+
+func _snap_list(nodes: Array, terrain: Terrain3D) -> void:
+	for c in nodes:
 		if c is Node3D:
 			var h := terrain.data.get_height(c.global_position)
 			if not is_nan(h):
