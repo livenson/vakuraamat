@@ -1,8 +1,11 @@
 [gd_resource type="Terrain3DAssets" format=3]
 
+[ext_resource type="PackedScene" path="res://assets/models/trees/pine_lod.tscn" id="1_6k0bd"]
 [ext_resource type="PackedScene" path="res://assets/vegetation/tree_juniper.tscn" id="1_mn37j"]
+[ext_resource type="PackedScene" path="res://assets/models/trees/spruce_lod.tscn" id="2_4owig"]
 [ext_resource type="PackedScene" path="res://assets/vegetation/tree_juniper_dead.tscn" id="2_jqbyg"]
 [ext_resource type="PackedScene" path="res://assets/vegetation/bush_jello.tscn" id="3_g1h4r"]
+[ext_resource type="PackedScene" path="res://assets/models/trees/birch_lod.tscn" id="3_xse01"]
 [ext_resource type="PackedScene" path="res://assets/vegetation/bush_brush.tscn" id="4_g1h05"]
 [ext_resource type="PackedScene" path="res://assets/vegetation/grass_tuft.tscn" id="5_bk6l8"]
 [ext_resource type="PackedScene" path="res://assets/vegetation/clover.tscn" id="6_uy5wq"]
@@ -15,53 +18,83 @@
 [ext_resource type="Texture2D" path="res://assets/terrain/textures/gravel_alb_ht.png" id="13_7lcjq"]
 [ext_resource type="Texture2D" path="res://assets/terrain/textures/gravel_nrm_rgh.png" id="14_dv55q"]
 
-[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_hm4dy"]
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_7lcjq"]
+name = "tree_pine"
+scene_file = ExtResource("1_6k0bd")
+density = 0.01
+last_lod = 1
+last_shadow_lod = 0
+lod0_range = 110.0
+lod1_range = 1200.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_dv55q"]
+name = "tree_spruce"
+id = 1
+scene_file = ExtResource("2_4owig")
+density = 0.01
+last_lod = 1
+last_shadow_lod = 0
+lod0_range = 110.0
+lod1_range = 1200.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_hia5x"]
+name = "tree_birch"
+id = 2
+scene_file = ExtResource("3_xse01")
+density = 0.01
+last_lod = 1
+last_shadow_lod = 0
+lod0_range = 110.0
+lod1_range = 1200.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_e3rm1"]
 name = "tree_juniper"
+id = 3
 scene_file = ExtResource("1_mn37j")
 density = 0.02130457
 last_lod = 0
 last_shadow_lod = 0
-lod0_range = 700.0
+lod0_range = 500.0
 
-[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_w0g7s"]
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_fb4rq"]
 name = "tree_juniper_dead"
-id = 1
+id = 4
 scene_file = ExtResource("2_jqbyg")
 density = 0.042180095
 last_lod = 0
 last_shadow_lod = 0
 lod0_range = 400.0
 
-[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_ujyme"]
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_v0kfu"]
 name = "bush_jello"
-id = 2
+id = 5
 scene_file = ExtResource("3_g1h4r")
 density = 6.6125536
 last_lod = 0
 last_shadow_lod = 0
 lod0_range = 250.0
 
-[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_6k0bd"]
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_prdxb"]
 name = "bush_brush"
-id = 3
+id = 6
 scene_file = ExtResource("4_g1h05")
 cast_shadows = 0
 last_lod = 0
 last_shadow_lod = 0
 lod0_range = 150.0
 
-[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_4owig"]
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_4633j"]
 name = "grass_tuft"
-id = 4
+id = 7
 scene_file = ExtResource("5_bk6l8")
 cast_shadows = 0
 last_lod = 0
 last_shadow_lod = 0
 lod0_range = 70.0
 
-[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_xse01"]
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_4m452"]
 name = "clover"
-id = 5
+id = 8
 scene_file = ExtResource("6_uy5wq")
 cast_shadows = 0
 last_lod = 0
@@ -103,5 +136,5 @@ normal_texture = ExtResource("12_xse01")
 uv_scale = 0.4
 
 [resource]
-mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_hm4dy"), SubResource("Terrain3DMeshAsset_w0g7s"), SubResource("Terrain3DMeshAsset_ujyme"), SubResource("Terrain3DMeshAsset_6k0bd"), SubResource("Terrain3DMeshAsset_4owig"), SubResource("Terrain3DMeshAsset_xse01")])
+mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_7lcjq"), SubResource("Terrain3DMeshAsset_dv55q"), SubResource("Terrain3DMeshAsset_hia5x"), SubResource("Terrain3DMeshAsset_e3rm1"), SubResource("Terrain3DMeshAsset_fb4rq"), SubResource("Terrain3DMeshAsset_v0kfu"), SubResource("Terrain3DMeshAsset_prdxb"), SubResource("Terrain3DMeshAsset_4633j"), SubResource("Terrain3DMeshAsset_4m452")])
 texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_hm4dy"), SubResource("Terrain3DTextureAsset_w0g7s"), SubResource("Terrain3DTextureAsset_ujyme"), SubResource("Terrain3DTextureAsset_6k0bd"), SubResource("Terrain3DTextureAsset_4owig")])
