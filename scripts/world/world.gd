@@ -94,6 +94,7 @@ func apply_era(era: EraDefinition, first_visit: bool) -> void:
 		layers.add_child(node)
 		_era_nodes[era.id] = node
 	node.activate()
+	_push_out_of_buildings(node)
 	_set_drape(era)
 	if first_visit and sky.tod:
 		sky.tod.current_time = era.default_time_of_day
@@ -161,6 +162,33 @@ func _configure_environment() -> void:
 	env.adjustment_contrast = 1.05
 	env.adjustment_saturation = 1.08
 	terrain.gi_mode = GeometryInstance3D.GI_MODE_STATIC
+
+
+## If the player stands where this era has a solid building (e.g. inside the 2026 ruin when the
+## 1798 manor appears), step out through the nearest wall instead of being ejected by physics.
+func _push_out_of_buildings(layer: Node) -> void:
+	var pos := player.global_position
+	for body in layer.find_children("*", "StaticBody3D", true, false):
+		var group: Node = body.get_parent()
+		if not (group is Node3D) or not group.has_meta("footprint"):
+			continue
+		var shape: CollisionShape3D = body.get_node_or_null("Shape")
+		if shape == null or not (shape.shape is BoxShape3D):
+			continue
+		var half: Vector3 = shape.shape.size * 0.5
+		var local: Vector3 = shape.global_transform.affine_inverse() * pos
+		if absf(local.x) < half.x and absf(local.z) < half.z and local.y > -half.y and local.y < half.y + 2.0:
+			var margin := 1.5
+			var dx := half.x - absf(local.x)
+			var dz := half.z - absf(local.z)
+			if dx < dz:
+				local.x = signf(local.x) * (half.x + margin) if local.x != 0.0 else half.x + margin
+			else:
+				local.z = signf(local.z) * (half.z + margin) if local.z != 0.0 else half.z + margin
+			player.global_position = shape.global_transform * local
+			player.velocity = Vector3.ZERO
+			_snap(player, 1.0)
+			return
 
 
 ## Still water from data/water_2026.json (flat patches in the laser DTM): the same ponds in every era.
