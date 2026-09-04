@@ -118,7 +118,7 @@ func _configure_sky() -> void:
 	tod.year = 2026
 	tod.month = 9
 	tod.day = 3
-	tod.minutes_per_day = 30.0
+	tod.minutes_per_day = 150.0   # a full day in 2.5 real hours; the slice is ~80 min
 	tod.game_time_enabled = true
 
 
