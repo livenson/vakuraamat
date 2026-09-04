@@ -7,10 +7,15 @@ extends SceneTree
 # Control-map ids: 0 meadow, 1 field, 2 canopy/forest, 3 gravel, 4 bare soil.
 # "height" = [min, max] canopy height (m, from canopy.r32) the rule applies to; trees are
 # scaled so the model (MODEL_HEIGHT m tall) matches the measured canopy height.
-const MODEL_HEIGHT := {"tree_juniper": 7.8, "tree_juniper_dead": 5.6}
+const MODEL_HEIGHT := {"tree_birch": 18.8, "tree_pine": 20.7, "tree_spruce": 22.2, "tree_juniper": 7.8, "tree_juniper_dead": 5.6}
+# Species by measured canopy height (Otepää mix: pine/spruce tall stands, birch mid, juniper edges).
+# "lod": [LOD0 range, LOD1 range] metres; LOD1 is the baked impostor.
 const RULES := [
-	{"scene": "tree_juniper", "ids": [2], "height": Vector2(3.0, 40.0), "per_100m2": 3.0, "scale": Vector2(0.85, 1.15), "range": 700.0, "shadows": true},
-	{"scene": "tree_juniper_dead", "ids": [2], "height": Vector2(3.0, 40.0), "per_100m2": 0.15, "scale": Vector2(0.85, 1.15), "range": 400.0, "shadows": true},
+	{"scene": "tree_pine", "ids": [2], "height": Vector2(13.0, 40.0), "per_100m2": 1.6, "scale": Vector2(0.9, 1.1), "range": 1200.0, "lod": [110.0, 1200.0], "shadows": true},
+	{"scene": "tree_spruce", "ids": [2], "height": Vector2(11.0, 40.0), "per_100m2": 1.3, "scale": Vector2(0.9, 1.1), "range": 1200.0, "lod": [110.0, 1200.0], "shadows": true},
+	{"scene": "tree_birch", "ids": [2], "height": Vector2(6.0, 18.0), "per_100m2": 1.4, "scale": Vector2(0.85, 1.15), "range": 1200.0, "lod": [110.0, 1200.0], "shadows": true},
+	{"scene": "tree_juniper", "ids": [2], "height": Vector2(3.0, 8.0), "per_100m2": 1.0, "scale": Vector2(0.85, 1.15), "range": 500.0, "shadows": true},
+	{"scene": "tree_juniper_dead", "ids": [2], "height": Vector2(3.0, 40.0), "per_100m2": 0.08, "scale": Vector2(0.85, 1.15), "range": 400.0, "shadows": true},
 	{"scene": "bush_jello", "ids": [2], "height": Vector2(0.8, 3.0), "per_100m2": 3.0, "scale": Vector2(0.8, 1.6), "range": 250.0, "shadows": true},
 	{"scene": "bush_brush", "ids": [0, 2], "height": Vector2(0.0, 3.0), "per_100m2": 0.5, "scale": Vector2(0.8, 1.6), "range": 150.0, "shadows": false},
 	{"scene": "grass_tuft", "ids": [0, 1], "per_100m2": 30.0, "scale": Vector2(0.8, 1.4), "range": 70.0, "shadows": false},
@@ -43,9 +48,16 @@ func _init() -> void:
 		var ma := Terrain3DMeshAsset.new()
 		ma.name = r.scene
 		ma.id = i
-		ma.scene_file = load("res://assets/vegetation/%s.tscn" % r.scene)
-		ma.last_lod = 0
-		ma.lod0_range = r.range
+		var scene_path: String = "res://assets/models/trees/%s_lod.tscn" % r.scene.trim_prefix("tree_") if r.has("lod") else "res://assets/vegetation/%s.tscn" % r.scene
+		ma.scene_file = load(scene_path)
+		if r.has("lod"):
+			ma.last_lod = 1
+			ma.lod0_range = r.lod[0]
+			ma.lod1_range = r.lod[1]
+			ma.last_shadow_lod = 0
+		else:
+			ma.last_lod = 0
+			ma.lod0_range = r.range
 		ma.cast_shadows = 1 if r.shadows else 0
 		assets.set_mesh_asset(i, ma)
 		terrain.instancer.clear_by_mesh(i)

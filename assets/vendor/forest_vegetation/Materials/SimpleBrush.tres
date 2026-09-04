@@ -1,6 +1,6 @@
 [gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" path="res://assets/vendor/forest_vegetation/Textures/Plant1.png" id="1_yorca"]
+[ext_resource type="Texture2D" path="res://assets/vendor/forest_vegetation/textures/Plant1.png" id="1_yorca"]
 
 [resource]
 transparency = 4

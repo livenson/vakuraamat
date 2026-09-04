@@ -2,5 +2,5 @@
 
 [ext_resource type="ArrayMesh" path="res://assets/vegetation/tree_juniper_dead_mesh.res" id="1_cik1h"]
 
-[node name="LOD0" type="MeshInstance3D" unique_id=1915427909]
+[node name="LOD0" type="MeshInstance3D" unique_id=431985770]
 mesh = ExtResource("1_cik1h")
