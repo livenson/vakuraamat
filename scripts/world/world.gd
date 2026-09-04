@@ -14,6 +14,7 @@ const FADE_TIME := 1.2
 
 var georef: TerrainGeoref
 var _screenshot_path := ""
+var _fx := ["sdfgi", "ssao", "ssil", "fog", "glow", "grade"]   # --fx=a,b,c limits the effects (measurement)
 var _screenshot_frame := 240
 var _frames := 0
 var _era_nodes: Dictionary = {}     # era_id -> EraController
@@ -54,6 +55,9 @@ func _ready() -> void:
 		elif a.begins_with("--era="):
 			GameState.register_unlocked = true
 			GameState.switch_era(a.trim_prefix("--era="))
+		elif a.begins_with("--fx="):
+			_fx = Array(a.trim_prefix("--fx=").split(",", false))
+			_configure_environment()
 		elif a.begins_with("--open="):
 			GameState.register_unlocked = true
 			get_tree().create_timer(2.0).timeout.connect(ui.debug_open.bind(a.trim_prefix("--open=")))
@@ -120,6 +124,39 @@ func _configure_sky() -> void:
 	tod.day = 3
 	tod.minutes_per_day = 150.0   # a full day in 2.5 real hours; the slice is ~80 min
 	tod.game_time_enabled = true
+	_configure_environment()
+
+
+## Rendering on top of Sky3D's Environment (visual upgrade plan step 1). All Forward+ built-ins.
+func _configure_environment() -> void:
+	var env: Environment = sky.environment
+	if env == null:
+		return
+	env.sdfgi_enabled = "sdfgi" in _fx
+	env.ssao_enabled = "ssao" in _fx
+	env.ssil_enabled = "ssil" in _fx
+	env.volumetric_fog_enabled = "fog" in _fx
+	env.glow_enabled = "glow" in _fx
+	env.adjustment_enabled = "grade" in _fx
+	env.sdfgi_cascades = 4
+	env.sdfgi_min_cell_size = 0.5
+	env.sdfgi_use_occlusion = true
+	env.sdfgi_bounce_feedback = 0.4
+	env.sdfgi_energy = 1.0
+	env.ssao_radius = 1.5
+	env.ssao_intensity = 1.5
+	env.ssil_radius = 4.0
+	env.ssil_intensity = 1.0
+	env.volumetric_fog_density = 0.004
+	env.volumetric_fog_albedo = Color(0.9, 0.92, 0.95)
+	env.volumetric_fog_sky_affect = 0.3
+	env.volumetric_fog_ambient_inject = 0.2
+	env.glow_intensity = 0.35
+	env.glow_bloom = 0.05
+	env.glow_hdr_threshold = 1.2
+	env.adjustment_contrast = 1.05
+	env.adjustment_saturation = 1.08
+	terrain.gi_mode = GeometryInstance3D.GI_MODE_STATIC
 
 
 func _snap(node: Node3D, lift: float) -> void:
