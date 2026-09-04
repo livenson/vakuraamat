@@ -10,3 +10,4 @@ assets/vendor/**/*.png filter=lfs diff=lfs merge=lfs -text
 addons/terrain_3d/bin/** filter=lfs diff=lfs merge=lfs -text
 addons/sky_3d/assets/**/*.png filter=lfs diff=lfs merge=lfs -text
 addons/sky_3d/assets/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+docs/screenshots/*.jpg filter=lfs diff=lfs merge=lfs -text

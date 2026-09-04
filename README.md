@@ -8,6 +8,20 @@ Design and plan: `vakuraamat-implementation-plan.md` (phases, architecture rules
 `vakuraamat-maaamet-data-pipeline.md` (data sources). This README covers what exists
 in the repo right now.
 
+## Screenshots
+
+| | |
+|---|---|
+| ![1938: the manor as the village school](docs/screenshots/manor_1938.jpg) 1938, the manor as the village school | ![1938: Kaseoja farm and the pond](docs/screenshots/farm_1938.jpg) 1938, Kaseoja farm by the pond |
+| ![1798: the manor](docs/screenshots/manor_1798.jpg) 1798, the manor | ![1798: the barn-dwelling](docs/screenshots/barn_1798.jpg) 1798, the barn-dwelling |
+| ![2026: the ruin](docs/screenshots/ruin_2026.jpg) 2026, the ruin where the register is found | ![2026: Leida at the oak](docs/screenshots/oak_leida.jpg) 2026, Leida at the oak |
+| ![The road into the village](docs/screenshots/forest_road.jpg) The road into the village, real trees from the laser scan | ![The register](docs/screenshots/register.jpg) The register: the era switch |
+| ![The journal](docs/screenshots/journal.jpg) The journal: ledger, blended era maps, codex | ![Trading](docs/screenshots/trade.jpg) Trading, era-local goods and money |
+| ![Building](docs/screenshots/build.jpg) Building at the farm, on its real cadastral unit | ![Debug map](docs/screenshots/debug_map.jpg) Debug map (M): everything in the era, click to teleport |
+
+All ground, buildings' positions, tree heights and the ponds come from Maa- ja Ruumiamet open data
+of the real Palupera village square; the manor, the family and the story are fiction.
+
 ## Status: all five phases playable
 
 - **Phase 1, the slice:** three eras of the Palupera square, the register as the era
