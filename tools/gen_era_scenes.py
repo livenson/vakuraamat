@@ -79,15 +79,27 @@ class Scene:
         i = self.ext_res("PackedScene", scene); cy = math.cos(yaw) * scale; sy = math.sin(yaw) * scale
         self.node(name, None, parent, f'transform = Transform3D({cy:.4f}, 0, {sy:.4f}, 0, {scale}, 0, {-sy:.4f}, 0, {cy:.4f}, {x}, 0, {z})', instance=i)
 
-    def building(self, name, parent, path, yaw=0.0, footprint=None, scale=1.0):
-        """A glb building at the parent's origin; optional box collider (w, h, d) so the player can't walk through."""
+    def building(self, name, parent, path, yaw=0.0, footprint=None, scale=1.0, skirt=True):
+        """A glb building at the parent's origin; optional box collider (w, h, d) so the player can't walk through.
+        The parent group gets metadata/footprint so EraController snaps it to the LOWEST corner, and a
+        foundation skirt fills the gap on the uphill side."""
         cy = math.cos(yaw) * scale; sy = math.sin(yaw) * scale
         self.instance(name, parent, path, f'transform = Transform3D({cy:.4f}, 0, {sy:.4f}, 0, {scale}, 0, {-sy:.4f}, 0, {cy:.4f}, 0, 0, 0)')
         if footprint:
             w, h, d = footprint
+            self._footprint(parent, w, d)
+            if skirt:
+                self.box(f"{name}Skirt", parent, (w - 0.2, 3.0, d - 0.2), -1.5, (0.42, 0.38, 0.32))
             self.sub.append(f'[sub_resource type="BoxShape3D" id="BS_{self.era}_{name}"]\nsize = Vector3({w}, {h}, {d})')
             self.node(f"{name}Body", "StaticBody3D", parent, "collision_layer = 1\ncollision_mask = 0")
             self.node("Shape", "CollisionShape3D", f"{parent}/{name}Body", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, {h / 2}, 0)\nshape = SubResource("BS_{self.era}_{name}")')
+
+    def _footprint(self, parent, w, d):
+        """Tag the group node so EraController samples the whole footprint when snapping."""
+        for i, n in enumerate(self.nodes):
+            if n.startswith(f'[node name="{parent.split("/")[-1]}" ') and 'metadata/footprint' not in n:
+                self.nodes[i] = n + f'\nmetadata/footprint = Vector2({w}, {d})'
+                return
 
     def instance(self, name, parent, path, props=""):
         i = self.ext_res("PackedScene", path)
@@ -153,7 +165,8 @@ def build_2026():
     bl = json.load(open(os.path.join(ROOT, "data/buildings_2026.json")))
     for i, b in enumerate(bl):
         s.group(f"B{i}", "Village", b["x"], b["z"])
-        s.box("Mass", f"Village/B{i}", (b["w"], b["h"], b["d"]), b["h"] / 2, tuple(min(1.0, k * 0.9) for k in b["color"]))
+        s._footprint(f"Village/B{i}", b["w"], b["d"])
+        s.box("Mass", f"Village/B{i}", (b["w"], b["h"] + 3.0, b["d"]), b["h"] / 2 - 1.5, tuple(min(1.0, k * 0.9) for k in b["color"]))
         s.box("Roof", f"Village/B{i}", (b["w"] + 0.6, 0.25, b["d"] + 0.6), b["h"] + 0.12, tuple(k * 0.6 for k in b["color"]))
     trade_post(s, "era_2026", (MANOR[0] - MW / 2 - 12, MANOR[1] - 10), "POST_2026", (0.85, 0.85, 0.8))
     return s
@@ -243,6 +256,8 @@ def trade_post(s, era, pos, key, box_color):
     sc = s.ext_res("Script", "res://scripts/trading/trade_post.gd")
     s.sub.append(f'[sub_resource type="BoxShape3D" id="TP_{era}"]\nsize = Vector3(2.6, 2.4, 2.2)')
     s.node("TradePost", "Node3D", ".", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {pos[0]}, 0, {pos[1]})\nscript = ExtResource("{sc}")\nera_id = "{era}"\npost_name_key = "{key}"\nintro_key = "{key}_TEXT"')
+    s._footprint("TradePost", 3.0, 2.4)
+    s.box("Base", "TradePost", (3.0, 2.0, 2.4), -1.0, (0.42, 0.38, 0.32))
     s.box("Stall", "TradePost", (2.4, 1.1, 1.2), 0.55, box_color)
     s.box("Awning", "TradePost", (2.8, 0.12, 2.0), 2.2, (0.5, 0.45, 0.3), 0, -0.3)
     s.box("PostA", "TradePost", (0.1, 2.2, 0.1), 1.1, DARKWOOD, -1.3, -1.2)
