@@ -45,6 +45,9 @@ func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--screenshot="):
 			_screenshot_path = a.trim_prefix("--screenshot=")
+			# deterministic captures: no stray mouse motion, no movement
+			player.input_enabled = false
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		elif a.begins_with("--frames="):
 			_screenshot_frame = int(a.trim_prefix("--frames="))
 		elif a.begins_with("--spawn="):
