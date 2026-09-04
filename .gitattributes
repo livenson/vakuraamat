@@ -1,3 +1,4 @@
+# Large, stable binaries in git LFS. Generated data is not committed at all (see .gitignore).
 *.glb filter=lfs diff=lfs merge=lfs -text
 *.fbx filter=lfs diff=lfs merge=lfs -text
 *.r32 filter=lfs diff=lfs merge=lfs -text
