@@ -18,7 +18,8 @@ const RULES := [
 	{"scene": "tree_juniper_dead", "ids": [2], "height": Vector2(3.0, 40.0), "per_100m2": 0.08, "scale": Vector2(0.85, 1.15), "range": 400.0, "shadows": true},
 	{"scene": "bush_jello", "ids": [2], "height": Vector2(0.8, 3.0), "per_100m2": 3.0, "scale": Vector2(0.8, 1.6), "range": 250.0, "shadows": true},
 	{"scene": "bush_brush", "ids": [0, 2], "height": Vector2(0.0, 3.0), "per_100m2": 0.5, "scale": Vector2(0.8, 1.6), "range": 150.0, "shadows": false},
-	{"scene": "grass_tuft", "ids": [0, 1], "per_100m2": 30.0, "scale": Vector2(0.8, 1.4), "range": 70.0, "shadows": false},
+	{"scene": "grass_card", "ids": [0, 1], "per_100m2": 45.0, "scale": Vector2(0.7, 1.3), "range": 80.0, "shadows": false},
+	{"scene": "grass_tuft", "ids": [0, 1], "per_100m2": 6.0, "scale": Vector2(0.8, 1.4), "range": 60.0, "shadows": false},
 	{"scene": "clover", "ids": [0], "per_100m2": 5.0, "scale": Vector2(0.8, 1.3), "range": 40.0, "shadows": false},
 ]
 
@@ -77,8 +78,10 @@ func _init() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 1798
 	var batches: Array = []
+	var colors: Array = []
 	for i in RULES.size():
 		batches.append([] as Array[Transform3D])
+		colors.append(PackedColorArray())
 	for y in size:
 		for x in size:
 			var id := Terrain3DUtil.get_base(Terrain3DUtil.as_uint(ctrl.get_pixel(x, y).r))
@@ -104,9 +107,12 @@ func _init() -> void:
 						s *= clampf(h / MODEL_HEIGHT[r.scene], 0.5, 3.0)
 					var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * s)
 					batches[i].append(Transform3D(basis, pos))
+					# per-instance tint: slight hue/brightness variation (used by the grass shader via COLOR)
+					var v: float = rng.randf_range(0.72, 1.08)
+					colors[i].append(Color(v * rng.randf_range(0.9, 1.15), v, v * rng.randf_range(0.8, 1.0)))
 	for i in RULES.size():
 		if batches[i].size() > 0:
-			terrain.instancer.add_transforms(i, batches[i], PackedColorArray(), i == RULES.size() - 1)
+			terrain.instancer.add_transforms(i, batches[i], colors[i], i == RULES.size() - 1)
 		print("[scatter_vegetation] %-18s %6d instances" % [RULES[i].scene, batches[i].size()])
 	terrain.data.save_directory(dir + "/data")
 	assets.texture_list = texture_list

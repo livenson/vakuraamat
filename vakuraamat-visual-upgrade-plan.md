@@ -35,7 +35,7 @@ screenshot; 2 because the user named trees as the worst; 3–6 as time allows.
 - [x] 0 buildings grounded (lowest footprint corner + skirts)
 - [x] 1 lighting (SDFGI, SSAO, SSIL, volumetric fog, glow, grading, TAA; ~60 FPS)
 - [x] 2 trees (Sapling birch/pine/spruce with CC0 foliage cards, own impostor baker, LOD at 110 m)
-- [ ] 3 grass
+- [x] 3 grass (procedural blade cards, wind shader, per-instance tint; own implementation, no addon)
 - [ ] 4 water
 - [ ] 5 ground decals
 - [ ] 6 building textures
