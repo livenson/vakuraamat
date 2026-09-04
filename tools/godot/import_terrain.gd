@@ -45,6 +45,7 @@ func _init() -> void:
 		quit(1)
 		return
 	var height_img := Image.create_from_data(size, size, false, Image.FORMAT_RF, raw)
+	_level_building_pads(height_img)
 
 	# --- colour map: orthophoto resampled to one texel per vertex ------------
 	var ortho := Image.load_from_file(dir + "/" + meta.texture)
@@ -134,6 +135,45 @@ func _init() -> void:
 
 ## Very simple colour classification of the (already vertex-resolution) orthophoto into
 ## material ids, encoded into a Terrain3D control map (base = overlay = id, blend 0).
+## Level the ground under authored buildings (data/site_layout.json "pads": x, z, w, d in tile metres):
+## the footprint takes the mean height, blended out over a 5 m margin. Shared by all eras.
+func _level_building_pads(img: Image) -> void:
+	if not FileAccess.file_exists("res://data/site_layout.json"):
+		return
+	var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/site_layout.json"))
+	var pads: Array = layout.get("pads", [])
+	var size := img.get_width()
+	for pad in pads:
+		var cx: float = pad[0]
+		var cz: float = pad[1]
+		var hw: float = pad[2] / 2.0 + 1.0
+		var hd: float = pad[3] / 2.0 + 1.0
+		var margin := 5.0
+		# mean height inside the footprint
+		var sum := 0.0
+		var n := 0
+		for z in range(int(cz - hd), int(cz + hd) + 1):
+			for x in range(int(cx - hw), int(cx + hw) + 1):
+				if x >= 0 and z >= 0 and x < size and z < size:
+					sum += img.get_pixel(x, z).r
+					n += 1
+		if n == 0:
+			continue
+		var level := sum / n
+		for z in range(int(cz - hd - margin), int(cz + hd + margin) + 1):
+			for x in range(int(cx - hw - margin), int(cx + hw + margin) + 1):
+				if x < 0 or z < 0 or x >= size or z >= size:
+					continue
+				var dx := maxf(absf(x - cx) - hw, 0.0)
+				var dz := maxf(absf(z - cz) - hd, 0.0)
+				var d := sqrt(dx * dx + dz * dz)
+				var t := clampf(1.0 - d / margin, 0.0, 1.0)
+				t = t * t * (3.0 - 2.0 * t)
+				var h := img.get_pixel(x, z).r
+				img.set_pixel(x, z, Color(lerpf(h, level, t), 0, 0, 1))
+		print("[import_terrain] pad at (%d,%d) %dx%d m levelled to %.2f m" % [cx, cz, pad[2], pad[3], level])
+
+
 ## Optional canopy/object height layer (metres above ground) written by fetch_tile.py.
 func _load_canopy(dir: String, meta: Dictionary, size: int) -> Image:
 	if meta.get("canopy") == null:

@@ -6,12 +6,15 @@ extends Node3D
 @export var era_id := ""
 
 var _snapped := false
+var _window_mats: Array[StandardMaterial3D] = []
+var _windows_lit := false
 
 
 func activate() -> void:
 	visible = true
 	if not _snapped:
 		_snap_children()
+		_collect_windows()
 		_snapped = true
 	process_mode = Node.PROCESS_MODE_INHERIT
 	for c in find_children("*", "Conditional", true, false):
@@ -53,3 +56,31 @@ func _snap_list(nodes: Array, terrain: Terrain3D) -> void:
 							h = hc if is_nan(h) else minf(h, hc)
 			if not is_nan(h):
 				c.global_position.y = h + float(c.get_meta("lift", 0.0))
+
+
+## Window panes: reflective glass by day, warm glow after dark (called by the world with the hour).
+func _collect_windows() -> void:
+	for mi in find_children("*", "MeshInstance3D", true, false):
+		if mi.mesh == null:
+			continue
+		for si in mi.mesh.get_surface_count():
+			var m: Material = mi.mesh.surface_get_material(si)
+			if m is StandardMaterial3D and m.resource_name == "Window":
+				var w: StandardMaterial3D = m.duplicate()
+				w.roughness = 0.06
+				w.metallic = 0.2
+				w.metallic_specular = 0.9
+				w.emission_enabled = true
+				w.emission = Color(1.0, 0.72, 0.4)
+				w.emission_energy_multiplier = 0.0
+				mi.set_surface_override_material(si, w)
+				_window_mats.append(w)
+
+
+func set_hour(hour: float) -> void:
+	var lit := hour < 6.5 or hour > 18.5
+	if lit == _windows_lit:
+		return
+	_windows_lit = lit
+	for w in _window_mats:
+		w.emission_energy_multiplier = 2.5 if lit else 0.0
