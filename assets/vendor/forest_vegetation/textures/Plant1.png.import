@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cjqji84kva1bc"
-path="res://.godot/imported/Plant JelloBush.png-0ff5aaa7b9d548c607f24b812878f793.ctex"
+uid="uid://dtxtqut18vcp8"
+path="res://.godot/imported/Plant1.png-eba974d39eb057b72dbe069404917821.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/vendor/forest_vegetation/Textures/Plant JelloBush.png"
-dest_files=["res://.godot/imported/Plant JelloBush.png-0ff5aaa7b9d548c607f24b812878f793.ctex"]
+source_file="res://assets/vendor/forest_vegetation/textures/Plant1.png"
+dest_files=["res://.godot/imported/Plant1.png-eba974d39eb057b72dbe069404917821.ctex"]
 
 [params]
 

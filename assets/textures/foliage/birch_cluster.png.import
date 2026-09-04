@@ -2,22 +2,20 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bd7u40ws8s57f"
-path.s3tc="res://.godot/imported/noise2.png-37a5cbd5451b4b9c2c18ab32099e6965.s3tc.ctex"
-path.etc2="res://.godot/imported/noise2.png-37a5cbd5451b4b9c2c18ab32099e6965.etc2.ctex"
+uid="uid://chfx58qkemte"
+path="res://.godot/imported/birch_cluster.png-e46de315899aea6fa9291412e1dc2309.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc", "etc2_astc"],
-"vram_texture": true
+"vram_texture": false
 }
 
 [deps]
 
-source_file="res://addons/sky_3d/assets/textures/noise2.png"
-dest_files=["res://.godot/imported/noise2.png-37a5cbd5451b4b9c2c18ab32099e6965.s3tc.ctex", "res://.godot/imported/noise2.png-37a5cbd5451b4b9c2c18ab32099e6965.etc2.ctex"]
+source_file="res://assets/textures/foliage/birch_cluster.png"
+dest_files=["res://.godot/imported/birch_cluster.png-e46de315899aea6fa9291412e1dc2309.ctex"]
 
 [params]
 
-compress/mode=2
+compress/mode=0
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

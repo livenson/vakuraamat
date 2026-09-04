@@ -2,16 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c08yvi3n7gfuh"
-path="res://.godot/imported/Grassy Vegetation1.png-63eca981650261bf4292351cec116702.ctex"
+uid="uid://cmc17wl6kpckp"
+path="res://.godot/imported/pine_conifer_sprigs.png-8dbf0214e891dfd017a34055f97dde4d.ctex"
 metadata={
 "vram_texture": false
+}
+generator_parameters={
+"md5": "e55c4432dd9e6833d653fbc8eba2298b"
 }
 
 [deps]
 
-source_file="res://assets/vendor/forest_vegetation/Textures/Grassy Vegetation1.png"
-dest_files=["res://.godot/imported/Grassy Vegetation1.png-63eca981650261bf4292351cec116702.ctex"]
+source_file="res://assets/models/trees/pine_conifer_sprigs.png"
+dest_files=["res://.godot/imported/pine_conifer_sprigs.png-8dbf0214e891dfd017a34055f97dde4d.ctex"]
 
 [params]
 
@@ -23,7 +26,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

@@ -2,16 +2,19 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cshbrn0bjkine"
-path="res://.godot/imported/Forage1.png-84c2b7d38d956ada0f3a1090554f4659.ctex"
+uid="uid://toeh4in4f14p"
+path="res://.godot/imported/birch_birch_cluster.png-78f950e978ad12d33d3647a9a7ec736a.ctex"
 metadata={
 "vram_texture": false
+}
+generator_parameters={
+"md5": "58ceacc41f842ada23cdd94880d70128"
 }
 
 [deps]
 
-source_file="res://assets/vendor/forest_vegetation/Textures/Forage1.png"
-dest_files=["res://.godot/imported/Forage1.png-84c2b7d38d956ada0f3a1090554f4659.ctex"]
+source_file="res://assets/models/trees/birch_birch_cluster.png"
+dest_files=["res://.godot/imported/birch_birch_cluster.png-78f950e978ad12d33d3647a9a7ec736a.ctex"]
 
 [params]
 
@@ -23,7 +26,7 @@ compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
 compress/normal_map=0
 compress/channel_pack=0
-mipmaps/generate=false
+mipmaps/generate=true
 mipmaps/limit=-1
 roughness/mode=0
 roughness/src_normal=""

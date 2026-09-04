@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://g247k0ptugll"
-path="res://.godot/imported/Bark1.png-bcf5539b5c3cea186f878ea2dfe638f7.ctex"
+uid="uid://crfea2dpf345l"
+path="res://.godot/imported/Clover Mouse Ears.png-3cfa5aca756aa6d2e15b109dad85e35a.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/vendor/forest_vegetation/Textures/Bark1.png"
-dest_files=["res://.godot/imported/Bark1.png-bcf5539b5c3cea186f878ea2dfe638f7.ctex"]
+source_file="res://assets/vendor/forest_vegetation/textures/Clover Mouse Ears.png"
+dest_files=["res://.godot/imported/Clover Mouse Ears.png-3cfa5aca756aa6d2e15b109dad85e35a.ctex"]
 
 [params]
 

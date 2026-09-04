@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://4ynegrxynp6h"
 path.s3tc="res://.godot/imported/field_nrm_rgh.png-9e27513283e85f008253e7091d38cb00.s3tc.ctex"
+path.etc2="res://.godot/imported/field_nrm_rgh.png-9e27513283e85f008253e7091d38cb00.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://assets/terrain/textures/field_nrm_rgh.png"
-dest_files=["res://.godot/imported/field_nrm_rgh.png-9e27513283e85f008253e7091d38cb00.s3tc.ctex"]
+dest_files=["res://.godot/imported/field_nrm_rgh.png-9e27513283e85f008253e7091d38cb00.s3tc.ctex", "res://.godot/imported/field_nrm_rgh.png-9e27513283e85f008253e7091d38cb00.etc2.ctex"]
 
 [params]
 

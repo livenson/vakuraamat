@@ -2,5 +2,5 @@
 
 [ext_resource type="ArrayMesh" path="res://assets/vegetation/grass_tuft_mesh.res" id="1_ct2po"]
 
-[node name="LOD0" type="MeshInstance3D" unique_id=1535388004]
+[node name="LOD0" type="MeshInstance3D" unique_id=1953835914]
 mesh = ExtResource("1_ct2po")

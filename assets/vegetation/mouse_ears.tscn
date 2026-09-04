@@ -2,5 +2,5 @@
 
 [ext_resource type="ArrayMesh" path="res://assets/vegetation/mouse_ears_mesh.res" id="1_6gh8g"]
 
-[node name="LOD0" type="MeshInstance3D" unique_id=2014662941]
+[node name="LOD0" type="MeshInstance3D" unique_id=1659864881]
 mesh = ExtResource("1_6gh8g")

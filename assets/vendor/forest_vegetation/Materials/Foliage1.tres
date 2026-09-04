@@ -1,6 +1,6 @@
 [gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" path="res://assets/vendor/forest_vegetation/Textures/Forage1.png" id="1_0l444"]
+[ext_resource type="Texture2D" path="res://assets/vendor/forest_vegetation/textures/Forage1.png" id="1_0l444"]
 
 [resource]
 transparency = 4

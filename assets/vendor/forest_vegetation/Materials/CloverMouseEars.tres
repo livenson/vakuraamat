@@ -1,6 +1,6 @@
 [gd_resource type="StandardMaterial3D" format=3]
 
-[ext_resource type="Texture2D" path="res://assets/vendor/forest_vegetation/Textures/Grassy Vegetation1.png" id="1_ymjvv"]
+[ext_resource type="Texture2D" path="res://assets/vendor/forest_vegetation/textures/Grassy Vegetation1.png" id="1_ymjvv"]
 
 [resource]
 transparency = 4
