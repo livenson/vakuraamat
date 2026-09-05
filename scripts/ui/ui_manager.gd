@@ -15,6 +15,7 @@ var hud: Control
 var prompt_label: Label
 var hover_label: Label
 var notice_label: Label
+var notice_card: PanelContainer
 var compass: Control
 var marker: Control
 var era_label: Label
@@ -150,11 +151,15 @@ func _draw_marker() -> void:
 	var behind := cam.is_position_behind(target)
 	var p: Vector2 = cam.unproject_position(target)
 	var on_screen := not behind and p.x > 20 and p.x < size.x - 20 and p.y > 60 and p.y < size.y - 40
-	var font := ThemeDB.fallback_font
+	var font := BookTheme.font("plex_medium")
 	if on_screen:
 		var d := 9.0
-		marker.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -d), p + Vector2(d, 0), p + Vector2(0, d), p + Vector2(-d, 0)]), GOLD)
-		marker.draw_string(font, p + Vector2(-30, -14), "%d m" % int(dist), HORIZONTAL_ALIGNMENT_CENTER, 60, 14, GOLD)
+		var diamond := PackedVector2Array([p + Vector2(0, -d), p + Vector2(d, 0), p + Vector2(0, d), p + Vector2(-d, 0)])
+		marker.draw_colored_polygon(diamond, BookTheme.BLUE)
+		diamond.append(diamond[0])
+		marker.draw_polyline(diamond, BookTheme.PAGE_LIGHT, 1.5, true)
+		marker.draw_string(font, p + Vector2(-29, -13), "%d m" % int(dist), HORIZONTAL_ALIGNMENT_CENTER, 60, 14, BookTheme.INK)
+		marker.draw_string(font, p + Vector2(-30, -14), "%d m" % int(dist), HORIZONTAL_ALIGNMENT_CENTER, 60, 14, BookTheme.PAGE_LIGHT)
 	else:
 		# direction on the compass ring: angle from the view forward
 		var to: Vector3 = target - player.global_position
@@ -167,8 +172,9 @@ func _draw_marker() -> void:
 		var tip := q + dir * 12
 		var left := q + Vector2(-dir.y, dir.x) * 8
 		var right := q - Vector2(-dir.y, dir.x) * 8
-		marker.draw_colored_polygon(PackedVector2Array([tip, left, right]), GOLD)
-		marker.draw_string(font, q - dir * 26 + Vector2(-30, 5), "%d m" % int(dist), HORIZONTAL_ALIGNMENT_CENTER, 60, 14, GOLD)
+		marker.draw_colored_polygon(PackedVector2Array([tip, left, right]), BookTheme.BLUE)
+		marker.draw_string(font, q - dir * 26 + Vector2(-29, 6), "%d m" % int(dist), HORIZONTAL_ALIGNMENT_CENTER, 60, 14, BookTheme.INK)
+		marker.draw_string(font, q - dir * 26 + Vector2(-30, 5), "%d m" % int(dist), HORIZONTAL_ALIGNMENT_CENTER, 60, 14, BookTheme.PAGE_LIGHT)
 
 
 func _draw_compass() -> void:
@@ -177,8 +183,9 @@ func _draw_compass() -> void:
 	var h := c.size.y
 	var heading := _heading_deg()
 	var px_per_deg := w / 120.0            # the tape shows 120 degrees
-	c.draw_rect(Rect2(0, 0, w, h), Color(0, 0, 0, 0.35))
-	var font := ThemeDB.fallback_font
+	c.draw_rect(Rect2(0, 0, w, h), Color(BookTheme.PAGE, 0.88))
+	c.draw_rect(Rect2(0, 0, w, h), BookTheme.INK, false, 1.0)
+	var font := BookTheme.font("plex")
 	for d in range(-180, 181, 15):
 		var rel := fmod(d - heading + 540.0, 360.0) - 180.0
 		if absf(rel) > 60.0:
@@ -186,27 +193,38 @@ func _draw_compass() -> void:
 		var x := w / 2 + rel * px_per_deg
 		var deg := int(fmod(d + 360.0, 360.0))
 		var big := deg % 90 == 0
-		c.draw_line(Vector2(x, h - 6), Vector2(x, h - (14 if big else 10)), Color(1, 1, 1, 0.8), 1.0)
+		c.draw_line(Vector2(x, h - 6), Vector2(x, h - (14 if big else 10)), Color(BookTheme.INK, 0.8), 1.0)
 		if big:
 			var name: String = ["N", "E", "S", "W"][deg / 90]
-			c.draw_string(font, Vector2(x - 6, 15), name, HORIZONTAL_ALIGNMENT_CENTER, 12, 15, GOLD if name == "N" else Color.WHITE)
+			c.draw_string(font, Vector2(x - 6, 15), name, HORIZONTAL_ALIGNMENT_CENTER, 12, 15, BookTheme.RUBRIC if name == "N" else BookTheme.INK)
 		elif deg % 45 == 0:
-			c.draw_string(font, Vector2(x - 12, 15), str(deg), HORIZONTAL_ALIGNMENT_CENTER, 24, 10, Color(1, 1, 1, 0.7))
-	c.draw_line(Vector2(w / 2, 2), Vector2(w / 2, h - 2), GOLD, 2.0)
-	c.draw_string(font, Vector2(w / 2 + 6, h - 8), "%d°" % int(round(heading)), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, GOLD)
+			c.draw_string(font, Vector2(x - 12, 15), str(deg), HORIZONTAL_ALIGNMENT_CENTER, 24, 10, BookTheme.FADED)
+	c.draw_line(Vector2(w / 2, 2), Vector2(w / 2, h - 2), BookTheme.BLUE, 2.0)
+	c.draw_string(font, Vector2(w / 2 + 6, h - 8), "%d°" % int(round(heading)), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, BookTheme.BLUE)
 
 
 # ---------------------------------------------------------------- building
 func _build_hud() -> void:
 	hud = Control.new()
+	hud.theme = BookTheme.theme()
 	hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(hud)
-	era_label = _label(hud, 20)
-	era_label.position = Vector2(16, 12)
-	keys_label = _label(hud, 14)
+	# the running head: a page chip with the place, the month, the clock and the cash
+	var chip := PanelContainer.new()
+	chip.add_theme_stylebox_override("panel", BookTheme.page_box(true, 10))
+	chip.position = Vector2(16, 12)
+	chip.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hud.add_child(chip)
+	era_label = Label.new()
+	era_label.add_theme_font_size_override("font_size", 15)
+	era_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	chip.add_child(era_label)
+	keys_label = _label(hud, 13)
 	keys_label.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_LEFT, Control.PRESET_MODE_MINSIZE, 16)
 	keys_label.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	keys_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	keys_label.custom_minimum_size = Vector2(820, 0)
 	keys_label.text = tr("UI_KEYS")
 	hover_label = _label(hud, 18)
 	hover_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
@@ -219,16 +237,26 @@ func _build_hud() -> void:
 	prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	prompt_label.custom_minimum_size = Vector2(400, 0)
 	prompt_label.position = Vector2(-200, 120)
-	prompt_label.add_theme_color_override("font_color", GOLD)
-	notice_label = _label(hud, 20)
-	notice_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	notice_label.offset_left = -380
-	notice_label.offset_right = 380
-	notice_label.offset_top = 70
-	notice_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	# notices: a page card with a rubric edge, faded after a moment
+	notice_card = PanelContainer.new()
+	var card := BookTheme.page_box(true, 12)
+	card.border_color = BookTheme.RUBRIC
+	card.border_width_left = 4
+	notice_card.add_theme_stylebox_override("panel", card)
+	notice_card.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	notice_card.offset_left = -360
+	notice_card.offset_right = 360
+	notice_card.offset_top = 64
+	notice_card.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	notice_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	notice_card.modulate.a = 0.0
+	hud.add_child(notice_card)
+	notice_label = Label.new()
+	notice_label.add_theme_font_size_override("font_size", 16)
 	notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	notice_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	notice_label.modulate.a = 0.0
+	notice_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	notice_card.add_child(notice_label)
 	# compass tape, top centre: north is -Z on the tile (map up)
 	compass = Control.new()
 	compass.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
@@ -249,15 +277,17 @@ func _build_hud() -> void:
 	dot.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
 	dot.size = Vector2(4, 4)
 	dot.position = Vector2(-2, -2)
-	dot.color = Color(1, 1, 1, 0.6)
+	dot.color = Color(BookTheme.PAGE_LIGHT, 0.8)
 	dot.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	hud.add_child(dot)
 
 
+## HUD text over the world: page colour with an ink shadow.
 func _label(parent: Control, size: int) -> Label:
 	var l := Label.new()
 	l.add_theme_font_size_override("font_size", size)
-	l.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0.85))
+	l.add_theme_color_override("font_color", BookTheme.PAGE_LIGHT)
+	l.add_theme_color_override("font_shadow_color", Color(BookTheme.INK, 0.9))
 	l.add_theme_constant_override("shadow_offset_x", 1)
 	l.add_theme_constant_override("shadow_offset_y", 1)
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -273,6 +303,7 @@ func _center_panel(p: Control) -> void:
 
 func _build_panel(title_key: String) -> PanelContainer:
 	var p := PanelContainer.new()
+	p.theme = BookTheme.theme()
 	p.custom_minimum_size = Vector2(760, 520)
 	p.visible = false
 	add_child(p)
@@ -283,9 +314,8 @@ func _build_panel(title_key: String) -> PanelContainer:
 	p.add_child(v)
 	var t := Label.new()
 	t.name = "Title"
+	t.theme_type_variation = "HeadLabel"
 	t.text = tr(title_key) if title_key != "" else ""
-	t.add_theme_font_size_override("font_size", 26)
-	t.add_theme_color_override("font_color", GOLD)
 	v.add_child(t)
 	return p
 
@@ -300,8 +330,8 @@ func _refresh_era_label() -> void:
 	if era == null:
 		era_label.text = ""
 		return
-	var badge := ("   ·   " + tr("UI_ONLINE_BADGE")) if Ledger.online else ""
-	era_label.text = "%s   %s   %s   %s%s" % [Sites.display_name(Sites.active), Ledger.date_string(), world.clock_string(), Ledger.format_money(Ledger.cash()), badge]
+	var badge := ("      " + tr("UI_ONLINE_BADGE")) if Ledger.online else ""
+	era_label.text = "%s      %s      %s      %s%s" % [Sites.display_name(Sites.active), Ledger.date_string(), world.clock_string().left(5), Ledger.format_money(Ledger.cash()), badge]
 	var obj := _objective()
 	if obj != "":
 		era_label.text += "\n" + obj
@@ -314,7 +344,7 @@ func _on_target_changed(t: Interactable) -> void:
 		hover_label.text = ""
 		return
 	var lbl := t.label()
-	prompt_label.text = ("%s  ·  " % lbl if lbl != "" else "") + "[E] " + t.prompt()
+	prompt_label.text = ("%s      " % lbl if lbl != "" else "") + "E  " + t.prompt()
 	hover_label.text = t.hover_text()
 
 
@@ -324,10 +354,10 @@ func show_notice(text: String) -> void:
 	notice_label.text = text
 	if _notice_tween:
 		_notice_tween.kill()
-	notice_label.modulate.a = 1.0
+	notice_card.modulate.a = 1.0
 	_notice_tween = create_tween()
 	_notice_tween.tween_interval(3.5 + text.length() * 0.03)
-	_notice_tween.tween_property(notice_label, "modulate:a", 0.0, 1.0)
+	_notice_tween.tween_property(notice_card, "modulate:a", 0.0, 1.0)
 
 
 # ---------------------------------------------------------------- panels
@@ -578,7 +608,7 @@ func _fill_pause() -> void:
 func _pause_button(body: VBoxContainer, text: String, cb: Callable) -> Button:
 	var b := Button.new()
 	b.text = text
-	b.add_theme_font_size_override("font_size", 22)
+	b.add_theme_font_size_override("font_size", 17)
 	b.custom_minimum_size = Vector2(0, 42)
 	b.pressed.connect(cb)
 	body.add_child(b)
@@ -749,16 +779,21 @@ func _fill_journal() -> void:
 	scroll.add_child(box)
 	var mine := Ledger.events(200, true)
 	if mine.is_empty():
-		var e := Label.new()
-		e.text = tr("UI_LEDGER_EMPTY")
-		box.add_child(e)
+		BookTheme.label(tr("UI_LEDGER_EMPTY"), "ProseLabel", box)
+	var grid := GridContainer.new()
+	grid.columns = 3
+	box.add_child(grid)
 	for e in mine:
-		var l := Label.new()
-		var amount := ("   %+d %s" % [int(e.amount), tr("CUR_EUR")]) if int(e.amount) != 0 else ""
-		l.text = "M%d  —  %s%s" % [int(e.month), str(e.title), amount]
+		BookTheme.label(Ledger.date_for(int(e.month)), "DetailLabel", grid)
+		var l := BookTheme.label(str(e.title), "", grid)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		l.custom_minimum_size = Vector2(700, 0)
-		box.add_child(l)
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		var amount := int(e.amount)
+		var a := BookTheme.label(("%+s" % BookTheme.money(amount)) if amount > 0 else (BookTheme.money(amount) if amount < 0 else ""), "", grid)
+		a.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		a.custom_minimum_size = Vector2(120, 0)
+		if amount != 0:
+			a.add_theme_color_override("font_color", BookTheme.GREEN if amount > 0 else BookTheme.RUBRIC)
 	var codex := ScrollContainer.new()
 	codex.name = tr("UI_CODEX")
 	tabs.add_child(codex)
@@ -767,16 +802,10 @@ func _fill_journal() -> void:
 	cbox.add_theme_constant_override("separation", 8)
 	codex.add_child(cbox)
 	for k in Sites.get_value("codex", []):
-		var t := Label.new()
-		t.text = tr(str(k) + "_TITLE")
-		t.add_theme_font_size_override("font_size", 18)
-		t.add_theme_color_override("font_color", GOLD)
-		cbox.add_child(t)
-		var l := Label.new()
-		l.text = tr(str(k))
+		BookTheme.label(tr(str(k) + "_TITLE"), "SubheadLabel", cbox)
+		var l := BookTheme.label(tr(str(k)), "ProseLabel", cbox)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size = Vector2(700, 0)
-		cbox.add_child(l)
 
 
 ## Offers on my plots and sales of them become notices; everything else waits in the feed.

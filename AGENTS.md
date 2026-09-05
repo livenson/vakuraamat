@@ -65,6 +65,9 @@ its design documents in the repo root describe that version.
 - Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`
   (or `--fullscreen`).
 - Strings: `assets/i18n/strings.csv` (keys, et, en). Add keys, never hard-code text.
+- UI look: `BookTheme` (scripts/ui/book_theme.gd) is the one theme; new panels set `theme =
+  BookTheme.theme()` and use its type variations (HeadLabel, DetailLabel, PrimaryButton, TextButton,
+  RowButton) instead of font or colour overrides; money through `BookTheme.money()`, no " · " joins.
 - A node added from a `SceneTree._init()` script enters the tree one frame later: `await process_frame`
   before touching Terrain3D objects. `assert()` does not stop headless tests; use the
   `_check()` helper pattern and the watchdog timer.

@@ -136,6 +136,19 @@ sides, or share the pack. Keep the news flowing with a scheduled `make news SITE
 (cron `*/15 * * * *`, or a launchd `StartInterval` of 900 with `SPACETIME_TOKEN` in its environment).
 SpacetimeDB's licence allows one production instance per project; Maincloud counts as that.
 
+## The book: how the menus look
+
+Every menu and panel is a page of the register: `scripts/ui/book_theme.gd` builds one Theme (aged
+paper, iron-gall ink, the cadastre's blue for anything you can act on, a rubric red only as the
+margin rule and for money owed; EB Garamond for titles and prose, IBM Plex Sans with tabular
+numerals for buttons, tables and figures) and every top-level Control sets it. Use the type
+variations rather than font overrides: `TitleLabel`, `HeadLabel`, `SubheadLabel`, `ProseLabel`,
+`DetailLabel`, `ColumnLabel` for text, `PrimaryButton`, `TextButton`, `RowButton` for buttons. Money
+goes through `BookTheme.money()` (thousands grouped), dates through `Ledger.date_for()`. The front
+page's plate (`scripts/ui/map_plate.gd`) draws the pack's cadastral units over its orthophoto and
+fills the saved book's plots; `tools/godot/menu_shot.tscn` screenshots the menu (`--locations` for
+the second page).
+
 ## Real buildings: ETAK footprints, the Building Register, LOD2 roofs
 
 `make buildings SITE=<id>` (part of `make tile`, and of every tile-service job) writes
