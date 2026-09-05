@@ -6,9 +6,8 @@
     python3 tools/new_site.py --id kvissentali --relink-era-maps
 
 What you get: site.json (terrain centre, latitude/longitude, eras' historical map layers, start,
-objectives, ending), layout.json (named spots around the tile centre), scenes.json (a register,
-one NPC per era, one artifact whose delivery leaves a visible trace in every later era, a trade
-post, farm plots, hunting, village massing), data/ (eras, one consequence point, the artifact,
+objectives, ending), layout.json (named spots around the tile centre), scenes.json (a register, one NPC per era, the quest
+blocks from blocks/ composed by tools/compose_story.py, a trade post, farm plots, hunting, village massing), data/ (eras, one consequence point, the artifact,
 and the template site's farming/hunting/trading/building content with era ids remapped),
 narrative/<era>.ink (Estonian lines with '# en:' tags) and strings.csv. Everything is meant
 to be rewritten; it is a working skeleton that passes validate_site.py and boots.
@@ -16,7 +15,10 @@ to be rewritten; it is a working skeleton that passes validate_site.py and boots
 Then: make tile SITE=<id>   (fetch Maa-amet data, build terrain, era maps, buildings, water, scenes)
       make ink; make validate; godot --path . -- --site=<id>
 """
-import argparse, csv, json, math, os, re, sys
+import argparse, csv, json, math, os, re, shutil, sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import compose_story  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -183,12 +185,15 @@ def apply_anchors(site, anchors, root=ROOT):
 
 
 def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", tile=None, template="palupera",
-             force=False, root=ROOT, template_root=ROOT, texture_mode="import", anchors=None):
+             force=False, root=ROOT, template_root=ROOT, texture_mode="import", anchors=None, seed=None, block_ids=None):
     if not re.fullmatch(r"[a-z][a-z0-9_]*", site):
         sys.exit("--id must be lowercase letters, digits, underscores")
     site_dir = os.path.join(root, "sites", site)
     if os.path.exists(site_dir) and not force:
         sys.exit(f"{site_dir} exists (use --force to overwrite the scaffold files)")
+    if os.path.exists(site_dir):
+        for sub in ("data", "narrative", "scenes"):   # fully regenerated; layout, buildings and water are kept
+            shutil.rmtree(os.path.join(site_dir, sub), ignore_errors=True)
     tile = tile or site
     tile_dir = os.path.join(root, "assets/terrain", tile)
     years = sorted(int(y) for y in eras.split(","))
@@ -197,6 +202,8 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
     mid = eras[-2] if len(eras) > 1 else eras[0]
     lat, lon = lest97_to_wgs84(*center)
     half = size / 2
+    if seed is None:
+        seed = int(center[0] + center[1]) % 100000   # each place gets its own composition
     pack = f"res://sites/{site}" if texture_mode == "import" else f"user://sites/{site}"   # where Godot will find the pack
     SITE_KEY = f"SITE_{site.upper()}"
     name = name or site.capitalize()
@@ -315,35 +322,25 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
             for e in re.findall(r'"([^"]*)"', p.get("eras", "")):
                 crops_by_era.setdefault(e, []).append(unquote(p["seed_item_id"]))
 
-    # --- the story block: one artifact, one consequence, a visible trace ---------------------------
-    write_tres(os.path.join(site_dir, "data/consequence_points/cp1_keepsake_returned.tres"), "res://scripts/consequence/consequence_point.gd", {
-        "id": q("cp1_keepsake_returned"), "flag_name": q("keepsake_returned"), "trigger_era": q(oldest),
-        "affected_eras": gd_array(eras[1:]), "trigger_description_key": q("CP1_KEEPSAKE_TRIGGER"), "effect_description_key": q("CP1_KEEPSAKE_EFFECT")})
-    write_tres(os.path.join(site_dir, "data/items/keepsake.tres"), "res://scripts/items/artifact_item.gd", {
-        "id": q("keepsake"), "display_name_key": q("ITEM_KEEPSAKE"), "description_key": q("ITEM_KEEPSAKE_DESC"), "can_cross_eras": "true",
-        "linked_consequence_point_id": q("cp1_keepsake_returned"), "valid_delivery_target": q(f"npc_{oldest}"), "origin_era": q(newest), "delivery_era": q(oldest)})
+    # --- story: quest blocks composed for these eras (tools/compose_story.py, blocks/) -------------
+    comp = compose_story.compose(site, name, years, seed, block_ids)
+    for fname, props in comp["items"]:
+        write_tres(os.path.join(site_dir, "data/items", fname), "res://scripts/items/artifact_item.gd", props)
+    for fname, props in comp["cps"]:
+        write_tres(os.path.join(site_dir, "data/consequence_points", fname), "res://scripts/consequence/consequence_point.gd", props)
     layout = anchor_layout(half, anchors)
     write_tres(os.path.join(site_dir, "data/manors/home_farm.tres"), "res://scripts/base_building/manor_definition.gd", {
         "id": q("home_farm"), "display_name_key": q("MANOR_HOME"), "era_id": q(mid), "cadastral_parcel_id": q(""), "position": "Vector2(%d, %d)" % (layout["farm"][0], layout["farm"][1]),
         "unlock_condition_flag": q(""), "structures": gd_array(structures)})
-    S("CP1_KEEPSAKE_TRIGGER", f"Sa andsid mälestuseseme tagasi aastal {years[0]}.", f"You returned the keepsake in {years[0]}.")
-    S("CP1_KEEPSAKE_EFFECT", "Mälestusese jõudis koju. Hilisematel aastatel seisab maamärgi juures kivi.", "The keepsake came home. In the later years a stone stands by the landmark.")
-    S("ITEM_KEEPSAKE", "Mälestusese", "Keepsake"); S("ITEM_KEEPSAKE_DESC", "Vana ese, mis ei kuulu sellesse aastasse.", "An old thing that does not belong to this year.")
+    strings.extend(comp["strings"])
     S("MANOR_HOME", "Kodutalu", "Home farm")
     S("LOC_LANDMARK", "Maamärk", "The landmark"); S("LOC_FARMSTEAD", "Talu", "The farmstead")
     S("ITEM_REGISTER", "Vakuraamat", "The register"); S("EX_REGISTER", "Raamat aastate vahel. Võta see.", "A book between the years. Take it.")
     S("NOTICE_REGISTER_FOUND", "Vakuraamat. Ava see (Tab) ja vali lehekülg.", "The register. Open it (Tab) and choose a page.")
-    S("OBJ_FIND_REGISTER", "Leia raamat.", "Find the register."); S("OBJ_VISIT_ERAS", "Käi läbi kõik aastad.", "Visit every year.")
-    S("OBJ_RETURN", f"Vii mälestusese aastasse {years[0]}.", f"Take the keepsake back to {years[0]}."); S("OBJ_SIT", f"Mine tagasi aastasse {years[-1]} ja räägi lõpuni.", f"Go back to {years[-1]} and finish the conversation.")
-    S("ENDING_KEPT_TITLE", "Alles", "Kept"); S("ENDING_KEPT_TEXT", "Kivi seisab. Keegi mäletab.", "The stone stands. Somebody remembers.")
-    S("ENDING_LOST_TITLE", "Kadunud", "Lost"); S("ENDING_LOST_TEXT", "Maa võttis omad tagasi. Lood jäid.", "The land took back its own. The stories stayed.")
-    S("ENDING_KEPT", "Alles %d / %d", "Kept %d of %d")
-    S("CODEX_REAL_TITLE", "Päris", "Real"); S("CODEX_REAL", f"Maa: {name}, Maa- ja Ruumiameti kõrgusandmed ja ortofoto.", f"The ground: {name}, from the Land Board's elevation data and orthophoto.")
-    S("CODEX_INVENTED_TITLE", "Välja mõeldud", "Invented"); S("CODEX_INVENTED", "Inimesed ja lugu.", "The people and the story.")
+    S("CODEX_REAL_TITLE", "Päris", "Real"); S("CODEX_REAL", f"Maa: {name}, Maa- ja Ruumiameti kõrgusandmed, ortofoto ja ajaloolised kaardid, meetri täpsusega.", f"The ground: {name}, from the Land Board's elevation data, orthophoto and historical maps, to the metre.")
+    S("CODEX_INVENTED_TITLE", "Välja mõeldud", "Invented"); S("CODEX_INVENTED", "Inimesed, nende nimed ja lugu on kokku pandud lugude klotsidest; ükski neist ei kujuta päris inimest.", "The people, their names and the story are assembled from story blocks; none depicts a real person.")
     for e, y in zip(eras, years):
-        S(f"NPC_{y}", f"Kohalik ({y})", f"A local ({y})")
         S(f"EX_LANDMARK_{y}", f"Maamärk aastal {y}.", f"The landmark in {y}.")
-        S(f"EX_KEPT_{y}", "Kivi, mille keegi siia pani. Nimi on veel loetav.", "A stone somebody set here. The name is still legible.")
         S(f"POST_{y}", f"Pood ({y})", f"The shop ({y})"); S(f"POST_{y}_TEXT", "Ostetakse ja müüakse selle aasta raha eest.", "Buying and selling for this year's money.")
 
     # --- layout -----------------------------------------------------------------------------------
@@ -351,19 +348,15 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
     reg, sp = layout["register"], layout["spawn"]
     yaw = round(math.degrees(math.atan2(-(reg[0] - sp[0]), -(reg[1] - sp[1]))) % 360, 1)   # face the register (0 = north)
 
-    # --- scenes -----------------------------------------------------------------------------------
+    # --- scenes: the base of every era plus the blocks' nodes ------------------------------------------
     def era_nodes(e, y, i):
-        nodes = [{"type": "npc", "name": f"Local{y}", "id": f"npc_{e}", "knot": "greeter", "label": f"NPC_{y}", "color": [0.4 + 0.1 * i, 0.35, 0.3], "at": {"ref": "register", "offset": [6, 4]}, "height": 1.7, "yaw": 2.6},
+        npc = comp["npcs"][e]
+        nodes = [{"type": "npc", "name": npc["node"], "id": npc["id"], "knot": "greeter", "label": npc["label"], "color": [0.4 + 0.1 * i, 0.35, 0.3], "at": {"ref": "register", "offset": [6, 4]}, "height": 1.7, "yaw": 2.6},
                  {"type": "group", "name": "Landmark", "at": "landmark", "children": [
                      {"type": "examine", "name": "LandmarkExamine", "key": f"EX_LANDMARK_{y}", "loc": "LOC_LANDMARK", "label": "LOC_LANDMARK"}]},
                  {"type": "trade_post", "at": "trade", "key": f"POST_{y}", "color": [0.7, 0.65, 0.5]}]
-        if e != oldest:
-            nodes.append({"type": "group", "name": "Kept", "at": "landmark", "flag": "keepsake_returned", "visible_when": True, "children": [
-                {"type": "instance", "name": "Stone", "scene": "res://assets/models/props/boundary_stone.glb", "at": [3, 0], "yaw_deg": 20},
-                {"type": "examine", "name": "KeptExamine", "key": f"EX_KEPT_{y}", "label": "LOC_LANDMARK", "at": [3, 0]}]})
         if e == newest:
             nodes.insert(0, {"type": "register", "name": "RegisterBook", "at": "register"})
-            nodes.append({"type": "pickup", "name": "Keepsake", "item": "keepsake", "examine": "ITEM_KEEPSAKE_DESC", "at": {"ref": "register", "offset": [-4, 3]}})
             nodes.append({"type": "village", "source": "buildings_2026.json"})
         if e == mid:
             nodes.append({"type": "manor_site", "id": "home_farm", "at": "farm"})
@@ -371,48 +364,33 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
             nodes.append({"type": "farm_plots", "at": {"ref": "farm", "offset": [8, 12]}, "count": 2, "seeds": crops_by_era[e][:3]})
         if i < len(eras) - 1:
             nodes.append({"type": "hunting", "max_animals": 6})
-        return nodes
+        return nodes + comp["nodes"][e]
     scenes = {"colors": {"darkwood": [0.30, 0.22, 0.14], "stone": [0.55, 0.53, 0.50]}, "fragments": {},
               "eras": {e: {"nodes": era_nodes(e, y, i)} for i, (e, y) in enumerate(zip(eras, years))}}
     json.dump(scenes, open(os.path.join(site_dir, "scenes.json"), "w"), indent=1)
 
     # --- ink ---------------------------------------------------------------------------------------
-    ext = "\n".join(f"EXTERNAL {d}" for d in ["flag(name)", "has_item(id)", "give_item(id, target)", "take_item(id)", "set_flag(name)", "end_chapter()", "chapter()", "trigger(cp_id)"]) + "\n-> END\n\n"
     os.makedirs(os.path.join(site_dir, "narrative"), exist_ok=True)
-    for e, y in zip(eras, years):
-        ink = ext + f"== greeter ==\n{{ not flag(\"met_{e}\"):\n    ~ set_flag(\"met_{e}\")\n    Sa ei ole siit. Aasta on {y}. # en: You're not from here. The year is {y}.\n- else:\n    Jälle sina. # en: You again.\n}}\n-> menu\n\n= menu\n"
-        if e == oldest:
-            ink += f"+ {{ has_item(\"keepsake\") and not flag(\"keepsake_returned\") }} [Anna mälestusese. %% Hand over the keepsake.]\n    ~ give_item(\"keepsake\", \"npc_{e}\")\n    Ta hoiab seda kaua käes. # en: They hold it for a long time.\n    {{ chapter() == 2:\n        ~ end_chapter()\n    }}\n    -> menu\n"
-        else:
-            ink += "+ { flag(\"keepsake_returned\") } [Kivi maamärgi juures. %% The stone by the landmark.]\n    Keegi pani selle sinna ammu. Nimi on veel peal. # en: Somebody set it there long ago. The name is still on it.\n    -> menu\n"
-        if e == newest:
-            ink += "+ { chapter() >= 3 and not flag(\"epilogue\") } [Räägime lõpuni. %% Let's finish the conversation.]\n    -> sit\n"
-        ink += "+ [Mis koht see on? %% What is this place?]\n    Vaata ringi. Maa räägib ise. # en: Look around. The ground speaks for itself.\n    -> menu\n+ [Ma lähen. %% I'll go.]\n    Mine. # en: Go.\n    -> END\n"
-        if e == newest:
-            ink += "\n= sit\n~ set_flag(\"epilogue\")\n~ end_chapter()\nNoh. Räägime siis sellest, mis alles on. # en: Well. Let's talk about what's still here.\n-> END\n"
-        open(os.path.join(site_dir, "narrative", f"{e}.ink"), "w", encoding="utf-8").write(ink)
+    for e in eras:
+        open(os.path.join(site_dir, "narrative", f"{e}.ink"), "w", encoding="utf-8").write(comp["ink"][e])
 
     # --- manifest + strings ---------------------------------------------------------------------------
+    locations = {"LOC_LANDMARK": "landmark", "LOC_FARMSTEAD": "farm"}
+    locations.update(comp["locations"])
     manifest = {
         "id": site, "name_key": SITE_KEY, "subtitle_key": f"{SITE_KEY}_SUBTITLE",
-        "description": f"{name}: scaffolded site pack. Replace the placeholder story.",
+        "description": f"{name}: generated site pack (blocks {', '.join(comp['blocks'])}, seed {seed}).",
         "terrain": {"tile": tile, "center": [float(center[0]), float(center[1])], "size": size, "latitude": lat, "longitude": lon, "utc_offset": 3.0, "date": [2026, 9, 3], "era_maps": era_maps},
         "start": {"era": newest, "spawn": layout["spawn"], "yaw_deg": yaw},
         "water": "water_2026.json", "buildings": "buildings_2026.json",
-        "locations": {"LOC_LANDMARK": "landmark", "LOC_FARMSTEAD": "farm"},
-        "objectives": [
-            {"when": "register_locked", "key": "OBJ_FIND_REGISTER", "target": "RegisterBook", "lift": 1.2},
-            {"chapter": 1, "key": "OBJ_VISIT_ERAS"},
-            {"chapter": 2, "key": "OBJ_RETURN", "target": f"Local{years[0]}", "era": oldest, "lift": 2.2},
-            {"chapter": 3, "not_flag": "epilogue", "key": "OBJ_SIT", "target": f"Local{years[-1]}", "era": newest, "lift": 2.2}],
+        "locations": locations,
+        "objectives": comp["objectives"],
         "register_nudge": {"chapter": 1, "era": oldest},
-        "ending": {"trigger_flag": "epilogue", "counted_flags": ["keepsake_returned"],
-                   "tiers": [{"min_kept": 1, "key": "ENDING_KEPT_TEXT"}, {"key": "ENDING_LOST_TEXT"}]},
+        "ending": comp["ending"],
         "codex": ["CODEX_REAL", "CODEX_INVENTED"],
         "debug": {"build_node": "Manor_home_farm"},
+        "story": {"seed": seed, "blocks": comp["blocks"], "npcs": {e: comp["npcs"][e]["name"] for e in eras}},
     }
-    # ending tier keys need <key>_TITLE: alias the titles
-    S("ENDING_KEPT_TEXT_TITLE", "Alles", "Kept"); S("ENDING_LOST_TEXT_TITLE", "Kadunud", "Lost")
     json.dump(manifest, open(os.path.join(site_dir, "site.json"), "w"), indent=2)
     seen = set(); rows = []
     for r in strings:
@@ -426,11 +404,10 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
         p = os.path.join(site_dir, fn)
         if not os.path.exists(p):
             json.dump([], open(p, "w"))
-    print(f"[new_site] {os.path.relpath(site_dir, root)}: eras {', '.join(eras)}; centre EPSG:3301 {center[0]:.0f} {center[1]:.0f} = {lat} N {lon} E")
+    print(f"[new_site] {os.path.relpath(site_dir, root)}: eras {', '.join(eras)}; blocks {', '.join(comp['blocks'])} (seed {seed}); centre EPSG:3301 {center[0]:.0f} {center[1]:.0f} = {lat} N {lon} E")
     if root == ROOT:
         print(f"[new_site] next: make tile SITE={site}   (or make era-maps / make features / make scenes separately), make ink, make validate")
     return site_dir
-
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -446,6 +423,8 @@ if __name__ == "__main__":
     ap.add_argument("--root", default=ROOT, help="project root holding sites/ and assets/terrain/ (default: the repo)")
     ap.add_argument("--texture-mode", choices=["import", "path"], default="import", help="era textures as imported res:// resources or runtime user:// paths")
     ap.add_argument("--anchors", help="anchors.json from extract_features.py to place the layout on")
+    ap.add_argument("--seed", type=int, help="story composition seed (default: from the centre coordinates)")
+    ap.add_argument("--blocks", help="comma-separated quest block ids (default: every usable block)")
     a = ap.parse_args()
     if a.relink_era_maps:
         relink_era_maps(a.id, a.root, a.texture_mode)
@@ -453,4 +432,5 @@ if __name__ == "__main__":
         if not a.center:
             sys.exit("--center X Y is required")
         anchors = json.load(open(a.anchors)) if a.anchors else None
-        scaffold(a.id, a.name, a.center, a.size, a.eras, a.tile, a.template, a.force, a.root, ROOT, a.texture_mode, anchors)
+        scaffold(a.id, a.name, a.center, a.size, a.eras, a.tile, a.template, a.force, a.root, ROOT, a.texture_mode, anchors,
+                 a.seed, a.blocks.split(",") if a.blocks else None)

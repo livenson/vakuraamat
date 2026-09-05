@@ -1,15 +1,16 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene load_steps=27 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/npc/npc.tscn" id="1"]
 [ext_resource type="Script" path="res://scripts/interaction/conditional.gd" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/props/examine_point.tscn" id="3"]
 [ext_resource type="Script" path="res://scripts/trading/trade_post.gd" id="4"]
-[ext_resource type="PackedScene" path="res://assets/models/props/boundary_stone.glb" id="5"]
-[ext_resource type="Script" path="res://scripts/base_building/manor_controller.gd" id="6"]
-[ext_resource type="PackedScene" path="res://scenes/farming/farm_plot.tscn" id="7"]
-[ext_resource type="Script" path="res://scripts/farming/seed_bin.gd" id="8"]
-[ext_resource type="Script" path="res://scripts/hunting/hunting_spawner.gd" id="9"]
-[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/base_building/manor_controller.gd" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/farming/farm_plot.tscn" id="6"]
+[ext_resource type="Script" path="res://scripts/farming/seed_bin.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/hunting/hunting_spawner.gd" id="8"]
+[ext_resource type="PackedScene" path="res://scenes/props/pickup.tscn" id="9"]
+[ext_resource type="PackedScene" path="res://assets/models/props/boundary_stone.glb" id="10"]
+[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="11"]
 
 [sub_resource type="BoxShape3D" id="TP_era_1938_1"]
 size = Vector3(2.6, 2.4, 2.2)
@@ -52,12 +53,28 @@ size = Vector3(1.4, 1.2, 1.0)
 albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
+[sub_resource type="StandardMaterial3D" id="M12"]
+albedo_color = Color(0.550, 0.530, 0.500, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="M13"]
+albedo_color = Color(0.300, 0.220, 0.140, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="M14"]
+albedo_color = Color(0.300, 0.220, 0.140, 1)
+roughness = 0.9
+
+[sub_resource type="StandardMaterial3D" id="M15"]
+albedo_color = Color(0.300, 0.220, 0.140, 1)
+roughness = 0.9
+
 [node name="era_1938" type="Node3D"]
-script = ExtResource("10")
+script = ExtResource("11")
 era_id = "era_1938"
 
 [node name="Local1938" parent="." instance=ExtResource("1")]
-transform = Transform3D(-0.8569, 0, 0.5155, 0, 1.0, 0, -0.5155, 0, -0.8569, 518.0, 0.0, 516.0)
+transform = Transform3D(-0.8569, 0, 0.5155, 0, 1.0, 0, -0.5155, 0, -0.8569, 505.0, 0.0, 512.0)
 npc_id = "npc_era_1938"
 knot = "greeter"
 label_key = "NPC_1938"
@@ -66,7 +83,7 @@ height = 1.7
 pose = "stand"
 
 [node name="Landmark" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 552.0, 0, 482.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 267.0, 0, 297.0)
 script = ExtResource("2")
 
 [node name="LandmarkExamine" parent="Landmark" instance=ExtResource("3")]
@@ -76,7 +93,7 @@ location_id = "LOC_LANDMARK"
 label_key = "LOC_LANDMARK"
 
 [node name="TradePost" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 542.0, 0, 542.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 538.0, 0, 522.0)
 script = ExtResource("4")
 era_id = "era_1938"
 post_name_key = "POST_1938"
@@ -116,23 +133,9 @@ collision_mask = 0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 shape = SubResource("TP_era_1938_1")
 
-[node name="Kept" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 552.0, 0, 482.0)
-script = ExtResource("2")
-flag = "keepsake_returned"
-visible_when = true
-
-[node name="Stone" parent="Kept" instance=ExtResource("5")]
-transform = Transform3D(0.9397, 0, 0.3420, 0, 1.0, 0, -0.3420, 0, 0.9397, 3, 0.0, 0)
-
-[node name="KeptExamine" parent="Kept" instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
-text_key = "EX_KEPT_1938"
-label_key = "LOC_LANDMARK"
-
 [node name="Manor_home_farm" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 452.0, 0, 552.0)
-script = ExtResource("6")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 534.0)
+script = ExtResource("5")
 manor_id = "home_farm"
 
 [node name="Post" type="CSGBox3D" parent="Manor_home_farm"]
@@ -154,22 +157,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
 shape = SubResource("MS_home_farm_7")
 
 [node name="Farming" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 460.0, 0, 564.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 178.0, 0, 546.0)
 script = ExtResource("2")
 
-[node name="Plot0" parent="Farming" instance=ExtResource("7")]
+[node name="Plot0" parent="Farming" instance=ExtResource("6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0)
 plot_id = "plot0"
 era_id = "era_1938"
 
-[node name="Plot1" parent="Farming" instance=ExtResource("7")]
+[node name="Plot1" parent="Farming" instance=ExtResource("6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 0)
 plot_id = "plot1"
 era_id = "era_1938"
 
 [node name="SeedBin" type="Node3D" parent="Farming"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, 0)
-script = ExtResource("8")
+script = ExtResource("7")
 era_id = "era_1938"
 seed_item_ids = Array[String](["seed_rye", "seed_oats", "seed_potato"])
 
@@ -187,6 +190,103 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 shape = SubResource("SB_era_1938_10")
 
 [node name="HuntingSpawner" type="Node3D" parent="."]
-script = ExtResource("9")
+script = ExtResource("8")
 era_id = "era_1938"
 max_animals = 6
+
+[node name="WellRing" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 534.0)
+script = ExtResource("2")
+flag = "well_kept"
+visible_when = true
+
+[node name="Ring" type="CSGTorus3D" parent="WellRing"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+inner_radius = 0.8
+outer_radius = 1.2
+sides = 12
+ring_sides = 6
+material = SubResource("M12")
+
+[node name="WellExamine" parent="WellRing" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
+text_key = "EX_WELL_KEPT"
+location_id = "LOC_WELL"
+label_key = "LOC_WELL"
+
+[node name="WellDip" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 534.0)
+script = ExtResource("2")
+flag = "well_kept"
+visible_when = false
+
+[node name="DipExamine" parent="WellDip" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
+text_key = "EX_WELL_DIP"
+location_id = "LOC_WELL"
+label_key = "LOC_WELL"
+
+[node name="Pickup_harvest_letter" parent="." instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 175.0, 0, 525.0)
+item_id = "harvest_letter"
+era_id = "era_1938"
+examine_key = "ITEM_HARVEST_LETTER_DESC"
+
+[node name="Pickup_deed_page" parent="." instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 261.0, 0, 301.0)
+item_id = "deed_page"
+era_id = "era_1938"
+examine_key = "ITEM_DEED_PAGE_DESC"
+
+[node name="Gate" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 359.0, 0, 496.0)
+script = ExtResource("2")
+flag = "boundary_marked"
+visible_when = true
+
+[node name="PostA" type="CSGBox3D" parent="Gate"]
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, -1.2, 1.1, 0)
+size = Vector3(0.18, 2.2, 0.18)
+material = SubResource("M13")
+
+[node name="PostB" type="CSGBox3D" parent="Gate"]
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 1.2, 1.1, 0)
+size = Vector3(0.18, 2.2, 0.18)
+material = SubResource("M14")
+
+[node name="Beam" type="CSGBox3D" parent="Gate"]
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0.0, 2.1, 0.0)
+size = Vector3(2.8, 0.15, 0.15)
+material = SubResource("M15")
+
+[node name="GateExamine" parent="Gate" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
+text_key = "EX_GATE_KEPT"
+location_id = "LOC_FIELD"
+label_key = "LOC_FIELD"
+
+[node name="GateGone" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 359.0, 0, 496.0)
+script = ExtResource("2")
+flag = "boundary_marked"
+visible_when = false
+
+[node name="NoGateExamine" parent="GateGone" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
+text_key = "EX_GATE_GONE"
+location_id = "LOC_FIELD"
+label_key = "LOC_FIELD"
+
+[node name="KeepsakeStone" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 267.0, 0, 297.0)
+script = ExtResource("2")
+flag = "keepsake_returned"
+visible_when = true
+
+[node name="Stone" parent="KeepsakeStone" instance=ExtResource("10")]
+transform = Transform3D(0.9397, 0, 0.3420, 0, 1.0, 0, -0.3420, 0, 0.9397, 3, 0.0, 0)
+
+[node name="StoneExamine" parent="KeepsakeStone" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 0, 0)
+text_key = "EX_KEEPSAKE_STONE"
+label_key = "LOC_LANDMARK"

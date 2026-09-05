@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://mgp0mwmt0tx4"
+valid=false
+
+[deps]
+
+source_file="res://blocks/deed.json"
+
+[params]
+
+compress=true

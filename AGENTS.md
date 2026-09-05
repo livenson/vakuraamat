@@ -23,6 +23,8 @@ The design and plan documents in the repo root are authoritative: `vakuraamat-im
   goods, crops, animals), `narrative/` (ink), `strings.csv`. `make scenes SITE=<id>` regenerates
   `sites/<id>/scenes/*.tscn`; do not hand-edit those scenes. Engine code (`scripts/`, `scenes/`)
   must not reference a site by name; go through `Sites` (manifest, `data_dir`, `layout`, `tile`).
+- Generated stories come from `blocks/*.json` via `tools/compose_story.py` (used by `tools/new_site.py`
+  and the tile service `tools/tile_service.py`); the Palupera pack is hand-written and does not use blocks.
 - Core UI strings stay in `assets/i18n/strings.csv`; story/place strings go in the pack's
   `strings.csv` (imported to `.translation` next to it; `make import` after editing).
 - Generated data is not committed: `assets/terrain/*/data`, tree meshes and impostor atlases. Rebuild

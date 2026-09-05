@@ -4,9 +4,9 @@
 
 [resource]
 script = ExtResource("1")
-id = "cp1_keepsake_returned"
+id = "cp_keepsake"
 flag_name = "keepsake_returned"
 trigger_era = "era_1798"
 affected_eras = Array[String](["era_1938", "era_2026"])
-trigger_description_key = "CP1_KEEPSAKE_TRIGGER"
-effect_description_key = "CP1_KEEPSAKE_EFFECT"
+trigger_description_key = "CP_KEEPSAKE_TRIGGER"
+effect_description_key = "CP_KEEPSAKE_EFFECT"

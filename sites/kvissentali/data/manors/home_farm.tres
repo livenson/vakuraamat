@@ -8,6 +8,6 @@ id = "home_farm"
 display_name_key = "MANOR_HOME"
 era_id = "era_1938"
 cadastral_parcel_id = ""
-position = Vector2(452, 552)
+position = Vector2(170, 534)
 unlock_condition_flag = ""
 structures = Array[String](["barn", "dairy_stand", "sauna", "storehouse", "swing"])

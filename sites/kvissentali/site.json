@@ -2,7 +2,7 @@
   "id": "kvissentali",
   "name_key": "SITE_KVISSENTALI",
   "subtitle_key": "SITE_KVISSENTALI_SUBTITLE",
-  "description": "Kvissentali: scaffolded site pack. Replace the placeholder story.",
+  "description": "Kvissentali: generated site pack (blocks well, letter, grafts, deed, keepsake, seed 34750).",
   "terrain": {
     "tile": "kvissentali",
     "center": [
@@ -32,16 +32,19 @@
   "start": {
     "era": "era_2026",
     "spawn": [
-      512.0,
-      532.0
+      499.0,
+      528.0
     ],
-    "yaw_deg": 0
+    "yaw_deg": 0.0
   },
   "water": "water_2026.json",
   "buildings": "buildings_2026.json",
   "locations": {
     "LOC_LANDMARK": "landmark",
-    "LOC_FARMSTEAD": "farm"
+    "LOC_FARMSTEAD": "farm",
+    "LOC_WELL": "farm",
+    "LOC_ORCHARD": "field",
+    "LOC_FIELD": "field"
   },
   "objectives": [
     {
@@ -56,7 +59,7 @@
     },
     {
       "chapter": 2,
-      "key": "OBJ_RETURN",
+      "key": "OBJ_DELIVER",
       "target": "Local1798",
       "era": "era_1798",
       "lift": 2.2
@@ -77,17 +80,27 @@
   "ending": {
     "trigger_flag": "epilogue",
     "counted_flags": [
+      "well_kept",
+      "orchard_planted",
+      "boundary_marked",
       "keepsake_returned"
     ],
     "tiers": [
       {
-        "min_kept": 1,
-        "key": "ENDING_KEPT_TEXT"
+        "min_kept": 4,
+        "key": "ENDING_ALL",
+        "bonus": true
       },
       {
-        "key": "ENDING_LOST_TEXT"
+        "min_kept": 2,
+        "key": "ENDING_SOME"
+      },
+      {
+        "key": "ENDING_NONE"
       }
-    ]
+    ],
+    "bonus_flag": "letter_delivered",
+    "partial_key": "ENDING_BOX_PARTIAL"
   },
   "codex": [
     "CODEX_REAL",
@@ -95,5 +108,20 @@
   ],
   "debug": {
     "build_node": "Manor_home_farm"
+  },
+  "story": {
+    "seed": 34750,
+    "blocks": [
+      "well",
+      "letter",
+      "grafts",
+      "deed",
+      "keepsake"
+    ],
+    "npcs": {
+      "era_1798": "Peep",
+      "era_1938": "Elmar",
+      "era_2026": "Kadri"
+    }
   }
 }
