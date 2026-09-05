@@ -31,6 +31,9 @@ var _timer := 0.0
 var _last_inside := Vector3.INF
 var _hold := Vector3.INF
 var _notice_at := -100.0
+var _haze: Dictionary = {}          # Vector2i -> MeshInstance3D: a survey haze along a tile still being fetched
+var _stage := ""                    # last service stage text (Locator.progress)
+var _haze_mat: ShaderMaterial
 
 
 static func pack_id(cx: float, cy: float) -> String:
@@ -47,6 +50,7 @@ func setup(w: Node3D) -> void:
 	for a in OS.get_cmdline_user_args():
 		if a == "--no-stream":
 			enabled = false
+	Locator.progress.connect(func(text: String): _stage = text)
 
 
 func pack_for(loc: Vector2i) -> String:
@@ -125,6 +129,7 @@ func _ensure(loc: Vector2i) -> void:
 	else:
 		tiles[loc] = {"state": "queued", "pack": pack, "root": null}
 		_queue.append(loc)
+		_show_haze(loc)
 		_pump()
 
 
@@ -160,6 +165,7 @@ func _fail(loc: Vector2i, why: String) -> void:
 		return
 	tiles[loc].state = "unavailable"
 	tiles[loc].retry_at = Time.get_ticks_msec() / 1000.0 + RETRY_S
+	_hide_haze(loc)
 	print("[Tiles] tile %s unavailable: %s" % [loc, why])
 
 
@@ -199,6 +205,7 @@ func _load(loc: Vector2i) -> void:
 	world.place_water(pack, root)
 	_set_tile_era(loc, GameState.current_era)
 	t.state = "ready"
+	_hide_haze(loc)
 	print("[Tiles] %s ready at %s" % [pack, loc])
 	if _hold != Vector3.INF and tile_of(_hold) == loc:
 		world._snap(world.player, 1.0)
@@ -257,6 +264,36 @@ func set_hour(hour: float) -> void:
 				era.set_hour(hour)
 
 
+## A translucent, slowly breathing wall of haze standing on the tile being surveyed, so the wait is
+## visible from the edge; removed when the tile is ready or given up.
+func _show_haze(loc: Vector2i) -> void:
+	if _haze == null:
+		_haze = {}   # a member added by a hot reload starts as null on the live instance
+	if _haze.has(loc) or world == null:
+		return
+	if _haze_mat == null:
+		_haze_mat = ShaderMaterial.new()
+		_haze_mat.shader = load("res://assets/shaders/survey_haze.gdshader")
+	var mi := MeshInstance3D.new()
+	var box := BoxMesh.new()
+	box.size = Vector3(size, 90.0, size)
+	mi.mesh = box
+	mi.material_override = _haze_mat
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	var centre := offset_of(loc) + Vector3(size * 0.5, 0.0, size * 0.5)
+	var h: float = world.terrain.data.get_height(world.player.global_position)
+	centre.y = (h if not is_nan(h) else 50.0) + 30.0
+	mi.position = centre
+	add_child(mi)
+	_haze[loc] = mi
+
+
+func _hide_haze(loc: Vector2i) -> void:
+	if _haze != null and _haze.has(loc):
+		_haze[loc].queue_free()
+		_haze.erase(loc)
+
+
 func _unload(loc: Vector2i) -> void:
 	var t: Dictionary = tiles[loc]
 	if t.get("root"):
@@ -287,4 +324,7 @@ func guard(player: CharacterBody3D) -> void:
 	if now - _notice_at >= NOTICE_GAP_S:
 		_notice_at = now
 		var st := state_of(tile_of(pos))
-		EventBus.notice.emit(tr("NOTICE_EDGE_PENDING") if enabled and st != "unavailable" else tr("NOTICE_EDGE_NONE"))
+		if enabled and st != "unavailable":
+			EventBus.notice.emit(tr("NOTICE_EDGE_PENDING") + ("  (%s)" % _stage if _stage != "" and st == "fetching" else ""))
+		else:
+			EventBus.notice.emit(tr("NOTICE_EDGE_NONE"))

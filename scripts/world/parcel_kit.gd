@@ -17,19 +17,21 @@ var _colors: Array[Color] = []
 func _ready() -> void:
 	if polygon.size() < 3:
 		return
+	if kit in ["hedge", "fence", "solar"]:
+		# these place every piece on the ground themselves: neither the kit nor its parcel group may be snapped
+		set_meta("no_snap", true)
+		if get_parent():
+			get_parent().set_meta("no_snap", true)
 	match kit:
 		"playground":
 			_playground()
 		"park":
 			_park()
 		"hedge":
-			set_meta("no_snap", true)   # boundaries follow the ground piece by piece instead of the group snap
 			_boundary(0.9, 0.7, Color(0.22, 0.4, 0.18), 1.2, true)
 		"fence":
-			set_meta("no_snap", true)
 			_boundary(2.0, 0.08, Color(0.45, 0.45, 0.42), 0.4, false)
 		"solar":
-			set_meta("no_snap", true)
 			_solar()
 			_boundary(1.8, 0.06, Color(0.5, 0.5, 0.48), 0.5, false)
 	if _colors.is_empty():

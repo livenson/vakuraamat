@@ -184,7 +184,7 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 	if with_rider and HumanFigure.available():
 		var rider := HumanFigure.make(r, 2026)
 		rider.pose = "sit"
-		rider.position = Vector3(0, 0.1, -0.42)   # hips over the saddle once the legs fold forward
+		rider.position = Vector3(0, 0.1, -0.12)   # hips over the saddle once the legs fold forward
 		rider.rotation.y = PI                    # the frame's front is +Z, the figure faces -Z
 		rider.rotation.x = -0.15                 # leaning onto the handlebar
 		root.add_child(rider)
