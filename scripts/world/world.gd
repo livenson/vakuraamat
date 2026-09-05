@@ -408,8 +408,14 @@ func enter_building(needle: String) -> bool:
 	var layer: Node = $EraLayers.get_node_or_null(GameState.current_era)
 	if interiors == null or layer == null:
 		return false
+	var turn := 0.0   # "<address>@<degrees>" turns the player after stepping in (screenshots)
+	if "@" in needle:
+		turn = deg_to_rad(float(needle.get_slice("@", 1)))
+		needle = needle.get_slice("@", 0)
 	for b in layer.find_children("*", "FootprintBuilding", true, false):
 		if needle.to_lower() in str(b.address).to_lower() and b.get_node_or_null("Door"):
 			interiors.enter(b, player)
+			if turn != 0.0:
+				player.rotation.y += turn
 			return true
 	return false

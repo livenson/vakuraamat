@@ -172,8 +172,11 @@ are skipped so hand-placed models keep their spot.
 Every real building that is not an outbuilding gets a door on the wall the exterior draws it on.
 E at the door steps in: the first visit generates the interior from the footprint (a floor per
 storey on the register's floor count, inner walls with window openings on the exterior's rhythm and a
-gap at the door, a ceiling, a ramp between storeys with an open landing, a warm light) and furnishes
-it by use: shop counters and shelves where a company is registered, desks for offices, a bed, table
+gap at the door, a ceiling, a ramp between storeys with an open landing), partitions it into rooms (a
+deterministic split of the floor plan by use: living room, kitchen and bedrooms in a dwelling, a reception
+and offices, a salesroom with a back room; every partition wall has a doorway with a lintel, every room its
+lamp, the ramp keeps to the largest room and no cut lands next to the entrance) and furnishes each room by
+its role: shop counters and shelves where a company is registered, desks for offices, a bed, table
 and sofa in dwellings, benches and cabinets in workshops. Pieces are Kenney Furniture Kit models
 (CC0, `assets/vendor/kenney_furniture_kit`). While inside, the exterior mesh and its collider hide so
 the openings look out at the real street; E at the door or simply walking out through it restores
