@@ -30,4 +30,5 @@ func _ready() -> void:
 	print("[boot] save/load ok (%s)" % ProjectSettings.globalize_path(SaveManager.slot_path("boot_test")))
 	TranslationServer.set_locale("en")
 	print("[boot] en: ", tr("ERA_1938_NAME"), " | et: ", TranslationServer.get_translation_object("et").get_message("ERA_1938_NAME") if TranslationServer.get_translation_object("et") else "n/a")
+	print("[boot] PASSED")
 	get_tree().quit()

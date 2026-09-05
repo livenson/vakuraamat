@@ -264,4 +264,4 @@ static func array_equal(a1: Array, a2: Array, use_equals = false) -> bool:
 
 static var InkRuntime: Node:
 	get:
-		return Engine.get_main_loop().root.get_node("__InkRuntime")
+		return Engine.get_main_loop().root.get_node_or_null("__InkRuntime")
