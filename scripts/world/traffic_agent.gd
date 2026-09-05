@@ -19,6 +19,7 @@ var lateral := 0.0               # metres to the right of the travel direction
 var allowed: Array = []
 var rng := RandomNumberGenerator.new()
 var _body: Node3D
+var _rider: HumanFigure = null   # the cyclist's figure (pedals with the speed)
 var _year := 2026
 var _wheels: Array[Node3D] = []
 var _t := 0.0
@@ -43,6 +44,8 @@ func setup(g: RoadGraph, k: String, e: Dictionary, start_s: float, fwd: bool, se
 			_body = _make_walker()
 		"bike":
 			_body = build_bike(true, rng, CLOTHES[rng.randi() % CLOTHES.size()])
+			for r in _body.find_children("*", "HumanFigure", true, false):
+				_rider = r
 		"car":
 			_body = _make_car(year)
 		"cart":
@@ -117,6 +120,8 @@ func _place(delta: float) -> void:
 			_body.rotation.z = sin(_t * 6.0) * 0.03
 	for w in _wheels:
 		w.rotate_object_local(Vector3.RIGHT, -_speed_now * delta / 0.32)   # roughly a 0.3 m wheel radius
+	if kind == "cyclist" and _rider:
+		_rider.pedal_phase += _speed_now * delta * TAU / 4.5   # one crank turn per 4.5 m
 
 
 # ---------------------------------------------------------------- bodies
@@ -183,7 +188,7 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 	root.rotation.y = PI   # built with the handlebar at +Z; agents and the mounted player face -Z
 	if with_rider and HumanFigure.available():
 		var rider := HumanFigure.make(r, 2026)
-		rider.pose = "sit"
+		rider.pose = "pedal"
 		rider.position = Vector3(0, 0.1, -0.42)   # hips over the saddle once the legs fold forward and the lean is on
 		rider.rotation.y = 0.0                   # HumanFigure already faces the frame's front (+Z here)
 		rider.rotation.x = 0.3                   # leaning onto the handlebar (pitch about the feet)
@@ -205,7 +210,7 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 
 const CAR_KIT := "res://assets/vendor/kenney_car_kit/glb/"
 const CAR_MODELS := ["sedan", "sedan", "sedan-sports", "hatchback-sports", "hatchback-sports", "suv", "suv-luxury", "van", "delivery", "taxi", "truck"]
-const CAR_SCALE := 1.7   # the kit's sedan is 2.55 m long; a real one about 4.3 m
+const CAR_SCALE := 1.4   # the kit's sedan is 2.55 x 1.5 x 1.45 m: at 1.4 it is 3.6 m long and 2 m tall, a cartoon car that still fits the street
 
 
 ## A car from the Kenney Car Kit (CC0) when it is installed, else the box car. Pre-1950 cars are a

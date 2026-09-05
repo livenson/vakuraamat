@@ -199,6 +199,17 @@ func _details() -> void:
 		m.albedo_color = Color(0.5, 0.32, 0.26)
 		box.material = m
 		box.position = Vector3(c.x + 1.5, top + 0.3, c.y)
+		if not model.is_empty():
+			# on the LOD2 roof: at its highest vertex, nudged towards the centre, sunk half a metre in
+			var ridge := Vector3(c.x, -INF, c.y)
+			for face in model.faces:
+				for v in face:
+					if float(v[1]) > ridge.y:
+						ridge = Vector3(float(v[0]), float(v[1]), float(v[2]))
+			var toward := (Vector3(c.x, ridge.y, c.y) - ridge)
+			toward.y = 0.0
+			ridge += toward.limit_length(0.6)
+			box.position = Vector3(ridge.x, ridge.y + 0.3, ridge.z)
 		add_child(box)
 	if solar:
 		var panel := CSGBox3D.new()
@@ -356,10 +367,8 @@ func _quad_on_face(st: SurfaceTool, f: Dictionary, u: float, y: float, w: float,
 func _openings() -> void:
 	if _wall_faces.is_empty():
 		return
-	var eave := INF
-	for f in _wall_faces:
-		eave = minf(eave, float(f.ymax))
-	if eave == INF or eave < 2.2:
+	var eave := _eave()
+	if eave < 2.2:
 		return
 	var n_floors := floors if floors > 0 else maxi(1, int(round(eave / 3.0)))
 	n_floors = mini(n_floors, int(eave / 2.4))
@@ -379,8 +388,9 @@ func _openings() -> void:
 		if cols < 1:
 			cols = 1
 		var step := width / (cols + 1)
+		var base: float = maxf(float(f.ymin), _ground_on(f))
 		for k in n_floors:
-			var y: float = float(f.ymin) + k * fh + (0.9 if kind == "dwelling" else 1.3) + win_h / 2.0
+			var y: float = base + k * fh + (0.9 if kind == "dwelling" else 1.3) + win_h / 2.0
 			if y + win_h / 2.0 > float(f.ymax) - 0.2:
 				continue
 			for c in cols:
@@ -395,7 +405,7 @@ func _openings() -> void:
 		var lw: float = float(longest.umax) - float(longest.umin)
 		var cols := maxi(1, int((lw - 1.6) / spacing))
 		var u: float = float(longest.umin) + lw / (cols + 1) * (cols / 2 + 1)
-		var y0: float = float(longest.ymin) + door_h / 2.0
+		var y0: float = maxf(float(longest.ymin), _ground_on(longest)) + door_h / 2.0
 		_quad_on_face(_trim, longest, u, y0, door_w + 0.16, door_h + 0.1, 0.02)
 		var door := _windows if kind != "dwelling" else _trim
 		_quad_on_face(door, longest, u, y0, door_w, door_h, 0.05)
@@ -441,11 +451,49 @@ func door_frame() -> Dictionary:
 		"ymin": float(longest.ymin), "eave": float(longest.ymax)}
 
 
-## Eave height and floor count the openings use (the interior follows the same rhythm).
-func storeys() -> Dictionary:
+## The ground along a wall face, relative to the building's origin (the model stands on its lowest
+## corner, so on a slope the uphill walls start below grade): the highest terrain sample under it.
+func _ground_on(f: Dictionary) -> float:
+	var world: Node = GameState.world
+	if world == null or not ("terrain" in world) or world.terrain == null or world.terrain.data == null:
+		return 0.0
+	# relative to the lowest corner of the footprint, where the model stands (the node may not be
+	# snapped to the ground yet, so its own y is no reference)
+	var origin := INF
+	for p in polygon:
+		var hp: float = world.terrain.data.get_height(to_global(Vector3(p.x, 0.0, p.y)))
+		if not is_nan(hp):
+			origin = minf(origin, hp)
+	if origin == INF:
+		return 0.0
+	var g := 0.0
+	var pts: Array = f.get("pts", [])
+	var samples: Array = pts.duplicate()
+	if pts.size() >= 2:
+		samples.append((Vector3(pts[0]) + Vector3(pts[pts.size() / 2])) * 0.5)
+	for p in samples:
+		var h: float = world.terrain.data.get_height(to_global(Vector3(p.x, 0.0, p.z)))
+		if not is_nan(h):
+			g = maxf(g, minf(h - origin, 2.0))
+	return g
+
+
+## The eave: the top of the longest wall face (a porch or a low wing must not pull it down), else
+## the register height.
+func _eave() -> float:
+	var best := -1.0
 	var eave := height
 	for f in _wall_faces:
-		eave = minf(eave, float(f.ymax))
+		var w: float = float(f.umax) - float(f.umin)
+		if w > best:
+			best = w
+			eave = float(f.ymax)
+	return eave
+
+
+## Eave height and floor count the openings use (the interior follows the same rhythm).
+func storeys() -> Dictionary:
+	var eave := _eave()
 	var n_floors := floors if floors > 0 else maxi(1, int(round(eave / 3.0)))
 	n_floors = clampi(n_floors, 1, maxi(1, int(eave / 2.4)))
 	return {"eave": eave, "floors": n_floors, "floor_height": eave / maxf(n_floors, 1)}

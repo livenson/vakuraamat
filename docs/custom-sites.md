@@ -152,6 +152,9 @@ until the pack is installed or the job fails with its error and a Close button.
 The debug map (M) lays its text out without overlaps: street names along their longest stretch (from
 `roads.json`), house numbers at the buildings (from `buildings.json` addresses), then the points'
 labels nearest the player; every point keeps its dot, and the dot under the mouse shows its name.
+Rooms are furnished from role plans (`Interiors.PLANS`): an anchored group on the longest wall, a
+piece across from it, wall runs, free-standing islands and grids that repeat to fill large rooms,
+and corner pieces; the Kenney models are scaled to life size from their bounds.
 `tools/godot/menu_shot.tscn` screenshots the menu (`--locations` for the second page, `--creating`
 or `--failed` for the sheet).
 

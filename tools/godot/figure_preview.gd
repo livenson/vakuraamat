@@ -1,5 +1,5 @@
 # Visual check of the MakeHuman figures: all eight in a row, walking, with a camera in front.
-#   godot --path . res://tools/godot/figure_preview.tscn -- --screenshot=/abs/out.png [--frames=120]
+#   godot --path . res://tools/godot/figure_preview.tscn -- --screenshot=/abs/out.png [--frames=120] [--side]
 extends Node3D
 
 var _path := ""
@@ -37,6 +37,8 @@ func _ready() -> void:
 	for i in names.size():
 		var f := HumanFigure.make(rng, 2026 if i % 2 == 0 else 1938, names[i])
 		f.position = Vector3(-7.0 + i * 2.0, 0, 0)
+		if "--side" in OS.get_cmdline_user_args():
+			f.rotation.y = PI / 2.0   # walking towards -X on screen: the gait seen from the side
 		if i < 4:
 			f.set_walking(true, 1.0)
 		else:

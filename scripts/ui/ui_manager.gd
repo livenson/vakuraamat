@@ -344,6 +344,10 @@ func _refresh_era_label() -> void:
 	var obj := _objective()
 	if obj != "":
 		era_label.text += "\n" + obj
+	if world.streamer and world.streamer.has_method("loading_status"):
+		var busy: String = world.streamer.loading_status()
+		if busy != "":
+			era_label.text += "\n" + tr("UI_LOADING_TILE") % busy
 	keys_label.text = tr("UI_KEYS")
 
 
