@@ -62,6 +62,10 @@ its design documents in the repo root describe that version.
   add `--site=<id>` for another pack.
 
 ## Conventions and pitfalls
+- The world's flags (`--site=`, `--spawn=`, `--open=`, `--enter=`, `--screenshot=`) are user args: they go
+  after `--`, and the run must name `res://scenes/world/world.tscn`, else the main menu opens and waits.
+- Prop checks without a world: `tools/godot/figure_preview.tscn` (the eight figures), `bike_preview.tscn`
+  (bicycles with riders, side-on, a red block marking the riding direction).
 - Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`
   (or `--fullscreen`; `--locations` for the second page, `--creating` / `--failed` for the world-creation
   sheet). Menu strings come from compiled translations: run `godot --headless --import` after editing

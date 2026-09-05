@@ -37,6 +37,9 @@ var _debug_canvas: Control
 var _debug_bg: TextureRect
 var _debug_bg_tile := Vector2i(9999, 9999)
 var _tile_ortho: Dictionary = {}      # pack id -> ImageTexture of its orthophoto (debug map background)
+var _map_layers: Dictionary = {}      # pack id -> {streets, numbers} read from roads.json and buildings.json
+var _map_layout: Dictionary = {}      # the last label layout of the debug map (see _lay_out_map)
+var _map_hover := Vector2(-1, -1)     # mouse position over the debug map canvas
 var _open_panel: Control = null
 
 
@@ -227,16 +230,10 @@ func _build_hud() -> void:
 	keys_label.custom_minimum_size = Vector2(820, 0)
 	keys_label.text = tr("UI_KEYS")
 	hover_label = _label(hud, 18)
-	hover_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	hover_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_below_crosshair(hover_label, 620, 40)
 	hover_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hover_label.custom_minimum_size = Vector2(620, 0)
-	hover_label.position = Vector2(-310, 40)
 	prompt_label = _label(hud, 18)
-	prompt_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
-	prompt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	prompt_label.custom_minimum_size = Vector2(400, 0)
-	prompt_label.position = Vector2(-200, 120)
+	_below_crosshair(prompt_label, 400, 120)
 	# notices: a page card with a rubric edge, faded after a moment
 	notice_card = PanelContainer.new()
 	var card := BookTheme.page_box(true, 12)
@@ -293,6 +290,18 @@ func _label(parent: Control, size: int) -> Label:
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	parent.add_child(l)
 	return l
+
+
+## A HUD line centred under the crosshair: anchors at the screen centre, `width` wide, `dy` below.
+func _below_crosshair(l: Label, width: float, dy: float) -> void:
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.set_anchors_preset(Control.PRESET_CENTER)
+	l.offset_left = -width * 0.5
+	l.offset_right = width * 0.5
+	l.offset_top = dy
+	l.offset_bottom = dy + 28
+	l.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	l.grow_vertical = Control.GROW_DIRECTION_END
 
 
 func _center_panel(p: Control) -> void:
@@ -671,6 +680,9 @@ func _map_frame(c: Control) -> Array:
 
 ## Draws on the canvas that emitted `draw` (bound at connect time): when the panel is rebuilt, the
 ## old canvas still gets one last draw while `_debug_canvas` already points at the new one.
+## Labels are laid out once per tile and player move (`_lay_out_map`): every point gets a dot,
+## a label only where it does not overlap one already placed; the point under the mouse always
+## shows its label.
 func _draw_debug_map(c: Control) -> void:
 	if not is_instance_valid(c) or c != _debug_canvas:
 		return
@@ -688,24 +700,37 @@ func _draw_debug_map(c: Control) -> void:
 	if loc != _debug_bg_tile and is_instance_valid(_debug_bg):
 		_debug_bg.texture = _tile_texture(loc, pack)
 		_debug_bg_tile = loc
-	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
-	if layer and loc == Vector2i.ZERO:
-		for n in layer.find_children("*", "Interactable", true, false):
-			if not n.visible or not n.is_visible_in_tree():
-				continue
-			var kind := "Examinable"
-			for k in DEBUG_COLORS:
-				if n.get_class() == k or (n.get_script() and n.get_script().get_global_name() == k):
-					kind = k
-			var p: Vector2 = origin + (Vector2(n.global_position.x, n.global_position.z) - off) / 1024.0 * side
-			var col: Color = DEBUG_COLORS.get(kind, Color.WHITE)
-			c.draw_circle(p, 5, col)
-			c.draw_circle(p, 5, Color.BLACK, false, 1.0)
-			var text: String = n.label() if n.label() != "" else n.name
-			c.draw_string(font, p + Vector2(7, 4), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.BLACK)
-			c.draw_string(font, p + Vector2(6, 3), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, col)
-	# the player and heading
 	var pp := origin + (Vector2(player.global_position.x, player.global_position.z) - off) / 1024.0 * side
+	if _map_layout.is_empty() or _map_layout.loc != loc or _map_layout.pack != pack or _map_layout.side != side \
+			or _map_layout.origin != origin or pp.distance_to(_map_layout.at) > side * 0.06:
+		_lay_out_map(origin, side, loc, pack, pp)
+	for d in _map_layout.dots:
+		c.draw_circle(d.pos, 4, d.col)
+		c.draw_circle(d.pos, 4, Color.BLACK, false, 1.0)
+	for l in _map_layout.labels:
+		if l.angle != 0.0:
+			c.draw_set_transform(l.pos, l.angle)
+			c.draw_string(font, Vector2(-l.w * 0.5 + 1, 1 + l.dy), l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.size, Color(0, 0, 0, 0.8))
+			c.draw_string(font, Vector2(-l.w * 0.5, l.dy), l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.size, l.col)
+			c.draw_set_transform(Vector2.ZERO)
+		else:
+			c.draw_string(font, l.pos + Vector2(1, 1), l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.size, Color(0, 0, 0, 0.8))
+			c.draw_string(font, l.pos, l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.size, l.col)
+	# the point under the mouse: its label on a slip of paper, on top of everything
+	var near: Dictionary = {}
+	var best := 12.0
+	for d in _map_layout.dots:
+		var dist: float = d.pos.distance_to(_map_hover)
+		if dist < best:
+			best = dist
+			near = d
+	if not near.is_empty():
+		var w := font.get_string_size(near.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x
+		var box := Rect2(near.pos + Vector2(10, -20), Vector2(w + 12, 22))
+		c.draw_rect(box, BookTheme.PAGE)
+		c.draw_rect(box, BookTheme.INK, false, 1.0)
+		c.draw_string(font, box.position + Vector2(6, 15), near.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, BookTheme.INK)
+	# the player and heading
 	var fwd := -player.global_transform.basis.z
 	c.draw_line(pp, pp + Vector2(fwd.x, fwd.z) * 18, Color.WHITE, 2.0)
 	c.draw_circle(pp, 6, Color.WHITE)
@@ -718,6 +743,118 @@ func _draw_debug_map(c: Control) -> void:
 	var tile_text := "tile %d,%d  %s" % [loc.x, loc.y, pack if pack != "" else "(not loaded)"]
 	c.draw_string(font, origin + Vector2(11, 19), tile_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.BLACK)
 	c.draw_string(font, origin + Vector2(10, 18), tile_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, GOLD)
+
+
+## Lay the map's text out without overlaps: street names along their longest stretch first, then
+## house numbers, then the points' labels nearest the player first, each kept only if its box is
+## free. Dots are kept for every point (the hover readout names them).
+func _lay_out_map(origin: Vector2, side: float, loc: Vector2i, pack: String, pp: Vector2) -> void:
+	var font := ThemeDB.fallback_font
+	var off := Vector2(loc.x, loc.y) * 1024.0
+	var k := side / 1024.0
+	var taken: Array[Rect2] = []
+	var labels: Array = []
+	var dots: Array = []
+	var layer := _map_layer(pack)
+	var frame := Rect2(origin, Vector2(side, side))
+	for st in layer.get("streets", []):
+		var w := font.get_string_size(st.name, HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x
+		var pos: Vector2 = origin + Vector2(st.at) * k
+		if not frame.grow(-w * 0.5).has_point(pos):
+			continue   # the name would run off the plate: the stretch is at the tile's edge
+		var ext := Vector2(absf(w * cos(st.angle)) + absf(12 * sin(st.angle)), absf(w * sin(st.angle)) + absf(12 * cos(st.angle)))
+		if _map_take(taken, Rect2(pos - ext * 0.5, ext)):
+			labels.append({"pos": pos, "text": st.name, "col": Color(1, 1, 1), "size": 12, "angle": st.angle, "w": w, "dy": -4})
+	for hn in layer.get("numbers", []):
+		var w := font.get_string_size(hn.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 9).x
+		var pos: Vector2 = origin + Vector2(hn.at) * k - Vector2(w * 0.5, -3)
+		if not frame.has_point(pos):
+			continue
+		if _map_take(taken, Rect2(pos + Vector2(0, -8), Vector2(w, 9))):
+			labels.append({"pos": pos, "text": hn.text, "col": Color(1, 0.96, 0.8), "size": 9, "angle": 0.0, "w": w, "dy": 0})
+	var era_layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
+	if era_layer and loc == Vector2i.ZERO:
+		for n in era_layer.find_children("*", "Interactable", true, false):
+			if not n.visible or not n.is_visible_in_tree():
+				continue
+			var kind := "Examinable"
+			for kk in DEBUG_COLORS:
+				if n.get_class() == kk or (n.get_script() and n.get_script().get_global_name() == kk):
+					kind = kk
+			var p: Vector2 = origin + (Vector2(n.global_position.x, n.global_position.z) - off) * k
+			if not Rect2(origin, Vector2(side, side)).grow(6).has_point(p):
+				continue   # a neighbour tile's point
+			var text: String = n.label() if n.label() != "" else n.name
+			dots.append({"pos": p, "text": text, "col": DEBUG_COLORS.get(kind, Color.WHITE)})
+	dots.sort_custom(func(a, b): return a.pos.distance_squared_to(pp) < b.pos.distance_squared_to(pp))
+	for d in dots:
+		var w := font.get_string_size(d.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x
+		var pos: Vector2 = d.pos + Vector2(7, 4)
+		if _map_take(taken, Rect2(pos + Vector2(-1, -10), Vector2(w + 2, 12))):
+			labels.append({"pos": pos, "text": d.text, "col": d.col, "size": 11, "angle": 0.0, "w": w, "dy": 0})
+	_map_layout = {"loc": loc, "pack": pack, "side": side, "origin": origin, "at": pp, "dots": dots, "labels": labels}
+
+
+## Claim `r` on the map if it overlaps nothing claimed before.
+func _map_take(taken: Array[Rect2], r: Rect2) -> bool:
+	for t in taken:
+		if t.intersects(r):
+			return false
+	taken.append(r)
+	return true
+
+
+## Street names and house numbers of a pack's tile, from its roads.json and buildings.json (read
+## once): each named street labelled once, at the middle of its longest stretch, along it; each
+## addressed building's number at its centre. Positions in tile metres.
+func _map_layer(pack: String) -> Dictionary:
+	if _map_layers == null:
+		_map_layers = {}
+	if pack == "":
+		return {}
+	if _map_layers.has(pack):
+		return _map_layers[pack]
+	var streets: Array = []
+	var longest: Dictionary = {}   # name -> {len, pts}
+	var rd = JSON.parse_string(FileAccess.get_file_as_string(Sites.path_in(pack, "roads.json")))
+	if typeof(rd) == TYPE_DICTIONARY:
+		for r in rd.get("roads", []):
+			var name := str(r.get("name", ""))
+			var pts: Array = r.get("points", [])
+			if name == "" or name == "<null>" or pts.size() < 2:
+				continue
+			var length := 0.0
+			for i in range(1, pts.size()):
+				length += Vector2(pts[i - 1][0], pts[i - 1][1]).distance_to(Vector2(pts[i][0], pts[i][1]))
+			if length > float(longest.get(name, {}).get("len", 0.0)):
+				longest[name] = {"len": length, "pts": pts}
+		for name in longest:
+			var pts: Array = longest[name].pts
+			var half: float = longest[name].len * 0.5
+			for i in range(1, pts.size()):
+				var a := Vector2(pts[i - 1][0], pts[i - 1][1])
+				var b := Vector2(pts[i][0], pts[i][1])
+				var seg := a.distance_to(b)
+				if half <= seg or i == pts.size() - 1:
+					var angle := (b - a).angle()
+					if angle > PI * 0.5 or angle < -PI * 0.5:
+						angle += PI   # never upside down
+					streets.append({"name": name, "at": a.lerp(b, clampf(half / maxf(seg, 0.01), 0.0, 1.0)), "angle": angle})
+					break
+				half -= seg
+	var numbers: Array = []
+	var bd = JSON.parse_string(FileAccess.get_file_as_string(Sites.path_in(pack, "buildings.json")))
+	var blds: Array = bd.get("buildings", []) if typeof(bd) == TYPE_DICTIONARY else (bd if typeof(bd) == TYPE_ARRAY else [])
+	var re := RegEx.create_from_string("(\\d+[a-zA-Z]?(?:/\\d+)?)$")
+	for b in blds:
+		var addrs: Array = b.get("addresses", [])
+		if addrs.is_empty():
+			continue
+		var m := re.search(str(addrs[0]).strip_edges())
+		if m:
+			numbers.append({"text": m.get_string(1), "at": Vector2(float(b.get("x", 0.0)), float(b.get("z", 0.0)))})
+	_map_layers[pack] = {"streets": streets, "numbers": numbers}
+	return _map_layers[pack]
 
 
 ## Background of the debug map for a tile: the era drape of the site's own tile, the orthophoto of a
@@ -737,6 +874,8 @@ func _tile_texture(loc: Vector2i, pack: String) -> Texture2D:
 
 
 func _debug_map_input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion:
+		_map_hover = event.position
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		var f := _map_frame(_debug_canvas)
 		var local: Vector2 = (event.position - f[0]) / f[1] * 1024.0
