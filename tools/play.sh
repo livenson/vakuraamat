@@ -1,8 +1,8 @@
 #!/bin/sh
 # Start everything the game needs and the game itself: the tile service (world generation from
-# national data, port 8765) and the world service (shared worlds, port 8766) if they are not
+# national data, port 8765) if it is not
 # running, then Godot. Extra arguments go to the game after "--" (e.g. --site=kvissentali,
-# --windowed). Service logs: <user dir>/logs/tile_service.log and world_service.log.
+# --windowed). Service log: <user dir>/logs/tile_service.log. The town server is separate: make server.
 # The game also starts the services itself when run from the source tree; this script is the
 # one-command way and keeps their logs in files.
 set -e
@@ -30,5 +30,4 @@ start_service() {  # name port script
 }
 
 start_service tile_service 8765 tools/tile_service.py
-start_service world_service 8766 tools/world_service.py
 exec "$GODOT" --path . -- "$@"

@@ -1,5 +1,10 @@
 # Vakuraamat — first iteration design: mechanics, narrative, level design
 
+> **Revision note (2026-09-05):** this document describes the historical three-era game, kept at the
+> git tag `v0.9-historical`. The game is now a present-day economy on the same real ground with a shared
+> town ledger; the current rules are in `AGENTS.md`, `README.md` and `docs/custom-sites.md`.
+
+
 **Purpose of this document:** the creative design for the Phase 1 vertical slice, complementing `vakuraamat-implementation-plan.md` (the code/architecture plan) and `vakuraamat-maaamet-data-pipeline.md` (the data plan). Where the implementation plan says "5 consequence points, 2–4 artifacts, 3 eras," this document says *which* ones, and why.
 
 Everything here is scoped strictly to Phase 1. Farming, hunting, trading, and manor expansion are deliberately absent — they arrive in Phases 2–5 and must not leak into this slice.

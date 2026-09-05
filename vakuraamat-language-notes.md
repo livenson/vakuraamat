@@ -1,5 +1,10 @@
 # Vakuraamat — language across the three eras
 
+> **Revision note (2026-09-05):** this document describes the historical three-era game, kept at the
+> git tag `v0.9-historical`. The game is now a present-day economy on the same real ground with a shared
+> town ledger; the current rules are in `AGENTS.md`, `README.md` and `docs/custom-sites.md`.
+
+
 **Purpose of this document:** a reference for writing dialogue, examine-text, and in-world documents so that each era *sounds* right, plus the localization consequences. Complements `vakuraamat-first-iteration-design.md`. Everything here is scoped to the slice's three eras (1798, 1938, 2026) and the Palupera area, which sits in the **Tartu dialect** zone of South Estonian.
 
 The short version: the three eras are three different linguistic worlds, and the differences are themselves material for the game — including one that improves the family's story.

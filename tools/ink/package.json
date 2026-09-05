@@ -1,7 +1,0 @@
-{
-  "name": "vakuraamat-ink-tools",
-  "private": true,
-  "description": "Compiles sites/*/narrative/*.ink to JSON with the inkjs compiler (no dotnet needed).",
-  "dependencies": { "inkjs": "2.4.0" },
-  "scripts": { "compile": "node compile.js" }
-}

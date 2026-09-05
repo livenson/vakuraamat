@@ -282,7 +282,7 @@ stay inside their tile's road graph.
 
 `tools/play.sh [--site=<id>] [--windowed]` (or `make play ARGS="..."`) starts the tile service
 (port 8765) and the world service (port 8766) if they are not running, keeps their logs under the
-user directory (`logs/tile_service.log`, `logs/world_service.log`) and launches the game. The game
+user directory (`logs/tile_service.log`) and launches the game; the town server is `make server`. The game
 also starts either service itself when it runs from the source tree and the configured URL is
 local (`Locator.spawn_local`), so `godot --path .` works too; exported builds need a service URL
 in `settings.cfg` (`[service] url`, `worlds_url`).
@@ -329,40 +329,21 @@ a start era without a register.
 
 ```jsonc
 {
-  "id": "palupera",                       // must equal the directory name
-  "name_key": "SITE_PALUPERA",            // menu label
-  "subtitle_key": "MENU_SUBTITLE",        // menu subtitle
+  "id": "kvissentali",                    // must equal the directory name
+  "name_key": "SITE_KVISSENTALI",         // menu label
+  "subtitle_key": "SITE_KVISSENTALI_SUBTITLE",
   "terrain": {
-    "tile": "palupera",                   // assets/terrain/<tile>/
-    "center": [637548, 6444029],          // EPSG:3301 easting, northing
+    "tile": "kvissentali",                // assets/terrain/<tile>/
+    "center": [657600, 6477150],          // EPSG:3301 easting, northing
     "size": 1024,                         // metres; one Terrain3D region (<= 2048)
-    "latitude": 58.1158, "longitude": 26.3341, "utc_offset": 3.0, "date": [2026, 9, 3],   // Sky3D sun
-    "era_maps": {"era_1938": {"layer": "kk1940", "file": "era_1938_cadastral.png"}}        // WMS ground maps
+    "latitude": 58.4, "longitude": 26.7, "utc_offset": 3.0, "date": [2026, 9, 3]   // Sky3D sun; the date starts the month clock
   },
   "start": {"era": "era_2026", "spawn": [508, 513], "yaw_deg": 180},
   "water": "water_2026.json", "buildings": "buildings_2026.json",
-  "locations": {"LOC_OAK": "oak"},        // journal map markers: translation key -> layout key
-  "objectives": [                         // first matching rule wins; HUD text + optional marker
-    {"when": "register_locked", "key": "OBJ_FIND_REGISTER", "target": "RegisterBook", "lift": 1.2},
-    {"chapter": 1, "key": "OBJ_VISIT_ERAS"},
-    {"chapter": 3, "not_flag": "epilogue", "key": "OBJ_SIT", "target": "Leida", "era": "era_2026", "lift": 2.2}
-  ],
-  "register_nudge": {"chapter": 1, "era": "era_1798"},   // arrow in the register during that chapter
-  "ending": {
-    "trigger_flag": "epilogue",           // set by ink when the story ends; opens the ending panel
-    "counted_flags": ["family_recorded_1798", "north_field_ploughed", "well_kept_open", "cellar_opened"],
-    "bonus_flag": "letter_delivered",
-    "tiers": [{"min_kept": 4, "bonus": true, "key": "ENDING_ORCHARD"}, {"min_kept": 2, "key": "ENDING_FURROWS"}, {"key": "ENDING_FOREST"}],
-    "partial_key": "ENDING_BOX_PARTIAL"   // shown when the bonus is done but not everything was kept
-  },
-  "codex": ["CODEX_REAL", "CODEX_INVENTED"],   // journal tab: <key> and <key>_TITLE
-  "debug": {"build_node": "Manor_kaseoja_farm"}
+  "locations": {"LOC_LANDMARK": "landmark"},   // translation key -> layout key (named spots)
+  "codex": ["CODEX_REAL", "CODEX_INVENTED", "CODEX_DATA"]   // journal tab: <key> and <key>_TITLE
 }
 ```
-
-Chapter flow is engine-side and the same for every pack: the prologue commits when the register
-is first opened; chapter 1 ends when every era has been visited; later chapters end when ink calls
-`end_chapter()`; the ending panel opens when `ending.trigger_flag` is set.
 
 ## scenes.json reference
 
@@ -373,33 +354,29 @@ parameters (`"EX_OAK_{year}"`). `at` is a layout key, `[x, z]` or
 
 | type | fields | notes |
 |---|---|---|
-| `group` | name, at, flag, visible_when, min_chapter, lift, children | a `Conditional` node: shown when the flag matches (and the chapter is reached) |
+| `group` | name, at, lift, children | a plain Node3D container |
 | `use` | fragment, with | expands a named fragment with parameters |
 | `repeat` | count, var, children | loop; `{i}` in names, `i` in expressions |
 | `instance` | name, scene, at, scale, yaw / yaw_deg | any PackedScene or glb |
 | `building` | name, model, yaw_deg, footprint [w, h, d], scale, skirt | collider and foundation skirt; tags the group for lowest-corner snapping |
 | `box`, `torus` | size, y, color, at, rot / inner, outer, color, y | quick CSG props; colours by name from `colors` |
-| `examine` | name, key, loc, label, at | hover text, marks the journal location |
-| `story_point` | name, knot, speaker, text, loc, label, radius | a place that starts an ink knot |
-| `npc` | name, id, knot, label, color, at, height, yaw, pose | `id` is the artifact delivery target; pose stand / arms_folded / holding |
-| `pickup` | name, item, examine, at | era-local or artifact item lying in the world |
-| `register` | name, at, text | the vakuraamat; exactly one, in the start era |
+| `examine` | name, key, loc, label, at | hover text on a landmark |
 | `tree`, `scatter` | at, scale, yaw, scene / prefix, count, radius, scale [min, max], seed | single tree, or a random disc of them |
-| `farm_plots` | at, count, seeds | plots plus a seed bin |
-| `trade_post` | at, key, color | one per era; goods from `data/trade_goods` |
-| `manor_site` | id, at | build marker for a `ManorDefinition` |
-| `hunting` | max_animals | spawner using the land-cover map |
-| `village` | source | massing boxes from the buildings json |
+| `footprints` | source, year, include_undated | the real buildings from `buildings.json` |
+| `roads` | source | ETAK roads as terrain ribbons |
+| `parcels` | source, year | cadastral units and their kits (`assets/data/parcel_rules.json`) |
+| `traffic` | year, density, max_agents | ambient walkers, cyclists and cars on the road graph |
+| `bicycle` | name, at | the rideable bicycle |
+| `village` | source | massing boxes from the laser data, for packs without the register |
 
 Fragments are the reusable blocks: `"fragments": {"oak": {"params": ["scale", "year"], "nodes": [...]}}`
-and `{"type": "use", "fragment": "oak", "with": {"scale": 0.75, "year": 1938}}`.
+and `{"type": "use", "fragment": "oak", "with": {"scale": 0.75, "year": 2026}}`.
 
 ## Rules that still hold
 
-Cross-era effects are flags set by consequence points only; farming, hunting, trading and
-building never read them; only artifacts cross eras. A pack that wants a new visible consequence
-adds a `ConsequencePoint`, an ink line that calls `trigger()` or delivers an artifact with
-`give_item()`, and `group` nodes with that flag in the affected eras. Nothing else changes.
+The ledger is the only state that is shared or saved; everything a pack places in the world is
+regenerated from data. Structures a pack offers are `StructureDefinition`s with a euro cost, a rent
+bonus and the purposes they may stand on; the module and the offline ledger both validate them.
 
 Every data source a pack uses gets a row in `THIRD_PARTY.md`; the Maa-amet attribution is
-shown in the menu and must stay.
+shown in the menu and must stay, and the codex names the register, notice and news sources.
