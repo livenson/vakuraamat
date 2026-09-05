@@ -23,7 +23,7 @@ roughness = 0.6
 albedo_color = Color(0.700, 0.680, 0.620, 1)
 roughness = 0.9
 
-[sub_resource type="SphereShape3D" id="S1"]
+[sub_resource type="SphereShape3D" id="S3"]
 radius = 1.2
 
 [sub_resource type="StandardMaterial3D" id="M4"]
@@ -34,7 +34,7 @@ roughness = 0.9
 albedo_color = Color(0.550, 0.530, 0.500, 1)
 roughness = 0.9
 
-[sub_resource type="BoxShape3D" id="SB_era_2026"]
+[sub_resource type="BoxShape3D" id="SB_era_2026_6"]
 size = Vector3(1.4, 1.2, 1.0)
 
 [sub_resource type="StandardMaterial3D" id="M7"]
@@ -153,7 +153,7 @@ roughness = 0.9
 albedo_color = Color(0.388, 0.387, 0.333, 1)
 roughness = 0.9
 
-[sub_resource type="BoxShape3D" id="TP_era_2026"]
+[sub_resource type="BoxShape3D" id="TP_era_2026_36"]
 size = Vector3(2.6, 2.4, 2.2)
 
 [sub_resource type="StandardMaterial3D" id="M37"]
@@ -185,7 +185,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 422, 0, 534)
 script = ExtResource("1")
 
 [node name="OakTree" parent="Oak" instance=ExtResource("2")]
-transform = Transform3D(0.760, 0, 0.640, 0, 1.0, 0, -0.640, 0, 0.760, 0, 0, 0)
+transform = Transform3D(0.7660, 0, 0.6428, 0, 1.0, 0, -0.6428, 0, 0.7660, 0.0, 0.0, 0.0)
 
 [node name="OakExamine" parent="Oak" instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 1.5)
@@ -198,7 +198,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 508, 0, 545)
 script = ExtResource("1")
 
 [node name="RuinModel" parent="Ruin" instance=ExtResource("4")]
-transform = Transform3D(-1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, -1.0000, 0, 0, 0)
+transform = Transform3D(-1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, -1.0000, 0, 0.0, 0)
 
 [node name="RuinExamine" parent="Ruin" instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -19.0)
@@ -226,7 +226,7 @@ collision_mask = 0
 
 [node name="Shape" type="CollisionShape3D" parent="Ruin/RegisterBook/Body3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
-shape = SubResource("S1")
+shape = SubResource("S3")
 
 [node name="OrchardKept" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 469, 0, 541)
@@ -235,22 +235,22 @@ flag = "cellar_opened"
 visible_when = true
 
 [node name="Apple0" parent="OrchardKept" instance=ExtResource("6")]
-transform = Transform3D(0.5500, 0, 0.0000, 0, 0.55, 0, -0.0000, 0, 0.5500, 0.0, 0, 0)
+transform = Transform3D(0.5500, 0, 0.0000, 0, 0.55, 0, -0.0000, 0, 0.5500, 0.0, 0.0, 0)
 
 [node name="Apple1" parent="OrchardKept" instance=ExtResource("6")]
-transform = Transform3D(0.2948, 0, 0.5793, 0, 0.65, 0, -0.5793, 0, 0.2948, 4.5, 0, 0)
+transform = Transform3D(0.2948, 0, 0.5793, 0, 0.65, 0, -0.5793, 0, 0.2948, 4.5, 0.0, 0)
 
 [node name="Apple2" parent="OrchardKept" instance=ExtResource("6")]
-transform = Transform3D(-0.4414, 0, 0.6064, 0, 0.75, 0, -0.6064, 0, -0.4414, 9.0, 0, 0)
+transform = Transform3D(-0.4414, 0, 0.6064, 0, 0.75, 0, -0.6064, 0, -0.4414, 9.0, 0.0, 0)
 
 [node name="Apple3" parent="OrchardKept" instance=ExtResource("6")]
-transform = Transform3D(-0.5431, 0, -0.0868, 0, 0.55, 0, 0.0868, 0, -0.5431, 13.5, 0, 0)
+transform = Transform3D(-0.5431, 0, -0.0868, 0, 0.55, 0, 0.0868, 0, -0.5431, 13.5, 0.0, 0)
 
 [node name="Apple4" parent="OrchardKept" instance=ExtResource("6")]
-transform = Transform3D(-0.1998, 0, -0.6185, 0, 0.65, 0, 0.6185, 0, -0.1998, 18.0, 0, 0)
+transform = Transform3D(-0.1998, 0, -0.6185, 0, 0.65, 0, 0.6185, 0, -0.1998, 18.0, 0.0, 0)
 
 [node name="Apple5" parent="OrchardKept" instance=ExtResource("6")]
-transform = Transform3D(0.5315, 0, -0.5292, 0, 0.75, 0, 0.5292, 0, 0.5315, 22.5, 0, 0)
+transform = Transform3D(0.5315, 0, -0.5292, 0, 0.75, 0, 0.5292, 0, 0.5315, 22.5, 0.0, 0)
 
 [node name="OrchardExamine" parent="OrchardKept" instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 2.5)
@@ -265,16 +265,16 @@ flag = "cellar_opened"
 visible_when = false
 
 [node name="Scrub0" parent="OrchardScrub" instance=ExtResource("7")]
-transform = Transform3D(1.3000, 0, 0.0000, 0, 1.3, 0, -0.0000, 0, 1.3000, 2, 0, 1.5)
+transform = Transform3D(1.3000, 0, 0.0000, 0, 1.3, 0, -0.0000, 0, 1.3000, 2, 0.0, 1.5)
 
 [node name="Scrub1" parent="OrchardScrub" instance=ExtResource("7")]
-transform = Transform3D(0.8081, 0, 1.0183, 0, 1.3, 0, -1.0183, 0, 0.8081, 8, 0, 1.5)
+transform = Transform3D(0.8081, 0, 1.0183, 0, 1.3, 0, -1.0183, 0, 0.8081, 8, 0.0, 1.5)
 
 [node name="Scrub2" parent="OrchardScrub" instance=ExtResource("7")]
-transform = Transform3D(-0.2954, 0, 1.2660, 0, 1.3, 0, -1.2660, 0, -0.2954, 14, 0, 1.5)
+transform = Transform3D(-0.2954, 0, 1.2660, 0, 1.3, 0, -1.2660, 0, -0.2954, 14, 0.0, 1.5)
 
 [node name="Scrub3" parent="OrchardScrub" instance=ExtResource("7")]
-transform = Transform3D(-1.1753, 0, 0.5556, 0, 1.3, 0, -0.5556, 0, -1.1753, 20, 0, 1.5)
+transform = Transform3D(-1.1753, 0, 0.5556, 0, 1.3, 0, -0.5556, 0, -1.1753, 20, 0.0, 1.5)
 
 [node name="ScrubExamine" parent="OrchardScrub" instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 2.5)
@@ -287,7 +287,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 377, 0, 552)
 script = ExtResource("1")
 
 [node name="Foundation" type="CSGBox3D" parent="Farm"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 0.17, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0.0, 0.17, 0.0)
 size = Vector3(14, 0.35, 8)
 material = SubResource("M4")
 
@@ -312,7 +312,7 @@ ring_sides = 6
 material = SubResource("M5")
 
 [node name="WellExamine" parent="WellRing" instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
 text_key = "EX_WELL_2026"
 location_id = "LOC_WELL"
 label_key = "LOC_WELL"
@@ -324,7 +324,7 @@ flag = "well_kept_open"
 visible_when = false
 
 [node name="DipExamine" parent="WellDip" instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
 text_key = "EX_WELL_DIP_2026"
 location_id = "LOC_WELL"
 label_key = "LOC_WELL"
@@ -336,10 +336,10 @@ flag = "family_recorded_1798"
 visible_when = true
 
 [node name="BoundaryStone" parent="StoneKept" instance=ExtResource("8")]
-transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, 0, 0, 0)
+transform = Transform3D(0.9397, 0, 0.3420, 0, 1.0, 0, -0.3420, 0, 0.9397, 0.0, 0.0, 0.0)
 
 [node name="StoneExamine" parent="StoneKept" instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
 text_key = "EX_STONE_2026"
 label_key = "LOC_NORTH_FIELD"
 
@@ -350,7 +350,7 @@ flag = "north_field_ploughed"
 visible_when = true
 
 [node name="MeadowExamine" parent="FieldMeadow" instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
 text_key = "EX_FIELD_MEADOW_2026"
 location_id = "LOC_NORTH_FIELD"
 label_key = "LOC_NORTH_FIELD"
@@ -362,121 +362,121 @@ flag = "north_field_ploughed"
 visible_when = false
 
 [node name="Young0" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.6179, 0, 0.0513, 0, 0.62, 0, -0.0513, 0, 0.6179, -34.7, 0, 4.4)
+transform = Transform3D(0.6179, 0, 0.0513, 0, 0.62, 0, -0.0513, 0, 0.6179, -34.7, 0.0, 4.4)
 
 [node name="Young1" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.2065, 0, -0.4444, 0, 0.49, 0, 0.4444, 0, -0.2065, 6.7, 0, 9.7)
+transform = Transform3D(-0.2065, 0, -0.4444, 0, 0.49, 0, 0.4444, 0, -0.2065, 6.7, 0.0, 9.7)
 
 [node name="Young2" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.4462, 0, 0.1120, 0, 0.46, 0, -0.1120, 0, -0.4462, -28.4, 0, 4.2)
+transform = Transform3D(-0.4462, 0, 0.1120, 0, 0.46, 0, -0.1120, 0, -0.4462, -28.4, 0.0, 4.2)
 
 [node name="Young3" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.3074, 0, -0.2060, 0, 0.37, 0, 0.2060, 0, 0.3074, -41.4, 0, -3.9)
+transform = Transform3D(0.3074, 0, -0.2060, 0, 0.37, 0, 0.2060, 0, 0.3074, -41.4, 0.0, -3.9)
 
 [node name="Young4" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3863, 0, 0.3915, 0, 0.55, 0, -0.3915, 0, -0.3863, -0.4, 0, -20.4)
+transform = Transform3D(-0.3863, 0, 0.3915, 0, 0.55, 0, -0.3915, 0, -0.3863, -0.4, 0.0, -20.4)
 
 [node name="Young5" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0837, 0, -0.6244, 0, 0.63, 0, 0.6244, 0, 0.0837, -6.2, 0, 41.3)
+transform = Transform3D(0.0837, 0, -0.6244, 0, 0.63, 0, 0.6244, 0, 0.0837, -6.2, 0.0, 41.3)
 
 [node name="Young6" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.5775, 0, 0.2256, 0, 0.62, 0, -0.2256, 0, -0.5775, -30.7, 0, -19.9)
+transform = Transform3D(-0.5775, 0, 0.2256, 0, 0.62, 0, -0.2256, 0, -0.5775, -30.7, 0.0, -19.9)
 
 [node name="Young7" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3998, 0, -0.0122, 0, 0.4, 0, 0.0122, 0, -0.3998, -42.9, 0, 0.4)
+transform = Transform3D(-0.3998, 0, -0.0122, 0, 0.4, 0, 0.0122, 0, -0.3998, -42.9, 0.0, 0.4)
 
 [node name="Young8" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.1733, 0, -0.5849, 0, 0.61, 0, 0.5849, 0, 0.1733, -3.2, 0, -33.6)
+transform = Transform3D(0.1733, 0, -0.5849, 0, 0.61, 0, 0.5849, 0, 0.1733, -3.2, 0.0, -33.6)
 
 [node name="Young9" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.2524, 0, 0.4660, 0, 0.53, 0, -0.4660, 0, 0.2524, -1.2, 0, 30.4)
+transform = Transform3D(0.2524, 0, 0.4660, 0, 0.53, 0, -0.4660, 0, 0.2524, -1.2, 0.0, 30.4)
 
 [node name="Young10" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0472, 0, 0.6082, 0, 0.61, 0, -0.6082, 0, 0.0472, -5.8, 0, 13.2)
+transform = Transform3D(0.0472, 0, 0.6082, 0, 0.61, 0, -0.6082, 0, 0.0472, -5.8, 0.0, 13.2)
 
 [node name="Young11" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.3805, 0, 0.2759, 0, 0.47, 0, -0.2759, 0, 0.3805, 7.6, 0, -35.8)
+transform = Transform3D(0.3805, 0, 0.2759, 0, 0.47, 0, -0.2759, 0, 0.3805, 7.6, 0.0, -35.8)
 
 [node name="Young12" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.1082, 0, -0.4984, 0, 0.51, 0, 0.4984, 0, -0.1082, -30.4, 0, 13.6)
+transform = Transform3D(-0.1082, 0, -0.4984, 0, 0.51, 0, 0.4984, 0, -0.1082, -30.4, 0.0, 13.6)
 
 [node name="Young13" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0412, 0, -0.6387, 0, 0.64, 0, 0.6387, 0, 0.0412, 27.5, 0, -30.6)
+transform = Transform3D(0.0412, 0, -0.6387, 0, 0.64, 0, 0.6387, 0, 0.0412, 27.5, 0.0, -30.6)
 
 [node name="Young14" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.0114, 0, 0.4399, 0, 0.44, 0, -0.4399, 0, -0.0114, -31.7, 0, 13.0)
+transform = Transform3D(-0.0114, 0, 0.4399, 0, 0.44, 0, -0.4399, 0, -0.0114, -31.7, 0.0, 13.0)
 
 [node name="Young15" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3449, 0, 0.0594, 0, 0.35, 0, -0.0594, 0, -0.3449, 40.1, 0, 7.7)
+transform = Transform3D(-0.3449, 0, 0.0594, 0, 0.35, 0, -0.0594, 0, -0.3449, 40.1, 0.0, 7.7)
 
 [node name="Young16" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.1965, 0, -0.4922, 0, 0.53, 0, 0.4922, 0, -0.1965, -27.5, 0, 26.7)
+transform = Transform3D(-0.1965, 0, -0.4922, 0, 0.53, 0, 0.4922, 0, -0.1965, -27.5, 0.0, 26.7)
 
 [node name="Young17" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3590, 0, 0.0274, 0, 0.36, 0, -0.0274, 0, -0.3590, -25.8, 0, -27.7)
+transform = Transform3D(-0.3590, 0, 0.0274, 0, 0.36, 0, -0.0274, 0, -0.3590, -25.8, 0.0, -27.7)
 
 [node name="Young18" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.5693, 0, 0.1108, 0, 0.58, 0, -0.1108, 0, 0.5693, 8.1, 0, -35.7)
+transform = Transform3D(0.5693, 0, 0.1108, 0, 0.58, 0, -0.1108, 0, 0.5693, 8.1, 0.0, -35.7)
 
 [node name="Young19" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0958, 0, 0.6328, 0, 0.64, 0, -0.6328, 0, 0.0958, 26.1, 0, 21.0)
+transform = Transform3D(0.0958, 0, 0.6328, 0, 0.64, 0, -0.6328, 0, 0.0958, 26.1, 0.0, 21.0)
 
 [node name="Young20" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.5931, 0, -0.2125, 0, 0.63, 0, 0.2125, 0, 0.5931, -3.9, 0, -31.0)
+transform = Transform3D(0.5931, 0, -0.2125, 0, 0.63, 0, 0.2125, 0, 0.5931, -3.9, 0.0, -31.0)
 
 [node name="Young21" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.3491, 0, 0.1738, 0, 0.39, 0, -0.1738, 0, 0.3491, 21.0, 0, 31.2)
+transform = Transform3D(0.3491, 0, 0.1738, 0, 0.39, 0, -0.1738, 0, 0.3491, 21.0, 0.0, 31.2)
 
 [node name="Young22" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3776, 0, 0.1319, 0, 0.4, 0, -0.1319, 0, -0.3776, -37.0, 0, -18.5)
+transform = Transform3D(-0.3776, 0, 0.1319, 0, 0.4, 0, -0.1319, 0, -0.3776, -37.0, 0.0, -18.5)
 
 [node name="Young23" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3814, 0, 0.4370, 0, 0.58, 0, -0.4370, 0, -0.3814, 17.8, 0, -28.2)
+transform = Transform3D(-0.3814, 0, 0.4370, 0, 0.58, 0, -0.4370, 0, -0.3814, 17.8, 0.0, -28.2)
 
 [node name="Young24" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0028, 0, 0.5900, 0, 0.59, 0, -0.5900, 0, 0.0028, -30.4, 0, -29.2)
+transform = Transform3D(0.0028, 0, 0.5900, 0, 0.59, 0, -0.5900, 0, 0.0028, -30.4, 0.0, -29.2)
 
 [node name="Young25" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.2684, 0, -0.5254, 0, 0.59, 0, 0.5254, 0, -0.2684, 40.4, 0, -16.2)
+transform = Transform3D(-0.2684, 0, -0.5254, 0, 0.59, 0, 0.5254, 0, -0.2684, 40.4, 0.0, -16.2)
 
 [node name="Young26" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0824, 0, -0.3607, 0, 0.37, 0, 0.3607, 0, 0.0824, -32.3, 0, -20.8)
+transform = Transform3D(0.0824, 0, -0.3607, 0, 0.37, 0, 0.3607, 0, 0.0824, -32.3, 0.0, -20.8)
 
 [node name="Young27" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.2249, 0, 0.4466, 0, 0.5, 0, -0.4466, 0, 0.2249, 34.4, 0, -7.4)
+transform = Transform3D(0.2249, 0, 0.4466, 0, 0.5, 0, -0.4466, 0, 0.2249, 34.4, 0.0, -7.4)
 
 [node name="Young28" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.4921, 0, 0.0887, 0, 0.5, 0, -0.0887, 0, -0.4921, 37.4, 0, 8.3)
+transform = Transform3D(-0.4921, 0, 0.0887, 0, 0.5, 0, -0.0887, 0, -0.4921, 37.4, 0.0, 8.3)
 
 [node name="Young29" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.4328, 0, -0.4439, 0, 0.62, 0, 0.4439, 0, -0.4328, -28.5, 0, 3.6)
+transform = Transform3D(-0.4328, 0, -0.4439, 0, 0.62, 0, 0.4439, 0, -0.4328, -28.5, 0.0, 3.6)
 
 [node name="Young30" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.6399, 0, -0.1141, 0, 0.65, 0, 0.1141, 0, 0.6399, 5.2, 0, -20.7)
+transform = Transform3D(0.6399, 0, -0.1141, 0, 0.65, 0, 0.1141, 0, 0.6399, 5.2, 0.0, -20.7)
 
 [node name="Young31" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.1406, 0, 0.3422, 0, 0.37, 0, -0.3422, 0, 0.1406, -37.3, 0, 7.7)
+transform = Transform3D(0.1406, 0, 0.3422, 0, 0.37, 0, -0.3422, 0, 0.1406, -37.3, 0.0, 7.7)
 
 [node name="Young32" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3504, 0, 0.1471, 0, 0.38, 0, -0.1471, 0, -0.3504, -42.1, 0, -15.6)
+transform = Transform3D(-0.3504, 0, 0.1471, 0, 0.38, 0, -0.1471, 0, -0.3504, -42.1, 0.0, -15.6)
 
 [node name="Young33" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0498, 0, -0.5277, 0, 0.53, 0, 0.5277, 0, 0.0498, -4.4, 0, -8.0)
+transform = Transform3D(0.0498, 0, -0.5277, 0, 0.53, 0, 0.5277, 0, 0.0498, -4.4, 0.0, -8.0)
 
 [node name="Young34" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.2508, 0, -0.3736, 0, 0.45, 0, 0.3736, 0, -0.2508, 12.1, 0, 18.5)
+transform = Transform3D(-0.2508, 0, -0.3736, 0, 0.45, 0, 0.3736, 0, -0.2508, 12.1, 0.0, 18.5)
 
 [node name="Young35" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.6300, 0, 0.0060, 0, 0.63, 0, -0.0060, 0, 0.6300, 33.9, 0, 25.2)
+transform = Transform3D(0.6300, 0, 0.0060, 0, 0.63, 0, -0.0060, 0, 0.6300, 33.9, 0.0, 25.2)
 
 [node name="ForestExamine" parent="FieldForest" instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
 text_key = "EX_FIELD_FOREST_2026"
 location_id = "LOC_NORTH_FIELD"
 label_key = "LOC_NORTH_FIELD"
 
 [node name="Leida" parent="." instance=ExtResource("9")]
-transform = Transform3D(-0.7374, 0, 0.6755, 0, 1, 0, -0.6755, 0, -0.7374, 418, 0, 540)
+transform = Transform3D(-0.7374, 0, 0.6755, 0, 1.0, 0, -0.6755, 0, -0.7374, 418, 0.0, 540)
 npc_id = "npc_leida"
 knot = "leida"
 label_key = "NPC_LEIDA"
@@ -511,7 +511,7 @@ era_id = "era_2026"
 seed_item_ids = Array[String](["seed_potato", "seed_cabbage"])
 
 [node name="Bin" type="CSGBox3D" parent="Farming/SeedBin"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 0.45, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 0.45, 0)
 size = Vector3(1.2, 0.9, 0.8)
 material = SubResource("M7")
 
@@ -521,7 +521,7 @@ collision_mask = 0
 
 [node name="Shape" type="CollisionShape3D" parent="Farming/SeedBin/Body3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
-shape = SubResource("SB_era_2026")
+shape = SubResource("SB_era_2026_6")
 
 [node name="Village" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
@@ -533,12 +533,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(18, 20)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B0"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 1.2999999999999998, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 1.2999999999999998, 0)
 size = Vector3(18, 8.6, 20)
 material = SubResource("M8")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B0"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 5.72, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 5.72, 0)
 size = Vector3(18.6, 0.25, 20.6)
 material = SubResource("M9")
 
@@ -548,12 +548,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(17, 15)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B1"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 2.6500000000000004, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.6500000000000004, 0)
 size = Vector3(17, 11.3, 15)
 material = SubResource("M10")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B1"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 8.42, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 8.42, 0)
 size = Vector3(17.6, 0.25, 15.6)
 material = SubResource("M11")
 
@@ -563,12 +563,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(8, 32)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B2"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 2.5999999999999996, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.5999999999999996, 0)
 size = Vector3(8, 11.2, 32)
 material = SubResource("M12")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B2"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 8.319999999999999, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 8.319999999999999, 0)
 size = Vector3(8.6, 0.25, 32.6)
 material = SubResource("M13")
 
@@ -578,12 +578,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(60, 81)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B3"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 1.7000000000000002, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 1.7000000000000002, 0)
 size = Vector3(60, 9.4, 81)
 material = SubResource("M14")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B3"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 6.5200000000000005, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 6.5200000000000005, 0)
 size = Vector3(60.6, 0.25, 81.6)
 material = SubResource("M15")
 
@@ -593,12 +593,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(44, 70)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B4"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 3.55, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 3.55, 0)
 size = Vector3(44, 13.1, 70)
 material = SubResource("M16")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B4"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 10.219999999999999, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 10.219999999999999, 0)
 size = Vector3(44.6, 0.25, 70.6)
 material = SubResource("M17")
 
@@ -608,12 +608,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(12, 13)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B5"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 1.65, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 1.65, 0)
 size = Vector3(12, 9.3, 13)
 material = SubResource("M18")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B5"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 6.42, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 6.42, 0)
 size = Vector3(12.6, 0.25, 13.6)
 material = SubResource("M19")
 
@@ -623,12 +623,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(22, 5)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B6"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 1.6, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 1.6, 0)
 size = Vector3(22, 9.2, 5)
 material = SubResource("M20")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B6"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 6.32, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 6.32, 0)
 size = Vector3(22.6, 0.25, 5.6)
 material = SubResource("M21")
 
@@ -638,12 +638,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(12, 9)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B7"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 1.7000000000000002, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 1.7000000000000002, 0)
 size = Vector3(12, 9.4, 9)
 material = SubResource("M22")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B7"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 6.5200000000000005, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 6.5200000000000005, 0)
 size = Vector3(12.6, 0.25, 9.6)
 material = SubResource("M23")
 
@@ -653,12 +653,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(26, 33)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B8"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 2.95, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.95, 0)
 size = Vector3(26, 11.9, 33)
 material = SubResource("M24")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B8"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 9.02, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 9.02, 0)
 size = Vector3(26.6, 0.25, 33.6)
 material = SubResource("M25")
 
@@ -668,12 +668,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(33, 25)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B9"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 3.0, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 3.0, 0)
 size = Vector3(33, 12.0, 25)
 material = SubResource("M26")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B9"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 9.12, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 9.12, 0)
 size = Vector3(33.6, 0.25, 25.6)
 material = SubResource("M27")
 
@@ -683,12 +683,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(32, 24)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B10"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 2.95, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.95, 0)
 size = Vector3(32, 11.9, 24)
 material = SubResource("M28")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B10"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 9.02, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 9.02, 0)
 size = Vector3(32.6, 0.25, 24.6)
 material = SubResource("M29")
 
@@ -698,12 +698,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(14, 12)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B11"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 1.25, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 1.25, 0)
 size = Vector3(14, 8.5, 12)
 material = SubResource("M30")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B11"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 5.62, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 5.62, 0)
 size = Vector3(14.6, 0.25, 12.6)
 material = SubResource("M31")
 
@@ -713,12 +713,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(33, 20)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B12"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 2.35, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.35, 0)
 size = Vector3(33, 10.7, 20)
 material = SubResource("M32")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B12"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 7.82, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 7.82, 0)
 size = Vector3(33.6, 0.25, 20.6)
 material = SubResource("M33")
 
@@ -728,12 +728,12 @@ script = ExtResource("1")
 metadata/footprint = Vector2(12, 9)
 
 [node name="Mass" type="CSGBox3D" parent="Village/B13"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 4.5, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 4.5, 0)
 size = Vector3(12, 15.0, 9)
 material = SubResource("M34")
 
 [node name="Roof" type="CSGBox3D" parent="Village/B13"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 12.12, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 12.12, 0)
 size = Vector3(12.6, 0.25, 9.6)
 material = SubResource("M35")
 
@@ -746,27 +746,27 @@ intro_key = "POST_2026_TEXT"
 metadata/footprint = Vector2(3.0, 2.4)
 
 [node name="Base" type="CSGBox3D" parent="TradePost"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, -1.0, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, -1.0, 0)
 size = Vector3(3.0, 2.0, 2.4)
 material = SubResource("M37")
 
 [node name="Stall" type="CSGBox3D" parent="TradePost"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 0.55, 0)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 0.55, 0)
 size = Vector3(2.4, 1.1, 1.2)
 material = SubResource("M38")
 
 [node name="Awning" type="CSGBox3D" parent="TradePost"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 0, 2.2, -0.3)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.2, -0.3)
 size = Vector3(2.8, 0.12, 2.0)
 material = SubResource("M39")
 
 [node name="PostA" type="CSGBox3D" parent="TradePost"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, -1.3, 1.1, -1.2)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, -1.3, 1.1, -1.2)
 size = Vector3(0.1, 2.2, 0.1)
 material = SubResource("M40")
 
 [node name="PostB" type="CSGBox3D" parent="TradePost"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1, 0, -0.0000, 0, 1.0000, 1.3, 1.1, -1.2)
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 1.3, 1.1, -1.2)
 size = Vector3(0.1, 2.2, 0.1)
 material = SubResource("M41")
 
@@ -776,4 +776,4 @@ collision_mask = 0
 
 [node name="Shape" type="CollisionShape3D" parent="TradePost/Body3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
-shape = SubResource("TP_era_2026")
+shape = SubResource("TP_era_2026_36")
