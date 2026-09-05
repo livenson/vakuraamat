@@ -188,7 +188,7 @@ func _load(loc: Vector2i) -> void:
 			b.yield_rows = 8
 			var layout := _layout_of(pack)
 			if await b.import(terrain, tile_dir, layout, -1.0, loc):
-				var mask := TerrainBuilder.road_mask(Sites.path_in(pack, "roads.json"), terrain.region_size)
+				var mask := TerrainBuilder.footprint_mask(Sites.path_in(pack, "buildings.json"), terrain.region_size, TerrainBuilder.road_mask(Sites.path_in(pack, "roads.json"), terrain.region_size))
 				await b.scatter(terrain, tile_dir, layout.get("exclusions", []) + TerrainBuilder.water_exclusions(Sites.path_in(pack, str(Sites.manifest_for(pack).get("water", "")))), 1798, [], loc, mask)
 		if not tiles.has(loc) or tiles[loc] != t:
 			return   # unloaded meanwhile

@@ -86,6 +86,10 @@ its design documents in the repo root describe that version.
   (`Buildings`, `Parcels`, `Village`) stay at y 0 and their children snap; a node that positions its
   own pieces on the ground sets `metadata/no_snap` on itself AND on its parcel group, or its heights
   double and it floats in the sky.
+- Vegetation bakes exclude roads and building footprints at scatter time (`road_mask`, `footprint_mask`);
+  region `.res` files are generated, so after touching scatter inputs or `buildings.json` run
+  `make scatter SITE=<id>` on every machine. Cached neighbour tiles under `user://tiles` keep their old
+  bake; the interior stamps grass away on first entry as the safety net.
 - Streamed tiles sit at a 1024 m offset: nodes must read pack files through
   `Sites.path_in(Sites.pack_of(self), ...)` and sample the terrain with `to_global(...)`; `Parcels.at`
   already resolves the tile. Never assume tile-local equals world coordinates.

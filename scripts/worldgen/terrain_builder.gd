@@ -209,6 +209,42 @@ static func road_mask(roads_path: String, size: int) -> Image:
 	return img
 
 
+## Texels under building footprints painted into `into` (a road mask) or a fresh L8 image: the
+## register polygons of buildings.json grown by `margin`, or the massing rectangles when the file is
+## the plain buildings_2026.json list. Nothing grows through a floor. Paths, not a pack: the headless
+## tools run without Sites.
+static func footprint_mask(buildings_path: String, size: int, into: Image = null, margin: float = 0.7) -> Image:
+	var img: Image = into if into else Image.create_empty(size, size, false, Image.FORMAT_L8)
+	if buildings_path == "" or not FileAccess.file_exists(buildings_path):
+		return img
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(buildings_path))
+	var polys: Array = []
+	if typeof(parsed) == TYPE_DICTIONARY:
+		for b in parsed.get("buildings", []):
+			var poly := PackedVector2Array()
+			for pt in b.get("polygon", []):
+				poly.append(Vector2(float(pt[0]), float(pt[1])))
+			if poly.size() >= 3:
+				polys.append_array(Geometry2D.offset_polygon(poly, margin, Geometry2D.JOIN_MITER))
+	elif typeof(parsed) == TYPE_ARRAY:
+		for b in parsed:
+			var hw := float(b.get("w", 0)) / 2.0 + margin
+			var hd := float(b.get("d", 0)) / 2.0 + margin
+			var cx := float(b.get("x", 0))
+			var cz := float(b.get("z", 0))
+			polys.append(PackedVector2Array([Vector2(cx - hw, cz - hd), Vector2(cx + hw, cz - hd), Vector2(cx + hw, cz + hd), Vector2(cx - hw, cz + hd)]))
+	var on := Color(1, 1, 1)
+	for poly in polys:
+		var rect := Rect2(poly[0], Vector2.ZERO)
+		for pt in poly:
+			rect = rect.expand(pt)
+		for y in range(maxi(int(rect.position.y), 0), mini(int(rect.end.y) + 1, size)):
+			for x in range(maxi(int(rect.position.x), 0), mini(int(rect.end.x) + 1, size)):
+				if Geometry2D.is_point_in_polygon(Vector2(x + 0.5, y + 0.5), poly):
+					img.set_pixel(x, y, on)
+	return img
+
+
 ## Level the ground under authored buildings ("pads": x, z, w, d in tile metres): the footprint
 ## takes the mean height, blended out over a 5 m margin. Shared by all eras.
 static func level_building_pads(img: Image, pads: Array) -> void:

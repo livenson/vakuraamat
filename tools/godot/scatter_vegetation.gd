@@ -41,6 +41,7 @@ func _init() -> void:
 		exclusions = exclusions + TerrainBuilder.water_exclusions("res://sites/%s/%s" % [site, manifest.water])   # nothing grows in the ponds
 	var builder := TerrainBuilder.new()
 	var mask := TerrainBuilder.road_mask("res://sites/%s/roads.json" % site, terrain.region_size)   # no grass on carriageways
+	mask = TerrainBuilder.footprint_mask("res://sites/%s/buildings.json" % site, terrain.region_size, mask)   # nor under buildings
 	var counts: Array = await builder.scatter(terrain, dir, exclusions, 1798, texture_list, Vector2i.ZERO, mask)
 	print("[scatter_vegetation] saved -> %s (%d instances)" % [dir, counts.reduce(func(a, b): return a + b, 0)])
 	quit()
