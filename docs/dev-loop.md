@@ -1,0 +1,58 @@
+# The development loop: report from the game, fix, come back to the same spot
+
+Three pieces, all in debug builds (running from the project) and off in exported release builds.
+
+## 1. Report an issue in the game: F8
+
+F8 grabs the frame as you see it, then opens a note box. *Send* writes to `user://reports/`:
+
+- `report_<time>.json`: your note, site, era, chapter, position, yaw and pitch, what the crosshair
+  was on (node path, label, hover text, ids), interactables within 15 m, register buildings within
+  25 m (name, year, materials), committed flags, artifacts, the last engine errors and warnings,
+  the locale and FPS, and a `replay` command line;
+- `report_<time>.png`: the frame;
+- a save slot named after the report;
+- one line appended to `reports/feed.log`.
+
+`user://` is `~/Library/Application Support/Godot/app_userdata/Vakuraamat` on macOS
+(`~/.local/share/godot/app_userdata/Vakuraamat` on Linux, `%APPDATA%\Godot\app_userdata\Vakuraamat`
+on Windows). `python3 tools/dev.py reports` lists them, `show <id>` prints one.
+
+## 2. Claude Code watches the feed
+
+`make dev-watch` tails the feed for a human. For Claude Code the same file is a `Monitor` source:
+
+```
+tail -F "<userdir>/reports/feed.log"
+```
+
+Every report becomes an event in the session; Claude reads the JSON and the screenshot, fixes, runs
+`make test`, and answers with a reload or a restart (below). Nothing needs to be typed in the session.
+
+## 3. Back to the same spot: replay, hot reload, restart
+
+- **Replay**: `python3 tools/dev.py replay <id>` (or the `replay` line inside the report) starts the
+  world scene with `--report=<file>`: the report's site is selected, its save slot loaded, the
+  player placed at the recorded position, yaw and pitch.
+- **Hot reload** into the running game: `python3 tools/dev.py reload <paths>` appends a command to
+  `user://dev/commands.jsonl`; the `DevChannel` autoload polls it twice a second and answers in
+  `user://dev/results.log` (`tools/dev.py results`). Per file type:
+  - `.gd`: the script re-reads its source and `reload(true)` keeps instance state (exported values,
+    connections to renamed functions and changed autoload structure are the cases where it fails;
+    the result says "error N (restart needed)");
+  - era `.tscn`: the cache entry is replaced and the current era layer is instanced again with the
+    player where they stand (`make scenes` first when `scenes.json` changed);
+  - anything under `sites/<id>/` (`.tres`, `strings.csv`, `.ink.json`, `site.json`): the pack is
+    re-read, registries and strings reload, stories reset, the era layer re-instanced;
+  - shaders, textures, other resources: replaced in the cache.
+- **Restart at this spot**: `python3 tools/dev.py restart` makes the game write a report of where it
+  is and relaunch itself on it. Use it after changes hot reload cannot take.
+- Also: `teleport x z [yaw]`, `era <id>`, `screenshot </abs.png>`, `quit`.
+
+## Limits
+
+Godot's own "Synchronize Script Changes" only works for games launched from the editor, so this
+channel does the equivalent by hand. `Script.reload(true)` is best-effort: a stale closure or a
+changed signal signature can misbehave until the next restart, which is why restart-at-spot exists
+and is cheap (about ten seconds on a shipped tile, plus the terrain build on a fresh downloaded one).
+The channel is a plain file drop on the local machine; it is not a network service.

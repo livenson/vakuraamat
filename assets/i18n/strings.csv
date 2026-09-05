@@ -75,7 +75,7 @@ BUILD_NO_MATERIALS,Materjali ei jätku.,Not enough materials.
 BUILD_COST,Hind: %s,Cost: %s
 UI_DEBUG_MAP,Silumiskaart,Debug map
 UI_DEBUG_MAP_HINT,Klõps kaardil: teleport. M sulgeb.,Click the map to teleport. M closes.
-UI_KEYS,E tegutse   Tab vakuraamat   J päevik   I kott   L keel   M silumiskaart   Esc menüü,E interact   Tab register   J journal   I bag   L language   M debug map   Esc menu
+UI_KEYS,E tegutse   Tab vakuraamat   J päevik   I kott   L keel   M silumiskaart   F8 teata   Esc menüü,E interact   Tab register   J journal   I bag   L language   M debug map   F8 report   Esc menu
 MENU_SITE,Asukoht,Location
 UI_BUILDING_GROUND,Maa ehitatakse laserandmetest...,Building the ground from the laser data...
 MENU_NEW_LOCATION,Uus asukoht...,New location...
@@ -110,3 +110,7 @@ MENU_WORLDS_DOWN,"Maailmateenus ei vasta (%s). Käivita: make world-service","Th
 MENU_NO_SUCH_WORLD,Sellist maailma ei ole.,No such world.
 NOTICE_FRIEND_DELIVERY,"Sõber %s tegi sinu maailmas midagi: %s","A friend, %s, did something in your world: %s"
 MENU_CURRENT,praegune,current
+UI_REPORT_TITLE,Teata probleemist,Report an issue
+UI_REPORT_HINT,"Pilt on juba tehtud. Kirjuta, mis on valesti, kus, ja kuidas see peaks olema. Salvestatakse koos asukoha, sihtmärgi ja mänguseisuga.","The frame is already captured. Say what is wrong, where, and how it should be. Saved with your position, what you are looking at and the game state."
+UI_REPORT_SEND,Saada,Send
+UI_REPORT_SENT,Teade salvestatud: %s,Report saved: %s

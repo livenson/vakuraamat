@@ -6,7 +6,7 @@ SITE ?= palupera
 TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
 CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
-.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate tile-service world-service buildings real-trees
+.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate tile-service world-service buildings real-trees dev-watch
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, gdal, git-lfs; npm for ink), pull LFS files, first Godot import"
@@ -104,8 +104,8 @@ ink:
 
 test:
 	@python3 tools/validate_site.py --all | grep -E "OK|FAILED"
-	@for t in boot_test site_test userpack_test friends_test playthrough_test story_test farming_test hunting_test economy_test; do \
-	  printf "%-18s " $$t; $(GODOT) --headless --path . res://tools/godot/$$t.tscn 2>&1 | grep -E "PASSED|FAILED" | head -1; done
+	@for t in boot_test site_test userpack_test friends_test devchannel_test playthrough_test story_test farming_test hunting_test economy_test; do \
+	  printf "%-18s " $$t; $(GODOT) --headless --path . res://tools/godot/$$t.tscn -- --site=palupera 2>&1 | grep -E "PASSED|FAILED" | head -1; done
 
 lint:
 	git ls-files '*.gd' | grep -v '^addons/' | xargs uvx --python 3.12 --from gdtoolkit==4.5.0 gdlint
@@ -123,3 +123,6 @@ tile-service:
 
 world-service:
 	python3 tools/world_service.py --port 8766
+
+dev-watch:
+	python3 tools/dev.py watch

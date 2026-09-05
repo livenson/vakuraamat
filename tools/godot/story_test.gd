@@ -1,7 +1,7 @@
 # Generic play-through of a composed (block-based) pack, driven only by the pack's own data:
 # picks up every artifact, talks to every NPC, triggers every consequence point by trying the
 # dialogue options (or the story point), checks the flags, chapters and the epilogue.
-#   godot --headless --path . res://tools/godot/story_test.tscn -- --site=kvissentali
+#   godot --headless --path . res://tools/godot/story_test.tscn -- --story=kvissentali
 extends Node
 
 var world: Node3D
@@ -23,8 +23,8 @@ func _ready() -> void:
 		print("[story] FAILED: watchdog timeout")
 		get_tree().quit(2))
 	for a in OS.get_cmdline_user_args():
-		if a.begins_with("--site="):
-			site = a.trim_prefix("--site=")
+		if a.begins_with("--story="):
+			site = a.trim_prefix("--story=")   # not --site: the test runner pins that for the Palupera tests
 	await get_tree().process_frame
 	_check(Sites.available.has(site), "no such pack: " + site)
 	Sites.select(site, false)

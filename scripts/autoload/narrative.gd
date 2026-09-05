@@ -63,6 +63,16 @@ func _ready() -> void:
 	load("res://addons/inkgd/ink_runtime_manager.gd").init(get_tree().root)
 
 
+## Forget the loaded stories (dev hot reload); they load again on the next conversation.
+func reset_players() -> void:
+	if _active:
+		_active = null
+		EventBus.dialogue_ended.emit("")
+	for p in _players.values():
+		p.queue_free()
+	_players.clear()
+
+
 func _player_for(era_id: String) -> Node:
 	if _players.has(era_id):
 		return _players[era_id]

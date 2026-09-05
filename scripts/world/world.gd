@@ -44,7 +44,11 @@ func _ready() -> void:
 	_place_water()
 	fade.color.a = 1.0
 	await get_tree().process_frame
-	if GameState.pending_load and SaveManager.has_save():
+	var report := _report_from_args()
+	if not report.is_empty() and SaveManager.has_save(str(report.get("save_slot", ""))):
+		GameState.pending_load = false
+		await SaveManager.load_slot(str(report.save_slot))
+	elif GameState.pending_load and SaveManager.has_save():
 		GameState.pending_load = false
 		await SaveManager.load_slot()
 	if not GameState.current_era:
@@ -56,6 +60,13 @@ func _ready() -> void:
 		var order := GameState.eras_in_order()
 		var first_era: String = str(start.get("era", order[-1].id if not order.is_empty() else ""))
 		await GameState.switch_era(first_era)
+	if not report.is_empty():
+		var p: Array = report.get("position", [])
+		if p.size() == 3:
+			player.set_pose(Vector3(float(p[0]), float(p[1]), float(p[2])), deg_to_rad(float(report.get("yaw_deg", 0.0))), deg_to_rad(float(report.get("pitch_deg", 0.0))))
+		if not GameState.current_era:
+			await GameState.switch_era(str(report.get("era", "")))
+		print("[world] replaying report %s" % report.get("id", ""))
 	var tw := create_tween()
 	tw.tween_property(fade, "color:a", 0.0, FADE_TIME)
 	_ready_done = true
@@ -83,6 +94,48 @@ func _ready() -> void:
 		elif a.begins_with("--open="):
 			GameState.register_unlocked = true
 			get_tree().create_timer(2.0).timeout.connect(ui.debug_open.bind(a.trim_prefix("--open=")))
+
+
+func _report_from_args() -> Dictionary:
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--report="):
+			var parsed = JSON.parse_string(FileAccess.get_file_as_string(a.trim_prefix("--report=")))
+			if typeof(parsed) == TYPE_DICTIONARY:
+				return parsed
+			push_error("cannot read report " + a)
+	return {}
+
+
+## Dev hot reload: drop an era layer and, if it is the current one, instance it again from disk
+## with the player left where they stand.
+func reload_era_layer(era_id: String) -> void:
+	var old: Node = _era_nodes.get(era_id)
+	if old:
+		layers.remove_child(old)
+		old.queue_free()
+		_era_nodes.erase(era_id)
+	if era_id != GameState.current_era:
+		return
+	var era: EraDefinition = GameState.era(era_id)
+	if era == null:
+		return
+	var node: EraController = load(era.scene_path).instantiate()
+	layers.add_child(node)
+	_era_nodes[era_id] = node
+	node.activate()
+	_set_drape(era)
+	_snap(player, 1.0)
+
+
+## Dev restart at this exact spot: write a report (with a save) and relaunch the world scene on it.
+func restart_here() -> void:
+	var path := Reporter.capture("restart", self)
+	var args := ["--path", ProjectSettings.globalize_path("res://"), "res://scenes/world/world.tscn", "--", "--report=" + path]
+	for a in OS.get_cmdline_user_args():
+		if a in ["--windowed", "--fullscreen", "--dev"]:
+			args.append(a)
+	OS.create_process(OS.get_executable_path(), args)
+	get_tree().quit()
 
 
 func _exit_tree() -> void:
