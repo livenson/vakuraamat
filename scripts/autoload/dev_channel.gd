@@ -72,6 +72,9 @@ func execute(cmd: Dictionary) -> Array:
 		await RenderingServer.frame_post_draw
 		world.get_viewport().get_texture().get_image().save_png(str(cmd.screenshot))
 		out.append("screenshot " + str(cmd.screenshot))
+	if cmd.has("codes") and world:
+		world.ui._toggle_codes()
+		out.append("codes %s" % ("on" if world.ui.codes_on else "off"))
 	if cmd.has("report") and world:
 		out.append("report " + Reporter.capture(str(cmd.report), world))
 	if cmd.has("quit"):
@@ -96,32 +99,36 @@ func execute(cmd: Dictionary) -> Array:
 func reload_path(p: String) -> String:
 	if not (p.begins_with("res://") or p.begins_with("user://")):
 		p = "res://" + p.trim_prefix("./")
-	if not FileAccess.file_exists(p):
-		return "%s: missing" % p
+	var result := ""
 	var ext := p.get_extension()
 	var world: Node = GameState.world
-	if ext == "gd":
+	if not FileAccess.file_exists(p):
+		result = "%s: missing" % p
+	elif ext == "gd":
 		var s = load(p)
-		if not (s is GDScript):
-			return "%s: not a GDScript" % p
-		s.source_code = FileAccess.get_file_as_string(p)
-		var err: int = s.reload(true)
-		return "%s: %s" % [p, "reloaded" if err == OK else "error %d (restart needed)" % err]
-	if ext == "tscn":
+		if s is GDScript:
+			s.source_code = FileAccess.get_file_as_string(p)
+			var err: int = s.reload(true)
+			result = "%s: %s" % [p, "reloaded" if err == OK else "error %d (restart needed)" % err]
+		else:
+			result = "%s: not a GDScript" % p
+	elif ext == "tscn":
 		ResourceLoader.load(p, "", ResourceLoader.CACHE_MODE_REPLACE)
+		result = "%s: cache replaced" % p
 		for era in GameState.eras.values():
 			if era.scene_path == p and world:
 				world.reload_era_layer(era.id)
-				return "%s: era layer %s re-instanced" % [p, era.id]
-		return "%s: cache replaced" % p
-	if p.begins_with(Sites.path("")) or p.begins_with("res://sites/") or p.begins_with(Sites.USER_ROOT):
+				result = "%s: era layer %s re-instanced" % [p, era.id]
+	elif p.begins_with(Sites.path("")) or p.begins_with("res://sites/") or p.begins_with(Sites.USER_ROOT):
 		Sites.reload_active()
 		Narrative.reset_players()
 		if world:
 			world.reload_era_layer(GameState.current_era)
-		return "%s: pack reloaded (registries, strings, stories; current era layer re-instanced)" % p
-	ResourceLoader.load(p, "", ResourceLoader.CACHE_MODE_REPLACE)
-	return "%s: cache replaced" % p
+		result = "%s: pack reloaded (registries, strings, stories; current era layer re-instanced)" % p
+	else:
+		ResourceLoader.load(p, "", ResourceLoader.CACHE_MODE_REPLACE)
+		result = "%s: cache replaced" % p
+	return result
 
 
 func _result(text: String) -> void:

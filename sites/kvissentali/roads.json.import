@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://d4h2yj1vlpe7f"
+valid=false
+
+[deps]
+
+source_file="res://sites/kvissentali/roads.json"
+
+[params]
+
+compress=true

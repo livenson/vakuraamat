@@ -12,6 +12,15 @@ extends Node3D
 @export var skirt := 3.0                                          # metres below the origin
 @export var source := ""                                          # buildings.json inside the active pack
 @export var building_id := 0
+@export var kind := "dwelling"                                    # dwelling | outbuilding | other | ruin
+@export var floors := 0                                           # register floors; 0 = from the height
+@export var facade := ""                                          # register facade material text
+@export var roof_cover := ""                                      # register roof covering text
+
+const TEX := "res://assets/textures/buildings/"
+var _windows := SurfaceTool.new()
+var _trim := SurfaceTool.new()
+var _wall_faces: Array = []   # {pts: Array[Vector3], n: Vector3, t: Vector3, umin, umax, ymin, ymax}
 
 static var _models: Dictionary = {}   # source path -> {id -> lod2 dict}
 
@@ -23,6 +32,8 @@ var _roof := SurfaceTool.new()
 func _ready() -> void:
 	_walls.begin(Mesh.PRIMITIVE_TRIANGLES)
 	_roof.begin(Mesh.PRIMITIVE_TRIANGLES)
+	_windows.begin(Mesh.PRIMITIVE_TRIANGLES)
+	_trim.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var model := _model()
 	if model.is_empty():
 		if polygon.size() < 3:
@@ -31,18 +42,22 @@ func _ready() -> void:
 	else:
 		_faces(model.faces)
 	_skirt()
+	if kind != "ruin":
+		_openings()
 	_walls.generate_normals()
 	_roof.generate_normals()
+	_windows.generate_normals()
+	_trim.generate_normals()
 	var mesh: ArrayMesh = _walls.commit()
 	mesh = _roof.commit(mesh)
+	mesh = _windows.commit(mesh)
+	mesh = _trim.commit(mesh)
+	# surfaces: 0 walls, 1 roof, 2 windows (named "Window": EraController lights them after dark), 3 trim
+	var mats := [_wall_material(), _roof_material(), _window_material(), _trim_material()]
+	for i in mesh.get_surface_count():
+		mesh.surface_set_material(i, mats[i] if i < mats.size() else mats[0])
 	var mi := MeshInstance3D.new()
 	mi.mesh = mesh
-	for i in mesh.get_surface_count():
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = wall_color if i == 0 else roof_color
-		mat.roughness = 0.9
-		mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-		mi.set_surface_override_material(i, mat)
 	add_child(mi)
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
@@ -90,6 +105,8 @@ func _faces(faces: Array) -> void:
 		if nrm.y < -0.5:
 			continue   # floor: never seen
 		var st := _roof if nrm.y > 0.3 else _walls
+		if st == _walls:
+			_register_face(pts)
 		# triangulate in the plane: drop the dominant axis
 		var proj: PackedVector2Array = PackedVector2Array()
 		var ax := absf(nrm.x)
@@ -123,6 +140,7 @@ func _extrude() -> void:
 		var b := polygon[(i + 1) % n]
 		_tri(_walls, Vector3(a.x, 0, a.y), Vector3(b.x, 0, b.y), Vector3(b.x, height, b.y))
 		_tri(_walls, Vector3(a.x, 0, a.y), Vector3(b.x, height, b.y), Vector3(a.x, height, a.y))
+		_register_face([Vector3(a.x, 0, a.y), Vector3(b.x, 0, b.y), Vector3(b.x, height, b.y), Vector3(a.x, height, a.y)])
 	var tris := Geometry2D.triangulate_polygon(polygon)
 	for i in range(0, tris.size(), 3):
 		var p0 := polygon[tris[i]]
@@ -203,3 +221,161 @@ func _extent() -> Vector2:
 		lo = lo.min(p)
 		hi = hi.max(p)
 	return hi - lo if polygon.size() > 0 else Vector2(6, 6)
+
+
+# ---------------------------------------------------------------- appearance from the register
+func _tex(name: String) -> Texture2D:
+	return load(TEX + name + "_color.jpg")
+
+
+func _nrm(name: String) -> Texture2D:
+	return load(TEX + name + "_normal.jpg")
+
+
+func _textured(name: String, tint: Color, scale: float, rough := 0.9) -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_texture = _tex(name)
+	m.normal_enabled = true
+	m.normal_texture = _nrm(name)
+	m.albedo_color = tint
+	m.roughness = rough
+	m.uv1_triplanar = true
+	m.uv1_world_triplanar = false
+	m.uv1_scale = Vector3(scale, scale, scale)
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	return m
+
+
+## Facade material text -> texture: plaster for rendered, block and board facades; wood siding for
+## timber; a warm-tinted plaster stands in for brick (no brick texture in the set).
+func _wall_material() -> StandardMaterial3D:
+	var f := facade.to_lower()
+	if f == "" and kind == "outbuilding":
+		return _textured("woodsiding", wall_color.lightened(0.15), 0.5)
+	if "puit" in f or "laudis" in f or "palk" in f:
+		return _textured("woodsiding", wall_color.lightened(0.25), 0.5)
+	if "tellis" in f:
+		return _textured("plaster", wall_color, 0.8, 0.95)
+	if "kivi" in f or "paekivi" in f:
+		return _textured("rock", wall_color.lightened(0.2), 0.4)
+	return _textured("plaster", wall_color.lightened(0.05), 0.6)
+
+
+func _roof_material() -> StandardMaterial3D:
+	var r := roof_cover.to_lower()
+	if "kivi" in r:
+		return _textured("rooftiles", roof_color.lightened(0.35), 0.7, 0.8)
+	if "roo" in r or "õlg" in r:
+		return _textured("thatch", roof_color.lightened(0.4), 0.6)
+	var m := StandardMaterial3D.new()
+	m.albedo_color = roof_color
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	if "plekk" in r:
+		m.metallic = 0.5
+		m.roughness = 0.45
+	else:
+		m.roughness = 0.95
+	return m
+
+
+func _window_material() -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.resource_name = "Window"
+	m.albedo_color = Color(0.1, 0.13, 0.17)
+	m.metallic = 0.3
+	m.roughness = 0.12
+	return m
+
+
+func _trim_material() -> StandardMaterial3D:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = Color(0.93, 0.92, 0.88) if kind == "dwelling" else Color(0.3, 0.22, 0.16)
+	m.roughness = 0.8
+	return m
+
+
+# ---------------------------------------------------------------- windows and doors
+func _register_face(pts: Array) -> void:
+	"""Remember a vertical wall face for the openings pass."""
+	var nrm := Vector3.ZERO
+	for i in pts.size():
+		nrm += (pts[i] as Vector3).cross(pts[(i + 1) % pts.size()])
+	nrm = nrm.normalized()
+	if absf(nrm.y) > 0.3 or nrm.length() < 0.5:
+		return
+	var t := nrm.cross(Vector3.UP).normalized()
+	var umin := INF
+	var umax := -INF
+	var ymin := INF
+	var ymax := -INF
+	for p in pts:
+		var u: float = (p as Vector3).dot(t)
+		umin = minf(umin, u)
+		umax = maxf(umax, u)
+		ymin = minf(ymin, p.y)
+		ymax = maxf(ymax, p.y)
+	_wall_faces.append({"pts": pts, "n": nrm, "t": t, "umin": umin, "umax": umax, "ymin": ymin, "ymax": ymax})
+
+
+func _quad_on_face(st: SurfaceTool, f: Dictionary, u: float, y: float, w: float, h: float, out: float) -> void:
+	var a: Vector3 = f.pts[0]
+	var base: Vector3 = a + f.t * (u - a.dot(f.t)) + Vector3.UP * (y - a.y) + f.n * out
+	var du: Vector3 = f.t * (w / 2.0)
+	var dy: Vector3 = Vector3.UP * (h / 2.0)
+	var p0 := base - du - dy
+	var p1 := base + du - dy
+	var p2 := base + du + dy
+	var p3 := base - du + dy
+	_tri(st, p0, p1, p2)
+	_tri(st, p0, p2, p3)
+	_tri(st, p0, p2, p1)   # both sides, so the normal sign of the face does not matter
+	_tri(st, p0, p3, p2)
+
+
+## Windows in rows per floor and a door on the longest wall; sizes and spacing by building kind.
+func _openings() -> void:
+	if _wall_faces.is_empty():
+		return
+	var eave := INF
+	for f in _wall_faces:
+		eave = minf(eave, float(f.ymax))
+	if eave == INF or eave < 2.2:
+		return
+	var n_floors := floors if floors > 0 else maxi(1, int(round(eave / 3.0)))
+	n_floors = mini(n_floors, int(eave / 2.4))
+	var fh := eave / maxf(n_floors, 1)
+	var win_w := 1.1 if kind == "dwelling" else 0.8
+	var win_h := minf(1.35, fh * 0.45) if kind == "dwelling" else 0.6
+	var spacing := 2.8 if kind == "dwelling" else 5.0
+	var longest: Dictionary = {}
+	for f in _wall_faces:
+		if longest.is_empty() or (float(f.umax) - float(f.umin)) > (float(longest.umax) - float(longest.umin)):
+			longest = f
+	for f in _wall_faces:
+		var width: float = float(f.umax) - float(f.umin)
+		if width < 2.4:
+			continue
+		var cols := int((width - 1.6) / spacing)
+		if cols < 1:
+			cols = 1
+		var step := width / (cols + 1)
+		for k in n_floors:
+			var y: float = float(f.ymin) + k * fh + (0.9 if kind == "dwelling" else 1.3) + win_h / 2.0
+			if y + win_h / 2.0 > float(f.ymax) - 0.2:
+				continue
+			for c in cols:
+				var u: float = float(f.umin) + step * (c + 1)
+				if f == longest and k == 0 and c == cols / 2:
+					continue   # the door goes here
+				_quad_on_face(_trim, f, u, y, win_w + 0.16, win_h + 0.16, 0.02)
+				_quad_on_face(_windows, f, u, y, win_w, win_h, 0.04)
+	if not longest.is_empty():
+		var door_w := 1.0 if kind == "dwelling" else 2.4
+		var door_h := 2.1 if kind == "dwelling" else 2.4
+		var lw: float = float(longest.umax) - float(longest.umin)
+		var cols := maxi(1, int((lw - 1.6) / spacing))
+		var u: float = float(longest.umin) + lw / (cols + 1) * (cols / 2 + 1)
+		var y0: float = float(longest.ymin) + door_h / 2.0
+		_quad_on_face(_trim, longest, u, y0, door_w + 0.16, door_h + 0.1, 0.02)
+		var door := _windows if kind != "dwelling" else _trim
+		_quad_on_face(door, longest, u, y0, door_w, door_h, 0.05)

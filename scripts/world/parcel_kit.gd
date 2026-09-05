@@ -1,0 +1,140 @@
+# Props for one cadastral unit, chosen by assets/data/parcel_rules.json from the unit's registered
+# purpose: a playground (swing frame, slide, sandpit, bench), park benches, a garden hedge along the
+# boundary, or an industrial fence. Cheap geometry, all in one mesh, on the terrain via the group snap.
+class_name ParcelKit
+extends Node3D
+
+@export var kit := ""                         # playground | park | hedge | fence
+@export var tunnus := ""                      # cadastral number, for the codes overlay
+@export var polygon: PackedVector2Array = PackedVector2Array()   # boundary around the origin (x east, y = z south)
+
+var _st := SurfaceTool.new()
+var _colors: Array[Color] = []
+
+
+func _ready() -> void:
+	if polygon.size() < 3:
+		return
+	match kit:
+		"playground":
+			_playground()
+		"park":
+			_park()
+		"hedge":
+			_boundary(0.9, 0.7, Color(0.22, 0.4, 0.18), 1.2, true)
+		"fence":
+			_boundary(2.0, 0.08, Color(0.45, 0.45, 0.42), 0.4, false)
+	if _colors.is_empty():
+		return
+	var mi := MeshInstance3D.new()
+	var mesh: ArrayMesh = _st.commit()
+	mi.mesh = mesh
+	var mat := StandardMaterial3D.new()
+	mat.vertex_color_use_as_albedo = true
+	mat.roughness = 0.85
+	mi.material_override = mat
+	add_child(mi)
+	var body := StaticBody3D.new()
+	body.collision_layer = 1
+	var shape := CollisionShape3D.new()
+	shape.shape = mesh.create_trimesh_shape()
+	body.add_child(shape)
+	add_child(body)
+
+
+func _box(center: Vector3, size: Vector3, col: Color, yaw := 0.0) -> void:
+	if _colors.is_empty():
+		_st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	_colors.append(col)
+	var b := Basis(Vector3.UP, yaw)
+	var h := size / 2.0
+	var c := [Vector3(-h.x, -h.y, -h.z), Vector3(h.x, -h.y, -h.z), Vector3(h.x, h.y, -h.z), Vector3(-h.x, h.y, -h.z),
+			Vector3(-h.x, -h.y, h.z), Vector3(h.x, -h.y, h.z), Vector3(h.x, h.y, h.z), Vector3(-h.x, h.y, h.z)]
+	var faces := [[0, 1, 2, 3], [5, 4, 7, 6], [4, 0, 3, 7], [1, 5, 6, 2], [3, 2, 6, 7], [4, 5, 1, 0]]
+	for f in faces:
+		var p := [center + b * c[f[0]], center + b * c[f[1]], center + b * c[f[2]], center + b * c[f[3]]]
+		var n: Vector3 = (p[1] - p[0]).cross(p[3] - p[0]).normalized()
+		for v in [p[0], p[1], p[2], p[0], p[2], p[3]]:
+			_st.set_normal(n)
+			_st.set_color(col)
+			_st.add_vertex(v)
+
+
+func _centroid() -> Vector2:
+	var c := Vector2.ZERO
+	for p in polygon:
+		c += p
+	return c / polygon.size()
+
+
+func _playground() -> void:
+	var c := _centroid()
+	var wood := Color(0.55, 0.38, 0.2)
+	var red := Color(0.75, 0.2, 0.15)
+	var blue := Color(0.15, 0.3, 0.65)
+	var sand := Color(0.85, 0.78, 0.6)
+	# swing frame
+	for dx in [-1.6, 1.6]:
+		_box(Vector3(c.x + dx, 1.2, c.y), Vector3(0.12, 2.4, 0.12), wood)
+	_box(Vector3(c.x, 2.4, c.y), Vector3(3.4, 0.12, 0.12), wood)
+	for dx in [-0.6, 0.6]:
+		_box(Vector3(c.x + dx, 0.55, c.y), Vector3(0.45, 0.06, 0.2), red)
+		_box(Vector3(c.x + dx, 1.5, c.y), Vector3(0.03, 1.8, 0.03), Color(0.3, 0.3, 0.3))
+	# slide: platform, ladder posts, ramp
+	var sx := c.x + 5.0
+	var sz := c.y + 1.0
+	_box(Vector3(sx, 1.5, sz), Vector3(1.0, 0.1, 1.0), wood)
+	for d in [Vector2(-0.45, -0.45), Vector2(0.45, -0.45), Vector2(-0.45, 0.45), Vector2(0.45, 0.45)]:
+		_box(Vector3(sx + d.x, 0.75, sz + d.y), Vector3(0.08, 1.5, 0.08), wood)
+	_box(Vector3(sx + 1.6, 0.8, sz), Vector3(2.6, 0.08, 0.6), blue, 0.0)
+	# sandpit
+	var px := c.x - 5.0
+	var pz := c.y - 1.5
+	_box(Vector3(px, 0.15, pz), Vector3(3.0, 0.3, 3.0), sand)
+	for side in [[Vector3(0, 0.2, -1.55), Vector3(3.2, 0.4, 0.12)], [Vector3(0, 0.2, 1.55), Vector3(3.2, 0.4, 0.12)], [Vector3(-1.55, 0.2, 0), Vector3(0.12, 0.4, 3.2)], [Vector3(1.55, 0.2, 0), Vector3(0.12, 0.4, 3.2)]]:
+		_box(Vector3(px, 0, pz) + side[0], side[1], wood)
+	_bench(Vector3(c.x, 0, c.y + 5.0), 0.0)
+
+
+func _bench(at: Vector3, yaw: float) -> void:
+	var wood := Color(0.5, 0.35, 0.2)
+	var b := Basis(Vector3.UP, yaw)
+	_box(at + Vector3(0, 0.45, 0), Vector3(1.8, 0.06, 0.4), wood, yaw)
+	_box(at + Vector3(0, 0.8, 0) + b * Vector3(0, 0, -0.2), Vector3(1.8, 0.4, 0.05), wood, yaw)
+	for dx in [-0.75, 0.75]:
+		_box(at + b * Vector3(dx, 0.22, 0), Vector3(0.08, 0.45, 0.4), Color(0.25, 0.25, 0.25), yaw)
+
+
+func _park() -> void:
+	var c := _centroid()
+	var ext := Vector2.ZERO
+	for p in polygon:
+		ext = ext.max((p - c).abs())
+	var r := minf(ext.x, ext.y) * 0.5
+	if r < 3.0:
+		return
+	for i in 4:
+		var a := i * TAU / 4.0
+		_bench(Vector3(c.x + cos(a) * r, 0, c.y + sin(a) * r), -a)
+
+
+## Hedge or fence along the boundary, inset a little; gaps where the boundary is long enough for a gate.
+func _boundary(h: float, thickness: float, col: Color, seg: float, gaps: bool) -> void:
+	var n := polygon.size()
+	var c := _centroid()
+	for i in n:
+		var a := polygon[i]
+		var b := polygon[(i + 1) % n]
+		var dir := b - a
+		var length := dir.length()
+		if length < 1.0:
+			continue
+		dir /= length
+		var inward := (c - (a + b) / 2.0).normalized() * 0.6
+		var count := int(length / seg)
+		for k in count:
+			if gaps and k % 9 == 4:
+				continue   # a gate
+			var t := (k + 0.5) * seg
+			var p := a + dir * t + inward
+			_box(Vector3(p.x, h / 2.0, p.y), Vector3(seg * 0.95, h, thickness), col, -atan2(dir.y, dir.x))

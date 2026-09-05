@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://bhjg8j8d2dsee"
+valid=false
+
+[deps]
+
+source_file="res://sites/palupera/roads.json"
+
+[params]
+
+compress=true

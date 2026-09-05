@@ -36,13 +36,13 @@ func _snap_children() -> void:
 	_snap_list(get_children(), terrain)
 	# one level deeper for container groups (the village massing, the real footprints)
 	for c in get_children():
-		if c is Node3D and c.get_child_count() > 0 and c.name in ["Village", "Buildings"]:
+		if c is Node3D and c.get_child_count() > 0 and c.name in ["Village", "Buildings", "Parcels"]:
 			_snap_list(c.get_children(), terrain)
 
 
 func _snap_list(nodes: Array, terrain: Terrain3D) -> void:
 	for c in nodes:
-		if c is Node3D:
+		if c is Node3D and not c.has_meta("no_snap"):
 			var h := terrain.data.get_height(c.global_position)
 			if c.has_meta("footprint"):
 				# buildings: sit on the lowest corner so nothing hangs in the air; the skirt fills the rest

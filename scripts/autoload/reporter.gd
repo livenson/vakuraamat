@@ -74,6 +74,7 @@ func capture(note: String, world: Node) -> String:
 		"position": [snappedf(pos.x, 0.01), snappedf(pos.y, 0.01), snappedf(pos.z, 0.01)],
 		"yaw_deg": snappedf(rad_to_deg(player.rotation.y), 0.1), "pitch_deg": snappedf(rad_to_deg(cam.rotation.x), 0.1),
 		"target": _describe(interactor.target if interactor else null, pos),
+		"parcel": Parcels.at(pos), "road": _nearest_road(layer, pos), "links": links_for(pos, interactor.target if interactor else null, layer),
 		"nearby": _nearby(layer, pos), "buildings_nearby": _buildings_nearby(layer, pos),
 		"flags": TimelineState.flags.keys(), "artifacts": Inventory.artifacts.duplicate(),
 		"errors": recent_errors.duplicate(), "screenshot": shot,
@@ -93,6 +94,54 @@ func capture(note: String, world: Node) -> String:
 	print("[Reporter] %s" % ProjectSettings.globalize_path(base + ".json"))
 	reported.emit(ProjectSettings.globalize_path(base + ".json"))
 	return ProjectSettings.globalize_path(base + ".json")
+
+
+func _nearest_road(layer: Node, pos: Vector3) -> Dictionary:
+	if layer == null:
+		return {}
+	var rn: Node = layer.find_child("Roads", true, false)
+	return rn.nearest(pos) if rn and rn.has_method("nearest") else {}
+
+
+## Registry links for what is around: the cadastral unit under `pos`, the building looked at (or the
+## nearest one), the ETAK object search. Used by the codes overlay (K) and the reports.
+func links_for(pos: Vector3, target: Node, layer: Node) -> Dictionary:
+	var out := {}
+	var u := Parcels.at(pos)
+	if not u.is_empty():
+		out["cadastre"] = str(u.get("link", ""))
+		if u.get("land_registry"):
+			out["land_registry_number"] = str(u.land_registry)
+	var fb: Node = null
+	var n := target
+	while n and not (n is FootprintBuilding):
+		n = n.get_parent()
+	if n is FootprintBuilding:
+		fb = n
+	elif layer:
+		var best := 25.0
+		for c in layer.find_children("*", "FootprintBuilding", true, false):
+			var d: float = c.global_position.distance_to(pos)
+			if d < best and c.is_visible_in_tree():
+				best = d
+				fb = c
+	if fb:
+		var text := FileAccess.get_file_as_string(Sites.path("buildings.json"))
+		var parsed = JSON.parse_string(text) if text != "" else null
+		if typeof(parsed) == TYPE_DICTIONARY:
+			for b in parsed.get("buildings", []):
+				if int(b.id) == fb.building_id:
+					out["etak_id"] = int(b.id)
+					if b.get("ehr"):
+						out["ehr"] = "https://livekluster.ehr.ee/ui/ehr/v1/building/%s" % str(b.ehr)
+					out["etak_search"] = "https://geoportaal.maaamet.ee/est/ruumiandmed/eesti-topograafia-andmekogu/etaki-kirje-otsing-p872.html"
+					break
+	var geo: TerrainGeoref = GameState.world.georef if GameState.world and GameState.world.georef else null
+	if geo and geo.is_valid():
+		var e: Vector2 = geo.world_to_lest97(pos)
+		out["xgis_map"] = "https://xgis.maaamet.ee/xgis2/page/app/maainfo?punkt=%d,%d&moot=500" % [int(e.x), int(e.y)]
+		out["lest97"] = "%d %d" % [int(e.x), int(e.y)]
+	return out
 
 
 func _describe(n: Node, from: Vector3) -> Dictionary:

@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://ume7kdmmkkt1"
+valid=false
+
+[deps]
+
+source_file="res://assets/data/parcel_rules.json"
+
+[params]
+
+compress=true

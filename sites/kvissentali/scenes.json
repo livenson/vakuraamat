@@ -476,6 +476,15 @@
      "include_undated": true
     },
     {
+     "type": "roads",
+     "source": "roads.json"
+    },
+    {
+     "type": "parcels",
+     "source": "parcels.json",
+     "year": 2026
+    },
+    {
      "type": "farm_plots",
      "at": {
       "ref": "farm",

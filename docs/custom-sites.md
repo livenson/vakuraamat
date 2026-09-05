@@ -145,6 +145,29 @@ preferred as the story's landmark anchor. All of it is in `buildings.json` under
 well, a wooden house from 1930, a listed building). Buildings inside the layout's exclusion circles
 are skipped so hand-placed models keep their spot.
 
+## Cadastral units, roads and what stands on a plot
+
+`make parcels SITE=<id>` fetches the cadastral units of the tile (Maa-amet cadastre WFS: number,
+address, registered purposes, area, ownership, land-registry number, polygon) into
+`sites/<id>/parcels.json`; `make roads SITE=<id>` fetches ETAK roads (streets, other roads,
+pedestrian and cycle paths, trails; width, surface, name) into `roads.json`. Both run in `make tile`
+and the tile service.
+
+**What is generated for each plot is decided by `assets/data/parcel_rules.json`** (a pack can
+override it with `sites/<id>/parcel_rules.json`): the first rule matching the unit's purpose, size,
+ownership and the era year names a kit, built by `scripts/world/parcel_kit.gd`: `playground` (swing
+frame, slide, sandpit, bench) on small municipal public land, `park` (benches) on larger public land,
+`hedge` around residential plots, `fence` around industrial ones, or nothing. The `parcels` and
+`roads` nodes in `scenes.json` place them (generated packs: newest era; Palupera: 2026). Roads are
+ribbons on the terrain (`scripts/world/road_network.gd`): asphalt with kerbs for streets, light paving
+for footpaths, gravel for other roads and trails.
+
+**K in the game** shows the codes for where you stand and what you look at: the cadastral unit
+(number, address, purpose, area, ownership) with its X-GIS link, the building's ETAK id and Building
+Register link, the nearest road (name, type, width, surface), the target node path, and draws the
+unit's boundary on the ground; the links are copied to the clipboard. F8 reports carry the same
+`parcel`, `road` and `links` fields.
+
 ## Real trees
 
 `make real-trees SITE=<id>` (part of `make tile` and the service) fetches Maa-amet's single-tree

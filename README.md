@@ -83,6 +83,11 @@ blocks (`blocks/*.json`, composed by `tools/compose_story.py`): one NPC per era,
 between eras, a choice, visible traces in the later years and three endings, all placed on anchors
 found in the data. `make test` plays such a pack through end to end (`story_test`).
 
+**Streets, plots and facades:** ETAK roads become asphalt streets with kerbs, footpaths and gravel
+roads; every cadastral unit gets what its registered purpose implies (`assets/data/parcel_rules.json`:
+playground, park benches, garden hedge, industrial fence); buildings have textured facades by material,
+window rows per floor, doors and chimneys. K shows the cadastral number, building codes and registry links.
+
 **Real buildings and trees:** every building in a tile comes from the topographic database (footprint),
 the Building Register (year built, floors, purpose, facade and roof materials, heating, water, solar)
 and Maa-amet's LOD2 3D models (roof shapes); a building appears only in the eras after its first year

@@ -49,6 +49,13 @@ Every report becomes an event in the session; Claude reads the JSON and the scre
   is and relaunch itself on it. Use it after changes hot reload cannot take.
 - Also: `teleport x z [yaw]`, `era <id>`, `screenshot </abs.png>`, `quit`.
 
+## K: codes overlay
+
+K toggles an overlay with the cadastral unit under you (number, purpose, area, owner, X-GIS link),
+the building you look at (ETAK id, Building Register link), the nearest road and the target node, and
+draws the unit boundary; the links go to the clipboard. `python3 tools/dev.py codes` toggles it from
+outside. Reports include the same fields.
+
 ## /debug-game
 
 In Claude Code, `/debug-game [site | report-id]` (project skill in `.claude/skills/debug-game/`) launches the

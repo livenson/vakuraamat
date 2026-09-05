@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=31 format=3]
 
 [ext_resource type="Script" path="res://scripts/interaction/conditional.gd" id="1"]
 [ext_resource type="PackedScene" path="res://assets/models/props/oak.glb" id="2"]
@@ -13,8 +13,10 @@
 [ext_resource type="PackedScene" path="res://scenes/farming/farm_plot.tscn" id="11"]
 [ext_resource type="Script" path="res://scripts/farming/seed_bin.gd" id="12"]
 [ext_resource type="Script" path="res://scripts/world/footprint_building.gd" id="13"]
-[ext_resource type="Script" path="res://scripts/trading/trade_post.gd" id="14"]
-[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="15"]
+[ext_resource type="Script" path="res://scripts/world/road_network.gd" id="14"]
+[ext_resource type="Script" path="res://scripts/world/parcel_kit.gd" id="15"]
+[ext_resource type="Script" path="res://scripts/trading/trade_post.gd" id="16"]
+[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="17"]
 
 [sub_resource type="StandardMaterial3D" id="M1"]
 albedo_color = Color(0.450, 0.250, 0.100, 1)
@@ -66,7 +68,7 @@ albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
 [node name="era_2026" type="Node3D"]
-script = ExtResource("15")
+script = ExtResource("17")
 era_id = "era_2026"
 
 [node name="Oak" type="Node3D" parent="."]
@@ -430,6 +432,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 381159
+kind = "ruin"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B380430" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 450.3, 0, 211.8)
@@ -444,6 +450,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 380430
+kind = "ruin"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B6344831" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 394.0, 0, 245.0)
@@ -458,6 +468,10 @@ wall_color = Color(0.680, 0.680, 0.650, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6344831
+kind = "outbuilding"
+floors = 1
+facade = "väike- või suurplokk (vaht, mull, kergkruus, kärg, betoon jms)"
+roof_cover = "plaatmaterjal (seal hulgas tsementkiudplaat)"
 
 [node name="B6967038" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 363.0, 0, 278.7)
@@ -472,6 +486,10 @@ wall_color = Color(0.620, 0.360, 0.280, 1)
 roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 6967038
+kind = "outbuilding"
+floors = 1
+facade = "keraamiline tellis"
+roof_cover = "eterniit"
 
 [node name="B8200048" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 464.0, 0, 283.8)
@@ -487,6 +505,10 @@ roof_color = Color(0.450, 0.280, 0.240, 1)
 source = "buildings.json"
 building_id = 8200048
 well = true
+kind = "outbuilding"
+floors = 1
+facade = "metall (seal hulgas plekk või profiilplekk)"
+roof_cover = "plekk"
 
 [node name="B380433" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 402.1, 0, 285.1)
@@ -501,6 +523,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 380433
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B383790" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 210.8, 0, 290.3)
@@ -515,6 +541,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 383790
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B383792" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 863.0, 0, 313.6)
@@ -530,6 +560,10 @@ roof_color = Color(0.600, 0.300, 0.220, 1)
 source = "buildings.json"
 building_id = 383792
 chimney = true
+kind = "dwelling"
+floors = 2
+facade = "puit"
+roof_cover = "katusekivi"
 
 [node name="B379304" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 795.6, 0, 317.4)
@@ -544,6 +578,10 @@ wall_color = Color(0.620, 0.360, 0.280, 1)
 roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 379304
+kind = "outbuilding"
+floors = 1
+facade = "keraamiline tellis"
+roof_cover = "eterniit"
 
 [node name="B383376" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 877.5, 0, 328.5)
@@ -558,6 +596,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 383376
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B6343052" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 356.0, 0, 341.6)
@@ -572,6 +614,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6343052
+kind = "ruin"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B6344384" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 896.9, 0, 345.8)
@@ -586,6 +632,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6344384
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B9131790" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 407.5, 0, 348.1)
@@ -600,6 +650,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 9131790
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B383378" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 958.9, 0, 356.3)
@@ -614,6 +668,10 @@ wall_color = Color(0.740, 0.600, 0.320, 1)
 roof_color = Color(0.450, 0.280, 0.240, 1)
 source = "buildings.json"
 building_id = 383378
+kind = "dwelling"
+floors = 2
+facade = "puit (vooder)"
+roof_cover = "plekk"
 
 [node name="B383379" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 971.5, 0, 362.6)
@@ -629,6 +687,10 @@ roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 383379
 chimney = true
+kind = "outbuilding"
+floors = 1
+facade = "puudub"
+roof_cover = "plaatmaterjal (seal hulgas tsementkiudplaat)"
 
 [node name="B383381" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 966.9, 0, 375.6)
@@ -643,6 +705,10 @@ wall_color = Color(0.740, 0.600, 0.320, 1)
 roof_color = Color(0.220, 0.200, 0.190, 1)
 source = "buildings.json"
 building_id = 383381
+kind = "outbuilding"
+floors = 1
+facade = "puit (vooder)"
+roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
 
 [node name="B6092642" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 980.6, 0, 381.6)
@@ -657,6 +723,10 @@ wall_color = Color(0.740, 0.600, 0.320, 1)
 roof_color = Color(0.220, 0.200, 0.190, 1)
 source = "buildings.json"
 building_id = 6092642
+kind = "outbuilding"
+floors = 1
+facade = "puit (vooder)"
+roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
 
 [node name="B466991" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 851.3, 0, 393.5)
@@ -672,6 +742,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 466991
 chimney = true
+kind = "dwelling"
+floors = 2
+facade = "puit"
+roof_cover = "eterniit"
 
 [node name="B6343874" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 745.6, 0, 401.4)
@@ -686,6 +760,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6343874
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B466993" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 851.5, 0, 408.8)
@@ -701,6 +779,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 466993
 chimney = true
+kind = "outbuilding"
+floors = 1
+facade = "puit"
+roof_cover = "eterniit"
 
 [node name="B382021" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 331.0, 0, 423.0)
@@ -716,6 +798,10 @@ roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 382021
 well = true
+kind = "outbuilding"
+floors = 1
+facade = "puudub"
+roof_cover = "plaatmaterjal (seal hulgas tsementkiudplaat)"
 
 [node name="B379826" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 342.9, 0, 453.2)
@@ -730,6 +816,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 379826
+kind = "ruin"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B469816" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 769.6, 0, 465.9)
@@ -745,6 +835,10 @@ roof_color = Color(0.450, 0.280, 0.240, 1)
 source = "buildings.json"
 building_id = 469816
 chimney = true
+kind = "dwelling"
+floors = 2
+facade = "krohv"
+roof_cover = "plekk"
 
 [node name="B6345378" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 745.7, 0, 466.8)
@@ -759,6 +853,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6345378
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B379869" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 354.6, 0, 473.6)
@@ -773,6 +871,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 379869
+kind = "ruin"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B424126" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 463.6, 0, 476.4)
@@ -788,6 +890,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 424126
 chimney = true
+kind = "dwelling"
+floors = 2
+facade = "keraamiline tellis"
+roof_cover = "eterniit"
 
 [node name="B424127" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 725.4, 0, 478.9)
@@ -803,6 +909,10 @@ roof_color = Color(0.378, 0.342, 0.270, 1)
 source = "buildings.json"
 building_id = 424127
 chimney = true
+kind = "dwelling"
+floors = 2
+facade = "krohv"
+roof_cover = "plaatmaterjal (seal hulgas tsementkiudplaat)"
 
 [node name="B379872" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 420.0, 0, 492.1)
@@ -817,6 +927,10 @@ wall_color = Color(0.620, 0.360, 0.280, 1)
 roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 379872
+kind = "outbuilding"
+floors = 1
+facade = "keraamiline tellis"
+roof_cover = "eterniit"
 
 [node name="B378721" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 511.1, 0, 494.3)
@@ -831,6 +945,10 @@ wall_color = Color(0.550, 0.420, 0.280, 1)
 roof_color = Color(0.450, 0.280, 0.240, 1)
 source = "buildings.json"
 building_id = 378721
+kind = "outbuilding"
+floors = 1
+facade = "puit"
+roof_cover = "plekk"
 
 [node name="B430585" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 789.1, 0, 495.8)
@@ -845,6 +963,10 @@ wall_color = Color(0.740, 0.600, 0.320, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 430585
+kind = "outbuilding"
+floors = 0
+facade = "puit (vooder)"
+roof_cover = "plaatmaterjal (seal hulgas tsementkiudplaat)"
 
 [node name="B389491" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1030.1, 0, 496.8)
@@ -859,6 +981,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 389491
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B382540" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 635.5, 0, 501.4)
@@ -875,6 +1001,10 @@ source = "buildings.json"
 building_id = 382540
 chimney = true
 well = true
+kind = "dwelling"
+floors = 2
+facade = "puit (vooder)"
+roof_cover = "plekk"
 
 [node name="B473922" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 752.8, 0, 502.9)
@@ -890,6 +1020,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 473922
 chimney = true
+kind = "outbuilding"
+floors = 1
+facade = "keraamiline tellis"
+roof_cover = "eterniit"
 
 [node name="B389490" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 680.2, 0, 503.3)
@@ -905,6 +1039,10 @@ roof_color = Color(0.450, 0.280, 0.240, 1)
 source = "buildings.json"
 building_id = 389490
 chimney = true
+kind = "dwelling"
+floors = 2
+facade = "muu"
+roof_cover = "plekk"
 
 [node name="B6343847" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1016.5, 0, 507.8)
@@ -919,6 +1057,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6343847
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B378720" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 335.9, 0, 509.2)
@@ -934,6 +1076,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 378720
 chimney = true
+kind = "outbuilding"
+floors = 2
+facade = "keraamiline tellis"
+roof_cover = "eterniit"
 
 [node name="B378723" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 619.3, 0, 514.6)
@@ -950,6 +1096,10 @@ source = "buildings.json"
 building_id = 378723
 chimney = true
 well = true
+kind = "dwelling"
+floors = 2
+facade = "puit (palk)"
+roof_cover = "plekk"
 
 [node name="B6344835" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 744.3, 0, 522.4)
@@ -964,6 +1114,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6344835
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B378724" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 712.4, 0, 524.1)
@@ -979,6 +1133,10 @@ roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 378724
 chimney = true
+kind = "outbuilding"
+floors = 1
+facade = "väike- või suurplokk (vaht, mull, kergkruus, kärg, betoon jms)"
+roof_cover = "plaatmaterjal (seal hulgas tsementkiudplaat)"
 
 [node name="B7822510" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 739.6, 0, 524.6)
@@ -993,6 +1151,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 7822510
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B8861089" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 627.1, 0, 530.0)
@@ -1007,6 +1169,10 @@ wall_color = Color(0.740, 0.600, 0.320, 1)
 roof_color = Color(0.450, 0.280, 0.240, 1)
 source = "buildings.json"
 building_id = 8861089
+kind = "outbuilding"
+floors = 1
+facade = "puit (vooder)"
+roof_cover = "plekk"
 
 [node name="B6345610" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 664.2, 0, 541.3)
@@ -1022,6 +1188,10 @@ roof_color = Color(0.450, 0.280, 0.240, 1)
 source = "buildings.json"
 building_id = 6345610
 chimney = true
+kind = "outbuilding"
+floors = 1
+facade = "puit (vooder)"
+roof_cover = "plekk"
 
 [node name="B6344524" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 650.1, 0, 557.0)
@@ -1036,6 +1206,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6344524
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B7822474" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 309.8, 0, 559.0)
@@ -1051,6 +1225,10 @@ roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 7822474
 chimney = true
+kind = "outbuilding"
+floors = 2
+facade = "puudub"
+roof_cover = "info puudub"
 
 [node name="B379635" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 435.2, 0, 559.0)
@@ -1065,6 +1243,10 @@ wall_color = Color(0.880, 0.820, 0.680, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 379635
+kind = "outbuilding"
+floors = 2
+facade = "krohv"
+roof_cover = "puit/laast"
 
 [node name="B381197" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1019.8, 0, 593.7)
@@ -1079,6 +1261,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 381197
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B6345089" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 993.6, 0, 599.5)
@@ -1093,6 +1279,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6345089
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B6343367" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1019.1, 0, 607.0)
@@ -1107,6 +1297,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6343367
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B381198" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1006.1, 0, 611.0)
@@ -1122,6 +1316,10 @@ roof_color = Color(0.378, 0.342, 0.270, 1)
 source = "buildings.json"
 building_id = 381198
 chimney = true
+kind = "dwelling"
+floors = 0
+facade = "muu"
+roof_cover = "muu"
 
 [node name="B7876741" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 503.2, 0, 621.0)
@@ -1136,6 +1334,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 7876741
+kind = "outbuilding"
+floors = 1
+facade = "muu"
+roof_cover = "eterniit"
 
 [node name="B379828" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 678.6, 0, 623.7)
@@ -1151,6 +1353,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 379828
 chimney = true
+kind = "dwelling"
+floors = 1
+facade = "puit"
+roof_cover = "eterniit"
 
 [node name="B7876744" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 505.9, 0, 624.5)
@@ -1165,6 +1371,10 @@ wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 7876744
+kind = "outbuilding"
+floors = 1
+facade = "tellis, väikeplokk"
+roof_cover = "eterniit"
 
 [node name="B379397" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 692.8, 0, 627.2)
@@ -1181,6 +1391,10 @@ source = "buildings.json"
 building_id = 379397
 chimney = true
 well = true
+kind = "outbuilding"
+floors = 1
+facade = "puit (vooder)"
+roof_cover = "eterniit"
 
 [node name="B464340" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 508.7, 0, 628.1)
@@ -1196,6 +1410,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 464340
 chimney = true
+kind = "outbuilding"
+floors = 1
+facade = "tellis, väikeplokk"
+roof_cover = "eterniit"
 
 [node name="B6344571" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 485.0, 0, 632.7)
@@ -1210,6 +1428,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6344571
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B464341" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 512.0, 0, 659.4)
@@ -1225,6 +1447,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 464341
 chimney = true
+kind = "dwelling"
+floors = 1
+facade = "puit"
+roof_cover = "eterniit"
 
 [node name="B464343" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 661.7, 0, 681.6)
@@ -1239,6 +1465,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 464343
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B464342" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 471.2, 0, 683.9)
@@ -1253,6 +1483,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 464342
+kind = "ruin"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B739808" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 597.8, 0, 697.3)
@@ -1268,6 +1502,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 739808
 chimney = true
+kind = "dwelling"
+floors = 1
+facade = "krohv"
+roof_cover = "eterniit"
 
 [node name="B7390677" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 980.9, 0, 704.4)
@@ -1282,6 +1520,10 @@ wall_color = Color(0.740, 0.600, 0.320, 1)
 roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 7390677
+kind = "outbuilding"
+floors = 1
+facade = "puit (vooder)"
+roof_cover = "eterniit"
 
 [node name="B380594" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 631.4, 0, 705.3)
@@ -1296,6 +1538,10 @@ wall_color = Color(0.620, 0.360, 0.280, 1)
 roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 380594
+kind = "outbuilding"
+floors = 1
+facade = "keraamiline tellis"
+roof_cover = "eterniit"
 
 [node name="B380595" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 985.1, 0, 707.0)
@@ -1310,6 +1556,10 @@ wall_color = Color(0.740, 0.600, 0.320, 1)
 roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 380595
+kind = "outbuilding"
+floors = 1
+facade = "puit (vooder)"
+roof_cover = "eterniit"
 
 [node name="B380596" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 967.3, 0, 708.2)
@@ -1324,6 +1574,10 @@ wall_color = Color(0.740, 0.600, 0.320, 1)
 roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 380596
+kind = "outbuilding"
+floors = 1
+facade = "puit (vooder)"
+roof_cover = "eterniit"
 
 [node name="B6343361" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 934.3, 0, 716.9)
@@ -1339,6 +1593,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 6343361
 chimney = true
+kind = "outbuilding"
+floors = 1
+facade = "puit (palk)"
+roof_cover = "eterniit"
 
 [node name="B383500" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 984.0, 0, 719.7)
@@ -1354,6 +1612,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 383500
 chimney = true
+kind = "dwelling"
+floors = 1
+facade = "puit"
+roof_cover = "eterniit"
 
 [node name="B382363" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 931.4, 0, 803.2)
@@ -1369,6 +1631,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 382363
 chimney = true
+kind = "dwelling"
+floors = 2
+facade = "krohv"
+roof_cover = "eterniit"
 
 [node name="B382531" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 969.0, 0, 810.7)
@@ -1384,6 +1650,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 382531
 chimney = true
+kind = "dwelling"
+floors = 2
+facade = "krohv"
+roof_cover = "eterniit"
 
 [node name="B6342852" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 950.7, 0, 816.9)
@@ -1398,6 +1668,10 @@ wall_color = Color(0.740, 0.600, 0.320, 1)
 roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 6342852
+kind = "outbuilding"
+floors = 1
+facade = "puit (vooder)"
+roof_cover = "eterniit"
 
 [node name="B6345180" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 959.8, 0, 818.5)
@@ -1412,6 +1686,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6345180
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B6344450" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 933.9, 0, 868.3)
@@ -1428,6 +1706,10 @@ source = "buildings.json"
 building_id = 6344450
 chimney = true
 well = true
+kind = "outbuilding"
+floors = 1
+facade = "puit (palk)"
+roof_cover = "plekk"
 
 [node name="B472353" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 951.1, 0, 874.8)
@@ -1444,6 +1726,10 @@ source = "buildings.json"
 building_id = 472353
 chimney = true
 well = true
+kind = "dwelling"
+floors = 2
+facade = "puit (vooder)"
+roof_cover = "plekk"
 
 [node name="B425593" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 933.1, 0, 884.0)
@@ -1458,6 +1744,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.450, 0.280, 0.240, 1)
 source = "buildings.json"
 building_id = 425593
+kind = "outbuilding"
+floors = 1
+facade = "info puudub"
+roof_cover = "plekk"
 
 [node name="B7427029" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 938.0, 0, 884.7)
@@ -1472,6 +1762,10 @@ wall_color = Color(0.550, 0.420, 0.280, 1)
 roof_color = Color(0.450, 0.280, 0.240, 1)
 source = "buildings.json"
 building_id = 7427029
+kind = "outbuilding"
+floors = 1
+facade = "puit"
+roof_cover = "plekk"
 
 [node name="B425594" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 606.6, 0, 907.7)
@@ -1487,6 +1781,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 425594
 chimney = true
+kind = "dwelling"
+floors = 1
+facade = "puit"
+roof_cover = "eterniit"
 
 [node name="B425596" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 616.1, 0, 920.6)
@@ -1501,6 +1799,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 425596
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B7822522" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 623.6, 0, 927.5)
@@ -1515,6 +1817,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 7822522
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B378310" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 695.8, 0, 939.2)
@@ -1529,6 +1835,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 378310
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B378311" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 716.3, 0, 942.9)
@@ -1544,6 +1854,10 @@ roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 378311
 chimney = true
+kind = "dwelling"
+floors = 1
+facade = "puit"
+roof_cover = "eterniit"
 
 [node name="B6345209" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 690.3, 0, 954.6)
@@ -1558,6 +1872,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 6345209
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B378312" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 684.6, 0, 1000.6)
@@ -1572,6 +1890,10 @@ wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.207, 0.171, 0.131, 1)
 source = "buildings.json"
 building_id = 378312
+kind = "outbuilding"
+floors = 0
+facade = ""
+roof_cover = ""
 
 [node name="B430587" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 978.0, 0, 1023.7)
@@ -1586,10 +1908,133 @@ wall_color = Color(0.550, 0.420, 0.280, 1)
 roof_color = Color(0.550, 0.550, 0.520, 1)
 source = "buildings.json"
 building_id = 430587
+kind = "outbuilding"
+floors = 1
+facade = "puit"
+roof_cover = "eterniit"
+
+[node name="Roads" type="Node3D" parent="."]
+script = ExtResource("14")
+source = "roads.json"
+metadata/no_snap = true
+
+[node name="Parcels" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("1")
+
+[node name="P17101_001_1998" type="Node3D" parent="Parcels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 912.0, 0, 196.6)
+script = ExtResource("1")
+
+[node name="Kit" type="Node3D" parent="Parcels/P17101_001_1998"]
+script = ExtResource("15")
+kit = "fence"
+tunnus = "17101:001:1998"
+polygon = PackedVector2Array(-112.7, 114.3, -14.5, 65.8, 57.8, 132.9, 70.0, 130.4, 110.9, 121.6, 163.1, 110.7, 200.6, 93.2, 213.2, 85.8, -213.2, -132.9)
+
+[node name="P58201_001_0228" type="Node3D" parent="Parcels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 534.3, 0, 602.1)
+script = ExtResource("1")
+
+[node name="Kit" type="Node3D" parent="Parcels/P58201_001_0228"]
+script = ExtResource("15")
+kit = "park"
+tunnus = "58201:001:0228"
+polygon = PackedVector2Array(-41.7, -3.7, -35.7, 2.0, -31.1, 7.2, -27.2, 12.8, -21.8, 20.8, -15.2, 29.4, -8.0, 39.5, 8.9, 62.2, 21.9, 80.1, 26.5, 85.7, 36.7, 98.2, 36.9, 88.5, 70.5, 60.9, 100.4, 37.3, 139.9, 3.2, 88.1, -60.4, 81.6, -69.9, 71.4, -97.1, 71.0, -98.2, 65.6, -96.1, 53.8, -93.2, 44.1, -92.1, 26.6, -91.4, 8.6, -91.2, -1.1, -90.8, -10.8, -90.1, -28.1, -86.2, -28.7, -89.2, -37.7, -87.1, -47.1, -83.4, -45.9, -80.6, -63.3, -72.6, -90.6, -61.5, -110.6, -53.6, -128.7, -45.7, -139.9, -40.4, -101.7, 0.4, -68.5, -26.9, -68.1, -27.3, -62.4, -22.3)
+
+[node name="P58201_002_0026" type="Node3D" parent="Parcels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 387.6, 0, 519.0)
+script = ExtResource("1")
+
+[node name="Kit" type="Node3D" parent="Parcels/P58201_002_0026"]
+script = ExtResource("15")
+kit = "fence"
+tunnus = "58201:002:0026"
+polygon = PackedVector2Array(102.7, -12.7, 97.5, -21.7, 57.3, -7.9, 38.8, -45.8, 39.9, -69.5, -29.8, -62.0, -51.8, -50.2, -86.4, -47.3, -102.0, 42.7, -102.6, 46.5, -48.8, 59.1, -41.6, 69.4, -37.3, 63.2, -8.2, 35.1)
+
+[node name="P58201_002_0831" type="Node3D" parent="Parcels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 995.7, 0, 811.3)
+script = ExtResource("1")
+
+[node name="Kit" type="Node3D" parent="Parcels/P58201_002_0831"]
+script = ExtResource("15")
+kit = "hedge"
+tunnus = "58201:002:0831"
+polygon = PackedVector2Array(-38.2, -16.5, -40.8, 9.9, 38.4, 16.5, 40.8, -9.8)
+
+[node name="P58201_002_1360" type="Node3D" parent="Parcels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -86.4, 0, 659.1)
+script = ExtResource("1")
+
+[node name="Kit" type="Node3D" parent="Parcels/P58201_002_1360"]
+script = ExtResource("15")
+kit = "fence"
+tunnus = "58201:002:1360"
+polygon = PackedVector2Array(-76.3, 61.3, 51.6, -68.7, 56.4, -73.8, 171.2, -201.8, 256.7, -297.3, 297.4, -179.4, 387.6, -187.4, 422.2, -190.3, 444.2, -202.1, 513.9, -209.6, 537.1, -220.0, 550.1, -219.1, 647.9, -253.7, 548.7, -494.8, 423.9, -489.7, 384.5, -462.2, 423.3, -411.3, 407.9, -385.0, 379.7, -356.4, 370.2, -419.3, 274.4, -384.4, 197.4, -501.3, 137.0, -598.4, 88.2, -549.0, 87.3, -548.1, 82.0, -543.0, 80.9, -541.9, 191.5, -475.8, 49.5, -329.5, 95.6, -274.9, 29.9, -205.1, 16.9, -112.4, -26.3, -67.4, -46.2, -63.5, -77.8, -71.9, -349.1, -67.0, -379.3, -67.0, -382.9, -67.0, -451.6, 65.5, -480.2, 65.6, -486.6, 69.4, -513.8, 103.1, -541.6, 138.3, -569.4, 173.6, -597.0, 208.7, -626.3, 245.9, -647.8, 272.7, -204.6, 271.9, 145.6, 598.3, 242.1, 430.1, 86.4, 236.3, -2.6, 140.2)
+
+[node name="P58201_002_1512" type="Node3D" parent="Parcels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 530.9, 0, 455.0)
+script = ExtResource("1")
+
+[node name="Kit" type="Node3D" parent="Parcels/P58201_002_1512"]
+script = ExtResource("15")
+kit = "park"
+tunnus = "58201:002:1512"
+polygon = PackedVector2Array(-67.2, -15.0, -34.5, 49.6, 5.3, 41.2, 38.4, 41.0, 59.9, 38.7, 67.1, 35.5, 30.6, -49.6)
+
+[node name="P58201_002_1513" type="Node3D" parent="Parcels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 670.9, 0, 400.9)
+script = ExtResource("1")
+
+[node name="Kit" type="Node3D" parent="Parcels/P58201_002_1513"]
+script = ExtResource("15")
+kit = "park"
+tunnus = "58201:002:1513"
+polygon = PackedVector2Array(-60.1, 84.1, 98.1, 4.0, 95.8, -1.4, 60.6, -84.1, -98.1, -2.7)
+
+[node name="P58201_002_1650" type="Node3D" parent="Parcels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 915.8, 0, 413.4)
+script = ExtResource("1")
+
+[node name="Kit" type="Node3D" parent="Parcels/P58201_002_1650"]
+script = ExtResource("15")
+kit = "fence"
+tunnus = "58201:002:1650"
+polygon = PackedVector2Array(3.8, -3.3, -2.1, -4.5, -3.9, 3.3, 2.1, 4.4)
+
+[node name="P58201_002_1670" type="Node3D" parent="Parcels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 343.4, 0, 399.4)
+script = ExtResource("1")
+
+[node name="Kit" type="Node3D" parent="Parcels/P58201_002_1670"]
+script = ExtResource("15")
+kit = "fence"
+tunnus = "58201:002:1670"
+polygon = PackedVector2Array(-0.5, -8.3, -8.7, 1.7, 1.5, 8.3, 8.7, -2.7)
+
+[node name="P58201_002_2480" type="Node3D" parent="Parcels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 808.5, 0, 345.9)
+script = ExtResource("1")
+
+[node name="Kit" type="Node3D" parent="Parcels/P58201_002_2480"]
+script = ExtResource("15")
+kit = "fence"
+tunnus = "58201:002:2480"
+polygon = PackedVector2Array(-18.2, -30.6, 7.3, 29.4, 9.7, 35.0, 18.1, 32.1, 17.8, 31.5, -9.2, -35.0)
+
+[node name="P58201_002_2500" type="Node3D" parent="Parcels"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 455.8, 0, 475.1)
+script = ExtResource("1")
+
+[node name="Kit" type="Node3D" parent="Parcels/P58201_002_2500"]
+script = ExtResource("15")
+kit = "hedge"
+tunnus = "58201:002:2500"
+polygon = PackedVector2Array(-5.1, -36.0, -28.3, -25.6, -29.4, -1.9, -10.9, 36.0, 29.3, 22.2, 5.1, -26.0)
 
 [node name="TradePost" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 484.0, 0, 535)
-script = ExtResource("14")
+script = ExtResource("16")
 era_id = "era_2026"
 post_name_key = "POST_2026"
 intro_key = "POST_2026_TEXT"

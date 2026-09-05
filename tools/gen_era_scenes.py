@@ -34,6 +34,8 @@ PRIMITIVES
   farm_plots   at count seeds                    trade_post  at key color
   manor_site   id at                             hunting     [max_animals]
   village      source                            massing boxes from a buildings json (x z w d h color)
+  roads        [source]                         ETAK roads/paths as terrain ribbons (roads.json)
+  parcels      [source year]                     cadastral units -> kits by assets/data/parcel_rules.json
   footprints   source [year include_undated respect_exclusions]  real ETAK/EHR footprints built <= year;
                                                  buildings inside layout exclusion circles are skipped
   use          fragment with={param: value}
@@ -235,7 +237,48 @@ class Scene:
                 extras += "\nsolar = true"
             if b.get("well"):
                 extras += "\nwell = true"
+            kind = "ruin" if str(b.get("type") or "") == "Vare" else b.get("kind", "dwelling")
+            mats = b.get("materials") or {}
+            extras += f'\nkind = "{kind}"\nfloors = {int(b.get("floors") or 0)}\nfacade = "{(mats.get("facade") or mats.get("wall_type") or "").replace(chr(34), "")}"\nroof_cover = "{(mats.get("roof_cover") or "").replace(chr(34), "")}"'
             self.node("Footprint", "Node3D", f"Buildings/{name}", f'script = ExtResource("{sc}")\npolygon = PackedVector2Array({pts})\nheight = {b["h"]}\nwall_color = {color(c)}\nroof_color = {color(rc)}\nsource = "{source_rel}"\nbuilding_id = {b.get("id", 0)}{extras}')
+            n += 1
+        return n
+
+    def roads(self, source_rel="roads.json"):
+        """ETAK roads drawn on the terrain at runtime (scripts/world/road_network.gd)."""
+        sc = self.ext_res("Script", "res://scripts/world/road_network.gd")
+        self.node("Roads", "Node3D", ".", f'script = ExtResource("{sc}")\nsource = "{source_rel}"\nmetadata/no_snap = true')
+
+    def parcels(self, units, rules, year, exclusions=()):
+        """Cadastral units -> kits by assets/data/parcel_rules.json (first matching rule; kit null = nothing)."""
+        sc = self.ext_res("Script", "res://scripts/world/parcel_kit.gd")
+        self.group("Parcels", ".", 0, 0)
+        n = 0
+        for u in units:
+            purposes = u.get("purpose") or []
+            kit = None
+            for r in rules:
+                if r.get("purpose") and not any(p in r["purpose"] for p in purposes):
+                    continue
+                area = float(u.get("area") or 0)
+                if "min_area" in r and area < r["min_area"]:
+                    continue
+                if "max_area" in r and area > r["max_area"]:
+                    continue
+                if r.get("ownership") and u.get("ownership") not in r["ownership"]:
+                    continue
+                if year is not None and (("from_year" in r and year < r["from_year"]) or ("until_year" in r and year > r["until_year"])):
+                    continue
+                kit = r.get("kit")
+                break
+            if not kit:
+                continue
+            if any(math.hypot(u["x"] - e[0], u["z"] - e[1]) < float(e[2]) + 10 for e in exclusions):
+                continue
+            pts = ", ".join(f"{p[0] - u['x']:.1f}, {p[1] - u['z']:.1f}" for p in u["polygon"])
+            name = "P" + str(u.get("tunnus", n)).replace(":", "_")
+            self.group(name, "Parcels", u["x"], u["z"])
+            self.node("Kit", "Node3D", f"Parcels/{name}", f'script = ExtResource("{sc}")\nkit = "{kit}"\ntunnus = "{u.get("tunnus", "")}"\npolygon = PackedVector2Array({pts})')
             n += 1
         return n
 
@@ -382,6 +425,19 @@ class Interpreter:
                 s.manor_site(n["id"], self.pos(n.get("at"), env))
             elif t == "hunting":
                 s.hunting(int(self.num(n.get("max_animals", 8), env)))
+            elif t == "roads":
+                if os.path.exists(os.path.join(self.site_dir, n.get("source", "roads.json"))):
+                    s.roads(n.get("source", "roads.json"))
+            elif t == "parcels":
+                src = os.path.join(self.site_dir, n.get("source", "parcels.json"))
+                rules_path = os.path.join(self.site_dir, "parcel_rules.json")
+                if not os.path.exists(rules_path):
+                    rules_path = os.path.join(ROOT, "assets/data/parcel_rules.json")
+                if os.path.exists(src) and os.path.exists(rules_path):
+                    units = json.load(open(src)).get("parcels", [])
+                    rules = json.load(open(rules_path)).get("rules", [])
+                    year = self.num(n.get("year"), env) if n.get("year") is not None else None
+                    s.parcels(units, rules, int(year) if year is not None else None, self.layout.get("exclusions", []))
             elif t == "footprints":
                 src = os.path.join(self.site_dir, n.get("source", "buildings.json"))
                 if os.path.exists(src):
