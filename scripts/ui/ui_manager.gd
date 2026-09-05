@@ -1061,6 +1061,8 @@ func _tile_texture(loc: Vector2i, pack: String) -> Texture2D:
 		return newest[-1].texture() if not newest.is_empty() else null
 	if pack == "":
 		return null
+	if _tile_ortho == null:
+		_tile_ortho = {}   # members added by a hot reload start as null on the live instance
 	if not _tile_ortho.has(pack):
 		var img := Image.load_from_file(Sites.tile_dir_of(pack) + "/ortho.jpg")
 		_tile_ortho[pack] = ImageTexture.create_from_image(img) if img else null
