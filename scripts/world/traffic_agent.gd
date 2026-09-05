@@ -294,6 +294,18 @@ static func _bike_crank(bb: Vector3, chrome: Material, rubber: Material) -> Node
 ## tubes, spoked wheels with tyres and rims, a crank with pedals (meta "crank": the agent turns it
 ## with the rider's pedalling), gloss paint and chrome. Built with the handlebar at +Z.
 static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Color) -> Node3D:
+	if not with_rider and ResourceLoader.exists(BIKE_MODEL):
+		# the parked bike and the mounted view: the Poly Pizza bicycle (Poly by Google, CC BY 3.0), 1.8 m long
+		var holder := Node3D.new()
+		var model: Node3D = (load(BIKE_MODEL) as PackedScene).instantiate()
+		var b: AABB = Interiors._bounds(model)
+		var k := 1.8 / maxf(maxf(b.size.x, b.size.z), 0.001)
+		model.scale = Vector3.ONE * k
+		model.position = Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k)
+		if b.size.x > b.size.z:
+			model.rotation.y = PI / 2.0
+		holder.add_child(model)
+		return holder
 	var root := Node3D.new()
 	var paint := StandardMaterial3D.new()
 	paint.albedo_color = [Color(0.12, 0.12, 0.14), Color(0.62, 0.1, 0.1), Color(0.15, 0.32, 0.6), Color(0.85, 0.85, 0.82), Color(0.2, 0.45, 0.3), Color(0.9, 0.55, 0.15)][r.randi() % 6]
@@ -364,6 +376,7 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 	return root
 
 
+const BIKE_MODEL := "res://assets/vendor/polypizza/bicycle.glb"
 const CAR_KIT := "res://assets/vendor/kenney_car_kit/glb/"
 const CAR_MODELS := ["sedan", "sedan", "sedan-sports", "hatchback-sports", "hatchback-sports", "suv", "suv-luxury", "van", "delivery", "taxi", "truck"]
 const CAR_SCALE := 1.4   # the kit's sedan is 2.55 x 1.5 x 1.45 m: at 1.4 it is 3.6 m long and 2 m tall, a cartoon car that still fits the street

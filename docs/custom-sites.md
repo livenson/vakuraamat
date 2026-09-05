@@ -221,6 +221,12 @@ Interaction components after Cogito's patterns (MIT, credited in `THIRD_PARTY.md
 - `Readable`: the notice board beside the entrance opens a page of the book with the building's
   register row, its tenants and its plot's owner (`UiManager.show_sheet`).
 
+Bathrooms (toilet, bathtub, sink and mirror, Kenney models from Poly Pizza) are one room of every
+home; boats (Quaternius, Google and jeremy models from Poly Pizza) moor along the long side of every
+still-water patch over 300 m², a sailboat on big water; the parked bicycle is the Google model.
+`tools/godot/model_preview.tscn -- --dir=res://assets/vendor/polypizza/ --fit=2` renders a vendored
+directory in a row, each model scaled to `--fit` metres.
+
 Check flags: `--enter="<address>@<deg>"` puts you inside, `--leave` steps back out and turns you
 to face the door.
 

@@ -71,6 +71,9 @@ its design documents in the repo root describe that version.
   18:30), `--own=<tunnus>+<structure>` buys a plot in a fresh local book and builds on it.
 - Data sources, make targets and the terrain pipeline are documented in `docs/data-pipeline.md`; the
   README only links there. Keep the README short.
+- Poly Pizza downloads cannot be scripted (403 on the file host); the user saves the glb by hand into
+  `assets/vendor/polypizza/<name>.glb`, then add a THIRD_PARTY.md row (Kenney and Quaternius there are
+  CC0, "Poly by Google" is CC BY 3.0). Scale every vendored model from its bounds (`Interiors._bounds`).
 - Prop checks without a world: `tools/godot/figure_preview.tscn` (the eight figures), `bike_preview.tscn`
   (bicycles with riders, side-on, a red block marking the riding direction).
 - Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`
