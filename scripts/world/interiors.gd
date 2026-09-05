@@ -219,6 +219,7 @@ func _build(b: FootprintBuilding) -> Node3D:
 			ramp_room = r
 	var ramp_edge := _ramp_edge(ramp_room.poly, door_pt, ramp_room.doorways)
 	var landing := _ramp_landing(ramp_room.poly, ramp_edge, fh)
+	var hole := _ramp_hole(ramp_room.poly, ramp_edge, fh)
 	var upper: Array = []
 	for r in rooms:
 		upper.append({"poly": r.poly, "role": "", "doorways": r.doorways})
@@ -230,8 +231,8 @@ func _build(b: FootprintBuilding) -> Node3D:
 		var y0 := floor0 + k * fh
 		var y1 := y0 + fh
 		var top := k == n_floors - 1
-		_slab(root, poly, y0, floor_mat, true, [] if k == 0 else [landing])
-		_slab(root, poly, y1 - SLAB, ceil_mat, false, [] if top or n_floors == 1 else [landing])
+		_slab(root, poly, y0, floor_mat, true, [] if k == 0 else [hole])
+		_slab(root, poly, y1 - SLAB, ceil_mat, false, [] if top or n_floors == 1 else [hole])
 		for i in poly.size():
 			var a := poly[i]
 			var c := poly[(i + 1) % poly.size()]
@@ -249,9 +250,10 @@ func _build(b: FootprintBuilding) -> Node3D:
 				var light := OmniLight3D.new()
 				light.position = Vector3(spot.x, y0 + minf(2.2, fh - 0.6), spot.y)
 				light.light_color = Color(1.0, 0.9, 0.75)
-				light.light_energy = 4.0
+				var room_area: float = absf(_area(room.poly))
+				light.light_energy = clampf(room_area / 12.0, 1.2, 4.0)   # a small room needs a small lamp, or the walls blow out
 				light.light_specular = 0.2
-				light.omni_range = 12.0
+				light.omni_range = clampf(sqrt(room_area) * 1.5, 5.0, 12.0)
 				light.omni_attenuation = 1.0
 				light.shadow_enabled = false
 				root.add_child(light)
@@ -285,24 +287,30 @@ func _partition(poly: PackedVector2Array, use: String, rng: RandomNumberGenerato
 		rect = rect.expand(p)
 	# cut across the longer axis, else the shorter; the cut keeps 1.5 m from the exterior door's coordinate
 	var vertical := rect.size.x >= rect.size.y
-	var cut := -1.0
-	for attempt in 2:
-		var span: float = rect.size.x if vertical else rect.size.y
-		var lo_edge: float = rect.position.x if vertical else rect.position.y
-		var door_c: float = door_pt.x if vertical else door_pt.y
-		var options: Array = [rng.randf_range(0.42, 0.58), rng.randf_range(0.42, 0.58)] if not once_only else [0.25, 0.75]
-		var best_d := -1.0
-		for t in options:
-			var c: float = lo_edge + span * t
-			var d := absf(c - door_c)
-			if d > best_d:
-				best_d = d
-				cut = c
-		if best_d >= 1.5:
+	var cut := 0.0
+	var have_cut := false
+	# a cut near the middle of the longer side, else the shorter, else off-centre: a door in the
+	# middle of both sides must still leave a room plan
+	var sets: Array = [[rng.randf_range(0.42, 0.58), rng.randf_range(0.42, 0.58)], [0.32, 0.68]] if not once_only else [[0.25, 0.75]]
+	for options in sets:
+		for attempt in 2:
+			var span: float = rect.size.x if vertical else rect.size.y
+			var lo_edge: float = rect.position.x if vertical else rect.position.y
+			var door_c: float = door_pt.x if vertical else door_pt.y
+			var best_d := -1.0
+			for t in options:
+				var c: float = lo_edge + span * t
+				var d := absf(c - door_c)
+				if d > best_d:
+					best_d = d
+					cut = c
+			if best_d >= 1.5:
+				have_cut = true
+				break
+			vertical = not vertical
+		if have_cut:
 			break
-		cut = -1.0
-		vertical = not vertical
-	if cut < 0.0:
+	if not have_cut:
 		return leaf
 	var pad := 5.0
 	var half: PackedVector2Array
@@ -495,23 +503,31 @@ func _use_of(b: FootprintBuilding, tenants: Array) -> String:
 	return "office"
 
 
-## Floor or ceiling: the inset polygon triangulated, with holes where the ramp lands (skipped triangles).
+## Floor or ceiling: the inset polygon, minus the stair notches (polygons that reach past the wall, so
+## the cut leaves plain polygons), triangulated.
 func _slab(root: Node3D, poly: PackedVector2Array, y: float, mat: Material, up: bool, holes: Array) -> void:
 	var st := SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var tris := Geometry2D.triangulate_polygon(poly)
+	var pieces: Array = [poly]
+	for h in holes:
+		var cut: Array = []
+		for piece in pieces:
+			for out in Geometry2D.clip_polygons(piece, h):
+				if out.size() >= 3 and not Geometry2D.is_polygon_clockwise(out) == Geometry2D.is_polygon_clockwise(piece):
+					continue   # an island hole the notch failed to open to the edge: keep the piece whole below
+				if out.size() >= 3:
+					cut.append(out)
+		pieces = cut if not cut.is_empty() else pieces
 	var shape_pts := PackedVector3Array()
-	for i in range(0, tris.size(), 3):
-		var p0 := poly[tris[i]]
-		var p1 := poly[tris[i + 1]]
-		var p2 := poly[tris[i + 2]]
-		var c := (p0 + p1 + p2) / 3.0
-		var skip := false
-		for h in holes:
-			if h.has_point(c):
-				skip = true
-		if skip:
-			continue
+	var flat: Array = []   # [p0, p1, p2] per triangle
+	for piece in pieces:
+		var tris := Geometry2D.triangulate_polygon(piece)
+		for i in range(0, tris.size(), 3):
+			flat.append([piece[tris[i]], piece[tris[i + 1]], piece[tris[i + 2]]])
+	for tri in flat:
+		var p0: Vector2 = tri[0]
+		var p1: Vector2 = tri[1]
+		var p2: Vector2 = tri[2]
 		var v0 := Vector3(p0.x, y, p0.y)
 		var v1 := Vector3(p1.x, y, p1.y)
 		var v2 := Vector3(p2.x, y, p2.y)
@@ -540,6 +556,28 @@ func _slab(root: Node3D, poly: PackedVector2Array, y: float, mat: Material, up: 
 		cs.shape = shape
 		body.add_child(cs)
 		root.add_child(body)
+
+
+## Painted casing round a window opening ([u0, u1, ylo, yhi] along the wall from `a`) and a sill
+## board below it, centred on the wall plane.
+func _casing(root: Node3D, a: Vector2, dir: Vector2, o: Array) -> void:
+	var trim := StandardMaterial3D.new()
+	trim.albedo_color = Color(0.93, 0.91, 0.86)
+	var yaw := -atan2(dir.y, dir.x)
+	var w: float = o[1] - o[0]
+	var h: float = o[3] - o[2]
+	for part in [[Vector3(0.07, h + 0.14, 0.08), Vector2(o[0] - 0.035, (o[2] + o[3]) * 0.5)], [Vector3(0.07, h + 0.14, 0.08), Vector2(o[1] + 0.035, (o[2] + o[3]) * 0.5)],
+			[Vector3(w + 0.14, 0.07, 0.08), Vector2((o[0] + o[1]) * 0.5, o[3] + 0.035)], [Vector3(w + 0.2, 0.04, 0.2), Vector2((o[0] + o[1]) * 0.5, o[2] - 0.02)]]:
+		var mi := MeshInstance3D.new()
+		var box := BoxMesh.new()
+		box.size = part[0] as Vector3
+		mi.mesh = box
+		mi.material_override = trim
+		var off: Vector2 = part[1]
+		var at: Vector2 = a + dir * off.x
+		mi.position = Vector3(at.x, off.y, at.y)
+		mi.rotation.y = yaw
+		root.add_child(mi)
 
 
 ## One inner wall between two floor heights: solid below the sill and above the lintel, piers between
@@ -587,6 +625,8 @@ func _wall(root: Node3D, a: Vector2, c: Vector2, y0: float, y1: float, mat: Mate
 		quad.call(o[0], o[1], y0, o[2])
 		quad.call(o[0], o[1], o[3], y1)
 		u = o[1]
+		if o[2] > y0 + 0.2:
+			_casing(root, a, dir, o)
 	quad.call(u, length, y0, y1)
 	st.generate_normals()
 	var mi := MeshInstance3D.new()
@@ -633,6 +673,20 @@ func _ramp_landing(poly: PackedVector2Array, edge: int, fh: float) -> Rect2:
 	return rect
 
 
+## The opening in the floor above the stair: over its upper 2.2 m of run, from beyond the wall to
+## 0.7 m past the stair's free side, so the climber has headroom and steps off onto solid floor.
+func _ramp_hole(poly: PackedVector2Array, edge: int, fh: float) -> PackedVector2Array:
+	var r := _ramp_rect(poly, edge, fh)
+	var start: Vector2 = r[0]
+	var dir: Vector2 = r[1]
+	var inward: Vector2 = r[2]
+	var run: float = r[3]
+	var end := start + dir * run
+	return PackedVector2Array([end - dir * 2.2 - inward * 1.0, end - inward * 1.0, end + inward * 1.8, end - dir * 2.2 + inward * 1.8])
+
+
+## The stair: steps as solid blocks over a walkable slope (the collider), a closed side, a handrail
+## on posts along the free side.
 func _ramp(root: Node3D, poly: PackedVector2Array, edge: int, y0: float, fh: float, mat: Material) -> void:
 	var r := _ramp_rect(poly, edge, fh)
 	var start: Vector2 = r[0]
@@ -656,13 +710,33 @@ func _ramp(root: Node3D, poly: PackedVector2Array, edge: int, y0: float, fh: flo
 			st.add_vertex(v[idx])
 	for tri in [[0, 1, 2], [0, 2, 3]]:
 		faces.append_array([v[tri[0]], v[tri[1]], v[tri[2]]])
-	st.generate_normals()
-	var mi := MeshInstance3D.new()
-	mi.mesh = st.commit()
 	var m := StandardMaterial3D.new()
 	m.albedo_color = Color(0.5, 0.38, 0.26)
-	mi.material_override = m
-	root.add_child(mi)
+	var steps := maxi(3, int(round(fh / 0.18)))
+	var tread := run / steps
+	var rise := fh / steps
+	var yaw := -atan2(dir.y, dir.x)
+	for i in steps:
+		var top := y0 + (i + 1) * rise
+		var block := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(tread, top - y0, w)
+		block.mesh = bm
+		block.material_override = m
+		var centre := start + dir * ((i + 0.5) * tread) + inward * (w * 0.5)
+		block.position = Vector3(centre.x, y0 + (top - y0) * 0.5, centre.y)
+		block.rotation.y = yaw
+		root.add_child(block)
+	for i in range(0, int(run / 1.0) + 1):
+		var u := minf(i * 1.0 + 0.1, run - 0.1)
+		var post := MeshInstance3D.new()
+		var pm := BoxMesh.new()
+		pm.size = Vector3(0.05, 0.95, 0.05)
+		post.mesh = pm
+		post.material_override = mat
+		var at := start + dir * u + inward * (w + 0.05)
+		post.position = Vector3(at.x, y0 + fh * (u / run) + 0.475, at.y)
+		root.add_child(post)
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
 	var cs := CollisionShape3D.new()
@@ -727,11 +801,12 @@ const PLANS := {
 	"bedroom": [
 		{"kind": "anchor", "piece": "bedDouble", "sides": "cabinetBed"},
 		{"kind": "run", "pieces": ["bookcaseOpen"], "max": 1},
-		{"kind": "corners", "pieces": ["chair", "plantSmall2", "lampRoundFloor"]},
+		{"kind": "corners", "pieces": ["plantSmall2", "lampRoundFloor"]},
 	],
 	"hall": [
-		{"kind": "run", "pieces": ["bookcaseClosed"], "max": 1},
-		{"kind": "corners", "pieces": ["chair", "plantSmall3", "lampRoundFloor"]},
+		{"kind": "run", "pieces": ["bookcaseClosed", "cabinetBed"], "max": 2},
+		{"kind": "island", "piece": "table", "around": "chair", "min_area": 18.0},
+		{"kind": "corners", "pieces": ["plantSmall3", "lampRoundFloor"]},
 	],
 	"reception": [
 		{"kind": "anchor", "piece": "desk", "front": "chairDesk", "stack": "computerScreen"},

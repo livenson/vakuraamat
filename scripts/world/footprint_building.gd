@@ -348,6 +348,19 @@ func _register_face(pts: Array) -> void:
 	_wall_faces.append({"pts": pts, "n": nrm, "t": t, "umin": umin, "umax": umax, "ymin": ymin, "ymax": ymax})
 
 
+## Whether a w x h opening centred at (u, y) lies within the face polygon (gable ends are pentagons).
+func _fits_face(f: Dictionary, u: float, y: float, w: float, h: float) -> bool:
+	var outline := PackedVector2Array()
+	for p in f.pts:
+		outline.append(Vector2((p as Vector3).dot(f.t), (p as Vector3).y))
+	if outline.size() < 3:
+		return true
+	for corner in [Vector2(u - w / 2.0, y - h / 2.0), Vector2(u + w / 2.0, y - h / 2.0), Vector2(u + w / 2.0, y + h / 2.0), Vector2(u - w / 2.0, y + h / 2.0)]:
+		if not Geometry2D.is_point_in_polygon(corner, outline):
+			return false
+	return true
+
+
 func _quad_on_face(st: SurfaceTool, f: Dictionary, u: float, y: float, w: float, h: float, out: float) -> void:
 	var a: Vector3 = f.pts[0]
 	var base: Vector3 = a + f.t * (u - a.dot(f.t)) + Vector3.UP * (y - a.y) + f.n * out
@@ -397,6 +410,8 @@ func _openings() -> void:
 				var u: float = float(f.umin) + step * (c + 1)
 				if f == longest and k == 0 and c == cols / 2:
 					continue   # the door goes here
+				if not _fits_face(f, u, y, win_w + 0.3, win_h + 0.3):
+					continue   # under the slope of a gable: the face is a pentagon there
 				_quad_on_face(_trim, f, u, y, win_w + 0.16, win_h + 0.16, 0.02)
 				_quad_on_face(_windows, f, u, y, win_w, win_h, 0.04)
 	if not longest.is_empty():

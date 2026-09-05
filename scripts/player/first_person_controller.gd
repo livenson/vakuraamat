@@ -173,7 +173,7 @@ func _physics_process(delta: float) -> void:
 
 	if not is_on_floor():
 		velocity += get_gravity() * delta
-	elif Input.is_action_just_pressed("jump"):
+	elif input_enabled and Input.is_action_just_pressed("jump"):   # not while typing a report
 		velocity.y = jump_velocity
 
 	var dir := (transform.basis * Vector3(input.x, 0.0, input.y)).normalized()
