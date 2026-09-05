@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://b48k0ao6odok6"
+valid=false
+
+[deps]
+
+source_file="res://sites/kvissentali/buildings.json"
+
+[params]
+
+compress=true

@@ -34,6 +34,8 @@ PRIMITIVES
   farm_plots   at count seeds                    trade_post  at key color
   manor_site   id at                             hunting     [max_animals]
   village      source                            massing boxes from a buildings json (x z w d h color)
+  footprints   source [year include_undated respect_exclusions]  real ETAK/EHR footprints built <= year;
+                                                 buildings inside layout exclusion circles are skipped
   use          fragment with={param: value}
 """
 import argparse, json, math, os, random, sys
@@ -205,6 +207,38 @@ class Scene:
         m = self.mat(c)
         self.node(name, "MeshInstance3D", parent, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, {y_center}, 0)\nmesh = {mesh}\nsurface_material_override/0 = {m}')
 
+    def footprints(self, buildings, year, include_undated, source_rel="buildings.json", exclusions=()):
+        """Real footprints (sites/<id>/buildings.json from ETAK + EHR): one FootprintBuilding per building
+        whose first year of use is <= year (undated ones only when include_undated). The node reads the
+        LOD2 roof model at runtime from the pack's buildings.json by id."""
+        sc = self.ext_res("Script", "res://scripts/world/footprint_building.gd")
+        self.group("Buildings", ".", 0, 0)
+        n = 0
+        for b in buildings:
+            y = b.get("year")
+            if (y is None and not include_undated) or (y is not None and year is not None and y > year):
+                continue
+            if str(b.get("status") or "").endswith("LAMMUTATUD"):
+                continue
+            if any(math.hypot(b["x"] - e[0], b["z"] - e[1]) < float(e[2]) + max(b["w"], b["d"]) / 2 for e in exclusions):
+                continue   # hand-placed content (manor, farm...) stands here
+            pts = ", ".join(f"{p[0] - b['x']:.2f}, {p[1] - b['z']:.2f}" for p in b["polygon"])
+            c = b.get("wall_color") or b.get("color", [0.6, 0.6, 0.58])
+            rc = b.get("roof_color") or [k * 0.45 for k in c]
+            name = f"B{b.get('id', n)}"
+            self.group(name, "Buildings", b["x"], b["z"])
+            self.footprint(f"Buildings/{name}", b["w"], b["d"])
+            extras = ""
+            if b.get("chimney"):
+                extras += "\nchimney = true"
+            if b.get("solar") and year is not None and year >= 2005:
+                extras += "\nsolar = true"
+            if b.get("well"):
+                extras += "\nwell = true"
+            self.node("Footprint", "Node3D", f"Buildings/{name}", f'script = ExtResource("{sc}")\npolygon = PackedVector2Array({pts})\nheight = {b["h"]}\nwall_color = {color(c)}\nroof_color = {color(rc)}\nsource = "{source_rel}"\nbuilding_id = {b.get("id", 0)}{extras}')
+            n += 1
+        return n
+
     def village(self, buildings):
         """Real building footprints (from the nDSM) as simple massing boxes."""
         self.group("Village", ".", 0, 0)
@@ -348,6 +382,16 @@ class Interpreter:
                 s.manor_site(n["id"], self.pos(n.get("at"), env))
             elif t == "hunting":
                 s.hunting(int(self.num(n.get("max_animals", 8), env)))
+            elif t == "footprints":
+                src = os.path.join(self.site_dir, n.get("source", "buildings.json"))
+                if os.path.exists(src):
+                    data = json.load(open(src))
+                    blist = data.get("buildings", data) if isinstance(data, dict) else data
+                    year = self.num(n.get("year"), env) if n.get("year") is not None else None
+                    excl = self.layout.get("exclusions", []) if n.get("respect_exclusions", True) else []
+                    s.footprints(blist, int(year) if year is not None else None, bool(n.get("include_undated", False)), n.get("source", "buildings.json"), excl)
+                else:
+                    self.problems.append(f"footprints source missing: {src}")
             elif t == "village":
                 src = os.path.join(self.site_dir, n.get("source", "buildings_2026.json"))
                 if os.path.exists(src):

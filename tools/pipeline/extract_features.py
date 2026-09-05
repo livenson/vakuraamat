@@ -102,7 +102,11 @@ def find_anchors(heights, canopy, ortho, buildings):
     dist_r = np.hypot(xs - rx, ys - rz)
     landmark = None
     near = [bld for bld in buildings if math.hypot(bld["x"] - rx, bld["z"] - rz) <= 350 and math.hypot(bld["x"] - rx, bld["z"] - rz) >= 25]
-    if near:
+    notable = [bld for bld in near if bld.get("monument") or "mõis" in str(bld.get("name") or "").lower() or "kirik" in str(bld.get("name") or "").lower()]
+    if notable:
+        big = max(notable, key=lambda bld: bld["w"] * bld["d"])
+        landmark = [big["x"], big["z"] + big["d"] / 2 + 8]
+    elif near:
         big = max(near, key=lambda bld: bld["w"] * bld["d"])
         landmark = [big["x"], big["z"] + big["d"] / 2 + 8]
     elif canopy is not None:
@@ -181,7 +185,9 @@ def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2
     ponds.sort(key=lambda p: -p["area"])
     log(f"{len(ponds)} still-water patches (>= {min_pond} m²)")
 
-    anchors = find_anchors(heights, canopy, ortho, buildings)
+    reg_path = os.path.join(site_dir, "buildings.json")
+    reg = json.load(open(reg_path)).get("buildings", []) if os.path.exists(reg_path) else []
+    anchors = find_anchors(heights, canopy, ortho, reg or buildings)
     log("anchors " + ", ".join(f"{k} ({v[0]:.0f},{v[1]:.0f})" for k, v in anchors.items()))
     bfile = os.path.join(site_dir, m.get("buildings", "buildings_2026.json"))
     wfile = os.path.join(site_dir, m.get("water", "water_2026.json"))

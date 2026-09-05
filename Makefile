@@ -6,7 +6,7 @@ SITE ?= palupera
 TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
 CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
-.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate tile-service world-service
+.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate tile-service world-service buildings real-trees
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, gdal, git-lfs; npm for ink), pull LFS files, first Godot import"
@@ -42,10 +42,12 @@ import:
 tile:
 	python3 tools/pipeline/fetch_tile.py --site $(SITE)
 	python3 tools/new_site.py --id $(SITE) --relink-era-maps
+	$(MAKE) real-trees
 	$(MAKE) import
 	$(GODOT) --headless --path . -s res://tools/godot/import_terrain.gd -- --site=$(SITE) --tile=$(TILE)
 	$(MAKE) scatter
 	@[ -s sites/$(SITE)/buildings_2026.json ] && [ "$$(cat sites/$(SITE)/buildings_2026.json)" != "[]" ] || $(MAKE) features
+	@[ -s sites/$(SITE)/buildings.json ] || $(MAKE) buildings
 	$(MAKE) scenes
 	python3 tools/validate_site.py --site $(SITE)
 
@@ -64,6 +66,12 @@ era-maps:
 
 features:
 	python3 tools/pipeline/extract_features.py --site $(SITE)
+
+buildings:
+	python3 tools/pipeline/fetch_buildings.py --site $(SITE)
+
+real-trees:
+	python3 tools/pipeline/fetch_trees.py --site $(SITE)
 
 scenes:
 	python3 tools/gen_era_scenes.py --site $(SITE)

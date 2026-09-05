@@ -1,15 +1,16 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=22 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/npc/npc.tscn" id="1"]
 [ext_resource type="Script" path="res://scripts/interaction/conditional.gd" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/props/examine_point.tscn" id="3"]
 [ext_resource type="Script" path="res://scripts/trading/trade_post.gd" id="4"]
-[ext_resource type="PackedScene" path="res://scenes/farming/farm_plot.tscn" id="5"]
-[ext_resource type="Script" path="res://scripts/farming/seed_bin.gd" id="6"]
-[ext_resource type="Script" path="res://scripts/hunting/hunting_spawner.gd" id="7"]
-[ext_resource type="Script" path="res://scripts/interaction/story_point.gd" id="8"]
-[ext_resource type="PackedScene" path="res://scenes/props/pickup.tscn" id="9"]
-[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/world/footprint_building.gd" id="5"]
+[ext_resource type="PackedScene" path="res://scenes/farming/farm_plot.tscn" id="6"]
+[ext_resource type="Script" path="res://scripts/farming/seed_bin.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/hunting/hunting_spawner.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/interaction/story_point.gd" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/props/pickup.tscn" id="10"]
+[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="11"]
 
 [sub_resource type="BoxShape3D" id="TP_era_1798_1"]
 size = Vector3(2.6, 2.4, 2.2)
@@ -49,7 +50,7 @@ albedo_color = Color(0.550, 0.530, 0.500, 1)
 roughness = 0.9
 
 [node name="era_1798" type="Node3D"]
-script = ExtResource("10")
+script = ExtResource("11")
 era_id = "era_1798"
 
 [node name="Local1798" parent="." instance=ExtResource("1")]
@@ -62,7 +63,7 @@ height = 1.7
 pose = "stand"
 
 [node name="Landmark" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 267.0, 0, 297.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 235.5, 0, 499.2)
 script = ExtResource("2")
 
 [node name="LandmarkExamine" parent="Landmark" instance=ExtResource("3")]
@@ -112,23 +113,27 @@ collision_mask = 0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 shape = SubResource("TP_era_1798_1")
 
-[node name="Farming" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 178.0, 0, 546.0)
+[node name="Buildings" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 script = ExtResource("2")
 
-[node name="Plot0" parent="Farming" instance=ExtResource("5")]
+[node name="Farming" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 178.0, 0, 545.0)
+script = ExtResource("2")
+
+[node name="Plot0" parent="Farming" instance=ExtResource("6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0)
 plot_id = "plot0"
 era_id = "era_1798"
 
-[node name="Plot1" parent="Farming" instance=ExtResource("5")]
+[node name="Plot1" parent="Farming" instance=ExtResource("6")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 0)
 plot_id = "plot1"
 era_id = "era_1798"
 
 [node name="SeedBin" type="Node3D" parent="Farming"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, 0)
-script = ExtResource("6")
+script = ExtResource("7")
 era_id = "era_1798"
 seed_item_ids = Array[String](["seed_rye", "seed_oats"])
 
@@ -146,16 +151,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 shape = SubResource("SB_era_1798_7")
 
 [node name="HuntingSpawner" type="Node3D" parent="."]
-script = ExtResource("7")
+script = ExtResource("8")
 era_id = "era_1798"
 max_animals = 6
 
 [node name="WellStoryGroup" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 534.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 533.0)
 script = ExtResource("2")
 
 [node name="WellStory" type="Node3D" parent="WellStoryGroup"]
-script = ExtResource("8")
+script = ExtResource("9")
 knot = "well_choice"
 speaker_key = "NPC_1798"
 text_key = "EX_WELL_OPEN"
@@ -171,7 +176,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
 shape = SubResource("S9")
 
 [node name="WellSite" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 534.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 533.0)
 script = ExtResource("2")
 
 [node name="HalfRing" type="CSGTorus3D" parent="WellSite"]
@@ -182,14 +187,14 @@ sides = 12
 ring_sides = 6
 material = SubResource("M10")
 
-[node name="Pickup_bell_clapper" parent="." instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 273.0, 0, 292.0)
+[node name="Pickup_bell_clapper" parent="." instance=ExtResource("10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 241.5, 0, 494.2)
 item_id = "bell_clapper"
 era_id = "era_1798"
 examine_key = "ITEM_BELL_CLAPPER_DESC"
 
-[node name="Pickup_graft_bundle" parent="." instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 164.0, 0, 541.0)
+[node name="Pickup_graft_bundle" parent="." instance=ExtResource("10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 164.0, 0, 540.0)
 item_id = "graft_bundle"
 era_id = "era_1798"
 examine_key = "ITEM_GRAFT_BUNDLE_DESC"

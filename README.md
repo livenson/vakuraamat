@@ -83,6 +83,12 @@ blocks (`blocks/*.json`, composed by `tools/compose_story.py`): one NPC per era,
 between eras, a choice, visible traces in the later years and three endings, all placed on anchors
 found in the data. `make test` plays such a pack through end to end (`story_test`).
 
+**Real buildings and trees:** every building in a tile comes from the topographic database (footprint),
+the Building Register (year built, floors, purpose, facade and roof materials, heating, water, solar)
+and Maa-amet's LOD2 3D models (roof shapes); a building appears only in the eras after its first year
+of use, coloured by its materials, with a chimney where there is a flue. In towns, every tree stands
+where the laser scan found it, at its measured height (Maa-amet single-tree models).
+
 **Friends:** `make world-service`, then *Share this world* in the Locations panel gives a code; a
 friend enters it under *Visit* and plays your world (regenerated on their side, starting from your
 committed consequences). What they trigger there comes back to you as deliveries the next time you

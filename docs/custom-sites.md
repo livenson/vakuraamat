@@ -114,6 +114,46 @@ option checks `visiting()`. They are listed in the ledger but not counted for th
 player is never blocked. The URLs of both services live in `user://settings.cfg` (`[service] url`,
 `[service] worlds_url`); your player name for deliveries is `[player] name`.
 
+## Real buildings: ETAK footprints, the Building Register, LOD2 roofs
+
+`make buildings SITE=<id>` (part of `make tile`, and of every tile-service job) writes
+`sites/<id>/buildings.json`:
+
+- **ETAK** (the topographic database, WFS) gives every building polygon in the tile and its type;
+- the **Building Register (EHR)** adds, per building code, the first year of use, floors, footprint
+  area, volume, purpose and status;
+- **Maa-amet Geo3D LOD2** adds the actual roof geometry (FileGDB per municipality, read with GDAL;
+  the municipality comes from the address gazetteer);
+- the tile's **nDSM** gives a measured height where the model is missing.
+
+The `footprints` node in `scenes.json` (`{"type": "footprints", "source": "buildings.json", "year":
+1938}`) places one `FootprintBuilding` per building whose first year of use is not later than the
+era's year (undated buildings only where `include_undated` is set, normally the newest era), so the
+1938 layer of a generated pack shows only the houses that stood in 1938. The node builds the LOD2
+mesh at runtime (walls and roof as two materials, a foundation skirt, a trimesh collider) or, without
+a model, extrudes the footprint to its measured height. Palupera uses real footprints in 2026 and its
+hand-placed manor, school and farm models in the older eras; generated packs use footprints in every
+era. `buildings_2026.json` (laser massing boxes, `village` node) remains as the fallback when the
+register is unreachable.
+
+The register's technical indicators shape each building: facade material sets the wall colour
+(plaster, brick, wood siding, fibre-cement, concrete...), roof covering the roof colour (tile, sheet
+metal, eternit, bitumen), heat source and fuel add a chimney, solar electricity adds panels (from 2005
+on), an own dug well puts a stone ring beside the house, and monuments or manor main buildings are
+preferred as the story's landmark anchor. All of it is in `buildings.json` under `materials`,
+`chimney`, `solar`, `well`, `monument`, so a story block can also read it (a house with its own
+well, a wooden house from 1930, a listed building). Buildings inside the layout's exclusion circles
+are skipped so hand-placed models keep their spot.
+
+## Real trees
+
+`make real-trees SITE=<id>` (part of `make tile` and the service) fetches Maa-amet's single-tree
+models (trunk position, height, crown diameter, conifer or deciduous) for the tile into
+`assets/terrain/<tile>/trees.json`. The dataset covers towns flown at low altitude in 2020–2024
+(Tartu yes, Palupera no); where it exists the terrain builder places every measured tree with the
+matching species and scale instead of the statistical scatter, and keeps the statistical bushes and
+grass. Tiles without coverage are unchanged.
+
 ## Iterating
 
 | Change | Then run |
