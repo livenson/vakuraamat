@@ -1,0 +1,15 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://d2mkyfus8be1r"
+path="res://.godot/imported/era_2026.ink.json-91923442b219ff4fdb7e22acd54c9aa1.res"
+
+[deps]
+
+source_file="res://sites/palupera/narrative/era_2026.ink.json"
+dest_files=["res://.godot/imported/era_2026.ink.json-91923442b219ff4fdb7e22acd54c9aa1.res"]
+
+[params]
+
+compress=true

@@ -2,12 +2,12 @@
 
 importer="inkgd.ink.json"
 type="Resource"
-uid="uid://cy0jmhu5ad4m4"
+uid="uid://cjkl6de0fcesf"
 valid=false
 
 [deps]
 
-source_file="res://data/site_layout.json"
+source_file="res://sites/palupera/buildings_2026.json"
 
 [params]
 

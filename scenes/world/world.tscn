@@ -1,7 +1,6 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/world/world.gd" id="1_world"]
-[ext_resource type="Terrain3DAssets" path="res://assets/terrain/palupera/terrain_assets.tres" id="2_assets"]
 [ext_resource type="Shader" path="res://assets/terrain/ortho_drape.gdshader" id="3_shader"]
 [ext_resource type="Script" path="res://addons/sky_3d/src/Sky3D.gd" id="4_sky3d"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="5_player"]
@@ -16,9 +15,7 @@ shader_override = ExtResource("3_shader")
 script = ExtResource("1_world")
 
 [node name="Terrain3D" type="Terrain3D" parent="."]
-data_directory = "res://assets/terrain/palupera/data"
 material = SubResource("Terrain3DMaterial_ground")
-assets = ExtResource("2_assets")
 collision_mode = 1
 collision_radius = 64
 

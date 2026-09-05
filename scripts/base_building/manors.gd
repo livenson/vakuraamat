@@ -3,23 +3,21 @@ extends Node
 
 signal structure_built(manor_id: String, structure_id: String)
 
-const MANOR_DIR := "res://data/manors/"
-const STRUCT_DIR := "res://data/structures/"
-
 var manors: Dictionary = {}       # id -> ManorDefinition
 var structures: Dictionary = {}   # id -> StructureDefinition
 var built: Dictionary = {}        # manor_id -> Array[String] of structure ids
 
 
 func _ready() -> void:
-	for pair in [[MANOR_DIR, manors], [STRUCT_DIR, structures]]:
-		var d := DirAccess.open(pair[0])
-		if d:
-			for f in d.get_files():
-				f = f.trim_suffix(".remap")
-				if f.ends_with(".tres"):
-					var r: Resource = load(pair[0] + f)
-					pair[1][r.id] = r
+	Sites.site_changed.connect(func(_id): reload())
+	reload()
+
+
+func reload() -> void:
+	manors.clear()
+	structures.clear()
+	Sites.load_dir(Sites.data_dir("manors"), manors)
+	Sites.load_dir(Sites.data_dir("structures"), structures)
 
 
 func built_at(manor_id: String) -> Array:

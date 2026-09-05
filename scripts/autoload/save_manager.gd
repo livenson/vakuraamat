@@ -28,7 +28,8 @@ func has_save(slot: String = AUTOSAVE) -> bool:
 
 func save(slot: String = AUTOSAVE) -> bool:
 	var data := {
-		"version": 1,
+		"version": 2,
+		"site": Sites.active,
 		"saved_at": Time.get_datetime_string_from_system(),
 		"timeline": TimelineState.to_dict(),
 		"game": GameState.to_dict(),
@@ -57,6 +58,9 @@ func load_slot(slot: String = AUTOSAVE) -> bool:
 	if typeof(data) != TYPE_DICTIONARY:
 		push_error("corrupt save %s" % slot)
 		return false
+	var site := str(data.get("site", Sites.active))
+	if site != Sites.active and Sites.available.has(site):
+		Sites.select(site)   # registries reload; the menu normally does this before the world loads
 	TimelineState.from_dict(data.get("timeline", {}))
 	Inventory.from_dict(data.get("inventory", {}))
 	Journal.from_dict(data.get("journal", {}))
@@ -68,6 +72,14 @@ func load_slot(slot: String = AUTOSAVE) -> bool:
 	await GameState.from_dict(data.get("game", {}))   # last: switches era, moves the player
 	dirty = false
 	return true
+
+
+## Site id recorded in a save, "" if none.
+func saved_site(slot: String = AUTOSAVE) -> String:
+	if not has_save(slot):
+		return ""
+	var data = JSON.parse_string(FileAccess.get_file_as_string(slot_path(slot)))
+	return str(data.get("site", "")) if typeof(data) == TYPE_DICTIONARY else ""
 
 
 func autosave() -> void:

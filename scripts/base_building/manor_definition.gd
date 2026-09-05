@@ -7,7 +7,7 @@ extends Resource
 @export var display_name_key: String
 @export var era_id: String
 @export var cadastral_parcel_id: String
-@export var location_terrain_tile: String = "palupera"
+@export var location_terrain_tile: String = ""      # optional note; the site manifest names the tile
 @export var position: Vector2                      # tile metres (x east, z south)
 @export var unlock_condition_flag: String = ""     # optional TimelineState flag gating access (read only)
 @export var structures: Array[String] = []         # StructureDefinition ids buildable here

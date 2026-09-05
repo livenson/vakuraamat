@@ -1,11 +1,8 @@
 # Registry of eras, consequence points and items, plus the current era, chapter and the
 # orchestration of era switching and chapter commits. Autoload "GameState".
 # The world scene registers itself here so switches can be applied to it.
+# Registries load from the active site pack (Sites.data_dir) and reload when it changes.
 extends Node
-
-const ERA_DIR := "res://data/eras/"
-const CP_DIR := "res://data/consequence_points/"
-const ITEM_DIR := "res://data/items/"
 
 var eras: Dictionary = {}                 # id -> EraDefinition
 var consequence_points: Dictionary = {}   # id -> ConsequencePoint
@@ -33,29 +30,29 @@ func reset() -> void:
 	Inventory.local = {}
 	Journal.entries = []
 	Journal.visited = {}
-	Trading.money = {"era_1798": 12, "era_1938": 150, "era_2026": 2000}
+	Trading.money = {}
+	for e in eras.values():
+		Trading.money[e.id] = e.starting_money
 	Manors.built = {}
 
 
 func _ready() -> void:
-	_load_dir(ERA_DIR, eras)
-	_load_dir(CP_DIR, consequence_points)
-	_load_dir(ITEM_DIR, items)
+	Sites.site_changed.connect(func(_id): reload())
+	reload()
+
+
+## (Re)load the registries from the active site pack.
+func reload() -> void:
+	eras.clear()
+	consequence_points.clear()
+	items.clear()
+	_cp_by_flag.clear()
+	Sites.load_dir(Sites.data_dir("eras"), eras)
+	Sites.load_dir(Sites.data_dir("consequence_points"), consequence_points)
+	Sites.load_dir(Sites.data_dir("items"), items)
 	for cp in consequence_points.values():
 		_cp_by_flag[cp.flag_name] = cp
-	print("[GameState] %d eras, %d consequence points, %d items" % [eras.size(), consequence_points.size(), items.size()])
-
-
-func _load_dir(dir: String, into: Dictionary) -> void:
-	var d := DirAccess.open(dir)
-	if d == null:
-		return
-	for f in d.get_files():
-		f = f.trim_suffix(".remap")   # exported builds list converted resources with this suffix
-		if f.ends_with(".tres") or f.ends_with(".res"):
-			var r: Resource = load(dir + f)
-			if r and "id" in r:
-				into[r.id] = r
+	print("[GameState] site %s: %d eras, %d consequence points, %d items" % [Sites.active, eras.size(), consequence_points.size(), items.size()])
 
 
 func era(id: String) -> EraDefinition:
