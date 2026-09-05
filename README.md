@@ -131,6 +131,9 @@ computed for the site's real latitude and longitude; the HUD shows the game cloc
 player's L-EST97 (EPSG:3301) easting/northing so alignment can be checked against
 Maa-amet's map viewer.
 
+To play on an Android TV over the home network, see [docs/tv-streaming.md](docs/tv-streaming.md)
+(Sunshine on the Mac, Moonlight on the TV; no account or cloud involved).
+
 ## Terrain pipeline (repeatable, two commands)
 
 ```sh
