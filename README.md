@@ -42,7 +42,9 @@ Farming, hunting, trading and building never reference the timeline, consequence
 artifact systems; the tests check that by grepping the source.
 
 Run the game: `godot --path .` (main menu). Controls: WASD, E interact, Tab register,
-J journal, I bag, L language, fullscreen from the menu (F11, on macOS Cmd+Ctrl+F; remembered in `user://settings.cfg`, `-- --fullscreen` / `-- --windowed` override once), Esc. Headless checks:
+J journal, I bag, L language, Esc menu (continue, fullscreen, language, save and quit).
+Fullscreen: F11, on macOS Cmd+Ctrl+F; remembered in `user://settings.cfg`, `-- --fullscreen` /
+`-- --windowed` override once. Headless checks:
 
 ```sh
 for t in boot_test playthrough_test farming_test hunting_test economy_test; do
@@ -121,7 +123,7 @@ the editor). Terrain3D's macOS binaries are unsigned; if Gatekeeper blocks them 
 tools/verify_spike.sh                                       # windowed run, screenshot + avg FPS, quits
 ```
 
-WASD move, Shift sprint (9 m/s), Ctrl dash (20 m/s), Space jump, Esc releases the mouse.
+WASD move, Shift sprint (9 m/s), Ctrl dash (20 m/s), Space jump, Esc opens the menu and releases the mouse.
 F toggles fly mode, a survey tool with no gravity or collision that moves where you look
 (40 m/s, Shift and Ctrl multiply). T teleports to the point you are looking at (ray-marched
 against the heightfield, so it works across the whole tile), H returns to the spawn point. Sky3D runs a 30-minute day/night cycle with the sun

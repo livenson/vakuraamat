@@ -44,6 +44,7 @@ var _trade_post: TradePost = null
 var build: PanelContainer
 var _manor_ctl: ManorController = null
 var debug_map: PanelContainer
+var pause: PanelContainer
 var _debug_canvas: Control
 var _open_panel: Control = null
 
@@ -66,6 +67,8 @@ func _ready() -> void:
 	trade = _build_panel("UI_TRADE")
 	build = _build_panel("UI_BUILD")
 	debug_map = _build_panel("UI_DEBUG_MAP")
+	pause = _build_panel("UI_MENU")
+	pause.custom_minimum_size = Vector2(600, 0)
 	debug_map.custom_minimum_size = Vector2(1180, 840)
 	_center_panel(debug_map)
 	move_child($Fade, get_child_count() - 1)
@@ -369,15 +372,20 @@ func _set_gameplay_input(on: bool) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		if _open_panel:
+			_close()
+		else:
+			_fill_pause()
+			_open(pause)
+		get_viewport().set_input_as_handled()
+		return
+	if _open_panel == pause:
+		return
 	if dialogue.visible:
 		if event.is_action_pressed("interact") or event.is_action_pressed("ui_accept") \
 				or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
 			_next_line()
-			get_viewport().set_input_as_handled()
-		return
-	if event.is_action_pressed("ui_cancel"):
-		if _open_panel:
-			_close()
 			get_viewport().set_input_as_handled()
 		return
 	if event.is_action_pressed("register"):
@@ -403,6 +411,7 @@ func _filler_for(p: Control) -> Callable:
 	if p == register: return _fill_register
 	if p == inventory: return _fill_inventory
 	if p == debug_map: return _fill_debug_map
+	if p == pause: return _fill_pause
 	return _fill_journal
 
 
@@ -423,6 +432,45 @@ func _clear_body(p: PanelContainer) -> VBoxContainer:
 		if c.name != "Title":
 			c.queue_free()
 	return body
+
+
+# --- pause menu (Esc)
+func _fill_pause() -> void:
+	var body := _clear_body(pause)
+	body.get_node("Title").text = tr("UI_MENU")
+	_pause_button(body, tr("UI_CONTINUE"), _close)
+	var fs := _pause_button(body, "", func(): WindowMode.set_fullscreen(not WindowMode.is_fullscreen()))
+	var relabel := func(on: bool):
+		fs.text = "%s: %s  (%s)" % [tr("MENU_FULLSCREEN"), tr("MENU_ON") if on else tr("MENU_OFF"), WindowMode.shortcut_text()]
+	relabel.call(WindowMode.is_fullscreen())
+	WindowMode.changed.connect(relabel, CONNECT_REFERENCE_COUNTED)
+	fs.tree_exiting.connect(func(): WindowMode.changed.disconnect(relabel))
+	_pause_button(body, tr("MENU_LANGUAGE"), func():
+		var next := "en" if TranslationServer.get_locale().begins_with("et") else "et"
+		TranslationServer.set_locale(next)
+		_refresh_era_label()
+		_fill_pause())
+	_pause_button(body, tr("UI_SAVE_MENU"), func():
+		SaveManager.autosave()
+		get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn"))
+	_pause_button(body, tr("UI_SAVE_QUIT"), func():
+		SaveManager.autosave()
+		get_tree().quit())
+	var hint := Label.new()
+	hint.text = tr("UI_KEYS")
+	hint.add_theme_font_size_override("font_size", 13)
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.add_child(hint)
+
+
+func _pause_button(body: VBoxContainer, text: String, cb: Callable) -> Button:
+	var b := Button.new()
+	b.text = text
+	b.add_theme_font_size_override("font_size", 22)
+	b.custom_minimum_size = Vector2(0, 42)
+	b.pressed.connect(cb)
+	body.add_child(b)
+	return b
 
 
 # --- register: the era switch
@@ -849,6 +897,7 @@ func debug_open(which: String) -> void:
 		"journal": _toggle(journal, _fill_journal)
 		"inventory": _toggle(inventory, _fill_inventory)
 		"map": _toggle(debug_map, _fill_debug_map)
+		"menu": _toggle(pause, _fill_pause)
 		"trade", "build":
 			var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
 			if layer:
