@@ -65,6 +65,14 @@ Estonian Land Board Open Data License — **free for commercial and non-commerci
   no API. Statistics Estonia (IA028 housing price index, JSON API) and Eesti Pank rates are the
   machine-readable macro inputs.
 
+### 1.11 e-Business Register open data
+- The Centre of Registers and Information Systems publishes every legal person daily as CSV, XML
+  and Parquet (CC BY 4.0): name, registry code, legal form, status, first entry date and the
+  registered address with its EHAK code and ADS address id. Detailed files (persons, shareholders,
+  annual reports) exist but are not used; personal identification numbers were removed in 2024.
+- The ADS address id (`ads_adr_id`) matches the Building Register's `adrId` for the same address,
+  which gives an exact company-to-building join without geocoding.
+
 ## 2. Target game artifacts
 
 Each raw data type maps to one or more of these final in-engine artifacts:
@@ -161,6 +169,12 @@ Historical maps present a genuinely different problem from modern DTM/orthophoto
 `land_value_per_m2`, `ehak`, `settlement`, `county`, `ads_oid`, and writes a `summary` block.
 `tools/pipeline/market.py` derives medians and quartiles per intended purpose into `market.json`, and
 can join a hand-exported Maa-amet XLSX (`--xlsx`) as `transactions`. Both files are committed with the pack.
+
+### 3.9 Register CSV → `tenants.json`
+`tools/pipeline/fetch_tenants.py` streams the zipped CSV, filters by the tile's EHAK codes, and
+matches by ADS id, then by a normalised street + number key against parcel and building addresses,
+then by farm name. Precedence and statistics are in the module docstring; the file keeps `match`
+and `via` per company so the game and the validator can tell an exact tenant from a street neighbour.
 
 ## 4. Recommended toolchain summary
 

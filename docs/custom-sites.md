@@ -183,6 +183,22 @@ statistics environment (https://www.maaruum.ee/kinnisvara/htraru/, XLSX only), `
 XLSX=<file>` joins it as `transactions`, which the game prefers when present. Older packs without
 `land_value` still load; re-run `make parcels SITE=<id>` to add it.
 
+### Tenants: real companies on real plots
+
+`make tenants` (also part of `make tile`) reads the e-Business Register's daily basic-data file
+(18 MB zip, CC BY 4.0, cached for a week under `data_raw/ariregister/`), keeps the companies whose
+settlement code is one of the tile's, and matches each to a parcel or building: first by the ADS
+address id that the Building Register records for every building, then by a normalised street and
+house number against parcel and building addresses (`Pikk tänav 4`, `Pikk tn 4` and `Pikk tn 4-11`
+are one key), then by farm name in villages. The result is `tenants.json`: registry code, name,
+legal form, status, first registration date, address, `tunnus`, `building_id`, `match` (`exact`,
+`street` for a company on one of the tile's streets whose number is outside it, `none`) and the
+register link. Only legal persons are kept; sole proprietors carry a person's name and are skipped
+(`--include-fie` overrides). Bankrupt and liquidating companies stay in the file flagged inactive,
+so their premises can stand empty in the game. `--stats` prints the match statistics and the
+unmatched street numbers, which is the loop for tuning the normaliser. Kvissentali matches about
+260 companies, four in five exactly; Palupera about 30.
+
 ## Traffic and the bicycle
 
 The `traffic` node (`{"type": "traffic", "year": 2026, "density": 1.0, "max_agents": 40}`) builds a
