@@ -123,6 +123,46 @@ def find_anchors(heights, canopy, ortho, buildings):
             {"register": register, "spawn": spawn, "landmark": landmark, "farm": farm, "trade": trade, "field": fld}.items()}
 
 
+def find_boats(ortho_path, size_m, heights, canopy, scale=2):
+    """Moored boats where the orthophoto shows them: bright, unsaturated blobs of a hull's size (2..60 m²)
+    with dark, low, treeless water around them (the river is the lowest ground of a tile), read at
+    1/scale m per pixel. Returns [{x, z, length, heading}] in tile metres; heading in degrees, the
+    hull's long axis, so the world can turn a model to it."""
+    px = size_m * scale
+    img = load_ortho(ortho_path, px)
+    r, g, b = img[..., 0], img[..., 1], img[..., 2]
+    v = img.max(axis=2)
+    sat = np.where(v > 0, (v - img.min(axis=2)) / np.maximum(v, 1e-6), 0)
+    low = heights < np.percentile(heights, 2) + 0.8                      # the river's level
+    if canopy is not None:
+        low &= box_fraction(canopy > 1.5, 4) < 0.05                      # no trees: not a shadow
+    low = np.kron(low, np.ones((scale, scale), dtype=bool))
+    water = (v < 0.3) & (sat < 0.55) & ((g - np.maximum(r, b)) < 0.06) & low
+    near_water = box_fraction(water, 5 * scale) > 0.3
+    bright = (v > 0.6) & (sat < 0.32) & ~water & near_water
+    out = []
+    m2 = 1.0 / (scale * scale)
+    for pix in components(bright, int(2 / m2)):
+        area = len(pix) * m2
+        if area > 60:
+            continue
+        ys, xs = pix[:, 0].astype(float), pix[:, 1].astype(float)
+        cy, cx = ys.mean(), xs.mean()
+        # water on the ring 1..3 m out: a hull sits in water, a car or a roof does not
+        ring = box_fraction(water, 3 * scale)[int(cy), int(cx)]
+        if ring < 0.35:
+            continue
+        cov = np.cov(np.vstack([xs - cx, ys - cy]))
+        vals, vecs = np.linalg.eigh(cov)
+        ax = vecs[:, 1]
+        length = 4.0 * math.sqrt(max(vals[1], 0.01)) / scale
+        if length < 2.5 or length > 12.0:
+            continue
+        out.append({"x": round(cx / scale, 1), "z": round(cy / scale, 1), "length": round(length, 1),
+                    "heading": round(math.degrees(math.atan2(ax[0], ax[1])), 1)})
+    return out
+
+
 def on_industrial_land(pond, site_dir):
     """A flat dark depression on production or business land is a solar field, a yard or a roof, not a pond
     (parcels.json, when the cadastre was fetched before this step)."""
@@ -240,6 +280,9 @@ def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2
     ponds.sort(key=lambda p: -p["area"])
     log(f"{len(ponds)} still-water patches (>= {min_pond} m²)")
 
+    boats = find_boats(os.path.join(tdir, meta["texture"]), size, heights, canopy)
+    log(f"{len(boats)} moored boats")
+
     reg_path = os.path.join(site_dir, "buildings.json")
     reg = json.load(open(reg_path)).get("buildings", []) if os.path.exists(reg_path) else []
     anchors = find_anchors(heights, canopy, ortho, reg or buildings)
@@ -254,6 +297,7 @@ def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2
         return buildings, ponds, anchors
     json.dump(buildings, open(bfile, "w"), indent=1)
     json.dump(ponds, open(wfile, "w"), indent=1)
+    json.dump(boats, open(os.path.join(site_dir, "boats_2026.json"), "w"), indent=1)
     json.dump(anchors, open(os.path.join(site_dir, "anchors.json"), "w"), indent=1)
     log(f"wrote {os.path.relpath(bfile, root)}, {os.path.relpath(wfile, root)} and anchors.json")
     return buildings, ponds, anchors

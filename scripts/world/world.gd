@@ -386,6 +386,7 @@ func place_water(pack: String, root: Node3D) -> void:
 		_water_mat.set_shader_parameter("foam_sampler", load("res://assets/textures/water/Foam.png"))
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("boats_" + pack)
+	_place_moored(pack, root)
 	for p in ponds:
 		var pond := Pond.new()
 		pond.name = "Pond"
@@ -396,6 +397,48 @@ func place_water(pack: String, root: Node3D) -> void:
 
 
 const BOATS := {"rowboat": 4.0, "canoe": 4.6, "boat": 5.0, "sailboat": 6.5}   # model -> length in metres
+
+
+## Boats where the orthophoto shows them: the feature pass writes boats_2026.json ([{x, z, length,
+## heading}] for bright hulls beside dark water); each gets a model by its length, at its heading.
+func _place_moored(pack: String, root: Node3D) -> void:
+	var path := Sites.path_in(pack, "boats_2026.json")
+	if not FileAccess.file_exists(path):
+		return
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(parsed) != TYPE_ARRAY:
+		return
+	for b in parsed:
+		var length := float(b.get("length", 4.0))
+		var name := "canoe" if length < 4.0 else ("rowboat" if length < 5.5 else ("boat" if length < 7.5 else "sailboat"))
+		var hull := _boat(name, clampf(length, 3.0, 9.0))
+		if hull == null:
+			continue
+		var at := Vector3(float(b.x), 0.0, float(b.z))
+		var h: float = terrain.data.get_height(at)
+		hull.position = Vector3(at.x, (h if not is_nan(h) else 0.0) + 0.05, at.z)
+		hull.rotation.y = deg_to_rad(float(b.get("heading", 0.0)))
+		root.add_child(hull)
+
+
+## A boat model with its long axis along local Z, scaled to `length` metres, standing on its origin.
+func _boat(name: String, length: float) -> Node3D:
+	var path := "res://assets/vendor/polypizza/%s.glb" % name
+	if not ResourceLoader.exists(path):
+		return null
+	var model: Node3D = (load(path) as PackedScene).instantiate()
+	var b: AABB = Interiors._bounds(model)
+	var longest := maxf(b.size.x, b.size.z)
+	if longest < 0.0001:
+		return null
+	var k := length / longest
+	var hull := Node3D.new()
+	model.scale = Vector3.ONE * k
+	model.position = Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k)
+	if b.size.x > b.size.z:
+		model.rotation.y = PI / 2.0
+	hull.add_child(model)
+	return hull
 
 ## Boats moored along the long side of a pond or bay (area in m²): one to four small boats, a
 ## sailboat on big water. Poly Pizza models (see THIRD_PARTY.md), scaled from their bounds.
@@ -411,21 +454,9 @@ func _moor_boats(p: Dictionary, root: Node3D, rng: RandomNumberGenerator) -> voi
 	var names: Array = ["rowboat", "canoe", "boat"]
 	for i in n:
 		var name: String = names[rng.randi() % names.size()] if not (i == 0 and area >= 2000.0) else "sailboat"
-		var path := "res://assets/vendor/polypizza/%s.glb" % name
-		if not ResourceLoader.exists(path):
+		var hull := _boat(name, BOATS[name])
+		if hull == null:
 			continue
-		var model: Node3D = (load(path) as PackedScene).instantiate()
-		var b: AABB = Interiors._bounds(model)
-		var longest := maxf(b.size.x, b.size.z)
-		if longest < 0.0001:
-			continue
-		var k: float = BOATS[name] / longest
-		var hull := Node3D.new()
-		model.scale = Vector3.ONE * k
-		model.position = Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k)
-		if b.size.x > b.size.z:
-			model.rotation.y = PI / 2.0   # the hull's long axis along the local Z
-		hull.add_child(model)
 		var t := (i + 0.5) / n
 		var side := 1.0 if rng.randf() < 0.5 else -1.0
 		var inset := minf(4.0, (d if along_x else w) * 0.3)
