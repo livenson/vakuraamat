@@ -20,6 +20,7 @@ config/features=PackedStringArray("4.7", "Forward Plus")
 EventBus="*res://scripts/autoload/event_bus.gd"
 Sites="*res://scripts/autoload/sites.gd"
 Locator="*res://scripts/autoload/locator.gd"
+SpacetimeDB="*res://spacetime_bindings/schema/spacetime_autoload.gd"
 Friends="*res://scripts/autoload/friends.gd"
 Reporter="*res://scripts/autoload/reporter.gd"
 DevChannel="*res://scripts/autoload/dev_channel.gd"
@@ -44,7 +45,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/inkgd/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
+enabled=PackedStringArray("res://addons/inkgd/plugin.cfg", "res://addons/sky_3d/plugin.cfg", "res://addons/terrain_3d/plugin.cfg", "res://addons/SpacetimeDB/plugin.cfg")
 
 [internationalization]
 

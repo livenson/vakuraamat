@@ -1,0 +1,33 @@
+{
+  "_doc": "Economy parameters shared by the town module (seeded by tools/town_admin.py) and the offline ledger. Money is whole euros; the period is a month.",
+  "starting_cash": 250000,
+  "seconds_per_month": 600,
+  "tax_rate_year": 0.005,
+  "yield_by_purpose": {
+    "ARIMAA": 0.08,
+    "TOOTMISMAA": 0.07,
+    "ELAMUMAA": 0.045,
+    "UHISKONDLIKE_EHITISTE_MAA": 0.03,
+    "MAATULUNDUSMAA": 0.015,
+    "ULDKASUTATAV_MAA": 0.0,
+    "TRANSPORDIMAA": 0.0,
+    "default": 0.01
+  },
+  "land_rate_per_m2": {
+    "_doc": "fallback EUR per m² when a parcel has no land_value",
+    "ARIMAA": 30.0,
+    "TOOTMISMAA": 20.0,
+    "ELAMUMAA": 25.0,
+    "UHISKONDLIKE_EHITISTE_MAA": 10.0,
+    "MAATULUNDUSMAA": 0.4,
+    "default": 2.0
+  },
+  "unsellable_ownership": ["Riigiomand", "Munitsipaalomand"],
+  "unsellable_purpose": ["TRANSPORDIMAA", "VEEKOGUDE_MAA", "KAITSEALUNE_MAA", "RIIGIKAITSEMAA"],
+  "arrears_chance": {"R": 0.03, "default": 0.12},
+  "drift": 0.01,
+  "ai_bid_chance": 0.2,
+  "families": ["Kask", "Tamm", "Lepik"],
+  "grace_months": 3,
+  "penalty": 0.1
+}

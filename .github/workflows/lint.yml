@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
       - name: gdlint project scripts (addons are vendored, not linted)
-        run: git ls-files '*.gd' | grep -v '^addons/' | xargs uvx --python 3.12 --from gdtoolkit==4.5.0 gdlint
+        run: git ls-files '*.gd' | grep -v '^addons/\|^spacetime_bindings/' | xargs uvx --python 3.12 --from gdtoolkit==4.5.0 gdlint
 
   python:
     name: ruff (Python tools)

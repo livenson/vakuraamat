@@ -1,0 +1,17 @@
+[package]
+name = "vakuraamat"
+version = "0.1.0"
+edition = "2021"
+description = "Vakuraamat town ledger: a SpacetimeDB module holding one town's parcels, owners, prices, obligations and news"
+license = "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+spacetimedb = "2.10"
+log = "0.4"
+vakuraamat-rules = { path = "rules" }
+
+[workspace]
+members = ["rules"]

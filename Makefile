@@ -6,7 +6,7 @@ SITE ?= palupera
 TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
 CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
-.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate tile-service world-service buildings real-trees dev-watch parcels roads market tenants
+.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate tile-service world-service buildings real-trees dev-watch parcels roads market tenants module server town
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, gdal, git-lfs; npm for ink), pull LFS files, first Godot import"
@@ -24,6 +24,9 @@ help:
 	@echo "make scenes           regenerate sites/$(SITE)/scenes/*.tscn from scenes.json + layout.json"
 	@echo "make validate         check every site pack for broken references (no Godot needed)"
 	@echo "make tenants          match e-Business Register companies to the tile's parcels and buildings into sites/$(SITE)/tenants.json"
+	@echo "make module           build the town ledger module (server/vakuraamat, Rust -> wasm; needs rustup with the wasm32 target)"
+	@echo "make server           run a local SpacetimeDB (spacetime start, 127.0.0.1:3300, log under the user dir)"
+	@echo "make town             publish the module as SITE's town (name from tools/town_admin.py) to SERVER and seed it from the pack"
 	@echo "make market           derive sites/$(SITE)/market.json (land value medians per purpose; XLSX=<maa-amet export> joins transaction statistics)"
 
 setup:
@@ -85,6 +88,24 @@ parcels:
 tenants:
 	python3 tools/pipeline/fetch_tenants.py --site $(SITE) --stats
 
+# SpacetimeDB toolchain: the CLI installs to ~/.local/bin, rustup (brew) to /opt/homebrew/opt/rustup/bin.
+STDB_PATH := /opt/homebrew/opt/rustup/bin:$(HOME)/.cargo/bin:$(HOME)/.local/bin:$(PATH)
+SERVER ?= http://127.0.0.1:3300
+TOWN ?= $(shell python3 tools/town_admin.py name --site $(SITE))
+USERDIR := $(HOME)/Library/Application Support/Godot/app_userdata/Vakuraamat
+
+module:
+	cd server/vakuraamat && PATH="$(STDB_PATH)" cargo test --quiet && PATH="$(STDB_PATH)" spacetime build
+
+server:
+	@mkdir -p "$(USERDIR)/logs"
+	@echo ">> SpacetimeDB on $(SERVER), log $(USERDIR)/logs/spacetime.log (Ctrl-C stops it)"
+	PATH="$(STDB_PATH)" spacetime start --listen-addr 127.0.0.1:3300 2>&1 | tee "$(USERDIR)/logs/spacetime.log"
+
+town: module
+	PATH="$(STDB_PATH)" spacetime publish -s $(SERVER) -p server/vakuraamat -y $(TOWN)
+	PATH="$(STDB_PATH)" python3 tools/town_admin.py seed --site $(SITE) --server $(SERVER) --db $(TOWN) $(if $(DEBUG),--debug)
+
 market:
 	python3 tools/pipeline/market.py --site $(SITE) $(if $(XLSX),--xlsx $(XLSX))
 
@@ -126,7 +147,7 @@ test:
 	  printf "%-18s " $$t; timeout 180 $(GODOT) --headless --path . res://tools/godot/$$t.tscn -- --site=palupera 2>&1 | grep -E "PASSED|FAILED" | head -1; if [ "$${PIPESTATUS[0]}" = 124 ]; then echo "TIMEOUT (stuck after 180 s)"; fi; done
 
 lint:
-	git ls-files '*.gd' | grep -v '^addons/' | xargs uvx --python 3.12 --from gdtoolkit==4.5.0 gdlint
+	git ls-files '*.gd' | grep -v '^addons/\|^spacetime_bindings/' | xargs uvx --python 3.12 --from gdtoolkit==4.5.0 gdlint
 	uvx ruff@0.16.6 check tools
 	git ls-files '*.sh' | xargs shellcheck
 

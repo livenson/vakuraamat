@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://b12w362ywdbtm"
+valid=false
+
+[deps]
+
+source_file="res://sites/palupera/market.json"
+
+[params]
+
+compress=true

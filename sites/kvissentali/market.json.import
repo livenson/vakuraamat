@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://d28x0idwa6hpu"
+valid=false
+
+[deps]
+
+source_file="res://sites/kvissentali/market.json"
+
+[params]
+
+compress=true
