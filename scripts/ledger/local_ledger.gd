@@ -35,22 +35,7 @@ func start(p_pack: String, player_name: String, seed_value: int = 0) -> void:
 	month = 0
 	price_index = 1000
 	_next_id = 1
-	for u in Parcels.units(pack):
-		var purpose: String = u.purpose[0] if u.get("purpose", []).size() > 0 else "SIHTOTSTARBETA_MAA"
-		var lv := int(u.get("land_value", 0) if u.get("land_value") != null else 0)
-		if lv <= 0:
-			lv = _fallback_value(purpose, int(u.get("area", 0)))
-		var sellable: bool = lv > 0 and not (u.get("ownership", "") in config.get("unsellable_ownership", [])) \
-			and not (purpose in config.get("unsellable_purpose", []))
-		parcels[u.tunnus] = {"tunnus": u.tunnus, "address": str(u.get("address", "")), "purpose": purpose, "area": int(u.get("area", 0)),
-			"land_value": lv, "price": list_price(lv), "rent_month": rent_month(lv, purpose), "owner_id": 0,
-			"owner_name": str(u.get("ownership", "")), "for_sale": sellable, "sellable": sellable, "x": float(u.get("x", 0)), "z": float(u.get("z", 0))}
-	var tpath := Sites.path_in(pack, "tenants.json")
-	if FileAccess.file_exists(tpath):
-		for t in _load_json(tpath).get("tenants", []):
-			if t.get("match") == "exact" and t.get("tunnus") != null and parcels.has(t.tunnus):
-				tenants.get_or_add(t.tunnus, []).append({"id": _id(), "tunnus": t.tunnus, "name": str(t.name), "registry_code": str(t.registry_code),
-					"legal_form": str(t.get("legal_form", "")), "status": str(t.get("status", "")), "since": str(t.get("since", "")), "arrears": 0})
+	add_pack(pack)
 	var defs := {}
 	Sites.load_dir(Sites.data_dir("structures"), defs)
 	for sid in defs:
@@ -59,6 +44,36 @@ func start(p_pack: String, player_name: String, seed_value: int = 0) -> void:
 			"display_name_key": s.display_name_key, "description_key": s.description_key}
 	me_id = add_player(player_name)
 	_event("tick", "Town opened with %d parcels" % parcels.size(), "", 0, 0)
+
+
+## The cadastral units and tenants of a pack into the book: the origin pack at start, a streamed
+## neighbour when its tile loads (positions shifted by the tile's offset). Units already known stay.
+func add_pack(p_pack: String, offset: Vector3 = Vector3.ZERO) -> int:
+	var added := 0
+	for u in Parcels.units(p_pack):
+		if parcels.has(u.tunnus):
+			continue
+		var purpose: String = u.purpose[0] if u.get("purpose", []).size() > 0 else "SIHTOTSTARBETA_MAA"
+		var lv := int(u.get("land_value", 0) if u.get("land_value") != null else 0)
+		if lv <= 0:
+			lv = _fallback_value(purpose, int(u.get("area", 0)))
+		var sellable: bool = lv > 0 and not (u.get("ownership", "") in config.get("unsellable_ownership", [])) \
+			and not (purpose in config.get("unsellable_purpose", []))
+		parcels[u.tunnus] = {"tunnus": u.tunnus, "address": str(u.get("address", "")), "purpose": purpose, "area": int(u.get("area", 0)),
+			"land_value": lv, "price": list_price(lv), "rent_month": rent_month(lv, purpose), "owner_id": 0,
+			"owner_name": str(u.get("ownership", "")), "for_sale": sellable, "sellable": sellable,
+			"x": float(u.get("x", 0)) + offset.x, "z": float(u.get("z", 0)) + offset.z, "pack": p_pack}
+		added += 1
+	var tpath := Sites.path_in(p_pack, "tenants.json")
+	if FileAccess.file_exists(tpath):
+		for t in _load_json(tpath).get("tenants", []):
+			if t.get("match") == "exact" and t.get("tunnus") != null and parcels.has(t.tunnus) and str(parcels[t.tunnus].get("pack", "")) == p_pack:
+				var rows: Array = tenants.get_or_add(t.tunnus, [])
+				if rows.any(func(r): return str(r.registry_code) == str(t.registry_code)):
+					continue
+				rows.append({"id": _id(), "tunnus": t.tunnus, "name": str(t.name), "registry_code": str(t.registry_code),
+					"legal_form": str(t.get("legal_form", "")), "status": str(t.get("status", "")), "since": str(t.get("since", "")), "arrears": 0})
+	return added
 
 
 func add_player(pname: String) -> int:

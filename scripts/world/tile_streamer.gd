@@ -220,6 +220,7 @@ func _load(loc: Vector2i) -> void:
 	t.state = "ready"
 	_hide_haze(loc)
 	print("[Tiles] %s ready at %s" % [pack, loc])
+	Ledger.add_pack(pack, offset_of(loc))
 	tile_ready.emit(loc, root)
 	if _hold != Vector3.INF and tile_of(_hold) == loc:
 		world._snap(world.player, 1.0)

@@ -84,6 +84,14 @@ func local() -> LocalLedger:
 	return _local
 
 
+## A streamed neighbour tile's plots into the offline book (the town server only holds its own tile).
+func add_pack(pack: String, offset: Vector3) -> void:
+	if online or _local == null or pack == "" or pack == Sites.active:
+		return
+	if _local.add_pack(pack, offset) > 0:
+		parcel_changed.emit("")
+
+
 func player_name() -> String:
 	return str(setting("player", "name", ""))
 
