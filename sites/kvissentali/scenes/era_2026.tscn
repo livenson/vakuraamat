@@ -6189,7 +6189,7 @@ transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 370.8,
 
 [node name="Kit" type="Node3D" parent="Parcels/P79514_036_0077"]
 script = ExtResource("4")
-kit = "park"
+kit = "court"
 tunnus = "79514:036:0077"
 polygon = PackedVector2Array(-38.0, -27.1, -35.4, 45.5, 10.6, 40.0, 24.9, 3.0, 38.0, -30.9, 20.9, -45.4, 12.3, -34.6, -5.3, -29.1, -32.7, -27.4)
 
