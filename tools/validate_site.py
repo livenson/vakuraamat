@@ -316,6 +316,8 @@ def validate(site, rep, root=ROOT):
                 for fn in ("flag", "has_item", "give_item", "take_item", "set_flag", "end_chapter", "chapter", "trigger"):
                     if f"EXTERNAL {fn}(" not in text:
                         rep.err(f"narrative/{f}: missing 'EXTERNAL {fn}(...)' declaration")
+                if "visiting()" in text and "EXTERNAL visiting()" not in text:
+                    rep.err(f"narrative/{f}: uses visiting() without declaring EXTERNAL visiting()")
                 for iid in re.findall(r'give_item\("([^"]+)"', text):
                     item(iid, f"narrative/{f}")
                 for cid in re.findall(r'trigger\("([^"]+)"', text):

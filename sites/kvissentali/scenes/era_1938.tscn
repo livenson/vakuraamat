@@ -54,7 +54,7 @@ albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
 [sub_resource type="StandardMaterial3D" id="M12"]
-albedo_color = Color(0.550, 0.530, 0.500, 1)
+albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
 [sub_resource type="StandardMaterial3D" id="M13"]
@@ -66,7 +66,7 @@ albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
 [sub_resource type="StandardMaterial3D" id="M15"]
-albedo_color = Color(0.300, 0.220, 0.140, 1)
+albedo_color = Color(0.550, 0.530, 0.500, 1)
 roughness = 0.9
 
 [node name="era_1938" type="Node3D"]
@@ -194,44 +194,6 @@ script = ExtResource("8")
 era_id = "era_1938"
 max_animals = 6
 
-[node name="WellRing" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 534.0)
-script = ExtResource("2")
-flag = "well_kept"
-visible_when = true
-
-[node name="Ring" type="CSGTorus3D" parent="WellRing"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
-inner_radius = 0.8
-outer_radius = 1.2
-sides = 12
-ring_sides = 6
-material = SubResource("M12")
-
-[node name="WellExamine" parent="WellRing" instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
-text_key = "EX_WELL_KEPT"
-location_id = "LOC_WELL"
-label_key = "LOC_WELL"
-
-[node name="WellDip" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 534.0)
-script = ExtResource("2")
-flag = "well_kept"
-visible_when = false
-
-[node name="DipExamine" parent="WellDip" instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
-text_key = "EX_WELL_DIP"
-location_id = "LOC_WELL"
-label_key = "LOC_WELL"
-
-[node name="Pickup_harvest_letter" parent="." instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 175.0, 0, 525.0)
-item_id = "harvest_letter"
-era_id = "era_1938"
-examine_key = "ITEM_HARVEST_LETTER_DESC"
-
 [node name="Pickup_deed_page" parent="." instance=ExtResource("9")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 261.0, 0, 301.0)
 item_id = "deed_page"
@@ -247,17 +209,17 @@ visible_when = true
 [node name="PostA" type="CSGBox3D" parent="Gate"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, -1.2, 1.1, 0)
 size = Vector3(0.18, 2.2, 0.18)
-material = SubResource("M13")
+material = SubResource("M12")
 
 [node name="PostB" type="CSGBox3D" parent="Gate"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 1.2, 1.1, 0)
 size = Vector3(0.18, 2.2, 0.18)
-material = SubResource("M14")
+material = SubResource("M13")
 
 [node name="Beam" type="CSGBox3D" parent="Gate"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0.0, 2.1, 0.0)
 size = Vector3(2.8, 0.15, 0.15)
-material = SubResource("M15")
+material = SubResource("M14")
 
 [node name="GateExamine" parent="Gate" instance=ExtResource("3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
@@ -276,6 +238,44 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
 text_key = "EX_GATE_GONE"
 location_id = "LOC_FIELD"
 label_key = "LOC_FIELD"
+
+[node name="Pickup_harvest_letter" parent="." instance=ExtResource("9")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 175.0, 0, 525.0)
+item_id = "harvest_letter"
+era_id = "era_1938"
+examine_key = "ITEM_HARVEST_LETTER_DESC"
+
+[node name="WellRing" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 534.0)
+script = ExtResource("2")
+flag = "well_kept"
+visible_when = true
+
+[node name="Ring" type="CSGTorus3D" parent="WellRing"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
+inner_radius = 0.8
+outer_radius = 1.2
+sides = 12
+ring_sides = 6
+material = SubResource("M15")
+
+[node name="WellExamine" parent="WellRing" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
+text_key = "EX_WELL_KEPT"
+location_id = "LOC_WELL"
+label_key = "LOC_WELL"
+
+[node name="WellDip" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 534.0)
+script = ExtResource("2")
+flag = "well_kept"
+visible_when = false
+
+[node name="DipExamine" parent="WellDip" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
+text_key = "EX_WELL_DIP"
+location_id = "LOC_WELL"
+label_key = "LOC_WELL"
 
 [node name="KeepsakeStone" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 267.0, 0, 297.0)

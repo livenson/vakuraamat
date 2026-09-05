@@ -6,8 +6,9 @@
 The game (scripts/autoload/locator.gd) talks to it:
     GET  /health                     -> {"ok": true}
     GET  /geocode?q=<text>           -> [{"name", "x", "y"}]           (Maa-amet in-ADS gazetteer)
-    POST /tile  {"id","name","x","y","size","eras"} -> 202 {"id"}     starts a job (or reuses a cached zip)
+    POST /tile  {"id","name","x","y","size","eras","seed","blocks"} -> 202 {"id"}   starts a job (or reuses a cached zip)
     GET  /status?id=<id>             -> {"stage","progress","done","error"}
+    GET  /packs                      -> [{"id","name","x","y","size","eras","seed","blocks"}]  packs ready in the cache
     GET  /download?id=<id>           -> zip with site/<pack files> and tile/<engine files>
 A job runs the same tools as `make site` + `make tile`, in a workspace outside the repo, with the
 download cache shared (data_raw/). Needs python3, numpy, GDAL and node (for the ink compiler).
@@ -64,7 +65,7 @@ def run_job(job):
         open(os.path.join(ws, ".gdignore"), "a").close()
         stage("scaffold", 0.05)
         new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid, template="palupera",
-                          force=True, root=ws, template_root=ROOT, texture_mode="path")
+                          force=True, root=ws, template_root=ROOT, texture_mode="path", seed=job.get("seed"), block_ids=job.get("blocks"))
         stage("fetching Maa-amet data", 0.1)
         subprocess.run([sys.executable, os.path.join(ROOT, "tools/pipeline/fetch_tile.py"), "--project", ws, "--site", sid,
                         "--raw-dir", os.path.join(ROOT, "data_raw")], check=True)
@@ -127,6 +128,18 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(200, geocode(q))
             except Exception as e:  # noqa: BLE001
                 return self._json(502, {"error": str(e)})
+        if u.path == "/packs":
+            packs = []
+            for f in sorted(os.listdir(WORKSPACE)):
+                if f.endswith(".zip"):
+                    sid = f[:-4]
+                    mpath = os.path.join(WORKSPACE, sid, "sites", sid, "site.json")
+                    if os.path.exists(mpath):
+                        m = json.load(open(mpath))
+                        packs.append({"id": sid, "name": m.get("description", sid).split(":")[0], "x": m["terrain"]["center"][0], "y": m["terrain"]["center"][1],
+                                      "size": m["terrain"]["size"], "eras": ",".join(str(e).rsplit("_", 1)[-1] for e in sorted(os.listdir(os.path.join(WORKSPACE, sid, "sites", sid, "data", "eras"))) if e.endswith(".tres")).replace(".tres", ""),
+                                      "seed": m.get("story", {}).get("seed"), "blocks": m.get("story", {}).get("blocks")})
+            return self._json(200, packs)
         if u.path == "/status":
             sid = qs.get("id", [""])[0]
             with LOCK:
@@ -173,6 +186,7 @@ class Handler(BaseHTTPRequestHandler):
                 JOBS[sid] = {"id": sid, "stage": "ready", "progress": 1.0, "done": True}
                 return self._json(202, {"id": sid, "stage": "ready"})
             job = {"id": sid, "name": name, "x": x, "y": y, "size": size, "eras": eras, "force": bool(req.get("force")),
+                   "seed": int(req["seed"]) if req.get("seed") is not None else None, "blocks": req.get("blocks") or None,
                    "stage": "queued", "progress": 0.0, "done": False}
             JOBS[sid] = job
         threading.Thread(target=run_job, args=(job,), daemon=True).start()

@@ -471,6 +471,10 @@ func _fill_pause() -> void:
 		TranslationServer.set_locale(next)
 		_refresh_era_label()
 		_fill_pause())
+	_pause_button(body, tr("MENU_LOCATIONS"), func():
+		SaveManager.autosave()
+		GameState.menu_open_locations = true
+		get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn"))
 	_pause_button(body, tr("UI_SAVE_MENU"), func():
 		SaveManager.autosave()
 		get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn"))

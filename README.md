@@ -83,6 +83,11 @@ blocks (`blocks/*.json`, composed by `tools/compose_story.py`): one NPC per era,
 between eras, a choice, visible traces in the later years and three endings, all placed on anchors
 found in the data. `make test` plays such a pack through end to end (`story_test`).
 
+**Friends:** `make world-service`, then *Share this world* in the Locations panel gives a code; a
+friend enters it under *Visit* and plays your world (regenerated on their side, starting from your
+committed consequences). What they trigger there comes back to you as deliveries the next time you
+load, as consequences with a ledger line. Some quest blocks can only be finished by a visitor.
+
 A pack holds everything place-specific: `site.json` (terrain tile and centre, sun position, era
 ground maps, spawn, journal locations, objectives, ending rules), `layout.json`, `scenes.json`,
 `data/` (eras, consequence points, items, manors, structures, trade goods, crops, animals),

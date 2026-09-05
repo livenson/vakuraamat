@@ -67,23 +67,6 @@ STRUCT_SWING_DESC,Jaanipäevaks.,For midsummer.
 NPC_1798,Peep,Peep
 NPC_1938,Elmar,Elmar
 NPC_2026,Kadri,Kadri
-LOC_WELL,Kaev,The well
-CP_WELL_TRIGGER,Sa aitasid kaevu lahti hoida aastal 1798.,You helped keep the well open in 1798.
-CP_WELL_EFFECT,Kaev jäi. Hilisematel aastatel on talul oma vesi.,The well stayed. In the later years the farm has its own water.
-EX_WELL_OPEN,Pooleli kaev. Käsk on see täis ajada. Keegi ei taha.,A half-dug well. The order is to fill it in. Nobody wants to.
-EX_WELL_KEPT,"Kiviring. Vesi on all, külm ja magus.","A ring of stones. The water is down there, cold and sweet."
-EX_WELL_DIP,Lohk maapinnas. Siin oli kord kaev.,A dip in the ground. There was a well here once.
-ITEM_HARVEST_LETTER,Kiri,A letter
-ITEM_HARVEST_LETTER_DESC,"„Sellele, kes leiab. Esimesest lõikusest.“","""To whoever finds this. From the first harvest."""
-CP_LETTER_TRIGGER,"Sa andsid kirja sellele, kellele see mõeldud oli.",You gave the letter to the one it was meant for.
-CP_LETTER_EFFECT,"Kiri jõudis kohale. Ta teab nüüd, kus kast on.",The letter arrived. They know where the box is now.
-LOC_ORCHARD,Õunaaed,The orchard
-ITEM_GRAFT_BUNDLE,Pookoksad,Grafting stock
-ITEM_GRAFT_BUNDLE_DESC,"Kimp õunapuuoksi, vahaga kaetud otsad. Ootavad maad.","A bundle of apple scions, ends sealed with wax. Waiting for ground."
-CP_GRAFTS_TRIGGER,"Sa tõid pookoksad aastasse, kus keegi need istutas.",You brought the grafting stock to a year where somebody planted it.
-CP_GRAFTS_EFFECT,Õunaaed kasvas. Hilisematel aastatel kannavad puud veel.,The orchard grew. In the later years the trees still bear.
-EX_ORCHARD_KEPT,Vanad õunapuud. Mõni kannab veel.,Old apple trees. A few still bear.
-EX_ORCHARD_SCRUB,Võsa. Kunagi taheti siia midagi istutada.,Scrub. Somebody once meant to plant something here.
 LOC_FIELD,Põld,The field
 ITEM_DEED_PAGE,Rebitud lehekülg,A torn page
 ITEM_DEED_PAGE_DESC,"Lehekülg vanast raamatust: talu nimi, piirid, aasta 1798.","A page from an old book: a farm's name, its bounds, the year 1798."
@@ -91,11 +74,33 @@ CP_DEED_TRIGGER,"Sa näitasid lehekülge sellele, kes raamatut pidas.",You showe
 CP_DEED_EFFECT,Piir kirjutati üles. Hilisematel aastatel seisab põllu serval värav.,The boundary was written down. In the later years a gate stands at the field's edge.
 EX_GATE_KEPT,"Värav ilma aiata. Piir, mida keegi enam ei vaidlusta.",A gate without a fence. A boundary nobody disputes any more.
 EX_GATE_GONE,Põllu serv. Siin vaieldi kord piiri üle.,The edge of a field. A boundary was once argued over here.
+ITEM_HARVEST_LETTER,Kiri,A letter
+ITEM_HARVEST_LETTER_DESC,"„Sellele, kes leiab. Esimesest lõikusest.“","""To whoever finds this. From the first harvest."""
+CP_LETTER_TRIGGER,"Sa andsid kirja sellele, kellele see mõeldud oli.",You gave the letter to the one it was meant for.
+CP_LETTER_EFFECT,"Kiri jõudis kohale. Ta teab nüüd, kus kast on.",The letter arrived. They know where the box is now.
+LOC_WELL,Kaev,The well
+CP_WELL_TRIGGER,Sa aitasid kaevu lahti hoida aastal 1798.,You helped keep the well open in 1798.
+CP_WELL_EFFECT,Kaev jäi. Hilisematel aastatel on talul oma vesi.,The well stayed. In the later years the farm has its own water.
+EX_WELL_OPEN,Pooleli kaev. Käsk on see täis ajada. Keegi ei taha.,A half-dug well. The order is to fill it in. Nobody wants to.
+EX_WELL_KEPT,"Kiviring. Vesi on all, külm ja magus.","A ring of stones. The water is down there, cold and sweet."
+EX_WELL_DIP,Lohk maapinnas. Siin oli kord kaev.,A dip in the ground. There was a well here once.
 ITEM_KEEPSAKE,Mälestusese,Keepsake
 ITEM_KEEPSAKE_DESC,"Vana vasktükk, millesse on raiutud nimi ja aasta 1798.",An old piece of copper with a name and the year 1798 cut into it.
 CP_KEEPSAKE_TRIGGER,Sa andsid mälestuseseme tagasi aastal 1798.,You returned the keepsake in 1798.
 CP_KEEPSAKE_EFFECT,Mälestusese jõudis koju. Hilisematel aastatel seisab maamärgi juures kivi.,The keepsake came home. In the later years a stone stands by the landmark.
 EX_KEEPSAKE_STONE,"Kivi, mille keegi siia pani. Nimi on veel loetav.",A stone somebody set here. The name is still legible.
+ITEM_BELL_CLAPPER,Kellakeel,A bell clapper
+ITEM_BELL_CLAPPER_DESC,Raske raudkeel ilma kellata. Keegi teisest majast peab selle viima.,A heavy iron clapper without its bell. Somebody from another house must carry it.
+CP_BELL_TRIGGER,Külaline teisest maailmast tõi kellakeele.,A visitor from another world brought the clapper.
+CP_BELL_EFFECT,Kell riputati üles. Hilisematel aastatel seisab poe juures kellapost.,The bell was hung. In the later years a bell post stands by the shop.
+EX_BELL_KEPT,"Kellapost. Keel on teisest kohast, öeldakse. Heli on ikka omal.","A bell post. The clapper is from elsewhere, they say. The sound is its own."
+LOC_ORCHARD,Õunaaed,The orchard
+ITEM_GRAFT_BUNDLE,Pookoksad,Grafting stock
+ITEM_GRAFT_BUNDLE_DESC,"Kimp õunapuuoksi, vahaga kaetud otsad. Ootavad maad.","A bundle of apple scions, ends sealed with wax. Waiting for ground."
+CP_GRAFTS_TRIGGER,"Sa tõid pookoksad aastasse, kus keegi need istutas.",You brought the grafting stock to a year where somebody planted it.
+CP_GRAFTS_EFFECT,Õunaaed kasvas. Hilisematel aastatel kannavad puud veel.,The orchard grew. In the later years the trees still bear.
+EX_ORCHARD_KEPT,Vanad õunapuud. Mõni kannab veel.,Old apple trees. A few still bear.
+EX_ORCHARD_SCRUB,Võsa. Kunagi taheti siia midagi istutada.,Scrub. Somebody once meant to plant something here.
 OBJ_FIND_REGISTER,Leia raamat.,Find the register.
 OBJ_VISIT_ERAS,Käi läbi kõik aastad.,Visit every year.
 OBJ_DELIVER,"Vii see, mille leidsid, sinna, kuhu see kuulub.",Take what you found to where it belongs.

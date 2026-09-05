@@ -23,6 +23,9 @@ The design and plan documents in the repo root are authoritative: `vakuraamat-im
   goods, crops, animals), `narrative/` (ink), `strings.csv`. `make scenes SITE=<id>` regenerates
   `sites/<id>/scenes/*.tscn`; do not hand-edit those scenes. Engine code (`scripts/`, `scenes/`)
   must not reference a site by name; go through `Sites` (manifest, `data_dir`, `layout`, `tile`).
+- Services: `tools/tile_service.py` (packs for a point, port 8765) and `tools/world_service.py` (shared
+  worlds and deliveries, port 8766) are loopback Python servers; the game talks to them through the
+  `Locator` and `Friends` autoloads. Tests that need them start their own instance (`friends_test`).
 - Generated stories come from `blocks/*.json` via `tools/compose_story.py` (used by `tools/new_site.py`
   and the tile service `tools/tile_service.py`); the Palupera pack is hand-written and does not use blocks.
 - Core UI strings stay in `assets/i18n/strings.csv`; story/place strings go in the pack's

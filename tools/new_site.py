@@ -389,7 +389,7 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
         "ending": comp["ending"],
         "codex": ["CODEX_REAL", "CODEX_INVENTED"],
         "debug": {"build_node": "Manor_home_farm"},
-        "story": {"seed": seed, "blocks": comp["blocks"], "npcs": {e: comp["npcs"][e]["name"] for e in eras}},
+        "story": {"seed": seed, "blocks": comp["blocks"], "npcs": {e: comp["npcs"][e]["name"] for e in eras}, "coop_flags": comp["coop_flags"]},
     }
     json.dump(manifest, open(os.path.join(site_dir, "site.json"), "w"), indent=2)
     seen = set(); rows = []
