@@ -35,6 +35,8 @@ PRIMITIVES
   manor_site   id at                             hunting     [max_animals]
   village      source                            massing boxes from a buildings json (x z w d h color)
   roads        [source]                         ETAK roads/paths as terrain ribbons (roads.json)
+  traffic      [year density max_agents]        ambient walkers/cyclists/cars/carts on the roads
+  bicycle      name at                          a parked bicycle the player can ride
   parcels      [source year]                     cadastral units -> kits by assets/data/parcel_rules.json
   footprints   source [year include_undated respect_exclusions]  real ETAK/EHR footprints built <= year;
                                                  buildings inside layout exclusion circles are skipped
@@ -244,6 +246,16 @@ class Scene:
             n += 1
         return n
 
+    def traffic(self, year, density=1.0, max_agents=40):
+        """Ambient walkers, cyclists, cars (or carts) on the road graph (scripts/world/traffic_system.gd)."""
+        sc = self.ext_res("Script", "res://scripts/world/traffic_system.gd")
+        self.node("Traffic", "Node3D", ".", f'script = ExtResource("{sc}")\nyear = {int(year)}\ndensity = {density}\nmax_agents = {int(max_agents)}\nmetadata/no_snap = true')
+
+    def bicycle(self, name, x, z):
+        """A parked bicycle the player can ride (scripts/interaction/bicycle.gd)."""
+        sc = self.ext_res("Script", "res://scripts/interaction/bicycle.gd")
+        self.node(name, "Node3D", ".", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {x}, 0, {z})\nscript = ExtResource("{sc}")')
+
     def roads(self, source_rel="roads.json"):
         """ETAK roads drawn on the terrain at runtime (scripts/world/road_network.gd)."""
         sc = self.ext_res("Script", "res://scripts/world/road_network.gd")
@@ -425,6 +437,12 @@ class Interpreter:
                 s.manor_site(n["id"], self.pos(n.get("at"), env))
             elif t == "hunting":
                 s.hunting(int(self.num(n.get("max_animals", 8), env)))
+            elif t == "traffic":
+                if os.path.exists(os.path.join(self.site_dir, "roads.json")):
+                    s.traffic(self.num(n.get("year", 2026), env), self.num(n.get("density", 1.0), env), self.num(n.get("max_agents", 40), env))
+            elif t == "bicycle":
+                x, z = self.pos(n.get("at"), env)
+                s.bicycle(name or "Bicycle", x, z)
             elif t == "roads":
                 if os.path.exists(os.path.join(self.site_dir, n.get("source", "roads.json"))):
                     s.roads(n.get("source", "roads.json"))

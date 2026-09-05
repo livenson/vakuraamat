@@ -64,6 +64,8 @@
       {"type": "footprints", "source": "buildings.json", "year": 2026, "include_undated": true},
       {"type": "roads", "source": "roads.json"},
       {"type": "parcels", "source": "parcels.json", "year": 2026},
+      {"type": "traffic", "year": 2026},
+      {"type": "bicycle", "name": "Bicycle", "at": {"ref": "manor", "offset": [-16, -6]}},
       {"type": "trade_post", "at": ["manor[0] - manor_size[0] / 2 - 12", "manor[1] - 10"], "key": "POST_2026", "color": [0.85, 0.85, 0.8]}
     ]},
     "era_1938": {"nodes": [

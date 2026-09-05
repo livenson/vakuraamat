@@ -47,7 +47,11 @@ Every report becomes an event in the session; Claude reads the JSON and the scre
   - shaders, textures, other resources: replaced in the cache.
 - **Restart at this spot**: `python3 tools/dev.py restart` makes the game write a report of where it
   is and relaunch itself on it. Use it after changes hot reload cannot take.
-- Also: `teleport x z [yaw]`, `era <id>`, `screenshot </abs.png>`, `quit`.
+- Also: `teleport x z [yaw]`, `era <id>`, `screenshot </abs.png>`, `codes`, `quit`.
+- Several games may run at once (a playtest plus a replay, plus the test suite). Each instance
+  registers itself in `user://dev/instances/<pid>.json` and only executes commands addressed to its
+  pid (`"pid": 0` means all). `tools/dev.py` targets the newest instance by default; `--pid <n>`
+  picks one and `--all` broadcasts; `python3 tools/dev.py instances` lists them.
 
 ## K: codes overlay
 

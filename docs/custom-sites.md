@@ -168,6 +168,18 @@ Register link, the nearest road (name, type, width, surface), the target node pa
 unit's boundary on the ground; the links are copied to the clipboard. F8 reports carry the same
 `parcel`, `road` and `links` fields.
 
+## Traffic and the bicycle
+
+The `traffic` node (`{"type": "traffic", "year": 2026, "density": 1.0, "max_agents": 40}`) builds a
+`RoadGraph` from `roads.json` and keeps ambient agents on the roads around the player: walkers on
+paths, streets and roads, cyclists, cars (right-hand lanes, pre-1950 black saloons, later vans and
+hatchbacks) and horse carts. The mix follows the era year (only walkers and carts before 1900, bikes
+and a few cars before 1950) and the clock (peaks at 7–9 and 16–19, few at night). Agents spawn
+35–220 m from the player, despawn beyond 320 m, keep a minimum gap to the one ahead and turn around
+at dead ends. The `bicycle` node (`{"type": "bicycle", "name": "Bicycle", "x": .., "z": ..}`) parks
+a rideable bike: E mounts it, E again dismounts, riding is about twice walking speed with momentum.
+Both need `roads.json`; `tools/new_site.py` adds them to the newest era of a generated pack.
+
 ## Real trees
 
 `make real-trees SITE=<id>` (part of `make tile` and the service) fetches Maa-amet's single-tree

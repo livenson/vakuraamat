@@ -40,9 +40,10 @@ func _ready() -> void:
 	# --- commands through the file channel
 	var cmdf := FileAccess.open(DevChannel.CMD, FileAccess.READ_WRITE if FileAccess.file_exists(DevChannel.CMD) else FileAccess.WRITE)
 	cmdf.seek_end()
-	cmdf.store_line(JSON.stringify({"teleport": [600, 320, 90]}))
-	cmdf.store_line(JSON.stringify({"era": "era_1938"}))
-	cmdf.store_line(JSON.stringify({"reload": ["res://scripts/interaction/examinable.gd", "res://sites/palupera/scenes/era_1938.tscn", "res://sites/palupera/strings.csv", "res://assets/shaders/water.gdshader"]}))
+	var pid := OS.get_process_id()   # addressed to this test only, never to a game the player has open
+	cmdf.store_line(JSON.stringify({"pid": pid, "teleport": [600, 320, 90]}))
+	cmdf.store_line(JSON.stringify({"pid": pid, "era": "era_1938"}))
+	cmdf.store_line(JSON.stringify({"pid": pid, "reload": ["res://scripts/interaction/examinable.gd", "res://sites/palupera/scenes/era_1938.tscn", "res://sites/palupera/strings.csv", "res://assets/shaders/water.gdshader"]}))
 	cmdf.close()
 	await get_tree().create_timer(1.5).timeout
 	await get_tree().create_timer(1.0).timeout
