@@ -49,6 +49,12 @@ Every report becomes an event in the session; Claude reads the JSON and the scre
   is and relaunch itself on it. Use it after changes hot reload cannot take.
 - Also: `teleport x z [yaw]`, `era <id>`, `screenshot </abs.png>`, `quit`.
 
+## /debug-game
+
+In Claude Code, `/debug-game [site | report-id]` (project skill in `.claude/skills/debug-game/`) launches the
+game from the session, starts the three watches (report feed, engine errors, channel results) and
+follows the react-fix-reload-verify protocol above.
+
 ## Limits
 
 Godot's own "Synchronize Script Changes" only works for games launched from the editor, so this

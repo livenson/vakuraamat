@@ -6,6 +6,7 @@ Additional Claude-specific guidance:
 - Verify visually: after any change to scenes, shaders or generated assets, take a screenshot with
   the world's `--screenshot` option (add `--site=<id>` for another pack) and look at it before reporting.
 - Site packs: content changes go in `sites/<id>/`, never in engine code; run `make validate` after.
+- `/debug-game` (project skill) launches the game and watches it; the manual recipe follows.
 - When the user is playtesting, watch the report feed with Monitor (`tail -F "$HOME/Library/Application Support/Godot/app_userdata/Vakuraamat/reports/feed.log"`),
   read each report's JSON and screenshot, fix, then `python3 tools/dev.py reload <files>` or `restart`; `replay <id>` puts a
   fresh game at the reported spot for a screenshot check.
