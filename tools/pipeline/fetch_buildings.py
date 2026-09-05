@@ -257,7 +257,8 @@ def classify(tyyp_text, purpose_code):
     return "other" if pc else "outbuilding"
 
 
-def fetch(site, root=ROOT, use_ehr=True, use_lod2=True):
+def fetch(site, root=ROOT, use_ehr=True, use_lod2=True, progress=None):
+    """`progress(frac, text)`, when given, hears about the register lookups (one HTTP call per building)."""
     site_dir = os.path.join(root, "sites", site)
     m = json.load(open(os.path.join(site_dir, "site.json")))
     tile = m["terrain"]["tile"]
@@ -274,7 +275,9 @@ def fetch(site, root=ROOT, use_ehr=True, use_lod2=True):
     lod2 = fetch_lod2(xmin, ymin, xmax, ymax, os.path.join(ROOT, "data_raw", "lod2")) if use_lod2 else {}
     out = []
     with_ehr = with_year = with_lod2 = 0
-    for f in feats:
+    for i, f in enumerate(feats):
+        if progress and i % 10 == 0:
+            progress(i / max(len(feats), 1), f"building register {i}/{len(feats)}")
         g = f.get("geometry") or {}
         rings = g.get("coordinates") if g.get("type") == "Polygon" else (g.get("coordinates", [[]])[0] if g.get("type") == "MultiPolygon" else None)
         if not rings:
