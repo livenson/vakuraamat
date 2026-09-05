@@ -173,6 +173,16 @@ func _fail(loc: Vector2i, why: String) -> void:
 
 
 ## Region (cached or built from inputs), water and the current era's ambient nodes.
+## What the streamer is busy with, for the HUD: "1,0 · fetching (cadastre and roads)" or "".
+func loading_status() -> String:
+	for loc in tiles:
+		var st := str(tiles[loc].get("state", ""))
+		if st in ["queued", "fetching", "loading"]:
+			var detail := _stage if st == "fetching" and _stage != "" else st
+			return "%d,%d · %s" % [loc.x, loc.y, detail]
+	return ""
+
+
 func _load(loc: Vector2i) -> void:
 	var t: Dictionary = tiles[loc]
 	var pack: String = t.pack

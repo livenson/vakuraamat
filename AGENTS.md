@@ -64,6 +64,9 @@ its design documents in the repo root describe that version.
 ## Conventions and pitfalls
 - The world's flags (`--site=`, `--spawn=`, `--open=`, `--enter=`, `--screenshot=`) are user args: they go
   after `--`, and the run must name `res://scenes/world/world.tscn`, else the main menu opens and waits.
+- Real buildings snap to the lowest vertex of their footprint outline (the group's bounding box sank
+  L-shaped houses); the eave is the top of the longest wall face; window sills measure from the ground
+  under each face. Test with a report replay: `-- --report=<json> --screenshot=...`.
 - Prop checks without a world: `tools/godot/figure_preview.tscn` (the eight figures), `bike_preview.tscn`
   (bicycles with riders, side-on, a red block marking the riding direction).
 - Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`

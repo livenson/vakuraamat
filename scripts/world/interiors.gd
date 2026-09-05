@@ -686,53 +686,99 @@ func _ramp(root: Node3D, poly: PackedVector2Array, edge: int, y0: float, fh: flo
 
 # ---------------------------------------------------------------- furniture
 
-const SETS := {
-	"living": [["loungeSofa", Vector3(2.0, 0.8, 0.9), Color(0.3, 0.4, 0.55)], ["tableCoffee", Vector3(1.0, 0.45, 0.6), Color(0.6, 0.45, 0.3), "front"],
-		["cabinetTelevision", Vector3(1.4, 0.5, 0.45), Color(0.5, 0.5, 0.5), "facing"], ["televisionModern", Vector3(1.1, 0.7, 0.2), Color(0.15, 0.15, 0.15), "stack"],
-		["bookcaseClosed", Vector3(1.0, 2.0, 0.4), Color(0.45, 0.32, 0.22)], ["plantSmall1", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)], ["lampRoundFloor", Vector3(0.4, 1.6, 0.4), Color(0.9, 0.85, 0.7)]],
-	"kitchen": [["kitchenCabinet", Vector3(1.0, 0.9, 0.6), Color(0.85, 0.85, 0.8)], ["kitchenStove", Vector3(0.9, 0.9, 0.6), Color(0.7, 0.7, 0.72)],
-		["kitchenFridge", Vector3(0.9, 1.9, 0.7), Color(0.85, 0.85, 0.88)], ["kitchenCabinet", Vector3(1.0, 0.9, 0.6), Color(0.85, 0.85, 0.8)],
-		["table", Vector3(1.4, 0.75, 0.9), Color(0.6, 0.45, 0.3)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24), "front"]],
-	"bedroom": [["bedDouble", Vector3(1.8, 0.6, 2.0), Color(0.75, 0.3, 0.3)], ["cabinetBed", Vector3(1.0, 1.8, 0.6), Color(0.4, 0.4, 0.42)],
-		["bookcaseOpen", Vector3(1.0, 2.0, 0.4), Color(0.6, 0.6, 0.58)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)],
-		["plantSmall2", Vector3(0.4, 0.9, 0.4), Color(0.3, 0.55, 0.3)], ["lampRoundFloor", Vector3(0.4, 1.6, 0.4), Color(0.9, 0.85, 0.7)]],
-	"hall": [["bookcaseClosed", Vector3(1.0, 2.0, 0.4), Color(0.45, 0.32, 0.22)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)],
-		["plantSmall3", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)], ["lampRoundFloor", Vector3(0.4, 1.6, 0.4), Color(0.9, 0.85, 0.7)]],
-	"reception": [["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22), "front"],
-		["loungeSofa", Vector3(2.0, 0.8, 0.9), Color(0.3, 0.4, 0.55)], ["tableCoffee", Vector3(1.0, 0.45, 0.6), Color(0.6, 0.45, 0.3)],
-		["bookcaseClosed", Vector3(1.0, 2.0, 0.4), Color(0.45, 0.32, 0.22)], ["plantSmall3", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)]],
-	"office": [["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22), "front"],
-		["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22), "front"],
-		["bookcaseOpen", Vector3(1.0, 2.0, 0.4), Color(0.6, 0.6, 0.58)], ["cabinetTelevision", Vector3(1.2, 1.1, 0.5), Color(0.5, 0.5, 0.5)], ["plantSmall2", Vector3(0.4, 0.9, 0.4), Color(0.3, 0.55, 0.3)]],
-	"salesroom": [["kitchenBar", Vector3(1.8, 1.0, 0.7), Color(0.55, 0.4, 0.3)], ["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)],
-		["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)], ["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)],
-		["table", Vector3(1.4, 0.75, 0.9), Color(0.6, 0.45, 0.3)], ["plantSmall3", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)]],
-	"back": [["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)], ["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)],
-		["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)], ["table", Vector3(1.4, 0.75, 0.9), Color(0.6, 0.45, 0.3)], ["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)]],
-	"workshop": [["table", Vector3(2.0, 0.85, 0.9), Color(0.45, 0.45, 0.42)], ["bench", Vector3(1.4, 0.5, 0.5), Color(0.5, 0.4, 0.3)],
-		["cabinetBed", Vector3(1.0, 1.8, 0.6), Color(0.4, 0.4, 0.42)], ["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)], ["bench", Vector3(1.4, 0.5, 0.5), Color(0.5, 0.4, 0.3)]],
-	"store": [["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)], ["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)],
-		["cabinetBed", Vector3(1.0, 1.8, 0.6), Color(0.4, 0.4, 0.42)], ["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)], ["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)]],
+## The furniture: kit model -> [size in metres (the model is scaled to this height; rugs to this
+## width), colour of the stand-in box].
+const PIECES := {
+	"loungeSofa": [Vector3(2.0, 0.8, 0.9), Color(0.3, 0.4, 0.55)], "tableCoffee": [Vector3(1.0, 0.45, 0.6), Color(0.6, 0.45, 0.3)],
+	"rugRectangle": [Vector3(2.6, 0.01, 1.7), Color(0.55, 0.35, 0.3)],
+	"cabinetTelevision": [Vector3(1.4, 0.5, 0.45), Color(0.5, 0.5, 0.5)], "televisionModern": [Vector3(1.1, 0.7, 0.2), Color(0.15, 0.15, 0.15)],
+	"bookcaseClosed": [Vector3(1.0, 2.0, 0.4), Color(0.45, 0.32, 0.22)], "bookcaseOpen": [Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)],
+	"plantSmall1": [Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)], "plantSmall2": [Vector3(0.4, 0.9, 0.4), Color(0.3, 0.55, 0.3)],
+	"plantSmall3": [Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)], "lampRoundFloor": [Vector3(0.4, 1.6, 0.4), Color(0.9, 0.85, 0.7)],
+	"kitchenCabinet": [Vector3(1.0, 0.9, 0.6), Color(0.85, 0.85, 0.8)], "kitchenStove": [Vector3(0.9, 0.9, 0.6), Color(0.7, 0.7, 0.72)],
+	"kitchenFridge": [Vector3(0.9, 1.9, 0.7), Color(0.85, 0.85, 0.88)], "kitchenBar": [Vector3(1.8, 1.0, 0.7), Color(0.55, 0.4, 0.3)],
+	"table": [Vector3(1.4, 0.75, 0.9), Color(0.6, 0.45, 0.3)], "chair": [Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)],
+	"bedDouble": [Vector3(1.8, 0.6, 2.0), Color(0.75, 0.3, 0.3)], "cabinetBed": [Vector3(0.5, 0.55, 0.45), Color(0.4, 0.4, 0.42)],
+	"desk": [Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], "chairDesk": [Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22)],
+	"computerScreen": [Vector3(0.5, 0.4, 0.15), Color(0.1, 0.1, 0.12)],
+	"cardboardBoxClosed": [Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)], "bench": [Vector3(1.6, 0.85, 0.7), Color(0.5, 0.4, 0.3)],
+}
+
+## Room plans by role, applied in order. "anchor": the piece centred on the longest free wall, with
+## a "front" piece before it, "sides" pieces beside it and a "rug" under the group; "opposite": on
+## the wall facing the anchor, with a "stack" piece on top; "run": the pieces repeated along the
+## walls (`walls` of them, cycling when "cycle"); "island": a free-standing piece nearest the room's
+## centre with "around" chairs; "grid": the piece repeated on a grid aligned with the longest wall
+## (rows of desks, shelf aisles, box stacks) with a "front" piece at each; "corners": one piece per
+## free corner. `min_area` gates a step by room size, `max` caps its count.
+const PLANS := {
+	"living": [
+		{"kind": "anchor", "piece": "loungeSofa", "front": "tableCoffee", "rug": "rugRectangle"},
+		{"kind": "opposite", "piece": "cabinetTelevision", "stack": "televisionModern"},
+		{"kind": "run", "pieces": ["bookcaseClosed"], "max": 2},
+		{"kind": "corners", "pieces": ["plantSmall1", "lampRoundFloor"]},
+		{"kind": "island", "piece": "table", "around": "chair", "min_area": 30.0},
+	],
+	"kitchen": [
+		{"kind": "run", "pieces": ["kitchenCabinet", "kitchenStove", "kitchenCabinet", "kitchenFridge"], "cycle": true, "walls": 2},
+		{"kind": "island", "piece": "table", "around": "chair"},
+		{"kind": "corners", "pieces": ["plantSmall2"]},
+	],
+	"bedroom": [
+		{"kind": "anchor", "piece": "bedDouble", "sides": "cabinetBed"},
+		{"kind": "run", "pieces": ["bookcaseOpen"], "max": 1},
+		{"kind": "corners", "pieces": ["chair", "plantSmall2", "lampRoundFloor"]},
+	],
+	"hall": [
+		{"kind": "run", "pieces": ["bookcaseClosed"], "max": 1},
+		{"kind": "corners", "pieces": ["chair", "plantSmall3", "lampRoundFloor"]},
+	],
+	"reception": [
+		{"kind": "anchor", "piece": "desk", "front": "chairDesk", "stack": "computerScreen"},
+		{"kind": "opposite", "piece": "loungeSofa", "front": "tableCoffee"},
+		{"kind": "run", "pieces": ["bookcaseClosed"], "max": 1},
+		{"kind": "corners", "pieces": ["plantSmall3", "plantSmall1"]},
+	],
+	"office": [
+		{"kind": "run", "pieces": ["bookcaseOpen", "cabinetTelevision"], "max": 3},
+		{"kind": "grid", "piece": "desk", "front": "chairDesk", "stack": "computerScreen", "pitch": Vector2(2.4, 2.8)},
+		{"kind": "corners", "pieces": ["plantSmall2", "plantSmall3"]},
+	],
+	"salesroom": [
+		{"kind": "anchor", "piece": "kitchenBar"},
+		{"kind": "run", "pieces": ["bookcaseOpen"], "cycle": true, "walls": 9},
+		{"kind": "grid", "piece": "bookcaseOpen", "pitch": Vector2(1.3, 3.0), "min_area": 40.0},
+		{"kind": "corners", "pieces": ["plantSmall3"]},
+	],
+	"back": [
+		{"kind": "run", "pieces": ["bookcaseOpen", "cardboardBoxClosed"], "cycle": true, "walls": 2},
+		{"kind": "grid", "piece": "cardboardBoxClosed", "pitch": Vector2(1.0, 1.2), "min_area": 20.0},
+	],
+	"workshop": [
+		{"kind": "run", "pieces": ["table", "cabinetBed", "bookcaseOpen"], "cycle": true, "walls": 2},
+		{"kind": "grid", "piece": "bench", "pitch": Vector2(2.6, 2.6), "min_area": 25.0},
+		{"kind": "corners", "pieces": ["cardboardBoxClosed", "cardboardBoxClosed"]},
+	],
+	"store": [
+		{"kind": "run", "pieces": ["bookcaseOpen", "cabinetBed"], "cycle": true, "walls": 9},
+		{"kind": "grid", "piece": "cardboardBoxClosed", "pitch": Vector2(1.0, 1.3), "min_area": 15.0},
+	],
 }
 
 
-## Furnish a room by its role: pieces line the walls in the set's order, packed along each usable
-## wall in turn (a wall carrying a doorway or the exterior door gets none, and nothing stands within
-## CLEAR of an `avoid` point). A piece flagged "front" stands in front of the previous wall piece
-## (a coffee table before the sofa, a chair at a desk), "facing" goes to the wall opposite it (the
-## television cabinet across from the sofa) and "stack" sits on top of it (the television).
+## Furnish a room by its role's plan (PLANS). Walls carrying a doorway or the exterior door take no
+## furniture, nothing stands within CLEAR of an `avoid` point, and pieces keep out of each other.
 func _furnish(root: Node3D, poly: PackedVector2Array, y0: float, role: String, seed_key: String, skip_edges: Array, avoid: Array) -> void:
-	var pieces: Array = SETS.get(role, SETS.office)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(seed_key)
-	var walls: Array = []   # {a, dir, inward, length, used}: usable walls, the packing cursor per wall
+	var room := {"root": root, "poly": poly, "y0": y0, "avoid": avoid, "walls": [], "placed": [], "anchor": {}}
 	for i in poly.size():
 		if i in skip_edges:
 			continue
 		var a := poly[i]
 		var c := poly[(i + 1) % poly.size()]
 		var length := a.distance_to(c)
-		if length < 2.0:
+		if length < 1.6:
 			continue
 		var on_edge := false
 		for p in avoid:
@@ -744,69 +790,236 @@ func _furnish(root: Node3D, poly: PackedVector2Array, y0: float, role: String, s
 		var inward := Vector2(-dir.y, dir.x)
 		if not Geometry2D.is_point_in_polygon(a + dir * 0.5 + inward * 0.5, poly):
 			inward = -inward
-		walls.append({"a": a, "dir": dir, "inward": inward, "length": length, "used": 0.4})
-	if walls.is_empty():
+		room.walls.append({"a": a, "dir": dir, "inward": inward, "length": length, "taken": []})
+	if room.walls.is_empty():
 		return
-	var wi := rng.randi() % walls.size()   # the first wall furnished varies per room
-	var anchor: Dictionary = {}            # the last wall piece: {at, inward, dir, size, y}
-	for piece in pieces:
-		var size: Vector3 = piece[1]
-		var flag: String = str(piece[3]) if piece.size() > 3 else ""
-		var spot: Dictionary = {}
-		if flag == "stack" and not anchor.is_empty():
-			spot = {"at": anchor.at, "dir": anchor.dir, "y": anchor.y + anchor.size.y}
-		elif flag == "front" and not anchor.is_empty():
-			spot = {"at": anchor.at + anchor.inward * (anchor.size.z + size.z) * 0.5 + anchor.inward * 0.35, "dir": anchor.dir, "y": y0}
-		elif flag == "facing" and not anchor.is_empty():
-			var best := -1
-			var best_d := INF
-			for k in walls.size():
-				var w: Dictionary = walls[k]
-				if w.inward.dot(anchor.inward) > -0.5:
-					continue
-				var d: float = absf((anchor.at - w.a).dot(w.inward))
-				if d < best_d:
-					best_d = d
-					best = k
-			if best >= 0:
-				spot = _pack(walls[best], size, y0, (anchor.at - walls[best].a).dot(walls[best].dir))
-		if spot.is_empty() and flag != "stack":
-			for _try in walls.size():
-				spot = _pack(walls[wi], size, y0)
-				if not spot.is_empty():
-					break
-				wi = (wi + 1) % walls.size()
-		if spot.is_empty():
+	room.walls.sort_custom(func(x, y): return x.length > y.length)
+	var area: float = absf(_area(poly))
+	for step in PLANS.get(role, PLANS.office):
+		if area < float(step.get("min_area", 0.0)):
 			continue
-		var at: Vector2 = spot.at
+		match str(step.kind):
+			"anchor":
+				_plan_anchor(room, step)
+			"opposite":
+				_plan_opposite(room, step)
+			"run":
+				_plan_run(room, step)
+			"island":
+				_plan_grid(room, step, true)
+			"grid":
+				_plan_grid(room, step, false)
+			"corners":
+				_plan_corners(room, step)
+
+
+## The piece centred on the longest wall with room for it, its front piece, side pieces and rug.
+func _plan_anchor(room: Dictionary, step: Dictionary) -> void:
+	var size: Vector3 = PIECES[step.piece][0]
+	for w in room.walls:
+		var spot := _fit(w, size, w.length * 0.5)
+		if spot.is_empty() or not _place(room, str(step.piece), spot):
+			continue
+		room.anchor = {"at": spot.at, "inward": w.inward, "dir": w.dir, "size": size, "y": room.y0}
+		if step.has("stack"):
+			_place(room, str(step.stack), {"at": spot.at, "dir": w.dir, "y": room.y0 + size.y, "grouped": true})
+		if step.has("front"):
+			var fs: Vector3 = PIECES[step.front][0]
+			_place(room, str(step.front), {"at": spot.at + w.inward * ((size.z + fs.z) * 0.5 + 0.35), "dir": w.dir, "y": room.y0, "grouped": true, "facing_back": step.front == "chairDesk"})
+		if step.has("sides"):
+			var ss: Vector3 = PIECES[step.sides][0]
+			for sgn in [-1.0, 1.0]:
+				var side_spot := _fit(w, ss, w.length * 0.5 + sgn * ((size.x + ss.x) * 0.5 + 0.15))
+				if not side_spot.is_empty():
+					_place(room, str(step.sides), side_spot)
+		if step.has("rug"):
+			var rs: Vector3 = PIECES[step.rug][0]
+			_place(room, str(step.rug), {"at": spot.at + w.inward * (size.z * 0.5 + rs.z * 0.5 - 0.2), "dir": w.dir, "y": room.y0 + 0.005, "grouped": true})
+		return
+
+
+## The piece on the wall facing the anchor, across from it; a stacked piece on top.
+func _plan_opposite(room: Dictionary, step: Dictionary) -> void:
+	if room.anchor.is_empty():
+		_plan_run(room, {"pieces": [step.piece], "max": 1})
+		return
+	var size: Vector3 = PIECES[step.piece][0]
+	var best: Dictionary = {}
+	var best_d := INF
+	for w in room.walls:
+		if w.inward.dot(room.anchor.inward) > -0.5:
+			continue
+		var d: float = absf((room.anchor.at - w.a).dot(w.inward))
+		if d < best_d:
+			best_d = d
+			best = w
+	if best.is_empty():
+		return
+	var spot := _fit(best, size, (room.anchor.at - best.a).dot(best.dir))
+	if spot.is_empty() or not _place(room, str(step.piece), spot):
+		return
+	if step.has("stack"):
+		_place(room, str(step.stack), {"at": spot.at, "dir": best.dir, "y": room.y0 + size.y, "grouped": true})
+	if step.has("front"):
+		var fs: Vector3 = PIECES[step.front][0]
+		_place(room, str(step.front), {"at": spot.at + best.inward * ((size.z + fs.z) * 0.5 + 0.35), "dir": best.dir, "y": room.y0, "grouped": true})
+
+
+## Pieces packed along the walls: `walls` walls (1), the list cycled to fill each when "cycle".
+func _plan_run(room: Dictionary, step: Dictionary) -> void:
+	var names: Array = step.pieces
+	var cap := int(step.get("max", 99))
+	var cycle := bool(step.get("cycle", false))
+	var count := 0
+	var used_walls := 0
+	var idx := 0
+	for w in room.walls:
+		if used_walls >= int(step.get("walls", 1)) or count >= cap:
+			break
+		var placed_here := 0
+		while count < cap and (cycle or idx < names.size()):
+			var name := str(names[idx % names.size()])
+			var spot := _fit(w, PIECES[name][0])
+			if spot.is_empty():
+				break
+			if _place(room, name, spot):
+				count += 1
+				placed_here += 1
+			idx += 1
+		if placed_here > 0:
+			used_walls += 1
+
+
+## Free-standing pieces on a grid aligned with the longest wall; `single` keeps the one nearest the
+## room's centre (a dining table) and puts the "around" chairs at its four sides.
+func _plan_grid(room: Dictionary, step: Dictionary, single: bool) -> void:
+	var size: Vector3 = PIECES[step.piece][0]
+	var w: Dictionary = room.walls[0]
+	var inner := _grow(room.poly, -1.1)
+	if inner.size() < 3:
+		return
+	var pitch: Vector2 = step.get("pitch", Vector2(size.x + 1.4, size.z + 1.6))
+	var rect_u := [INF, -INF]
+	var rect_v := [INF, -INF]
+	for p in room.poly:
+		var d: Vector2 = p - w.a
+		rect_u = [minf(rect_u[0], d.dot(w.dir)), maxf(rect_u[1], d.dot(w.dir))]
+		rect_v = [minf(rect_v[0], d.dot(w.inward)), maxf(rect_v[1], d.dot(w.inward))]
+	var centre := _centroid(room.poly)
+	var spots: Array = []
+	var u: float = rect_u[0] + pitch.x * 0.5
+	while u < rect_u[1]:
+		var v: float = rect_v[0] + size.z * 0.5 + 1.8   # a lane along the anchor wall for its furniture
+		while v < rect_v[1]:
+			var at: Vector2 = w.a + w.dir * u + w.inward * v
+			if Geometry2D.is_point_in_polygon(at, inner):
+				spots.append(at)
+			v += pitch.y
+		u += pitch.x
+	if single:
+		spots.sort_custom(func(x, y): return x.distance_squared_to(centre) < y.distance_squared_to(centre))
+	var cap := 1 if single else int(step.get("max", 99))
+	var count := 0
+	for at in spots:
+		if count >= cap:
+			break
+		var spot := {"at": at, "dir": w.dir, "y": room.y0}
+		if not _place(room, str(step.piece), spot):
+			continue
+		count += 1
+		if step.has("stack"):
+			_place(room, str(step.stack), {"at": at, "dir": w.dir, "y": room.y0 + size.y, "grouped": true})
+		if step.has("front"):
+			var fs: Vector3 = PIECES[step.front][0]
+			_place(room, str(step.front), {"at": at - w.inward * ((size.z + fs.z) * 0.5 + 0.1), "dir": w.dir, "y": room.y0, "grouped": true})
+		if step.has("around"):
+			var cs: Vector3 = PIECES[step.around][0]
+			for side in [[w.inward, w.dir], [-w.inward, -w.dir], [w.dir, -w.inward], [-w.dir, w.inward]]:
+				var off: Vector2 = side[0]
+				var gap: float = (size.z if off.is_equal_approx(w.inward) or off.is_equal_approx(-w.inward) else size.x) * 0.5 + cs.z * 0.5 + 0.1
+				_place(room, str(step.around), {"at": at + off * gap, "dir": side[1], "y": room.y0, "grouped": true})
+
+
+## One piece per free corner (0.5 m off both walls), skipping corners near a doorway.
+func _plan_corners(room: Dictionary, step: Dictionary) -> void:
+	var poly: PackedVector2Array = room.poly
+	var idx := 0
+	var names: Array = step.pieces
+	for i in poly.size():
+		if idx >= names.size():
+			return
+		var p := poly[i]
+		var prev := poly[(i - 1 + poly.size()) % poly.size()]
+		var next := poly[(i + 1) % poly.size()]
+		var bis := ((prev - p).normalized() + (next - p).normalized()).normalized()
+		var at := p + bis * 0.7
 		if not Geometry2D.is_point_in_polygon(at, poly):
 			continue
-		var blocked := false
-		for p in avoid:
-			if at.distance_to(p) < CLEAR:
-				blocked = true
-		if blocked:
-			continue
-		var node := _piece(str(piece[0]), size, piece[2])
-		node.position = Vector3(at.x, spot.y, at.y)
-		var dir: Vector2 = spot.dir
-		node.rotation.y = -atan2(dir.y, dir.x) + PI   # back to the wall
-		node.set_meta("piece", true)
-		root.add_child(node)
-		if flag == "" or flag == "facing":
-			anchor = {"at": at, "inward": spot.get("inward", anchor.get("inward", Vector2.ZERO)), "dir": dir, "size": size, "y": spot.y}
+		var facing := (next - p).normalized()
+		if _place(room, str(names[idx]), {"at": at, "dir": facing, "y": room.y0}):
+			idx += 1
 
 
-## The next free stretch of a wall for a piece `size` wide (from the wall's cursor, or from `along`
-## metres down the wall when given); {} when the wall is full. Advances the cursor.
-func _pack(w: Dictionary, size: Vector3, y0: float, along: float = -1.0) -> Dictionary:
-	var u: float = w.used + size.x * 0.5
-	if along >= 0.0:
-		u = maxf(u, along)
-	if u + size.x * 0.5 + 0.3 > w.length:
+## A stretch of wall `size.x` wide, preferably centred at `along` metres down the wall, else the
+## first gap that fits; {} when the wall is full. Reserves the stretch.
+func _fit(w: Dictionary, size: Vector3, along: float = -1.0) -> Dictionary:
+	var half := size.x * 0.5 + 0.2
+	var gaps: Array = []
+	var cursor := 0.35
+	for t in w.taken:
+		if t[0] - cursor >= half * 2.0:
+			gaps.append([cursor, t[0]])
+		cursor = maxf(cursor, t[1])
+	if w.length - 0.35 - cursor >= half * 2.0:
+		gaps.append([cursor, w.length - 0.35])
+	if gaps.is_empty():
 		return {}
-	w.used = u + size.x * 0.5 + 0.4
-	return {"at": w.a + w.dir * u + w.inward * (size.z * 0.5 + 0.3), "dir": w.dir, "inward": w.inward, "y": y0}
+	var u := -1.0
+	if along >= 0.0:
+		for g in gaps:
+			if along - half >= g[0] and along + half <= g[1]:
+				u = along
+			elif along >= g[0] and along <= g[1] and g[1] - g[0] >= half * 2.0:
+				u = clampf(along, g[0] + half, g[1] - half)
+	if u < 0.0:
+		u = gaps[0][0] + half
+	w.taken.append([u - half, u + half])
+	w.taken.sort_custom(func(x, y): return x[0] < y[0])
+	return {"at": w.a + w.dir * u + w.inward * (size.z * 0.5 + 0.3), "dir": w.dir, "inward": w.inward, "y": w.get("y", 0.0)}
+
+
+## Put a piece down at `spot` ({at, dir, y, grouped}) unless it is outside the room, within CLEAR
+## of an avoid point or on top of another piece (grouped pieces only check the avoid points).
+func _place(room: Dictionary, name: String, spot: Dictionary) -> bool:
+	var size: Vector3 = PIECES[name][0]
+	var at: Vector2 = spot.at
+	if not Geometry2D.is_point_in_polygon(at, room.poly):
+		return false
+	for p in room.avoid:
+		if at.distance_to(p) < CLEAR:
+			return false
+	var r := maxf(size.x, size.z) * 0.5
+	if not bool(spot.get("grouped", false)):
+		for q in room.placed:
+			if at.distance_to(q[0]) < r + q[1] + 0.25:
+				return false
+	var node := _piece(name, size, PIECES[name][1])
+	var y: float = spot.get("y", room.y0) if spot.has("y") and spot.y != 0.0 else room.y0
+	node.position = Vector3(at.x, y, at.y)
+	var dir: Vector2 = spot.dir
+	node.rotation.y = -atan2(dir.y, dir.x) + PI + (PI if bool(spot.get("facing_back", false)) else 0.0)   # back to the wall
+	node.set_meta("piece", true)
+	room.root.add_child(node)
+	if size.y > 0.05:
+		room.placed.append([at, r])
+	return true
+
+
+static func _centroid(poly: PackedVector2Array) -> Vector2:
+	var c := Vector2.ZERO
+	for p in poly:
+		c += p
+	return c / maxf(poly.size(), 1)
 
 
 ## A Kenney Furniture Kit model when vendored (`assets/vendor/kenney_furniture_kit/glb/<name>.glb`), else a box.
@@ -822,6 +1035,8 @@ func _piece(model: String, size: Vector3, color: Color) -> Node3D:
 		var bounds: AABB = _kit_size[model]
 		if bounds.size.y > 0.01:
 			var k := size.y / bounds.size.y   # the kit is modelled at about half life size
+			if size.y < 0.05 and bounds.size.x > 0.01:
+				k = size.x / bounds.size.x   # a rug: by width
 			var wrap := Node3D.new()
 			n.scale = Vector3(k, k, k)
 			n.position.y = -bounds.position.y * k
@@ -918,13 +1133,6 @@ static func _area(poly: PackedVector2Array) -> float:
 		var c := poly[(i + 1) % poly.size()]
 		s += a.x * c.y - c.x * a.y
 	return absf(s) / 2.0
-
-
-static func _centroid(poly: PackedVector2Array) -> Vector2:
-	var c := Vector2.ZERO
-	for p in poly:
-		c += p
-	return c / maxf(poly.size(), 1)
 
 
 static func _grow(poly: PackedVector2Array, d: float) -> PackedVector2Array:

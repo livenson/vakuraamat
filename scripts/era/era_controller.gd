@@ -43,15 +43,24 @@ func _snap_list(nodes: Array, terrain: Terrain3D) -> void:
 		if c is Node3D and not c.has_meta("no_snap"):
 			var h := terrain.data.get_height(c.global_position)
 			if c.has_meta("footprint"):
-				# buildings: sit on the lowest corner so nothing hangs in the air; the skirt fills the rest
-				var fp: Vector2 = c.get_meta("footprint")
-				var basis: Basis = c.global_transform.basis
-				for sx in [-0.5, 0.5]:
-					for sz in [-0.5, 0.5]:
-						var corner: Vector3 = c.global_position + basis * Vector3(sx * fp.x, 0, sz * fp.y)
-						var hc := terrain.data.get_height(corner)
-						if not is_nan(hc):
-							h = hc if is_nan(h) else minf(h, hc)
+				# buildings: sit on the lowest corner so nothing hangs in the air; the skirt fills the rest.
+				# A real footprint uses its own outline (the bounding box of an L-shape reaches ground
+				# outside the walls and sank the house); massing uses the box corners.
+				var corners: Array = []
+				var fb: Node = c.get_node_or_null("Footprint")   # the real building under its group
+				if fb is Node3D and "polygon" in fb and fb.polygon.size() >= 3:
+					for p in fb.polygon:
+						corners.append(fb.to_global(Vector3(p.x, 0.0, p.y)))
+				else:
+					var fp: Vector2 = c.get_meta("footprint")
+					var basis: Basis = c.global_transform.basis
+					for sx in [-0.5, 0.5]:
+						for sz in [-0.5, 0.5]:
+							corners.append(c.global_position + basis * Vector3(sx * fp.x, 0, sz * fp.y))
+				for corner in corners:
+					var hc := terrain.data.get_height(corner)
+					if not is_nan(hc):
+						h = hc if is_nan(h) else minf(h, hc)
 			if not is_nan(h):
 				c.global_position.y = h + float(c.get_meta("lift", 0.0))
 

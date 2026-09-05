@@ -134,6 +134,7 @@ ITEM_BICYCLE,Jalgratas,Bicycle
 EX_BICYCLE,"Jalgratas. E: sõida; E uuesti, kui midagi ei vaata: tule maha.","A bicycle. E to ride; E again, looking at nothing, to get off."
 NOTICE_BIKE_ON,"Rattal. Shift kiiremini, E maha.","On the bike. Shift to go faster, E to get off."
 NOTICE_BIKE_OFF,Maha tuldud.,Off the bike.
+UI_LOADING_TILE,Naabertükk laeb: %s,Loading the neighbour tile: %s
 NOTICE_EDGE_PENDING,Sealpoolne maa on alles mõõtmisel – oota hetk,The land beyond is still being surveyed. Wait a moment
 NOTICE_EDGE_NONE,Sealpool kaarti ei ole,There is no map beyond here
 NOTICE_TILE_READY,Naaberala on valmis,The next stretch of land is ready

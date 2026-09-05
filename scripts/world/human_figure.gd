@@ -21,7 +21,8 @@ const TINTS := {
 var skeleton: Skeleton3D
 var walking := false
 var speed_ratio := 1.0                     # 1 = walking pace
-var pose := "stand"                        # stand | arms_folded | holding | sit
+var pose := "stand"                        # stand | arms_folded | holding | sit | pedal
+var pedal_phase := 0.0                     # crank angle for the "pedal" pose (TrafficAgent advances it)
 var _phase := 0.0
 var _bones: Dictionary = {}                # name -> index
 var _rest: Dictionary = {}                 # name -> rest rotation (Quaternion)
@@ -110,22 +111,25 @@ func _rot(bone: String, pitch: float, roll: float = 0.0, yaw: float = 0.0) -> vo
 ## Legs swing about the hip, knees bend on the back swing, arms swing opposite, torso sways a little.
 ## Positive pitch moves the limb's far end forward for legs and arms hanging down.
 func _gait(t: float, amp: float) -> void:
-	var swing := sin(t) * 0.42 * amp
-	var knee_l := maxf(0.0, -sin(t - 0.5)) * 0.9 * amp
-	var knee_r := maxf(0.0, sin(t - 0.5)) * 0.9 * amp
+	# thighs swing about 17 degrees each way; the knee bends while the leg comes through, the foot
+	# lifts behind; arms swing opposite the legs with the elbows a little bent; a small pelvis roll
+	var swing := sin(t) * 0.3 * amp
+	var lift_l := maxf(0.0, cos(t - 0.2))   # the knee bends while the leg swings through under the body
+	var lift_r := maxf(0.0, -cos(t - 0.2))
 	_rot("thigh_l", swing)
 	_rot("thigh_r", -swing)
-	_rot("calf_l", -knee_l)
-	_rot("calf_r", -knee_r)
-	_rot("foot_l", knee_l * 0.4)
-	_rot("foot_r", knee_r * 0.4)
-	_rot("upperarm_l", -swing * 0.6, -ARM_DOWN)
-	_rot("upperarm_r", swing * 0.6, ARM_DOWN)
-	_rot("lowerarm_l", 0.25 + maxf(0.0, -swing) * 0.4)
-	_rot("lowerarm_r", 0.25 + maxf(0.0, swing) * 0.4)
-	_rot("spine_01", sin(t * 2.0) * 0.02, 0.0, sin(t) * 0.05)
-	_rot("head", 0.0, 0.0, -sin(t) * 0.04)
-	position.y = absf(sin(t)) * 0.03 * amp
+	_rot("calf_l", -0.12 - lift_l * 0.75 * amp)
+	_rot("calf_r", -0.12 - lift_r * 0.75 * amp)
+	_rot("foot_l", 0.05 + lift_l * 0.25)
+	_rot("foot_r", 0.05 + lift_r * 0.25)
+	_rot("upperarm_l", -swing * 0.9, -ARM_DOWN)
+	_rot("upperarm_r", swing * 0.9, ARM_DOWN)
+	_rot("lowerarm_l", 0.35 + maxf(0.0, -swing) * 0.6)
+	_rot("lowerarm_r", 0.35 + maxf(0.0, swing) * 0.6)
+	_rot("pelvis", 0.0, sin(t) * 0.04)
+	_rot("spine_01", 0.06 + sin(t * 2.0) * 0.015, -sin(t) * 0.03, sin(t) * 0.06)
+	_rot("head", -0.04, 0.0, -sin(t) * 0.05)
+	position.y = absf(sin(t)) * 0.02 * amp
 
 
 ## Standing poses for NPCs. The exported rest pose is an A-pose; ARM_DOWN brings the arms to the sides.
@@ -146,6 +150,18 @@ func _hold(p: String) -> void:
 			_rot("thigh_r", 1.4)
 			_rot("calf_l", -1.3)
 			_rot("calf_r", -1.3)
+			_rot("upperarm_l", 0.8, -ARM_DOWN)
+			_rot("upperarm_r", 0.8, ARM_DOWN)
+			_rot("lowerarm_l", 0.6)
+			_rot("lowerarm_r", 0.6)
+		"pedal":   # on a bicycle: the cranks turn with pedal_phase, the knee bends at the top of the stroke
+			var ph := pedal_phase
+			_rot("thigh_l", 1.25 + 0.35 * sin(ph))
+			_rot("thigh_r", 1.25 - 0.35 * sin(ph))
+			_rot("calf_l", -1.0 - 0.5 * sin(ph))
+			_rot("calf_r", -1.0 + 0.5 * sin(ph))
+			_rot("foot_l", 0.3 + 0.2 * cos(ph))
+			_rot("foot_r", 0.3 - 0.2 * cos(ph))
 			_rot("upperarm_l", 0.8, -ARM_DOWN)
 			_rot("upperarm_r", 0.8, ARM_DOWN)
 			_rot("lowerarm_l", 0.6)
