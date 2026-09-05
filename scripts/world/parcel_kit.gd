@@ -21,8 +21,10 @@ func _ready() -> void:
 		"park":
 			_park()
 		"hedge":
+			set_meta("no_snap", true)   # boundaries follow the ground piece by piece instead of the group snap
 			_boundary(0.9, 0.7, Color(0.22, 0.4, 0.18), 1.2, true)
 		"fence":
+			set_meta("no_snap", true)
 			_boundary(2.0, 0.08, Color(0.45, 0.45, 0.42), 0.4, false)
 	if _colors.is_empty():
 		return
@@ -137,4 +139,14 @@ func _boundary(h: float, thickness: float, col: Color, seg: float, gaps: bool) -
 				continue   # a gate
 			var t := (k + 0.5) * seg
 			var p := a + dir * t + inward
-			_box(Vector3(p.x, h / 2.0, p.y), Vector3(seg * 0.95, h, thickness), col, -atan2(dir.y, dir.x))
+			_box(Vector3(p.x, _ground(p) + h / 2.0 - 0.15, p.y), Vector3(seg * 0.95, h, thickness + 0.0), col, -atan2(dir.y, dir.x))
+
+
+## Terrain height under a kit-local point, in kit space (the kit itself stays at y 0).
+func _ground(p: Vector2) -> float:
+	var terrain: Terrain3D = GameState.world.terrain if GameState.world else null
+	if terrain == null or terrain.data == null:
+		return 0.0
+	var gp := to_global(Vector3(p.x, 0.0, p.y))
+	var h := terrain.data.get_height(gp)
+	return 0.0 if is_nan(h) else h - global_position.y

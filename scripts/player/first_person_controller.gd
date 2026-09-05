@@ -101,7 +101,6 @@ func mount(bike: Node3D) -> void:
 	rng.seed = hash(bike.name)
 	_bike_view = TrafficAgent.build_bike(false, rng, Color.WHITE)
 	_bike_view.position = Vector3(0, -1.55, -0.35)
-	_bike_view.rotation.y = PI
 	add_child(_bike_view)
 	camera.position.y -= 0.25
 	flying = false
