@@ -115,6 +115,20 @@ func _ready() -> void:
 				player.set_pose(player.global_position, player.rotation.y, deg_to_rad(float(parts[4])))
 		elif a == "--fly":
 			player.flying = true
+		elif a.begins_with("--own="):
+			# verification runs: buy a plot (and build on it: --own=<tunnus>+<structure>) once the ground stands
+			var bits := a.trim_prefix("--own=").split("+")
+			get_tree().create_timer(1.5).timeout.connect(func():
+				if Ledger.parcel(bits[0]).is_empty():
+					Ledger.reset_local(Sites.active)   # a direct world run has no book yet
+				await Ledger.debug_grant(1000000)
+				var err: String = await Ledger.buy(bits[0])
+				if bits.size() > 1 and err == "":
+					err = await Ledger.build(bits[0], bits[1])
+				print("[world] --own %s: %s" % [a, "ok" if err == "" else err]))
+		elif a.begins_with("--hour="):
+			if sky and sky.tod:
+				sky.tod.current_time = float(a.trim_prefix("--hour="))
 		elif a.begins_with("--fx="):
 			_fx = Array(a.trim_prefix("--fx=").split(",", false))
 			_configure_environment()

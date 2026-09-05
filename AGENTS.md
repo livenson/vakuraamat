@@ -67,6 +67,8 @@ its design documents in the repo root describe that version.
 - Real buildings snap to the lowest vertex of their footprint outline (the group's bounding box sank
   L-shaped houses); the eave is the top of the longest wall face; window sills measure from the ground
   under each face. Test with a report replay: `-- --report=<json> --screenshot=...`.
+- World flags for checks: `--hour=<h>` sets the time of day (street lights and windows light after
+  18:30), `--own=<tunnus>+<structure>` buys a plot in a fresh local book and builds on it.
 - Prop checks without a world: `tools/godot/figure_preview.tscn` (the eight figures), `bike_preview.tscn`
   (bicycles with riders, side-on, a red block marking the riding direction).
 - Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`
