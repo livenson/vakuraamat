@@ -61,6 +61,12 @@
      ]
     },
     {
+     "type": "footprints",
+     "source": "buildings.json",
+     "year": 1798,
+     "include_undated": false
+    },
+    {
      "type": "farm_plots",
      "at": {
       "ref": "farm",
@@ -193,6 +199,12 @@
       0.65,
       0.5
      ]
+    },
+    {
+     "type": "footprints",
+     "source": "buildings.json",
+     "year": 1938,
+     "include_undated": false
     },
     {
      "type": "manor_site",
@@ -458,8 +470,10 @@
      ]
     },
     {
-     "type": "village",
-     "source": "buildings_2026.json"
+     "type": "footprints",
+     "source": "buildings.json",
+     "year": 2026,
+     "include_undated": true
     },
     {
      "type": "farm_plots",

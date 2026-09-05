@@ -1,4 +1,4 @@
-[gd_scene load_steps=84 format=3]
+[gd_scene load_steps=29 format=3]
 
 [ext_resource type="Script" path="res://scripts/interaction/conditional.gd" id="1"]
 [ext_resource type="PackedScene" path="res://assets/models/props/oak.glb" id="2"]
@@ -12,8 +12,9 @@
 [ext_resource type="PackedScene" path="res://scenes/props/pickup.tscn" id="10"]
 [ext_resource type="PackedScene" path="res://scenes/farming/farm_plot.tscn" id="11"]
 [ext_resource type="Script" path="res://scripts/farming/seed_bin.gd" id="12"]
-[ext_resource type="Script" path="res://scripts/trading/trade_post.gd" id="13"]
-[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="14"]
+[ext_resource type="Script" path="res://scripts/world/footprint_building.gd" id="13"]
+[ext_resource type="Script" path="res://scripts/trading/trade_post.gd" id="14"]
+[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="15"]
 
 [sub_resource type="StandardMaterial3D" id="M1"]
 albedo_color = Color(0.450, 0.250, 0.100, 1)
@@ -41,227 +42,31 @@ size = Vector3(1.4, 1.2, 1.0)
 albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
-[sub_resource type="BoxMesh" id="BM8"]
-size = Vector3(18, 8.6, 20)
-
-[sub_resource type="StandardMaterial3D" id="M9"]
-albedo_color = Color(0.487, 0.471, 0.370, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM10"]
-size = Vector3(18.6, 0.25, 20.6)
-
-[sub_resource type="StandardMaterial3D" id="M11"]
-albedo_color = Color(0.325, 0.314, 0.247, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM12"]
-size = Vector3(17, 11.3, 15)
-
-[sub_resource type="StandardMaterial3D" id="M13"]
-albedo_color = Color(0.516, 0.499, 0.387, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM14"]
-size = Vector3(17.6, 0.25, 15.6)
-
-[sub_resource type="StandardMaterial3D" id="M15"]
-albedo_color = Color(0.344, 0.332, 0.258, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM16"]
-size = Vector3(8, 11.2, 32)
-
-[sub_resource type="StandardMaterial3D" id="M17"]
-albedo_color = Color(0.579, 0.570, 0.472, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM18"]
-size = Vector3(8.6, 0.25, 32.6)
-
-[sub_resource type="StandardMaterial3D" id="M19"]
-albedo_color = Color(0.386, 0.380, 0.314, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM20"]
-size = Vector3(60, 9.4, 81)
-
-[sub_resource type="StandardMaterial3D" id="M21"]
-albedo_color = Color(0.665, 0.729, 0.741, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM22"]
-size = Vector3(60.6, 0.25, 81.6)
-
-[sub_resource type="StandardMaterial3D" id="M23"]
-albedo_color = Color(0.443, 0.486, 0.494, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM24"]
-size = Vector3(44, 13.1, 70)
-
-[sub_resource type="StandardMaterial3D" id="M25"]
-albedo_color = Color(0.867, 0.872, 0.872, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM26"]
-size = Vector3(44.6, 0.25, 70.6)
-
-[sub_resource type="StandardMaterial3D" id="M27"]
-albedo_color = Color(0.578, 0.581, 0.581, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM28"]
-size = Vector3(12, 9.3, 13)
-
-[sub_resource type="StandardMaterial3D" id="M29"]
-albedo_color = Color(0.356, 0.411, 0.427, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM30"]
-size = Vector3(12.6, 0.25, 13.6)
-
-[sub_resource type="StandardMaterial3D" id="M31"]
-albedo_color = Color(0.237, 0.274, 0.284, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM32"]
-size = Vector3(22, 9.2, 5)
-
-[sub_resource type="StandardMaterial3D" id="M33"]
-albedo_color = Color(0.730, 0.725, 0.638, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM34"]
-size = Vector3(22.6, 0.25, 5.6)
-
-[sub_resource type="StandardMaterial3D" id="M35"]
-albedo_color = Color(0.487, 0.484, 0.425, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM36"]
-size = Vector3(12, 9.4, 9)
-
-[sub_resource type="StandardMaterial3D" id="M37"]
-albedo_color = Color(0.335, 0.323, 0.270, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM38"]
-size = Vector3(12.6, 0.25, 9.6)
-
-[sub_resource type="StandardMaterial3D" id="M39"]
-albedo_color = Color(0.223, 0.215, 0.180, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM40"]
-size = Vector3(26, 11.9, 33)
-
-[sub_resource type="StandardMaterial3D" id="M41"]
-albedo_color = Color(0.679, 0.532, 0.475, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM42"]
-size = Vector3(26.6, 0.25, 33.6)
-
-[sub_resource type="StandardMaterial3D" id="M43"]
-albedo_color = Color(0.453, 0.355, 0.317, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM44"]
-size = Vector3(33, 12.0, 25)
-
-[sub_resource type="StandardMaterial3D" id="M45"]
-albedo_color = Color(0.655, 0.418, 0.353, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM46"]
-size = Vector3(33.6, 0.25, 25.6)
-
-[sub_resource type="StandardMaterial3D" id="M47"]
-albedo_color = Color(0.437, 0.278, 0.235, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM48"]
-size = Vector3(32, 11.9, 24)
-
-[sub_resource type="StandardMaterial3D" id="M49"]
-albedo_color = Color(0.664, 0.495, 0.431, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM50"]
-size = Vector3(32.6, 0.25, 24.6)
-
-[sub_resource type="StandardMaterial3D" id="M51"]
-albedo_color = Color(0.443, 0.330, 0.287, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM52"]
-size = Vector3(14, 8.5, 12)
-
-[sub_resource type="StandardMaterial3D" id="M53"]
-albedo_color = Color(0.593, 0.664, 0.678, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM54"]
-size = Vector3(14.6, 0.25, 12.6)
-
-[sub_resource type="StandardMaterial3D" id="M55"]
-albedo_color = Color(0.395, 0.443, 0.452, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM56"]
-size = Vector3(33, 10.7, 20)
-
-[sub_resource type="StandardMaterial3D" id="M57"]
-albedo_color = Color(0.627, 0.546, 0.446, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM58"]
-size = Vector3(33.6, 0.25, 20.6)
-
-[sub_resource type="StandardMaterial3D" id="M59"]
-albedo_color = Color(0.418, 0.364, 0.297, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM60"]
-size = Vector3(12, 15.0, 9)
-
-[sub_resource type="StandardMaterial3D" id="M61"]
-albedo_color = Color(0.582, 0.581, 0.500, 1)
-roughness = 0.9
-
-[sub_resource type="BoxMesh" id="BM62"]
-size = Vector3(12.6, 0.25, 9.6)
-
-[sub_resource type="StandardMaterial3D" id="M63"]
-albedo_color = Color(0.388, 0.387, 0.333, 1)
-roughness = 0.9
-
-[sub_resource type="BoxShape3D" id="TP_era_2026_64"]
+[sub_resource type="BoxShape3D" id="TP_era_2026_8"]
 size = Vector3(2.6, 2.4, 2.2)
 
-[sub_resource type="StandardMaterial3D" id="M65"]
+[sub_resource type="StandardMaterial3D" id="M9"]
 albedo_color = Color(0.420, 0.380, 0.320, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M66"]
+[sub_resource type="StandardMaterial3D" id="M10"]
 albedo_color = Color(0.850, 0.850, 0.800, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M67"]
+[sub_resource type="StandardMaterial3D" id="M11"]
 albedo_color = Color(0.500, 0.450, 0.300, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M68"]
+[sub_resource type="StandardMaterial3D" id="M12"]
 albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M69"]
+[sub_resource type="StandardMaterial3D" id="M13"]
 albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
 [node name="era_2026" type="Node3D"]
-script = ExtResource("14")
+script = ExtResource("15")
 era_id = "era_2026"
 
 [node name="Oak" type="Node3D" parent="."]
@@ -608,223 +413,1183 @@ collision_mask = 0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 shape = SubResource("SB_era_2026_6")
 
-[node name="Village" type="Node3D" parent="."]
+[node name="Buildings" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 script = ExtResource("1")
 
-[node name="B0" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 117.0, 0, 169.7)
+[node name="B381159" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 350.3, 0, 199.1)
 script = ExtResource("1")
-metadata/footprint = Vector2(18, 20)
+metadata/footprint = Vector2(20.4, 38.3)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2999999999999998, 0)
-mesh = SubResource("BM8")
-surface_material_override/0 = SubResource("M9")
+[node name="Footprint" type="Node3D" parent="Buildings/B381159"]
+script = ExtResource("13")
+polygon = PackedVector2Array(10.20, -17.27, 5.72, 19.13, -10.17, 17.18, -5.70, -19.22)
+height = 9.2
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 381159
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B0"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.72, 0)
-mesh = SubResource("BM10")
-surface_material_override/0 = SubResource("M11")
-
-[node name="B1" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 131.0, 0, 182.2)
+[node name="B380430" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 450.3, 0, 211.8)
 script = ExtResource("1")
-metadata/footprint = Vector2(17, 15)
+metadata/footprint = Vector2(20.9, 37.7)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6500000000000004, 0)
-mesh = SubResource("BM12")
-surface_material_override/0 = SubResource("M13")
+[node name="Footprint" type="Node3D" parent="Buildings/B380430"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-8.76, 3.26, -5.93, -18.83, 10.42, -16.73, 5.86, 18.87, -10.49, 16.77)
+height = 8.7
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 380430
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.42, 0)
-mesh = SubResource("BM14")
-surface_material_override/0 = SubResource("M15")
-
-[node name="B2" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 440.0, 0, 209.7)
+[node name="B6344831" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 394.0, 0, 245.0)
 script = ExtResource("1")
-metadata/footprint = Vector2(8, 32)
+metadata/footprint = Vector2(8.0, 5.6)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5999999999999996, 0)
-mesh = SubResource("BM16")
-surface_material_override/0 = SubResource("M17")
+[node name="Footprint" type="Node3D" parent="Buildings/B6344831"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-3.42, -2.79, 3.95, -1.82, 3.33, 2.84, -4.03, 1.86)
+height = 4.9
+wall_color = Color(0.680, 0.680, 0.650, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6344831
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.319999999999999, 0)
-mesh = SubResource("BM18")
-surface_material_override/0 = SubResource("M19")
-
-[node name="B3" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 411.0, 0, 283.0)
+[node name="B6967038" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 363.0, 0, 278.7)
 script = ExtResource("1")
-metadata/footprint = Vector2(60, 81)
+metadata/footprint = Vector2(31.6, 80.4)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7000000000000002, 0)
-mesh = SubResource("BM20")
-surface_material_override/0 = SubResource("M21")
+[node name="Footprint" type="Node3D" parent="Buildings/B6967038"]
+script = ExtResource("13")
+polygon = PackedVector2Array(15.75, -37.63, 12.27, -5.99, 10.71, 8.20, 7.18, 40.25, -15.84, 37.72, -7.27, -40.16)
+height = 11.8
+wall_color = Color(0.620, 0.360, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 6967038
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5200000000000005, 0)
-mesh = SubResource("BM22")
-surface_material_override/0 = SubResource("M23")
-
-[node name="B4" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 452.5, 0, 281.6)
+[node name="B8200048" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 464.0, 0, 283.8)
 script = ExtResource("1")
-metadata/footprint = Vector2(44, 70)
+metadata/footprint = Vector2(54.9, 68.9)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.55, 0)
-mesh = SubResource("BM24")
-surface_material_override/0 = SubResource("M25")
+[node name="Footprint" type="Node3D" parent="Buildings/B8200048"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-19.71, -34.45, 26.42, -28.77, 20.55, 18.87, 27.49, 19.73, 25.68, 34.46, -27.40, 27.92)
+height = 10.4
+wall_color = Color(0.700, 0.720, 0.740, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 8200048
+well = true
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B4"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.219999999999999, 0)
-mesh = SubResource("BM26")
-surface_material_override/0 = SubResource("M27")
-
-[node name="B5" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 958.5, 0, 356.1)
+[node name="B380433" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 402.1, 0, 285.1)
 script = ExtResource("1")
-metadata/footprint = Vector2(12, 13)
+metadata/footprint = Vector2(56.9, 81.4)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
-mesh = SubResource("BM28")
-surface_material_override/0 = SubResource("M29")
+[node name="Footprint" type="Node3D" parent="Buildings/B380433"]
+script = ExtResource("13")
+polygon = PackedVector2Array(19.81, 40.67, -3.83, 38.07, -0.17, 4.91, -28.39, 1.80, -26.83, -12.39, 1.71, -9.24, 5.17, -40.74, 28.49, -38.18)
+height = 11.4
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 380433
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.42, 0)
-mesh = SubResource("BM30")
-surface_material_override/0 = SubResource("M31")
-
-[node name="B6" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 394.3, 0, 378.7)
+[node name="B383790" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 210.8, 0, 290.3)
 script = ExtResource("1")
-metadata/footprint = Vector2(22, 5)
+metadata/footprint = Vector2(26.6, 39.6)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
-mesh = SubResource("BM32")
-surface_material_override/0 = SubResource("M33")
+[node name="Footprint" type="Node3D" parent="Buildings/B383790"]
+script = ExtResource("13")
+polygon = PackedVector2Array(13.34, 14.74, 0.02, 19.85, -13.25, -14.67, 0.08, -19.79)
+height = 7.4
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 383790
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.32, 0)
-mesh = SubResource("BM34")
-surface_material_override/0 = SubResource("M35")
-
-[node name="B7" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 849.6, 0, 391.8)
+[node name="B383792" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 863.0, 0, 313.6)
 script = ExtResource("1")
-metadata/footprint = Vector2(12, 9)
+metadata/footprint = Vector2(11.3, 11.4)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B7"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7000000000000002, 0)
-mesh = SubResource("BM36")
-surface_material_override/0 = SubResource("M37")
+[node name="Footprint" type="Node3D" parent="Buildings/B383792"]
+script = ExtResource("13")
+polygon = PackedVector2Array(5.71, 2.13, -2.10, 5.64, -5.62, -2.22, 2.19, -5.72)
+height = 6.7
+wall_color = Color(0.550, 0.420, 0.280, 1)
+roof_color = Color(0.600, 0.300, 0.220, 1)
+source = "buildings.json"
+building_id = 383792
+chimney = true
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B7"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5200000000000005, 0)
-mesh = SubResource("BM38")
-surface_material_override/0 = SubResource("M39")
-
-[node name="B8" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 769.7, 0, 466.8)
+[node name="B379304" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 795.6, 0, 317.4)
 script = ExtResource("1")
-metadata/footprint = Vector2(26, 33)
+metadata/footprint = Vector2(7.4, 6.2)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B8"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.95, 0)
-mesh = SubResource("BM40")
-surface_material_override/0 = SubResource("M41")
+[node name="Footprint" type="Node3D" parent="Buildings/B379304"]
+script = ExtResource("13")
+polygon = PackedVector2Array(3.67, 0.57, -2.03, 3.17, -3.69, -0.48, 2.01, -3.07)
+height = 8.4
+wall_color = Color(0.620, 0.360, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 379304
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B8"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.02, 0)
-mesh = SubResource("BM42")
-surface_material_override/0 = SubResource("M43")
-
-[node name="B9" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 725.0, 0, 480.0)
+[node name="B383376" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 877.5, 0, 328.5)
 script = ExtResource("1")
-metadata/footprint = Vector2(33, 25)
+metadata/footprint = Vector2(8.8, 10.7)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B9"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
-mesh = SubResource("BM44")
-surface_material_override/0 = SubResource("M45")
+[node name="Footprint" type="Node3D" parent="Buildings/B383376"]
+script = ExtResource("13")
+polygon = PackedVector2Array(4.38, 3.12, -1.04, 5.30, -4.46, -3.20, 0.95, -5.38)
+height = 5.0
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 383376
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B9"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.12, 0)
-mesh = SubResource("BM46")
-surface_material_override/0 = SubResource("M47")
-
-[node name="B10" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 679.1, 0, 504.2)
+[node name="B6343052" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 356.0, 0, 341.6)
 script = ExtResource("1")
-metadata/footprint = Vector2(32, 24)
+metadata/footprint = Vector2(28.3, 50.4)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B10"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.95, 0)
-mesh = SubResource("BM48")
-surface_material_override/0 = SubResource("M49")
+[node name="Footprint" type="Node3D" parent="Buildings/B6343052"]
+script = ExtResource("13")
+polygon = PackedVector2Array(14.18, -22.65, 8.91, 25.23, -14.11, 22.70, -8.84, -25.18)
+height = 11.7
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6343052
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B10"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.02, 0)
-mesh = SubResource("BM50")
-surface_material_override/0 = SubResource("M51")
-
-[node name="B11" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 465.0, 0, 536.9)
+[node name="B6344384" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 896.9, 0, 345.8)
 script = ExtResource("1")
-metadata/footprint = Vector2(14, 12)
+metadata/footprint = Vector2(11.2, 11.2)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B11"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
-mesh = SubResource("BM52")
-surface_material_override/0 = SubResource("M53")
+[node name="Footprint" type="Node3D" parent="Buildings/B6344384"]
+script = ExtResource("13")
+polygon = PackedVector2Array(0.02, -5.59, 0.99, -5.51, 1.93, -5.26, 2.82, -4.85, 3.61, -4.29, 4.30, -3.60, 4.86, -2.80, 5.28, -1.92, 5.53, -0.97, 5.61, 0.00, 5.53, 0.97, 5.28, 1.91, 4.86, 2.79, 4.30, 3.59, 3.61, 4.28, 2.82, 4.84, 1.93, 5.25, 0.99, 5.50, 0.02, 5.59, -0.95, 5.50, -1.89, 5.25, -2.78, 4.84, -3.58, 4.28, -4.26, 3.59, -4.82, 2.79, -5.23, 1.91, -5.49, 0.97, -5.57, 0.00, -5.49, -0.97, -5.23, -1.92, -4.82, -2.80, -4.26, -3.60, -3.58, -4.29, -2.78, -4.85, -1.89, -5.26, -0.95, -5.51)
+height = 7.8
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6344384
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B11"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.62, 0)
-mesh = SubResource("BM54")
-surface_material_override/0 = SubResource("M55")
-
-[node name="B12" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 309.4, 0, 559.1)
+[node name="B9131790" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 407.5, 0, 348.1)
 script = ExtResource("1")
-metadata/footprint = Vector2(33, 20)
+metadata/footprint = Vector2(28.9, 49.8)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B12"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.35, 0)
-mesh = SubResource("BM56")
-surface_material_override/0 = SubResource("M57")
+[node name="Footprint" type="Node3D" parent="Buildings/B9131790"]
+script = ExtResource("13")
+polygon = PackedVector2Array(14.41, -22.33, 9.21, 24.92, -14.44, 22.32, -9.23, -24.93)
+height = 11.1
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 9131790
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B12"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.82, 0)
-mesh = SubResource("BM58")
-surface_material_override/0 = SubResource("M59")
-
-[node name="B13" type="Node3D" parent="Village"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 946.1, 0, 816.3)
+[node name="B383378" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 958.9, 0, 356.3)
 script = ExtResource("1")
-metadata/footprint = Vector2(12, 9)
+metadata/footprint = Vector2(11.6, 13.2)
 
-[node name="Mass" type="MeshInstance3D" parent="Village/B13"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
-mesh = SubResource("BM60")
-surface_material_override/0 = SubResource("M61")
+[node name="Footprint" type="Node3D" parent="Buildings/B383378"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-5.81, -2.59, -3.97, -2.86, -4.39, -5.68, 1.86, -6.60, 2.27, -3.79, 4.48, -4.12, 5.83, 5.02, -4.45, 6.55)
+height = 7.9
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 383378
 
-[node name="Roof" type="MeshInstance3D" parent="Village/B13"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.12, 0)
-mesh = SubResource("BM62")
-surface_material_override/0 = SubResource("M63")
+[node name="B383379" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 971.5, 0, 362.6)
+script = ExtResource("1")
+metadata/footprint = Vector2(5.1, 6.7)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B383379"]
+script = ExtResource("13")
+polygon = PackedVector2Array(2.52, 2.55, -1.36, 3.32, -2.55, -2.64, 1.33, -3.41)
+height = 13.4
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 383379
+chimney = true
+
+[node name="B383381" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 966.9, 0, 375.6)
+script = ExtResource("1")
+metadata/footprint = Vector2(6.7, 6.6)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B383381"]
+script = ExtResource("13")
+polygon = PackedVector2Array(3.35, 2.55, -2.55, 3.34, -3.33, -2.52, 2.57, -3.31)
+height = 5.7
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.220, 0.200, 0.190, 1)
+source = "buildings.json"
+building_id = 383381
+
+[node name="B6092642" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 980.6, 0, 381.6)
+script = ExtResource("1")
+metadata/footprint = Vector2(8.0, 10.5)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6092642"]
+script = ExtResource("13")
+polygon = PackedVector2Array(4.05, -3.52, 1.11, 5.27, -4.00, 3.56, -1.07, -5.23)
+height = 7.1
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.220, 0.200, 0.190, 1)
+source = "buildings.json"
+building_id = 6092642
+
+[node name="B466991" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 851.3, 0, 393.5)
+script = ExtResource("1")
+metadata/footprint = Vector2(14.2, 13.4)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B466991"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-2.76, 6.66, -7.12, -1.58, 2.74, -6.76, 7.08, 1.48)
+height = 7.7
+wall_color = Color(0.550, 0.420, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 466991
+chimney = true
+
+[node name="B6343874" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 745.6, 0, 401.4)
+script = ExtResource("1")
+metadata/footprint = Vector2(10.1, 8.6)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6343874"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-5.09, -0.20, 2.71, -4.26, 5.06, 0.25, -2.75, 4.31)
+height = 3.5
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6343874
+
+[node name="B466993" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 851.5, 0, 408.8)
+script = ExtResource("1")
+metadata/footprint = Vector2(6.4, 6.6)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B466993"]
+script = ExtResource("13")
+polygon = PackedVector2Array(3.16, 1.17, -0.91, 3.26, -3.22, -1.23, 0.85, -3.32)
+height = 4.5
+wall_color = Color(0.550, 0.420, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 466993
+chimney = true
+
+[node name="B382021" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 331.0, 0, 423.0)
+script = ExtResource("1")
+metadata/footprint = Vector2(6.2, 6.9)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B382021"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-0.97, 3.46, -3.07, -1.88, 1.02, -3.48, 3.12, 1.86)
+height = 3.3
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 382021
+well = true
+
+[node name="B379826" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 342.9, 0, 453.2)
+script = ExtResource("1")
+metadata/footprint = Vector2(17.0, 15.0)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B379826"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-4.16, 7.46, -8.53, -0.98, 4.13, -7.55, 8.51, 0.90)
+height = 4.1
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 379826
+
+[node name="B469816" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 769.6, 0, 465.9)
+script = ExtResource("1")
+metadata/footprint = Vector2(24.2, 32.0)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B469816"]
+script = ExtResource("13")
+polygon = PackedVector2Array(2.41, 16.04, -12.12, -10.74, -2.42, -16.00, 12.11, 10.78)
+height = 9.6
+wall_color = Color(0.880, 0.820, 0.680, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 469816
+chimney = true
+
+[node name="B6345378" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 745.7, 0, 466.8)
+script = ExtResource("1")
+metadata/footprint = Vector2(7.2, 8.0)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6345378"]
+script = ExtResource("13")
+polygon = PackedVector2Array(0.61, -4.04, 3.57, 1.83, -0.63, 3.95, -3.59, -1.92)
+height = 2.8
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6345378
+
+[node name="B379869" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 354.6, 0, 473.6)
+script = ExtResource("1")
+metadata/footprint = Vector2(21.1, 25.4)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B379869"]
+script = ExtResource("13")
+polygon = PackedVector2Array(0.08, 12.77, -10.50, -7.08, 0.01, -12.68, 10.58, 7.16)
+height = 4.4
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 379869
+
+[node name="B424126" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 463.6, 0, 476.4)
+script = ExtResource("1")
+metadata/footprint = Vector2(29.3, 41.5)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B424126"]
+script = ExtResource("13")
+polygon = PackedVector2Array(14.61, 16.15, 6.63, 20.77, -2.24, 5.44, -14.70, -16.09, -6.72, -20.71, 5.74, 0.82)
+height = 13.5
+wall_color = Color(0.620, 0.360, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 424126
+chimney = true
+
+[node name="B424127" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 725.4, 0, 478.9)
+script = ExtResource("1")
+metadata/footprint = Vector2(31.8, 24.1)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B424127"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-10.72, 12.07, -15.85, 2.95, 10.77, -12.03, 15.90, -2.91)
+height = 9.8
+wall_color = Color(0.880, 0.820, 0.680, 1)
+roof_color = Color(0.378, 0.342, 0.270, 1)
+source = "buildings.json"
+building_id = 424127
+chimney = true
+
+[node name="B379872" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 420.0, 0, 492.1)
+script = ExtResource("1")
+metadata/footprint = Vector2(33.3, 42.9)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B379872"]
+script = ExtResource("13")
+polygon = PackedVector2Array(2.04, 21.39, -16.59, -13.71, -1.94, -21.49, 16.68, 13.61)
+height = 7.2
+wall_color = Color(0.620, 0.360, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 379872
+
+[node name="B378721" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 511.1, 0, 494.3)
+script = ExtResource("1")
+metadata/footprint = Vector2(16.6, 12.8)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B378721"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-8.26, -1.31, 5.43, -6.41, 8.29, 1.25, -5.41, 6.35)
+height = 10.6
+wall_color = Color(0.550, 0.420, 0.280, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 378721
+
+[node name="B430585" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 789.1, 0, 495.8)
+script = ExtResource("1")
+metadata/footprint = Vector2(16.7, 21.2)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B430585"]
+script = ExtResource("13")
+polygon = PackedVector2Array(1.86, 10.60, -8.33, -6.87, -1.86, -10.65, 8.33, 6.83)
+height = 4.8
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 430585
+
+[node name="B389491" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1030.1, 0, 496.8)
+script = ExtResource("1")
+metadata/footprint = Vector2(22.8, 8.6)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B389491"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-11.40, 2.95, -10.97, -4.32, 11.41, -3.02, 10.99, 4.25)
+height = 5.9
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 389491
+
+[node name="B382540" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 635.5, 0, 501.4)
+script = ExtResource("1")
+metadata/footprint = Vector2(15.5, 19.1)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B382540"]
+script = ExtResource("13")
+polygon = PackedVector2Array(3.21, 7.63, -0.91, 9.60, -5.57, -0.11, -7.78, -4.71, 2.26, -9.53, 7.76, 1.93, 1.84, 4.77)
+height = 7.1
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 382540
+chimney = true
+well = true
+
+[node name="B473922" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 752.8, 0, 502.9)
+script = ExtResource("1")
+metadata/footprint = Vector2(19.3, 27.1)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B473922"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-3.52, -13.56, -0.24, -7.65, 2.13, -8.97, 8.43, 2.36, 6.06, 3.68, 9.64, 10.13, 3.51, 13.54, -9.65, -10.15)
+height = 3.9
+wall_color = Color(0.620, 0.360, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 473922
+chimney = true
+
+[node name="B389490" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 680.2, 0, 503.3)
+script = ExtResource("1")
+metadata/footprint = Vector2(30.4, 22.3)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B389490"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-10.69, 11.12, -15.14, 3.00, 10.80, -11.20, 15.23, -3.08)
+height = 9.8
+wall_color = Color(0.840, 0.760, 0.600, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 389490
+chimney = true
+
+[node name="B6343847" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1016.5, 0, 507.8)
+script = ExtResource("1")
+metadata/footprint = Vector2(6.6, 4.8)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6343847"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-2.34, -2.38, 3.33, -0.64, 2.38, 2.46, -3.30, 0.72)
+height = 3.0
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6343847
+
+[node name="B378720" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 335.9, 0, 509.2)
+script = ExtResource("1")
+metadata/footprint = Vector2(37.5, 44.0)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B378720"]
+script = ExtResource("13")
+polygon = PackedVector2Array(8.01, 22.03, -11.59, -10.84, -15.18, -8.70, -18.81, -14.77, -6.78, -21.94, 11.03, 7.94, 13.32, 6.58, 18.72, 15.65)
+height = 10.6
+wall_color = Color(0.620, 0.360, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 378720
+chimney = true
+
+[node name="B378723" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 619.3, 0, 514.6)
+script = ExtResource("1")
+metadata/footprint = Vector2(11.4, 12.6)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B378723"]
+script = ExtResource("13")
+polygon = PackedVector2Array(5.66, 2.99, -1.26, 6.29, -5.69, -2.97, 1.24, -6.27)
+height = 7.2
+wall_color = Color(0.420, 0.320, 0.220, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 378723
+chimney = true
+well = true
+
+[node name="B6344835" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 744.3, 0, 522.4)
+script = ExtResource("1")
+metadata/footprint = Vector2(5.7, 7.4)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6344835"]
+script = ExtResource("13")
+polygon = PackedVector2Array(0.31, -3.71, 2.86, 2.40, -0.32, 3.72, -2.86, -2.39)
+height = 2.5
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6344835
+
+[node name="B378724" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 712.4, 0, 524.1)
+script = ExtResource("1")
+metadata/footprint = Vector2(18.3, 25.3)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B378724"]
+script = ExtResource("13")
+polygon = PackedVector2Array(9.11, 9.12, 2.76, 12.59, -9.17, -9.22, -2.82, -12.69)
+height = 4.2
+wall_color = Color(0.680, 0.680, 0.650, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 378724
+chimney = true
+
+[node name="B7822510" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 739.6, 0, 524.6)
+script = ExtResource("1")
+metadata/footprint = Vector2(5.2, 6.3)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B7822510"]
+script = ExtResource("13")
+polygon = PackedVector2Array(0.16, -3.15, 2.56, 1.79, -0.21, 3.14, -2.61, -1.81)
+height = 3.6
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 7822510
+
+[node name="B8861089" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 627.1, 0, 530.0)
+script = ExtResource("1")
+metadata/footprint = Vector2(9.9, 10.7)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B8861089"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-4.98, -2.15, 0.53, -5.34, 4.90, 2.18, -0.62, 5.38)
+height = 4.3
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 8861089
+
+[node name="B6345610" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 664.2, 0, 541.3)
+script = ExtResource("1")
+metadata/footprint = Vector2(6.6, 7.1)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6345610"]
+script = ExtResource("13")
+polygon = PackedVector2Array(3.35, 1.49, -0.65, 3.59, -3.29, -1.42, 0.72, -3.52)
+height = 3.4
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 6345610
+chimney = true
+
+[node name="B6344524" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 650.1, 0, 557.0)
+script = ExtResource("1")
+metadata/footprint = Vector2(11.7, 10.3)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6344524"]
+script = ExtResource("13")
+polygon = PackedVector2Array(5.86, 0.83, -2.89, 5.16, -5.87, -0.86, 2.88, -5.18)
+height = 4.2
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6344524
+
+[node name="B7822474" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 309.8, 0, 559.0)
+script = ExtResource("1")
+metadata/footprint = Vector2(33.4, 19.6)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B7822474"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-13.72, -9.77, 16.70, -2.41, 13.75, 9.80, -16.67, 2.44)
+height = 9.0
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 7822474
+chimney = true
+
+[node name="B379635" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 435.2, 0, 559.0)
+script = ExtResource("1")
+metadata/footprint = Vector2(10.9, 10.8)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B379635"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-1.93, 5.36, -2.81, 4.95, -5.25, 2.04, -5.50, -0.81, -3.60, -4.10, -0.04, -5.39, 3.52, -4.10, 5.42, -0.81, 4.76, 2.92, 1.86, 5.36)
+height = 7.5
+wall_color = Color(0.880, 0.820, 0.680, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 379635
+
+[node name="B381197" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1019.8, 0, 593.7)
+script = ExtResource("1")
+metadata/footprint = Vector2(12.0, 9.8)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B381197"]
+script = ExtResource("13")
+polygon = PackedVector2Array(6.04, -4.66, 5.69, 4.92, -6.01, 4.49, -5.79, -1.60, 0.53, -1.37, 0.65, -4.85)
+height = 6.2
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 381197
+
+[node name="B6345089" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 993.6, 0, 599.5)
+script = ExtResource("1")
+metadata/footprint = Vector2(7.3, 5.4)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6345089"]
+script = ExtResource("13")
+polygon = PackedVector2Array(2.84, 2.73, -3.70, 1.54, -2.92, -2.69, 3.61, -1.50)
+height = 5.0
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6345089
+
+[node name="B6343367" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1019.1, 0, 607.0)
+script = ExtResource("1")
+metadata/footprint = Vector2(4.0, 6.9)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6343367"]
+script = ExtResource("13")
+polygon = PackedVector2Array(2.02, -3.28, 1.68, 3.47, -1.99, 3.28, -1.64, -3.46)
+height = 9.3
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6343367
+
+[node name="B381198" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1006.1, 0, 611.0)
+script = ExtResource("1")
+metadata/footprint = Vector2(9.5, 10.0)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B381198"]
+script = ExtResource("13")
+polygon = PackedVector2Array(4.77, -4.59, 4.37, 5.06, -4.74, 4.67, -4.34, -4.98)
+height = 6.9
+wall_color = Color(0.840, 0.760, 0.600, 1)
+roof_color = Color(0.378, 0.342, 0.270, 1)
+source = "buildings.json"
+building_id = 381198
+chimney = true
+
+[node name="B7876741" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 503.2, 0, 621.0)
+script = ExtResource("1")
+metadata/footprint = Vector2(9.1, 8.6)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B7876741"]
+script = ExtResource("13")
+polygon = PackedVector2Array(4.60, -0.47, -1.60, 4.28, -4.53, 0.46, 1.67, -4.29)
+height = 7.6
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 7876741
+
+[node name="B379828" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 678.6, 0, 623.7)
+script = ExtResource("1")
+metadata/footprint = Vector2(12.4, 12.8)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B379828"]
+script = ExtResource("13")
+polygon = PackedVector2Array(6.20, 1.63, -0.33, 6.38, -6.18, -1.67, 0.34, -6.42)
+height = 7.9
+wall_color = Color(0.550, 0.420, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 379828
+chimney = true
+
+[node name="B7876744" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 505.9, 0, 624.5)
+script = ExtResource("1")
+metadata/footprint = Vector2(8.6, 7.8)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B7876744"]
+script = ExtResource("13")
+polygon = PackedVector2Array(4.26, -0.89, -1.93, 3.87, -4.30, 0.78, 1.90, -3.97)
+height = 9.7
+wall_color = Color(0.660, 0.420, 0.320, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 7876744
+
+[node name="B379397" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 692.8, 0, 627.2)
+script = ExtResource("1")
+metadata/footprint = Vector2(7.7, 7.3)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B379397"]
+script = ExtResource("13")
+polygon = PackedVector2Array(3.88, -0.37, -1.23, 3.69, -3.79, 0.46, 1.31, -3.60)
+height = 5.6
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 379397
+chimney = true
+well = true
+
+[node name="B464340" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 508.7, 0, 628.1)
+script = ExtResource("1")
+metadata/footprint = Vector2(9.4, 9.0)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B464340"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-4.73, 0.27, 1.46, -4.49, 4.69, -0.28, -1.51, 4.47)
+height = 7.3
+wall_color = Color(0.660, 0.420, 0.320, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 464340
+chimney = true
+
+[node name="B6344571" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 485.0, 0, 632.7)
+script = ExtResource("1")
+metadata/footprint = Vector2(6.4, 5.1)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6344571"]
+script = ExtResource("13")
+polygon = PackedVector2Array(3.18, -1.37, 2.36, 2.53, -3.22, 1.37, -2.41, -2.53)
+height = 17.0
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6344571
+
+[node name="B464341" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 512.0, 0, 659.4)
+script = ExtResource("1")
+metadata/footprint = Vector2(13.8, 13.6)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B464341"]
+script = ExtResource("13")
+polygon = PackedVector2Array(6.85, 0.42, -1.27, 6.82, -6.95, -0.39, 1.17, -6.78)
+height = 9.1
+wall_color = Color(0.550, 0.420, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 464341
+chimney = true
+
+[node name="B464343" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 661.7, 0, 681.6)
+script = ExtResource("1")
+metadata/footprint = Vector2(13.4, 13.5)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B464343"]
+script = ExtResource("13")
+polygon = PackedVector2Array(6.74, 1.14, -0.80, 6.76, -6.65, -1.10, 0.89, -6.72)
+height = 11.8
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 464343
+
+[node name="B464342" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 471.2, 0, 683.9)
+script = ExtResource("1")
+metadata/footprint = Vector2(20.2, 19.0)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B464342"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-4.05, 9.49, -10.11, 2.10, 4.06, -9.52, 10.11, -2.13)
+height = 8.1
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 464342
+
+[node name="B739808" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 597.8, 0, 697.3)
+script = ExtResource("1")
+metadata/footprint = Vector2(24.9, 18.3)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B739808"]
+script = ExtResource("13")
+polygon = PackedVector2Array(2.93, -9.14, 12.43, 4.32, 5.98, 8.87, 1.73, 2.83, -7.21, 9.14, -12.45, 1.72)
+height = 5.3
+wall_color = Color(0.880, 0.820, 0.680, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 739808
+chimney = true
+
+[node name="B7390677" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 980.9, 0, 704.4)
+script = ExtResource("1")
+metadata/footprint = Vector2(7.2, 7.7)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B7390677"]
+script = ExtResource("13")
+polygon = PackedVector2Array(3.62, -1.32, 0.49, 3.81, -3.59, 1.06, -0.24, -3.91)
+height = 12.3
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 7390677
+
+[node name="B380594" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 631.4, 0, 705.3)
+script = ExtResource("1")
+metadata/footprint = Vector2(17.2, 14.7)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B380594"]
+script = ExtResource("13")
+polygon = PackedVector2Array(0.92, -7.37, 8.65, 2.12, 5.88, 4.06, 4.52, 2.13, -2.94, 7.35, -8.59, -0.71)
+height = 5.3
+wall_color = Color(0.620, 0.360, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 380594
+
+[node name="B380595" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 985.1, 0, 707.0)
+script = ExtResource("1")
+metadata/footprint = Vector2(7.4, 7.8)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B380595"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-3.71, 1.21, -0.58, -3.92, 3.70, -1.04, 0.33, 3.93)
+height = 6.1
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 380595
+
+[node name="B380596" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 967.3, 0, 708.2)
+script = ExtResource("1")
+metadata/footprint = Vector2(11.4, 12.7)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B380596"]
+script = ExtResource("13")
+polygon = PackedVector2Array(5.70, -2.88, -0.02, 6.32, -5.69, 2.80, 0.03, -6.40)
+height = 6.6
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 380596
+
+[node name="B6343361" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 934.3, 0, 716.9)
+script = ExtResource("1")
+metadata/footprint = Vector2(6.9, 6.4)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6343361"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-1.50, -3.23, 3.39, -0.88, 1.43, 3.19, -3.46, 0.84)
+height = 7.9
+wall_color = Color(0.420, 0.320, 0.220, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 6343361
+chimney = true
+
+[node name="B383500" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 984.0, 0, 719.7)
+script = ExtResource("1")
+metadata/footprint = Vector2(12.4, 12.8)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B383500"]
+script = ExtResource("13")
+polygon = PackedVector2Array(0.22, 6.37, -6.22, 1.64, -0.29, -6.42, 6.15, -1.69)
+height = 7.5
+wall_color = Color(0.550, 0.420, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 383500
+chimney = true
+
+[node name="B382363" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 931.4, 0, 803.2)
+script = ExtResource("1")
+metadata/footprint = Vector2(25.8, 21.1)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B382363"]
+script = ExtResource("13")
+polygon = PackedVector2Array(12.93, -6.27, 11.08, 3.25, -1.56, 0.79, -3.46, 10.55, -12.87, 8.71, -9.11, -10.57)
+height = 8.9
+wall_color = Color(0.880, 0.820, 0.680, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 382363
+chimney = true
+
+[node name="B382531" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 969.0, 0, 810.7)
+script = ExtResource("1")
+metadata/footprint = Vector2(16.8, 19.3)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B382531"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-6.44, -9.65, 8.40, -7.20, 7.33, -0.73, 2.46, -1.53, 0.63, 9.62, -6.27, 8.48, -5.86, 5.98, -5.29, 2.51, -8.36, 2.01)
+height = 7.2
+wall_color = Color(0.880, 0.820, 0.680, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 382531
+chimney = true
+
+[node name="B6342852" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 950.7, 0, 816.9)
+script = ExtResource("1")
+metadata/footprint = Vector2(9.1, 7.9)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6342852"]
+script = ExtResource("13")
+polygon = PackedVector2Array(4.52, -3.03, 3.71, 3.95, -4.53, 2.99, -3.72, -3.99)
+height = 12.5
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 6342852
+
+[node name="B6345180" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 959.8, 0, 818.5)
+script = ExtResource("1")
+metadata/footprint = Vector2(6.8, 5.6)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6345180"]
+script = ExtResource("13")
+polygon = PackedVector2Array(3.34, -1.82, 2.93, 0.68, 2.58, 2.79, -3.42, 1.80, -2.66, -2.81)
+height = 4.3
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6345180
+
+[node name="B6344450" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 933.9, 0, 868.3)
+script = ExtResource("1")
+metadata/footprint = Vector2(5.1, 7.3)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6344450"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-1.02, -3.65, 2.56, -2.83, 1.06, 3.69, -2.52, 2.86)
+height = 14.7
+wall_color = Color(0.420, 0.320, 0.220, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 6344450
+chimney = true
+well = true
+
+[node name="B472353" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 951.1, 0, 874.8)
+script = ExtResource("1")
+metadata/footprint = Vector2(10.3, 11.7)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B472353"]
+script = ExtResource("13")
+polygon = PackedVector2Array(3.99, 5.79, -5.17, 4.77, -3.99, -5.87, 5.17, -4.86)
+height = 7.1
+wall_color = Color(0.740, 0.600, 0.320, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 472353
+chimney = true
+well = true
+
+[node name="B425593" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 933.1, 0, 884.0)
+script = ExtResource("1")
+metadata/footprint = Vector2(5.4, 8.2)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B425593"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-2.66, 3.44, -1.51, -4.12, 2.74, -3.47, 1.59, 4.09)
+height = 10.3
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 425593
+
+[node name="B7427029" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 938.0, 0, 884.7)
+script = ExtResource("1")
+metadata/footprint = Vector2(6.5, 8.4)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B7427029"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-3.31, 3.39, -2.16, -4.17, 3.23, -3.35, 2.08, 4.21)
+height = 10.3
+wall_color = Color(0.550, 0.420, 0.280, 1)
+roof_color = Color(0.450, 0.280, 0.240, 1)
+source = "buildings.json"
+building_id = 7427029
+
+[node name="B425594" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 606.6, 0, 907.7)
+script = ExtResource("1")
+metadata/footprint = Vector2(11.9, 11.1)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B425594"]
+script = ExtResource("13")
+polygon = PackedVector2Array(2.25, 5.54, -5.92, 0.31, -2.17, -5.54, 6.00, -0.30)
+height = 7.9
+wall_color = Color(0.550, 0.420, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 425594
+chimney = true
+
+[node name="B425596" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 616.1, 0, 920.6)
+script = ExtResource("1")
+metadata/footprint = Vector2(10.9, 12.3)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B425596"]
+script = ExtResource("13")
+polygon = PackedVector2Array(5.46, -2.94, 0.52, 6.13, -5.45, 2.87, -0.51, -6.19)
+height = 6.2
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 425596
+
+[node name="B7822522" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 623.6, 0, 927.5)
+script = ExtResource("1")
+metadata/footprint = Vector2(7.2, 8.1)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B7822522"]
+script = ExtResource("13")
+polygon = PackedVector2Array(0.37, 4.02, -3.64, 1.86, -0.44, -4.08, 3.57, -1.91)
+height = 5.6
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 7822522
+
+[node name="B378310" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 695.8, 0, 939.2)
+script = ExtResource("1")
+metadata/footprint = Vector2(12.4, 15.2)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B378310"]
+script = ExtResource("13")
+polygon = PackedVector2Array(6.20, -4.83, 2.12, 7.63, -6.17, 4.92, -2.09, -7.55)
+height = 7.4
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 378310
+
+[node name="B378311" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 716.3, 0, 942.9)
+script = ExtResource("1")
+metadata/footprint = Vector2(11.1, 14.5)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B378311"]
+script = ExtResource("13")
+polygon = PackedVector2Array(0.17, -3.79, 5.51, -2.29, 2.82, 7.24, -5.16, 4.98, -3.74, -0.08, -5.56, -0.59, -3.68, -7.25, 0.79, -5.99)
+height = 7.5
+wall_color = Color(0.550, 0.420, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 378311
+chimney = true
+
+[node name="B6345209" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 690.3, 0, 954.6)
+script = ExtResource("1")
+metadata/footprint = Vector2(9.8, 10.5)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B6345209"]
+script = ExtResource("13")
+polygon = PackedVector2Array(4.94, -2.86, 2.23, 5.30, -4.88, 2.93, -2.17, -5.23)
+height = 6.8
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 6345209
+
+[node name="B378312" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 684.6, 0, 1000.6)
+script = ExtResource("1")
+metadata/footprint = Vector2(7.2, 6.5)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B378312"]
+script = ExtResource("13")
+polygon = PackedVector2Array(-3.57, -1.80, 2.33, -3.28, 3.60, 1.71, -2.31, 3.19)
+height = 8.8
+wall_color = Color(0.460, 0.380, 0.290, 1)
+roof_color = Color(0.207, 0.171, 0.131, 1)
+source = "buildings.json"
+building_id = 378312
+
+[node name="B430587" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 978.0, 0, 1023.7)
+script = ExtResource("1")
+metadata/footprint = Vector2(10.1, 9.9)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B430587"]
+script = ExtResource("13")
+polygon = PackedVector2Array(4.99, 0.16, -1.05, 4.92, -5.08, -0.20, 0.95, -4.96)
+height = 7.5
+wall_color = Color(0.550, 0.420, 0.280, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 430587
 
 [node name="TradePost" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 484.0, 0, 535)
-script = ExtResource("13")
+script = ExtResource("14")
 era_id = "era_2026"
 post_name_key = "POST_2026"
 intro_key = "POST_2026_TEXT"
@@ -833,27 +1598,27 @@ metadata/footprint = Vector2(3.0, 2.4)
 [node name="Base" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, -1.0, 0)
 size = Vector3(3.0, 2.0, 2.4)
-material = SubResource("M65")
+material = SubResource("M9")
 
 [node name="Stall" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 0.55, 0)
 size = Vector3(2.4, 1.1, 1.2)
-material = SubResource("M66")
+material = SubResource("M10")
 
 [node name="Awning" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.2, -0.3)
 size = Vector3(2.8, 0.12, 2.0)
-material = SubResource("M67")
+material = SubResource("M11")
 
 [node name="PostA" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, -1.3, 1.1, -1.2)
 size = Vector3(0.1, 2.2, 0.1)
-material = SubResource("M68")
+material = SubResource("M12")
 
 [node name="PostB" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 1.3, 1.1, -1.2)
 size = Vector3(0.1, 2.2, 0.1)
-material = SubResource("M69")
+material = SubResource("M13")
 
 [node name="Body3D" type="StaticBody3D" parent="TradePost"]
 collision_layer = 2
@@ -861,4 +1626,4 @@ collision_mask = 0
 
 [node name="Shape" type="CollisionShape3D" parent="TradePost/Body3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
-shape = SubResource("TP_era_2026_64")
+shape = SubResource("TP_era_2026_8")

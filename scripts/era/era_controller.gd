@@ -34,9 +34,9 @@ func _snap_children() -> void:
 	if terrain == null:
 		return
 	_snap_list(get_children(), terrain)
-	# one level deeper for container groups (e.g. the village massing)
+	# one level deeper for container groups (the village massing, the real footprints)
 	for c in get_children():
-		if c is Node3D and c.get_child_count() > 0 and c.name == "Village":
+		if c is Node3D and c.get_child_count() > 0 and c.name in ["Village", "Buildings"]:
 			_snap_list(c.get_children(), terrain)
 
 

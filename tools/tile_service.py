@@ -19,7 +19,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools")); sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
-import new_site, gen_era_scenes, extract_features  # noqa: E402
+import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees  # noqa: E402
 
 GEOCODER = "https://inaadress.maaamet.ee/inaadress/gazetteer?results=8&features=EHAK,TANAV,KATASTRIYKSUS,EHITISHOONE&address="
 JOBS = {}
@@ -69,10 +69,22 @@ def run_job(job):
         stage("fetching Maa-amet data", 0.1)
         subprocess.run([sys.executable, os.path.join(ROOT, "tools/pipeline/fetch_tile.py"), "--project", ws, "--site", sid,
                         "--raw-dir", os.path.join(ROOT, "data_raw")], check=True)
+        stage("measured trees", 0.5)
+        try:
+            fetch_trees.fetch(sid, root=ws)
+        except Exception as e:  # noqa: BLE001 - optional layer
+            log(f"{sid}: tree dataset unavailable ({e}); statistical scatter")
+        stage("building register", 0.55)
+        try:
+            fetch_buildings.fetch(sid, root=ws)
+        except Exception as e:  # noqa: BLE001 - the register is optional; the nDSM massing stands in
+            log(f"{sid}: building register unavailable ({e}); using laser massing")
         stage("buildings, water, anchors", 0.6)
         _, _, anchors = extract_features.extract(sid, root=ws)
         stage("layout", 0.7)
         new_site.apply_anchors(sid, anchors, root=ws)
+        new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid, template="palupera", force=True,
+                          root=ws, template_root=ROOT, texture_mode="path", anchors=anchors, seed=job.get("seed"), block_ids=job.get("blocks"))
         new_site.relink_era_maps(sid, root=ws, texture_mode="path")
         stage("scenes", 0.75)
         if not gen_era_scenes.generate(sid, root=ws):
@@ -95,7 +107,7 @@ def run_job(job):
             for f in sorted(os.listdir(tile_dir)):
                 full = os.path.join(tile_dir, f)
                 if os.path.isfile(full) and not f.endswith(".import"):
-                    z.write(full, "tile/" + f)
+                    z.write(full, "tile/" + f)   # includes trees.json when the dataset covers the tile
         os.replace(zpath + ".part", zpath)
         with LOCK:
             job.update(stage="ready", progress=1.0, done=True, zip=zpath)

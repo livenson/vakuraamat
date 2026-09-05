@@ -209,6 +209,52 @@ func classify(img: Image, canopy: Image = null) -> Image:
 	return ctrl
 
 
+## Trees from trees.json ([x, z, height, crown, conifer]) as instances of the rule whose species fits:
+## conifers become pines (tall) or spruces, deciduous trees birches; junipers for small conifers.
+## Returns true when the tile had measured trees.
+func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Array, rng: RandomNumberGenerator, batches: Array, colors: Array) -> bool:
+	var path := tile_dir + "/trees.json"
+	if not FileAccess.file_exists(path):
+		return false
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(parsed) != TYPE_DICTIONARY or parsed.get("trees", []).is_empty():
+		return false
+	var rule_index := {}
+	for i in RULES.size():
+		rule_index[RULES[i].scene] = i
+	var placed := 0
+	for t in parsed.trees:
+		var pos := Vector3(float(t[0]), 0.0, float(t[1]))
+		var excluded := false
+		for e in exclusions:
+			if Vector2(pos.x, pos.z).distance_to(Vector2(float(e[0]), float(e[1]))) < float(e[2]):
+				excluded = true
+				break
+		if excluded:
+			continue
+		var h := float(t[2])
+		var conifer := int(t[4]) == 1
+		var scene: String
+		if conifer:
+			scene = "tree_juniper" if h < 7.0 else ("tree_pine" if h >= 14.0 or rng.randf() < 0.5 else "tree_spruce")
+		else:
+			scene = "tree_birch"
+		if not rule_index.has(scene):
+			continue
+		pos.y = terrain.data.get_height(pos)
+		if is_nan(pos.y):
+			continue
+		var s := clampf(h / MODEL_HEIGHT[scene], 0.4, 3.0)
+		var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * s)
+		var i: int = rule_index[scene]
+		batches[i].append(Transform3D(basis, pos))
+		var v: float = rng.randf_range(0.8, 1.05)
+		colors[i].append(Color(v * rng.randf_range(0.92, 1.1), v, v * rng.randf_range(0.85, 1.0)))
+		placed += 1
+	print("[terrain_builder] %d measured trees placed from trees.json" % placed)
+	return placed > 0
+
+
 ## Scatter trees, bushes and grass by land-cover class and canopy height; save into the region file.
 ## `exclusions` are [x, z, r] circles kept clear. Returns instance counts per rule.
 ## `keep_textures`: the ground texture list to write back (headless initialisation drops it from
@@ -247,6 +293,9 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 	for i in RULES.size():
 		batches.append([] as Array[Transform3D])
 		colors.append(PackedColorArray())
+	# Measured single trees (Maa-amet Geo3D, tools/pipeline/fetch_trees.py) replace the statistical
+	# tree rules where the dataset covers the tile; bushes and grass stay statistical.
+	var measured := _place_measured_trees(terrain, tile_dir, exclusions, rng, batches, colors)
 	for y in size:
 		for x in size:
 			var id := Terrain3DUtil.get_base(Terrain3DUtil.as_uint(ctrl.get_pixel(x, y).r))
@@ -260,6 +309,8 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 			var h: float = canopy.get_pixel(x, y).r if canopy else -1.0
 			for i in RULES.size():
 				var r: Dictionary = RULES[i]
+				if measured and MODEL_HEIGHT.has(r.scene):
+					continue   # trees come from the measurements
 				if not (id in r.ids):
 					continue
 				if canopy and r.has("height") and (h < r.height.x or h >= r.height.y):

@@ -61,7 +61,7 @@
       {"type": "npc", "name": "Leida", "id": "npc_leida", "knot": "leida", "label": "NPC_LEIDA", "color": [0.45, 0.5, 0.62], "at": "leida", "height": 1.55, "yaw": 2.4, "pose": "holding"},
       {"type": "pickup", "name": "RustedTool", "item": "rusted_tool", "examine": "EX_RUSTED_TOOL", "at": {"ref": "oak", "offset": [3, 2]}},
       {"type": "farm_plots", "at": {"ref": "farm", "offset": [2, 14]}, "count": 2, "seeds": ["seed_potato", "seed_cabbage"]},
-      {"type": "village", "source": "buildings_2026.json"},
+      {"type": "footprints", "source": "buildings.json", "year": 2026, "include_undated": true},
       {"type": "trade_post", "at": ["manor[0] - manor_size[0] / 2 - 12", "manor[1] - 10"], "key": "POST_2026", "color": [0.85, 0.85, 0.8]}
     ]},
     "era_1938": {"nodes": [

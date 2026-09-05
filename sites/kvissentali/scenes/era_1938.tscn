@@ -1,16 +1,17 @@
-[gd_scene load_steps=27 format=3]
+[gd_scene load_steps=28 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/npc/npc.tscn" id="1"]
 [ext_resource type="Script" path="res://scripts/interaction/conditional.gd" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/props/examine_point.tscn" id="3"]
 [ext_resource type="Script" path="res://scripts/trading/trade_post.gd" id="4"]
-[ext_resource type="Script" path="res://scripts/base_building/manor_controller.gd" id="5"]
-[ext_resource type="PackedScene" path="res://scenes/farming/farm_plot.tscn" id="6"]
-[ext_resource type="Script" path="res://scripts/farming/seed_bin.gd" id="7"]
-[ext_resource type="Script" path="res://scripts/hunting/hunting_spawner.gd" id="8"]
-[ext_resource type="PackedScene" path="res://scenes/props/pickup.tscn" id="9"]
-[ext_resource type="PackedScene" path="res://assets/models/props/boundary_stone.glb" id="10"]
-[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="11"]
+[ext_resource type="Script" path="res://scripts/world/footprint_building.gd" id="5"]
+[ext_resource type="Script" path="res://scripts/base_building/manor_controller.gd" id="6"]
+[ext_resource type="PackedScene" path="res://scenes/farming/farm_plot.tscn" id="7"]
+[ext_resource type="Script" path="res://scripts/farming/seed_bin.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/hunting/hunting_spawner.gd" id="9"]
+[ext_resource type="PackedScene" path="res://scenes/props/pickup.tscn" id="10"]
+[ext_resource type="PackedScene" path="res://assets/models/props/boundary_stone.glb" id="11"]
+[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="12"]
 
 [sub_resource type="BoxShape3D" id="TP_era_1938_1"]
 size = Vector3(2.6, 2.4, 2.2)
@@ -70,7 +71,7 @@ albedo_color = Color(0.550, 0.530, 0.500, 1)
 roughness = 0.9
 
 [node name="era_1938" type="Node3D"]
-script = ExtResource("11")
+script = ExtResource("12")
 era_id = "era_1938"
 
 [node name="Local1938" parent="." instance=ExtResource("1")]
@@ -83,7 +84,7 @@ height = 1.7
 pose = "stand"
 
 [node name="Landmark" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 267.0, 0, 297.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 235.5, 0, 499.2)
 script = ExtResource("2")
 
 [node name="LandmarkExamine" parent="Landmark" instance=ExtResource("3")]
@@ -133,9 +134,58 @@ collision_mask = 0
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
 shape = SubResource("TP_era_1938_1")
 
-[node name="Manor_home_farm" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 534.0)
+[node name="Buildings" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+script = ExtResource("2")
+
+[node name="B727240" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 209.1, 0, 208.2)
+script = ExtResource("2")
+metadata/footprint = Vector2(29.4, 69.1)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B727240"]
 script = ExtResource("5")
+polygon = PackedVector2Array(-5.79, -34.62, -4.61, -29.88, -0.62, -30.87, 14.76, 31.06, 0.73, 34.53, -14.68, -27.49, -10.65, -28.50, -11.80, -33.13)
+height = 11.4
+wall_color = Color(0.620, 0.360, 0.280, 1)
+roof_color = Color(0.600, 0.300, 0.220, 1)
+source = "buildings.json"
+building_id = 727240
+chimney = true
+
+[node name="B707903" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, 0, 229.1)
+script = ExtResource("2")
+metadata/footprint = Vector2(14.3, 16.7)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B707903"]
+script = ExtResource("5")
+polygon = PackedVector2Array(7.10, 6.29, -5.43, 8.31, -7.20, -2.69, -3.27, -3.33, -3.85, -6.99, 4.74, -8.37)
+height = 6.8
+wall_color = Color(0.880, 0.820, 0.680, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 707903
+chimney = true
+
+[node name="B727598" type="Node3D" parent="Buildings"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 240.6, 0, 527.9)
+script = ExtResource("2")
+metadata/footprint = Vector2(19.4, 43.6)
+
+[node name="Footprint" type="Node3D" parent="Buildings/B727598"]
+script = ExtResource("5")
+polygon = PackedVector2Array(9.70, 19.68, -2.93, 21.74, -9.74, -19.77, 2.89, -21.84)
+height = 13.2
+wall_color = Color(0.880, 0.820, 0.680, 1)
+roof_color = Color(0.550, 0.550, 0.520, 1)
+source = "buildings.json"
+building_id = 727598
+chimney = true
+
+[node name="Manor_home_farm" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 533.0)
+script = ExtResource("6")
 manor_id = "home_farm"
 
 [node name="Post" type="CSGBox3D" parent="Manor_home_farm"]
@@ -157,22 +207,22 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
 shape = SubResource("MS_home_farm_7")
 
 [node name="Farming" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 178.0, 0, 546.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 178.0, 0, 545.0)
 script = ExtResource("2")
 
-[node name="Plot0" parent="Farming" instance=ExtResource("6")]
+[node name="Plot0" parent="Farming" instance=ExtResource("7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0)
 plot_id = "plot0"
 era_id = "era_1938"
 
-[node name="Plot1" parent="Farming" instance=ExtResource("6")]
+[node name="Plot1" parent="Farming" instance=ExtResource("7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 0)
 plot_id = "plot1"
 era_id = "era_1938"
 
 [node name="SeedBin" type="Node3D" parent="Farming"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, 0)
-script = ExtResource("7")
+script = ExtResource("8")
 era_id = "era_1938"
 seed_item_ids = Array[String](["seed_rye", "seed_oats", "seed_potato"])
 
@@ -190,12 +240,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
 shape = SubResource("SB_era_1938_10")
 
 [node name="HuntingSpawner" type="Node3D" parent="."]
-script = ExtResource("8")
+script = ExtResource("9")
 era_id = "era_1938"
 max_animals = 6
 
-[node name="Pickup_deed_page" parent="." instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 261.0, 0, 301.0)
+[node name="Pickup_deed_page" parent="." instance=ExtResource("10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 229.5, 0, 503.2)
 item_id = "deed_page"
 era_id = "era_1938"
 examine_key = "ITEM_DEED_PAGE_DESC"
@@ -239,14 +289,14 @@ text_key = "EX_GATE_GONE"
 location_id = "LOC_FIELD"
 label_key = "LOC_FIELD"
 
-[node name="Pickup_harvest_letter" parent="." instance=ExtResource("9")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 175.0, 0, 525.0)
+[node name="Pickup_harvest_letter" parent="." instance=ExtResource("10")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 175.0, 0, 524.0)
 item_id = "harvest_letter"
 era_id = "era_1938"
 examine_key = "ITEM_HARVEST_LETTER_DESC"
 
 [node name="WellRing" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 534.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 533.0)
 script = ExtResource("2")
 flag = "well_kept"
 visible_when = true
@@ -266,7 +316,7 @@ location_id = "LOC_WELL"
 label_key = "LOC_WELL"
 
 [node name="WellDip" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 534.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 533.0)
 script = ExtResource("2")
 flag = "well_kept"
 visible_when = false
@@ -278,12 +328,12 @@ location_id = "LOC_WELL"
 label_key = "LOC_WELL"
 
 [node name="KeepsakeStone" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 267.0, 0, 297.0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 235.5, 0, 499.2)
 script = ExtResource("2")
 flag = "keepsake_returned"
 visible_when = true
 
-[node name="Stone" parent="KeepsakeStone" instance=ExtResource("10")]
+[node name="Stone" parent="KeepsakeStone" instance=ExtResource("11")]
 transform = Transform3D(0.9397, 0, 0.3420, 0, 1.0, 0, -0.3420, 0, 0.9397, 3, 0.0, 0)
 
 [node name="StoneExamine" parent="KeepsakeStone" instance=ExtResource("3")]
