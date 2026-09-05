@@ -248,3 +248,11 @@ PURPOSE_SIHTOTSTARBETA_MAA,sihtotstarbeta maa,no purpose set
 PURPOSE_JAATMEHOIDLA_MAA,jäätmehoidla maa,waste
 PURPOSE_VEEKOGUDE_MAA,veekogude maa,water
 PURPOSE_KAITSEALUNE_MAA,kaitsealune maa,protected
+MENU_TOWN,Linn (ühine raamat),Town (shared ledger)
+MENU_TOWN_ADDRESS,"Linna aadress: %s  %s","Town address: %s  %s"
+MENU_TOWN_URL,Server,Server
+MENU_PLAY_OFFLINE,Mängi võrguta,Play offline
+MENU_COPY,Kopeeri,Copy
+MENU_COPIED,Kopeeritud.,Copied.
+MENU_SAVE,Salvesta,Save
+MENU_SAVED,Salvestatud.,Saved.

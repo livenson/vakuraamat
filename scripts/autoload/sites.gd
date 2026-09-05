@@ -274,6 +274,17 @@ func name_key(id: String) -> String:
 
 
 ## Load every .tres/.res under dir into `into`, keyed by the resource's `id` property.
+## First 8 hex digits of sha256(parcels.json bytes ++ tenants.json bytes), the same as tools/town_admin.py.
+func pack_hash(id: String) -> String:
+	var ctx := HashingContext.new()
+	ctx.start(HashingContext.HASH_SHA256)
+	for name in ["parcels.json", "tenants.json"]:
+		var path := path_in(id, name)
+		if FileAccess.file_exists(path):
+			ctx.update(FileAccess.get_file_as_bytes(path))
+	return ctx.finish().hex_encode().substr(0, 8)
+
+
 static func load_dir(dir: String, into: Dictionary) -> void:
 	var d := DirAccess.open(dir)
 	if d == null:

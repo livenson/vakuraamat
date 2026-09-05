@@ -37,13 +37,13 @@ func _ready() -> void:
 	var tenanted := sellable.filter(func(p): return Ledger.tenants_of(p.tunnus).size() > 0 and int(p.price) <= 200000)
 	_check(tenanted.size() > 0, "no affordable tenanted parcel")
 	var target: Dictionary = tenanted[0]
-	Ledger.debug_grant(-Ledger.cash() + 10)
-	_check(Ledger.buy(target.tunnus) == "LEDGER_NO_MONEY", "buy should fail without money")
-	Ledger.debug_grant(250000 - 10)
+	await Ledger.debug_grant(-Ledger.cash() + 10)
+	_check(await Ledger.buy(target.tunnus) == "LEDGER_NO_MONEY", "buy should fail without money")
+	await Ledger.debug_grant(250000 - 10)
 	var before := Ledger.cash()
-	_check(Ledger.buy(target.tunnus) == "", "buy failed")
+	_check(await Ledger.buy(target.tunnus) == "", "buy failed")
 	_check(Ledger.is_mine(target.tunnus) and Ledger.cash() == before - int(target.price), "ownership or cash wrong after buy")
-	_check(Ledger.buy(target.tunnus) == "LEDGER_ALREADY_OWNER", "second buy should say already owner")
+	_check(await Ledger.buy(target.tunnus) == "LEDGER_ALREADY_OWNER", "second buy should say already owner")
 	_check(Ledger.events(5)[0].kind == "sale", "sale event missing")
 
 	# a month: rent equals the yield when no tenant falls behind; land tax comes due
@@ -57,33 +57,33 @@ func _ready() -> void:
 	var due := Ledger.obligations()
 	_check(due.size() == 1 and due[0].kind == "land_tax" and int(due[0].amount) == l.tax_month(int(target.land_value)), "land tax obligation wrong")
 	before = Ledger.cash()
-	_check(Ledger.pay(int(due[0].id)) == "" and Ledger.obligations().size() == 0 and Ledger.cash() == before - int(due[0].amount), "paying tax failed")
+	_check(await Ledger.pay(int(due[0].id)) == "" and Ledger.obligations().size() == 0 and Ledger.cash() == before - int(due[0].amount), "paying tax failed")
 
 	# bids: a second local player bids on my plot, I accept
 	var other := l.add_player("Neighbour")
 	_check(l.place_bid(other, target.tunnus, 1000) == "", "neighbour bid failed")
-	_check(Ledger.place_bid(target.tunnus, 500) == "LEDGER_NOT_BIDDABLE", "owner must not bid on own plot")
+	_check(await Ledger.place_bid(target.tunnus, 500) == "LEDGER_NOT_BIDDABLE", "owner must not bid on own plot")
 	var bid: Dictionary = Ledger.bids_for(target.tunnus)[0]
 	before = Ledger.cash()
-	_check(Ledger.accept_bid(int(bid.id)) == "", "accept failed")
+	_check(await Ledger.accept_bid(int(bid.id)) == "", "accept failed")
 	_check(Ledger.owner_of(target.tunnus) == other and Ledger.cash() == before + 1000, "transfer after accept wrong")
 	_check(l.players[other].cash == 250000 - 1000, "buyer not charged")
 
 	# building on an owned plot: prerequisite, duplicate, cost
 	var mine: Dictionary = sellable.filter(func(p): return int(p.owner_id) == 0 and int(p.price) <= 100000)[0]
-	_check(Ledger.buy(mine.tunnus) == "", "second buy failed")
-	_check(Ledger.build(mine.tunnus, "barn") == "LEDGER_REQUIRES", "barn should need the storehouse")
+	_check(await Ledger.buy(mine.tunnus) == "", "second buy failed")
+	_check(await Ledger.build(mine.tunnus, "barn") == "LEDGER_REQUIRES", "barn should need the storehouse")
 	before = Ledger.cash()
-	_check(Ledger.build(mine.tunnus, "storehouse") == "", "storehouse build failed")
+	_check(await Ledger.build(mine.tunnus, "storehouse") == "", "storehouse build failed")
 	_check(Ledger.cash() == before - int(l.structures["storehouse"].cost), "build cost not charged")
-	_check(Ledger.build(mine.tunnus, "barn") == "" and Ledger.build(mine.tunnus, "barn") == "LEDGER_ALREADY_BUILT", "barn build or duplicate check failed")
+	_check(await Ledger.build(mine.tunnus, "barn") == "" and await Ledger.build(mine.tunnus, "barn") == "LEDGER_ALREADY_BUILT", "barn build or duplicate check failed")
 	_check(Ledger.improvements_of(mine.tunnus).size() == 2, "improvement count")
-	_check(Ledger.build(target.tunnus, "storehouse") == "LEDGER_NOT_OWNER", "building on a sold plot must fail")
+	_check(await Ledger.build(target.tunnus, "storehouse") == "LEDGER_NOT_OWNER", "building on a sold plot must fail")
 
 	# save round trip
 	var cash_before := Ledger.cash()
 	_check(SaveManager.save("ledger_test"), "save failed")
-	Ledger.debug_grant(12345)
+	await Ledger.debug_grant(12345)
 	var ok: bool = await SaveManager.load_slot("ledger_test")
 	_check(ok, "load failed")
 	_check(Ledger.month() == 1 and Ledger.cash() == cash_before and Ledger.is_mine(mine.tunnus) and Ledger.owner_of(target.tunnus) == other

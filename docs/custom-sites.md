@@ -129,6 +129,17 @@ local play. The Godot client is the vendored `addons/SpacetimeDB` SDK with bindi
 `spacetime_bindings/` (`godot --headless --path . --script res://addons/SpacetimeDB/cli.gd` after
 publishing the module as `vakuraamat`; commit the result).
 
+In the game, the `Ledger` autoload probes the server named in `user://settings.cfg` (`[town] url`,
+default `http://127.0.0.1:3300`; set it in the Locations panel's Town section or paste a friend's)
+for the pack's town when the world loads. If the town answers, the game joins it with the identity
+token kept in `[town] token`, subscribes to every table and plays online: purchases, bids, rents and
+months come from the server, other players walk around as blue figures with name plates, and the HUD
+says so. If it does not answer, or `[town] offline` is set, the same rules run in the offline book,
+which is what the save file holds. Only `scripts/ledger/town_ledger.gd` touches the SDK; `ledger_test`
+greps the rest. `town_test` starts a throwaway server on port 3777, publishes the prebuilt module,
+seeds Kvissentali and checks that two clients see each other's purchases, bids and presence; it
+reports a skipped pass when the CLI or the module build is missing.
+
 ### Playing the ledger
 
 In the world, **V** opens the vakuraamat: the plots nearest to you with land value, price, owner and

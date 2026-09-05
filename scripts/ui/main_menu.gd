@@ -189,6 +189,44 @@ func _build_locations_panel() -> void:
 		var n := _name_edit.text.strip_edges()
 		_create(n if n != "" else str(_picked.name), float(_picked.x), float(_picked.y)))
 
+	# --- town (the shared ledger)
+	_section(list, "MENU_TOWN")
+	var trow := HBoxContainer.new()
+	list.add_child(trow)
+	var town_db := Ledger.db_name_for(Sites.active)
+	var town_url := str(Ledger.setting("town", "url", Ledger.DEFAULT_TOWN_URL))
+	var tl := Label.new()
+	tl.text = tr("MENU_TOWN_ADDRESS") % [town_url, town_db]
+	tl.add_theme_font_size_override("font_size", 14)
+	trow.add_child(tl)
+	_small(trow, "MENU_COPY", func():
+		DisplayServer.clipboard_set("%s %s" % [town_url, town_db])
+		_status.text = tr("MENU_COPIED"))
+	var urow := HBoxContainer.new()
+	list.add_child(urow)
+	var ul := Label.new()
+	ul.text = tr("MENU_TOWN_URL") + ": "
+	urow.add_child(ul)
+	var url_edit := LineEdit.new()
+	url_edit.text = town_url
+	url_edit.custom_minimum_size = Vector2(300, 0)
+	urow.add_child(url_edit)
+	_small(urow, "MENU_SAVE", func():
+		var cfg := ConfigFile.new()
+		cfg.load(Sites.SETTINGS)
+		cfg.set_value("town", "url", url_edit.text.strip_edges())
+		cfg.save(Sites.SETTINGS)
+		_status.text = tr("MENU_SAVED"))
+	var offline := CheckButton.new()
+	offline.text = tr("MENU_PLAY_OFFLINE")
+	offline.button_pressed = bool(Ledger.setting("town", "offline", false))
+	offline.toggled.connect(func(on: bool):
+		var cfg := ConfigFile.new()
+		cfg.load(Sites.SETTINGS)
+		cfg.set_value("town", "offline", on)
+		cfg.save(Sites.SETTINGS))
+	urow.add_child(offline)
+
 	# --- friends
 	_section(list, "MENU_FRIENDS")
 	var frow := HBoxContainer.new()
