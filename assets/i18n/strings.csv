@@ -270,6 +270,18 @@ BTN_TELEPORT_TIP,Hüppa kohe sinna,Jump there now
 NOTICE_GUIDE_SET,Teejuht: %s,Guiding you to %s
 NOTICE_GUIDE_ARRIVED,Kohal: %s,You are at %s
 UI_ONLINE_BADGE,võrgus,online
+UI_PROMPT_SWITCH_ON,Lülita sisse,Switch on
+UI_PROMPT_SWITCH_OFF,Lülita välja,Switch off
+UI_PROMPT_CARRY,Tõsta,Carry
+UI_PROMPT_DROP,Pane maha,Put down
+UI_PROMPT_READ,Loe,Read
+UI_LAMP,Lamp,Lamp
+UI_NOTICE_BOARD,Teadetetahvel,Notice board
+UI_SHEET_CLOSE,Esc sulgeb,Esc closes
+UI_SHEET_REGISTER,"Ehitisregister: %s","Building register: %s"
+UI_SHEET_TENANTS,Üürnikud,Tenants
+UI_SHEET_OWNER,Katastriüksus %s · omanik %s,Cadastral unit %s · owner %s
+UI_SHEET_NO_TENANTS,Ühtegi ettevõtet ei ole siia registreeritud.,No company is registered at this address.
 UI_PROMPT_ENTER,Sisene,Enter
 UI_PROMPT_LEAVE,Välju,Leave
 UI_BUILDING,Hoone,Building

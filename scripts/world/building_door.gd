@@ -5,6 +5,7 @@ extends Interactable
 
 var building: FootprintBuilding
 var frame: Dictionary = {}
+var leaf: SwingDoor
 
 
 func setup(b: FootprintBuilding, f: Dictionary) -> void:
@@ -26,6 +27,19 @@ func setup(b: FootprintBuilding, f: Dictionary) -> void:
 		shape.position = Vector3(0, 0, side * 0.35)
 		body.add_child(shape)
 		add_child(body)
+	leaf = SwingDoor.new()
+	leaf.name = "Leaf"
+	var mat := StandardMaterial3D.new()
+	if b.kind == "dwelling":
+		mat.albedo_color = Color(0.32, 0.2, 0.12)
+		mat.roughness = 0.6
+	else:
+		mat.albedo_color = Color(0.25, 0.28, 0.3)
+		mat.metallic = 0.4
+		mat.roughness = 0.35
+	leaf.setup(float(f.width), float(f.height), mat)
+	leaf.position.z += 0.09   # just proud of the wall's own door quad
+	add_child(leaf)
 
 
 func label() -> String:
@@ -56,5 +70,8 @@ func hover_text() -> String:
 
 
 func interact(player: Node3D) -> void:
-	if Interiors.instance:
+	if leaf and not leaf.is_open:
+		leaf.open(player.global_position)
+		await get_tree().create_timer(0.35).timeout
+	if Interiors.instance and is_instance_valid(building):
 		Interiors.instance.toggle(building, player)

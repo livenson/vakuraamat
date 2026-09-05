@@ -134,6 +134,13 @@ func _ready() -> void:
 			_configure_environment()
 		elif a.begins_with("--enter="):
 			get_tree().create_timer(2.5).timeout.connect(enter_building.bind(a.trim_prefix("--enter=")))
+		elif a == "--leave":
+			# checks: after --enter, step back out and turn to face the door from the street
+			get_tree().create_timer(4.0).timeout.connect(func():
+				var ins: Node = get_node_or_null("Interiors")
+				if ins and ins.inside:
+					ins.exit(player)
+					player.set_pose(player.global_position, player.rotation.y + PI, 0.0))
 		elif a.begins_with("--open="):
 			get_tree().create_timer(2.0).timeout.connect(ui.debug_open.bind(a.trim_prefix("--open=")))
 

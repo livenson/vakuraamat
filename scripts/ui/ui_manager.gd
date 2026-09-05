@@ -25,6 +25,7 @@ var _notice_tween: Tween
 
 var journal: PanelContainer
 var debug_map: PanelContainer
+var sheet_panel: PanelContainer     # a readable's page (notice board, register extract)
 var pause: PanelContainer
 var report_panel: PanelContainer
 var codes_label: Label            # K: cadastral number, building codes, road, registry links
@@ -52,6 +53,8 @@ func _ready() -> void:
 	_build_hud()
 	journal = _build_panel("UI_JOURNAL")
 	debug_map = _build_panel("UI_DEBUG_MAP")
+	sheet_panel = _build_panel("")
+	sheet_panel.custom_minimum_size = Vector2(640, 420)
 	pause = _build_panel("UI_MENU")
 	report_panel = _build_panel("UI_REPORT_TITLE")
 	report_panel.custom_minimum_size = Vector2(640, 0)
@@ -434,6 +437,24 @@ func _unhandled_input(event: InputEvent) -> void:
 			var p := _open_panel
 			_close()
 			_toggle(p, _filler_for(p))
+
+
+## A readable's page: the title as the head, the text as prose; any panel key closes it.
+func show_sheet(title: String, text: String) -> void:
+	var body := _clear_body(sheet_panel)
+	body.get_node("Title").text = title
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	body.add_child(scroll)
+	var prose := BookTheme.label(text, "ProseLabel", scroll)
+	prose.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	prose.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var hint := BookTheme.label(tr("UI_SHEET_CLOSE"), "DetailLabel", body)
+	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	if _open_panel and _open_panel != sheet_panel:
+		_close()
+	_open(sheet_panel)
 
 
 func _filler_for(p: Control) -> Callable:
