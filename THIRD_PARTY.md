@@ -13,7 +13,7 @@ content (writing, models, textures), with the data attribution below carried in 
 | Godot Engine | 4.7.2 | engine | MIT | keep the engine licence text in the exported app (Godot does this) | yes |
 | Terrain3D (TokisanGames) | 1.0.2-stable, 2026-05-19 | `addons/terrain_3d` | MIT | keep `addons/terrain_3d/LICENSE.txt` | yes |
 | Sky3D (TokisanGames, J. Cuéllar) | 2.1.0, 2026-05-19 | `addons/sky_3d` | MIT; third-party textures listed in `addons/sky_3d/ThirdParty.md` | keep both files; check ThirdParty.md before redistributing the milky-way/moon textures | yes (check textures) |
-| inkgd (Frédéric Maquin) | godot4 branch, 2024-01-28 | `addons/inkgd` | MIT (runtime port of inkle's ink, also MIT) | keep `addons/inkgd/LICENSE` | yes |
+| inkgd (Frédéric Maquin) | godot4 branch, 2024-01-28; local patch: `InkUtils.InkRuntime` uses `get_node_or_null` so first `init` no longer logs a missing-node error | `addons/inkgd` | MIT (runtime port of inkle's ink, also MIT) | keep `addons/inkgd/LICENSE` | yes |
 | inkjs compiler | 2.4.0 (npm, dev tool only) | `tools/ink` (node_modules ignored) | MIT | not shipped | yes |
 | Forest Vegetation sample pack (Renard Noir) | v1.0, 2026-08-27 | `assets/vendor/forest_vegetation` (materials, textures, licence; the 70 MB FBX models are not committed, re-download from the Asset Store to rerun `make props`), derived scenes in `assets/vegetation` | MIT (`LICENSE.txt` in the pack) | keep the licence file; attribution appreciated, not required | yes |
 | ambientCG ground textures (Grass001, Grass004, Ground037, Gravel022) | 1K, 2026-09-03 | `assets/terrain/textures` (repacked) | CC0 1.0 | none | yes |
