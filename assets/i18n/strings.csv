@@ -77,3 +77,16 @@ UI_DEBUG_MAP,Silumiskaart,Debug map
 UI_DEBUG_MAP_HINT,Klõps kaardil: teleport. M sulgeb.,Click the map to teleport. M closes.
 UI_KEYS,E tegutse   Tab vakuraamat   J päevik   I kott   L keel   M silumiskaart   Esc menüü,E interact   Tab register   J journal   I bag   L language   M debug map   Esc menu
 MENU_SITE,Asukoht,Location
+UI_BUILDING_GROUND,Maa ehitatakse laserandmetest...,Building the ground from the laser data...
+MENU_NEW_LOCATION,Uus asukoht...,New location...
+MENU_SEARCH,Otsi,Search
+MENU_USE_MY_LOCATION,Kasuta minu asukohta,Use my location
+MENU_BACK,Tagasi,Back
+MENU_CREATE_WORLD,Loo maailm,Create the world
+MENU_LOCATION_HINT,"Aadress, koht või koordinaadid (L-EST97 ""E N"" või ""lat, lon"")","An address, a place, or coordinates (L-EST97 ""E N"" or ""lat, lon"")"
+MENU_SERVICE_DOWN,"Kaarditeenus ei vasta (%s). Käivita: make tile-service","The tile service is not answering (%s). Start it with: make tile-service"
+MENU_OUTSIDE_ESTONIA,See koht ei ole Eestis. Praegu on andmed ainult Eesti kohta.,That point is outside Estonia. Data is only available for Estonia so far.
+MENU_NO_RESULTS,Midagi ei leitud.,Nothing found.
+MENU_WORLD_READY,Maailm on valmis.,The world is ready.
+MENU_LOCATION_NAME,Nimi,Name
+MENU_GENERATING,Maailma luuakse: %s,Creating the world: %s

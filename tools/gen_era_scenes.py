@@ -358,8 +358,8 @@ class Interpreter:
                 self.problems.append(f"unknown node type {t!r} ({name})")
 
 
-def generate(site, check=False):
-    site_dir = os.path.join(ROOT, "sites", site)
+def generate(site, check=False, root=ROOT):
+    site_dir = os.path.join(root, "sites", site)
     spec = json.load(open(os.path.join(site_dir, "scenes.json")))
     layout = json.load(open(os.path.join(site_dir, "layout.json")))
     it = Interpreter(site_dir, spec, layout)
@@ -378,5 +378,6 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Generate era scenes from a site's scenes.json")
     ap.add_argument("--site", default="palupera")
     ap.add_argument("--check", action="store_true", help="only report problems, write nothing")
+    ap.add_argument("--root", default=ROOT, help="project root holding sites/ (default: the repo)")
     a = ap.parse_args()
-    sys.exit(0 if generate(a.site, a.check) else 1)
+    sys.exit(0 if generate(a.site, a.check, a.root) else 1)

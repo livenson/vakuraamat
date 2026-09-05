@@ -8,7 +8,9 @@ extends Node
 
 signal site_changed(id: String)
 
-const ROOT := "res://sites/"
+const ROOT := "res://sites/"            # packs shipped with the game
+const USER_ROOT := "user://sites/"      # packs generated or downloaded at runtime (tile service, friends)
+const USER_TILES := "user://tiles/"
 const SETTINGS := "user://settings.cfg"
 const DEFAULT_SITE := "palupera"
 
@@ -17,6 +19,7 @@ var active := ""
 var manifest: Dictionary = {}
 var _translations: Array[Translation] = []
 var _initialised := false
+var _root_of: Dictionary = {}           # id -> root it was found under
 
 
 func _ready() -> void:
@@ -45,13 +48,20 @@ func _ensure() -> void:
 
 func scan() -> void:
 	available.clear()
-	var d := DirAccess.open(ROOT)
-	if d == null:
-		return
-	for sub in d.get_directories():
-		if FileAccess.file_exists(ROOT + sub + "/site.json"):
-			available.append(sub)
+	_root_of.clear()
+	for root in [ROOT, USER_ROOT]:
+		var d := DirAccess.open(root)
+		if d == null:
+			continue
+		for sub in d.get_directories():
+			if FileAccess.file_exists(root + sub + "/site.json") and not _root_of.has(sub):
+				available.append(sub)
+				_root_of[sub] = root
 	available.sort()
+
+
+func is_user_pack(id: String) -> bool:
+	return _root_of.get(id, ROOT) == USER_ROOT
 
 
 ## Switch the active site (main menu). Registries listen to site_changed and reload.
@@ -79,17 +89,24 @@ func _activate(id: String) -> void:
 	for t in _translations:
 		TranslationServer.remove_translation(t)
 	_translations.clear()
+	var imported := false
 	for loc in ["et", "en"]:
 		var p := path("strings.%s.translation" % loc)
 		if ResourceLoader.exists(p):
 			var t: Translation = load(p)
 			TranslationServer.add_translation(t)
 			_translations.append(t)
-	print("[Sites] active site %s (%d available)" % [id, available.size()])
+			imported = true
+	if not imported:
+		# runtime packs have no imported .translation files: read strings.csv directly
+		for t in csv_translations(path("strings.csv")):
+			TranslationServer.add_translation(t)
+			_translations.append(t)
+	print("[Sites] active site %s (%d available%s)" % [id, available.size(), ", user pack" if is_user_pack(id) else ""])
 
 
 func manifest_for(id: String) -> Dictionary:
-	var text := FileAccess.get_file_as_string(ROOT + id + "/site.json")
+	var text := FileAccess.get_file_as_string(str(_root_of.get(id, ROOT)) + id + "/site.json")
 	if text.is_empty():
 		return {}
 	var parsed = JSON.parse_string(text)
@@ -99,7 +116,7 @@ func manifest_for(id: String) -> Dictionary:
 ## res:// path of a file inside the active site.
 func path(rel: String) -> String:
 	_ensure()
-	return ROOT + active + "/" + rel
+	return str(_root_of.get(active, ROOT)) + active + "/" + rel
 
 
 func data_dir(sub: String) -> String:
@@ -118,6 +135,69 @@ func terrain() -> Dictionary:
 
 func tile() -> String:
 	return str(terrain().get("tile", active))
+
+
+## Directory of the tile's engine files: shipped under res://assets/terrain, else downloaded under user://tiles.
+func tile_dir() -> String:
+	var t := tile()
+	var shipped := "res://assets/terrain/%s" % t
+	if FileAccess.file_exists(shipped + "/terrain_meta.json"):
+		return shipped
+	return USER_TILES + t
+
+
+## Translation objects from a keys,et,en CSV (quotes, doubled quotes and newlines inside quotes handled).
+static func csv_translations(csv_path: String) -> Array[Translation]:
+	var out: Array[Translation] = []
+	var text := FileAccess.get_file_as_string(csv_path)
+	if text.is_empty():
+		return out
+	var rows: Array = []
+	var row: Array = []
+	var field := ""
+	var quoted := false
+	var i := 0
+	while i < text.length():
+		var ch := text[i]
+		if quoted:
+			if ch == '"':
+				if i + 1 < text.length() and text[i + 1] == '"':
+					field += '"'
+					i += 1
+				else:
+					quoted = false
+			else:
+				field += ch
+		elif ch == '"':
+			quoted = true
+		elif ch == ",":
+			row.append(field)
+			field = ""
+		elif ch == "\n" or ch == "\r":
+			if ch == "\r" and i + 1 < text.length() and text[i + 1] == "\n":
+				i += 1
+			row.append(field)
+			field = ""
+			if row.size() > 1 or row[0] != "":
+				rows.append(row)
+			row = []
+		else:
+			field += ch
+		i += 1
+	if field != "" or not row.is_empty():
+		row.append(field)
+		rows.append(row)
+	if rows.is_empty():
+		return out
+	var header: Array = rows[0]
+	for col in range(1, header.size()):
+		var t := Translation.new()
+		t.locale = str(header[col]).strip_edges()
+		for r in rows.slice(1):
+			if r.size() > col and str(r[0]) != "":
+				t.add_message(str(r[0]), str(r[col]))
+		out.append(t)
+	return out
 
 
 func layout() -> Dictionary:

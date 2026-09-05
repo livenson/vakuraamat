@@ -36,7 +36,7 @@ func _ready() -> void:
 				node.free()
 			_check(FileAccess.file_exists(era.narrative_story), "%s: %s story %s missing (make ink)" % [site, era.id, era.narrative_story])
 			if FileAccess.file_exists("res://assets/terrain/%s/terrain_meta.json" % Sites.tile()):
-				_check(era.terrain_texture != null, "%s: %s has no terrain texture (make era-maps)" % [site, era.id])
+				_check(era.texture() != null, "%s: %s has no terrain texture (make era-maps)" % [site, era.id])
 			_check(tr(era.currency_key) != era.currency_key, "%s: %s currency key untranslated" % [site, era.id])
 		for cp in GameState.consequence_points.values():
 			_check(GameState.era(cp.trigger_era) != null, "%s: %s trigger era unknown" % [site, cp.id])

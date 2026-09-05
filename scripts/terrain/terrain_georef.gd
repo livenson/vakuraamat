@@ -8,8 +8,12 @@ var meta: Dictionary = {}
 
 
 static func load_tile(tile: String) -> TerrainGeoref:
+	return load_dir("res://assets/terrain/%s" % tile)
+
+
+static func load_dir(tile_dir: String) -> TerrainGeoref:
 	var g := TerrainGeoref.new()
-	var text := FileAccess.get_file_as_string("res://assets/terrain/%s/terrain_meta.json" % tile)
+	var text := FileAccess.get_file_as_string(tile_dir + "/terrain_meta.json")
 	if not text.is_empty():
 		g.meta = JSON.parse_string(text)
 	return g

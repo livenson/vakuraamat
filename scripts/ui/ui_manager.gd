@@ -614,7 +614,7 @@ func _fill_journal() -> void:
 	for era in order:
 		var id: String = era.id
 		var r := TextureRect.new()
-		r.texture = era.terrain_texture
+		r.texture = era.texture()
 		r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 		r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 		r.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -847,7 +847,7 @@ func _fill_debug_map() -> void:
 	body.add_child(stack)
 	var bg := TextureRect.new()
 	var newest := GameState.eras_in_order()
-	bg.texture = newest[-1].terrain_texture if not newest.is_empty() else null
+	bg.texture = newest[-1].texture() if not newest.is_empty() else null
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
