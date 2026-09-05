@@ -247,23 +247,25 @@ func _textured(name: String, tint: Color, scale: float, rough := 0.9) -> Standar
 
 
 ## Facade material text -> texture (Poly Haven CC0 sets, see tools/pipeline/fetch_polyhaven.py):
-## timber boards, logs, brick, fieldstone, prefab panels, concrete; rendered walls get plaster.
+## [register substrings, texture, lighten, uv scale, roughness]; rendered walls get plaster.
+const WALL_RULES := [
+	[["palk"], "logs", 0.2, 0.5, 0.9],
+	[["puit", "laudis"], "woodsiding", 0.25, 0.5, 0.9],
+	[["tellis"], "brick", 0.3, 0.6, 0.85],
+	[["paneel", "raudbetoon"], "panel", 0.2, 0.45, 0.9],
+	[["betoon"], "concrete", 0.15, 0.5, 0.9],
+	[["kivi"], "rock", 0.2, 0.4, 0.9],
+]
+
+
 func _wall_material() -> StandardMaterial3D:
 	var f := facade.to_lower()
 	if f == "" and kind == "outbuilding":
 		return _textured("woodsiding", wall_color.lightened(0.15), 0.5)
-	if "palk" in f:
-		return _textured("logs", wall_color.lightened(0.2), 0.5)
-	if "puit" in f or "laudis" in f:
-		return _textured("woodsiding", wall_color.lightened(0.25), 0.5)
-	if "tellis" in f:
-		return _textured("brick", wall_color.lightened(0.3), 0.6, 0.85)
-	if "paneel" in f or "raudbetoon" in f:
-		return _textured("panel", wall_color.lightened(0.2), 0.45, 0.9)
-	if "betoon" in f:
-		return _textured("concrete", wall_color.lightened(0.15), 0.5, 0.9)
-	if "kivi" in f or "paekivi" in f or "maakivi" in f:
-		return _textured("rock", wall_color.lightened(0.2), 0.4)
+	for r in WALL_RULES:
+		for key in r[0]:
+			if key in f:
+				return _textured(r[1], wall_color.lightened(r[2]), r[3], r[4])
 	return _textured("plaster", wall_color.lightened(0.05), 0.6)
 
 
