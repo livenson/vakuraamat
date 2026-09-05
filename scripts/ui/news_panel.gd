@@ -5,13 +5,14 @@ extends PanelContainer
 
 signal show_parcel(tunnus: String)
 
-const GOLD := Color(0.93, 0.78, 0.35)
+const GOLD := BookTheme.BLUE
 const REAL := ["news", "official", "macro"]
 
 var _page: VBoxContainer
 
 
 func setup() -> void:
+	theme = BookTheme.theme()
 	custom_minimum_size = Vector2(900, 600)
 	visible = false
 	var v := VBoxContainer.new()
@@ -20,8 +21,7 @@ func setup() -> void:
 	add_child(v)
 	var t := Label.new()
 	t.name = "Title"
-	t.add_theme_font_size_override("font_size", 26)
-	t.add_theme_color_override("font_color", GOLD)
+	t.theme_type_variation = "HeadLabel"
 	v.add_child(t)
 	var sc := ScrollContainer.new()
 	sc.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -34,7 +34,7 @@ func setup() -> void:
 
 
 func fill() -> void:
-	get_node("Body/Title").text = "%s   ·   %s" % [tr("UI_NEWS"), Ledger.date_string()]
+	get_node("Body/Title").text = "%s      %s" % [tr("UI_NEWS"), Ledger.date_string()]
 	for c in _page.get_children():
 		c.queue_free()
 	var events := Ledger.events(120)
@@ -45,16 +45,19 @@ func fill() -> void:
 		line.add_theme_constant_override("separation", 10)
 		_page.add_child(line)
 		var real: bool = str(e.kind) in REAL
-		var when: String = str(e.published).left(10) if real and str(e.published) != "" else "M%d" % int(e.month)
-		line.add_child(_lbl(when, 13, GOLD if real else Color(0.8, 0.8, 0.8)))
-		var title := _lbl(str(e.title), 14, Color.WHITE)
+		var when: String = str(e.published).left(10) if real and str(e.published) != "" else Ledger.date_for(int(e.month))
+		var wl := _lbl(when, 13, BookTheme.FADED)
+		wl.custom_minimum_size = Vector2(130, 0)
+		line.add_child(wl)
+		var title := _lbl(str(e.title), 14, BookTheme.INK)
 		title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		line.add_child(title)
 		if real:
-			line.add_child(_lbl(str(e.source), 13, GOLD))
+			line.add_child(_lbl(str(e.source), 13, BookTheme.FADED))
 			if str(e.link) != "":
 				var b := Button.new()
+				b.theme_type_variation = "TextButton"
 				b.text = tr("BTN_LINK")
 				b.tooltip_text = str(e.link)
 				var link: String = str(e.link)
@@ -64,6 +67,7 @@ func fill() -> void:
 				line.add_child(b)
 		elif str(e.tunnus) != "":
 			var b := Button.new()
+			b.theme_type_variation = "TextButton"
 			b.text = tr("BTN_SHOW")
 			var tunnus: String = str(e.tunnus)
 			b.pressed.connect(func(): show_parcel.emit(tunnus))

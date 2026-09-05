@@ -8,7 +8,7 @@ signal show_parcel(tunnus: String)
 signal guide(tunnus: String)      # point the HUD arrow at a plot
 signal teleport(tunnus: String)   # jump to a plot
 
-const GOLD := Color(0.93, 0.78, 0.35)
+const GOLD := BookTheme.BLUE   # the accent of the book: what is mine and what I can act on
 const MAX_ROWS := 120
 
 var world: Node3D
@@ -24,6 +24,7 @@ var _donate_box: SpinBox
 
 func setup(w: Node3D) -> void:
 	world = w
+	theme = BookTheme.theme()
 	custom_minimum_size = Vector2(980, 640)
 	visible = false
 	var v := VBoxContainer.new()
@@ -32,8 +33,7 @@ func setup(w: Node3D) -> void:
 	add_child(v)
 	var t := Label.new()
 	t.name = "Title"
-	t.add_theme_font_size_override("font_size", 26)
-	t.add_theme_color_override("font_color", GOLD)
+	t.theme_type_variation = "HeadLabel"
 	v.add_child(t)
 	tabs = TabContainer.new()
 	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -55,7 +55,7 @@ func setup(w: Node3D) -> void:
 
 
 func fill() -> void:
-	get_node("Body/Title").text = "%s   ·   %s   ·   %s" % [tr("UI_LEDGER_TITLE"), Ledger.date_string(), Ledger.format_money(Ledger.cash())]
+	get_node("Body/Title").text = "%s      %s      %s" % [tr("UI_LEDGER_TITLE"), Ledger.date_string(), Ledger.format_money(Ledger.cash())]
 	for i in tabs.get_tab_count():
 		tabs.set_tab_title(i, tr(tabs.get_child(i).name))
 	match tabs.current_tab:
@@ -96,7 +96,9 @@ func _fill_parcels() -> void:
 	grid.add_theme_constant_override("h_separation", 14)
 	body.add_child(grid)
 	for h in ["UI_LEDGER_COL_ADDRESS", "UI_LEDGER_COL_PURPOSE", "UI_LEDGER_COL_AREA", "UI_LEDGER_COL_VALUE", "UI_LEDGER_COL_PRICE", "UI_LEDGER_COL_OWNER", "UI_LEDGER_COL_YIELD", ""]:
-		grid.add_child(_lbl(tr(h) if h != "" else "", 13, GOLD))
+		var hl := BookTheme.label(tr(h) if h != "" else "", "ColumnLabel", grid)
+		if h in ["UI_LEDGER_COL_AREA", "UI_LEDGER_COL_VALUE", "UI_LEDGER_COL_PRICE", "UI_LEDGER_COL_YIELD"]:
+			hl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	var n := 0
 	for p in rows:
 		if n >= MAX_ROWS:
@@ -111,11 +113,11 @@ func _fill_parcels() -> void:
 		b.pressed.connect(func(): open_parcel(tunnus))
 		grid.add_child(b)
 		grid.add_child(_lbl(_purpose(p.purpose), 13))
-		grid.add_child(_lbl("%d m²" % int(p.area), 13))
-		grid.add_child(_lbl(Ledger.format_money(int(p.land_value)), 13))
-		grid.add_child(_lbl(Ledger.format_money(int(p.price)) if p.for_sale else "–", 13))
+		grid.add_child(_num("%d m²" % int(p.area)))
+		grid.add_child(_num(Ledger.format_money(int(p.land_value))))
+		grid.add_child(_num(Ledger.format_money(int(p.price)) if p.for_sale else "–"))
 		grid.add_child(_lbl(tr("UI_LEDGER_YOU") if Ledger.is_mine(p.tunnus) else str(p.owner_name), 13, GOLD if Ledger.is_mine(p.tunnus) else Color.WHITE))
-		grid.add_child(_lbl(Ledger.format_money(Ledger.yield_of(p.tunnus)) + tr("UI_PER_MONTH"), 13))
+		grid.add_child(_num(Ledger.format_money(Ledger.yield_of(p.tunnus)) + tr("UI_PER_MONTH")))
 		grid.add_child(_nav_buttons(tunnus))
 	if rows.size() > MAX_ROWS:
 		body.add_child(_lbl(tr("UI_LEDGER_MORE") % (rows.size() - MAX_ROWS), 13))
@@ -135,8 +137,8 @@ func _fill_plot() -> void:
 	head.add_child(_lbl("%s   %s" % [p.address, p.tunnus], 22, GOLD))
 	head.add_child(_nav_buttons(p.tunnus))
 	var mine := Ledger.is_mine(p.tunnus)
-	body.add_child(_lbl("%s · %d m² · %s: %s · %s: %s" % [_purpose(p.purpose), int(p.area), tr("UI_LEDGER_COL_VALUE"), Ledger.format_money(int(p.land_value)),
-		tr("UI_LEDGER_COL_OWNER"), tr("UI_LEDGER_YOU") if mine else str(p.owner_name)], 15))
+	body.add_child(_lbl("%s, %d m²      %s %s      %s %s" % [_purpose(p.purpose), int(p.area), tr("UI_LEDGER_COL_VALUE").to_lower(), Ledger.format_money(int(p.land_value)),
+		tr("UI_LEDGER_COL_OWNER").to_lower(), tr("UI_LEDGER_YOU") if mine else str(p.owner_name)], 15))
 	body.add_child(_lbl("%s: %s%s" % [tr("UI_LEDGER_COL_YIELD"), Ledger.format_money(Ledger.yield_of(p.tunnus)), tr("UI_PER_MONTH")], 15))
 	var tenants := Ledger.tenants_of(p.tunnus)
 	if tenants.is_empty():
@@ -147,8 +149,11 @@ func _fill_plot() -> void:
 		for t in tenants:
 			arrears += int(t.arrears)
 			var status := "" if t.status == "R" else "  (%s)" % tr("UI_TENANT_INACTIVE")
-			var owe := "  · %s %s" % [tr("UI_LEDGER_ARREARS"), Ledger.format_money(int(t.arrears))] if int(t.arrears) > 0 else ""
-			body.add_child(_lbl("   %s · %s · %s %s%s%s" % [t.name, t.legal_form, tr("UI_SINCE"), t.since, status, owe], 14))
+			var owe := "      %s %s" % [tr("UI_LEDGER_ARREARS"), Ledger.format_money(int(t.arrears))] if int(t.arrears) > 0 else ""
+			var tl := _lbl("   %s, %s, %s %s%s%s" % [t.name, t.legal_form, tr("UI_SINCE"), t.since, status, owe], 14)
+			if int(t.arrears) > 0:
+				tl.add_theme_color_override("font_color", BookTheme.RUBRIC)
+			body.add_child(tl)
 	var imps := Ledger.improvements_of(p.tunnus)
 	if imps.size() > 0:
 		body.add_child(_lbl(tr("UI_LEDGER_BUILT") + ": " + ", ".join(imps.map(func(i): return _struct_name(i.structure_id))), 14))
@@ -156,7 +161,7 @@ func _fill_plot() -> void:
 	actions.add_theme_constant_override("separation", 10)
 	body.add_child(actions)
 	if not mine and p.for_sale and p.sellable:
-		_btn(actions, tr("BTN_BUY") + "  " + Ledger.format_money(int(p.price)), func(): _do(await Ledger.buy(p.tunnus), "NOTICE_BOUGHT", p.address))
+		_btn(actions, tr("BTN_BUY") + "  " + Ledger.format_money(int(p.price)), func(): _do(await Ledger.buy(p.tunnus), "NOTICE_BOUGHT", p.address)).theme_type_variation = "PrimaryButton"
 	if not mine and int(p.owner_id) != 0:
 		_bid_box = _spin(actions, int(p.price), 1000, 5_000_000)
 		_btn(actions, tr("BTN_BID"), func(): _do(await Ledger.place_bid(p.tunnus, int(_bid_box.value)), "", ""))
@@ -211,8 +216,8 @@ func _fill_portfolio() -> void:
 	var me := Ledger.me()
 	var owned := Ledger.parcels().filter(func(p): return Ledger.is_mine(p.tunnus))
 	body.add_child(_lbl("%s: %s" % [tr("UI_LEDGER_CASH"), Ledger.format_money(Ledger.cash())], 20, GOLD))
-	body.add_child(_lbl("%s: %d   ·   %s: %s%s" % [tr("UI_LEDGER_OWNED"), owned.size(), tr("UI_LEDGER_INCOME"), Ledger.format_money(Ledger.monthly_income()), tr("UI_PER_MONTH")], 15))
-	body.add_child(_lbl("%s %d   ·   %s %d   ·   %s %d" % [tr("UI_LEDGER_FAVOURS"), int(me.get("favours", 0)), tr("UI_LEDGER_HEAT"), int(me.get("heat", 0)),
+	body.add_child(_lbl("%s: %d      %s: %s%s" % [tr("UI_LEDGER_OWNED"), owned.size(), tr("UI_LEDGER_INCOME"), Ledger.format_money(Ledger.monthly_income()), tr("UI_PER_MONTH")], 15))
+	body.add_child(_lbl("%s %d      %s %d      %s %d" % [tr("UI_LEDGER_FAVOURS"), int(me.get("favours", 0)), tr("UI_LEDGER_HEAT"), int(me.get("heat", 0)),
 		tr("UI_LEDGER_REPUTATION"), int(me.get("reputation", 0))], 15))
 	var due := Ledger.obligations()
 	body.add_child(_lbl(tr("UI_LEDGER_OBLIGATIONS") + (": –" if due.is_empty() else ""), 15, GOLD))
@@ -220,7 +225,9 @@ func _fill_portfolio() -> void:
 		var line := HBoxContainer.new()
 		body.add_child(line)
 		var p := Ledger.parcel(o.tunnus)
-		line.add_child(_lbl("   %s · %s · %s %s · %s" % [tr("UI_LEDGER_" + str(o.kind).to_upper()), p.get("address", o.tunnus), tr("UI_LEDGER_DUE"), _month_name(int(o.due_month)), Ledger.format_money(int(o.amount))], 14))
+		var ol := _lbl("   %s, %s, %s %s      %s" % [tr("UI_LEDGER_" + str(o.kind).to_upper()), p.get("address", o.tunnus), tr("UI_LEDGER_DUE"), _month_name(int(o.due_month)), Ledger.format_money(int(o.amount))], 14)
+		ol.add_theme_color_override("font_color", BookTheme.RUBRIC)
+		line.add_child(ol)
 		_btn(line, tr("BTN_PAY"), func(): _do(await Ledger.pay(int(o.id)), "", ""))
 	var drow := HBoxContainer.new()
 	drow.add_theme_constant_override("separation", 10)
@@ -266,7 +273,7 @@ func _fill_offers() -> void:
 
 func _fill_town() -> void:
 	var body := _clear(_pages["UI_LEDGER_TOWN"])
-	body.add_child(_lbl("%s   ·   %s %d" % [Ledger.date_string(), tr("UI_LEDGER_MONTH"), Ledger.month()], 18, GOLD))
+	body.add_child(_lbl("%s      %s %d" % [Ledger.date_string(), tr("UI_LEDGER_MONTH"), Ledger.month()], 18, GOLD))
 	body.add_child(_lbl("%s: %.2f" % [tr("UI_LEDGER_INDEX"), Ledger.price_index() / 1000.0], 15))
 	body.add_child(_lbl("%s: %s" % [tr("UI_LEDGER_STATUS"), tr("UI_ONLINE") % Ledger.town_name if Ledger.online else tr("UI_OFFLINE")], 15))
 	var owned := Ledger.parcels().filter(func(p): return int(p.owner_id) != 0)
@@ -299,6 +306,14 @@ func _lbl(text: String, size: int, color: Color = Color.WHITE) -> Label:
 	return l
 
 
+## A figure cell: right-aligned so the euro columns line up.
+func _num(text: String) -> Label:
+	var l := _lbl(text, 13)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return l
+
+
 func _btn(parent: Node, text: String, f: Callable) -> Button:
 	var b := Button.new()
 	b.text = text
@@ -324,11 +339,13 @@ func _nav_buttons(tunnus: String) -> HBoxContainer:
 	var h := HBoxContainer.new()
 	h.add_theme_constant_override("separation", 4)
 	var g := Button.new()
+	g.theme_type_variation = "TextButton"
 	g.text = tr("BTN_GUIDE")
 	g.tooltip_text = tr("BTN_GUIDE_TIP")
 	g.pressed.connect(func(): guide.emit(tunnus))
 	h.add_child(g)
 	var t := Button.new()
+	t.theme_type_variation = "TextButton"
 	t.text = tr("BTN_TELEPORT")
 	t.tooltip_text = tr("BTN_TELEPORT_TIP")
 	t.pressed.connect(func(): teleport.emit(tunnus))

@@ -115,16 +115,12 @@ func _ready() -> void:
 				player.set_pose(player.global_position, player.rotation.y, deg_to_rad(float(parts[4])))
 		elif a == "--fly":
 			player.flying = true
-		elif a.begins_with("--era="):
-			GameState.register_unlocked = true
-			GameState.switch_era(a.trim_prefix("--era="))
 		elif a.begins_with("--fx="):
 			_fx = Array(a.trim_prefix("--fx=").split(",", false))
 			_configure_environment()
 		elif a.begins_with("--enter="):
 			get_tree().create_timer(2.5).timeout.connect(enter_building.bind(a.trim_prefix("--enter=")))
 		elif a.begins_with("--open="):
-			GameState.register_unlocked = true
 			get_tree().create_timer(2.0).timeout.connect(ui.debug_open.bind(a.trim_prefix("--open=")))
 
 
