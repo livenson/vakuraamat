@@ -78,6 +78,11 @@ coordinates (or *Use my location*), pick a result, *Create the world*. The servi
 data, places the story skeleton on detected anchors and returns a pack; the game installs it under
 `user://` and builds the terrain on first visit.
 
+**Generated stories:** packs made by `make site` or the tile service get their story from quest
+blocks (`blocks/*.json`, composed by `tools/compose_story.py`): one NPC per era, artifacts to carry
+between eras, a choice, visible traces in the later years and three endings, all placed on anchors
+found in the data. `make test` plays such a pack through end to end (`story_test`).
+
 A pack holds everything place-specific: `site.json` (terrain tile and centre, sun position, era
 ground maps, spawn, journal locations, objectives, ending rules), `layout.json`, `scenes.json`,
 `data/` (eras, consequence points, items, manors, structures, trade goods, crops, animals),

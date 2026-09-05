@@ -64,43 +64,66 @@ STRUCT_STOREHOUSE,Ait,Storehouse
 STRUCT_STOREHOUSE_DESC,Vilja jaoks. Kõik algab aidast.,For the grain. Everything starts with a storehouse.
 STRUCT_SWING,Külakiik,Village swing
 STRUCT_SWING_DESC,Jaanipäevaks.,For midsummer.
-CP1_KEEPSAKE_TRIGGER,Sa andsid mälestuseseme tagasi aastal 1798.,You returned the keepsake in 1798.
-CP1_KEEPSAKE_EFFECT,Mälestusese jõudis koju. Hilisematel aastatel seisab maamärgi juures kivi.,The keepsake came home. In the later years a stone stands by the landmark.
+NPC_1798,Peep,Peep
+NPC_1938,Elmar,Elmar
+NPC_2026,Kadri,Kadri
+LOC_WELL,Kaev,The well
+CP_WELL_TRIGGER,Sa aitasid kaevu lahti hoida aastal 1798.,You helped keep the well open in 1798.
+CP_WELL_EFFECT,Kaev jäi. Hilisematel aastatel on talul oma vesi.,The well stayed. In the later years the farm has its own water.
+EX_WELL_OPEN,Pooleli kaev. Käsk on see täis ajada. Keegi ei taha.,A half-dug well. The order is to fill it in. Nobody wants to.
+EX_WELL_KEPT,"Kiviring. Vesi on all, külm ja magus.","A ring of stones. The water is down there, cold and sweet."
+EX_WELL_DIP,Lohk maapinnas. Siin oli kord kaev.,A dip in the ground. There was a well here once.
+ITEM_HARVEST_LETTER,Kiri,A letter
+ITEM_HARVEST_LETTER_DESC,"„Sellele, kes leiab. Esimesest lõikusest.“","""To whoever finds this. From the first harvest."""
+CP_LETTER_TRIGGER,"Sa andsid kirja sellele, kellele see mõeldud oli.",You gave the letter to the one it was meant for.
+CP_LETTER_EFFECT,"Kiri jõudis kohale. Ta teab nüüd, kus kast on.",The letter arrived. They know where the box is now.
+LOC_ORCHARD,Õunaaed,The orchard
+ITEM_GRAFT_BUNDLE,Pookoksad,Grafting stock
+ITEM_GRAFT_BUNDLE_DESC,"Kimp õunapuuoksi, vahaga kaetud otsad. Ootavad maad.","A bundle of apple scions, ends sealed with wax. Waiting for ground."
+CP_GRAFTS_TRIGGER,"Sa tõid pookoksad aastasse, kus keegi need istutas.",You brought the grafting stock to a year where somebody planted it.
+CP_GRAFTS_EFFECT,Õunaaed kasvas. Hilisematel aastatel kannavad puud veel.,The orchard grew. In the later years the trees still bear.
+EX_ORCHARD_KEPT,Vanad õunapuud. Mõni kannab veel.,Old apple trees. A few still bear.
+EX_ORCHARD_SCRUB,Võsa. Kunagi taheti siia midagi istutada.,Scrub. Somebody once meant to plant something here.
+LOC_FIELD,Põld,The field
+ITEM_DEED_PAGE,Rebitud lehekülg,A torn page
+ITEM_DEED_PAGE_DESC,"Lehekülg vanast raamatust: talu nimi, piirid, aasta 1798.","A page from an old book: a farm's name, its bounds, the year 1798."
+CP_DEED_TRIGGER,"Sa näitasid lehekülge sellele, kes raamatut pidas.",You showed the page to the one who kept the book.
+CP_DEED_EFFECT,Piir kirjutati üles. Hilisematel aastatel seisab põllu serval värav.,The boundary was written down. In the later years a gate stands at the field's edge.
+EX_GATE_KEPT,"Värav ilma aiata. Piir, mida keegi enam ei vaidlusta.",A gate without a fence. A boundary nobody disputes any more.
+EX_GATE_GONE,Põllu serv. Siin vaieldi kord piiri üle.,The edge of a field. A boundary was once argued over here.
 ITEM_KEEPSAKE,Mälestusese,Keepsake
-ITEM_KEEPSAKE_DESC,"Vana ese, mis ei kuulu sellesse aastasse.",An old thing that does not belong to this year.
+ITEM_KEEPSAKE_DESC,"Vana vasktükk, millesse on raiutud nimi ja aasta 1798.",An old piece of copper with a name and the year 1798 cut into it.
+CP_KEEPSAKE_TRIGGER,Sa andsid mälestuseseme tagasi aastal 1798.,You returned the keepsake in 1798.
+CP_KEEPSAKE_EFFECT,Mälestusese jõudis koju. Hilisematel aastatel seisab maamärgi juures kivi.,The keepsake came home. In the later years a stone stands by the landmark.
+EX_KEEPSAKE_STONE,"Kivi, mille keegi siia pani. Nimi on veel loetav.",A stone somebody set here. The name is still legible.
+OBJ_FIND_REGISTER,Leia raamat.,Find the register.
+OBJ_VISIT_ERAS,Käi läbi kõik aastad.,Visit every year.
+OBJ_DELIVER,"Vii see, mille leidsid, sinna, kuhu see kuulub.",Take what you found to where it belongs.
+OBJ_SIT,Mine tagasi aastasse 2026 ja räägi lõpuni.,Go back to 2026 and finish the conversation.
+ENDING_ALL_TITLE,Õunaaed,Orchard
+ENDING_ALL,"Kõik, mis sai hoitud, on alles. Kast on kõige vanema puu all, ja selles on kolme põlve paberid.","Everything that could be kept is here. The box is under the oldest tree, and in it are three generations of papers."
+ENDING_SOME_TITLE,Vaod,Furrows
+ENDING_SOME,"Jäljed on alles. Mitte kõik, aga need, mis on, näitab Kadri sulle ükshaaval, kepiga.","Traces remain. Not all of them, but the ones that are, Kadri shows you one by one, with a stick."
+ENDING_NONE_TITLE,Mets,Forest
+ENDING_NONE,"Maa võttis suurema osa vaikselt tagasi. Lood räägitakse ikkagi, tamme juurel istudes.","The land quietly took most of it back. The stories are told anyway, sitting on the oak's roots."
+ENDING_BOX_PARTIAL,"Kastis on kiri ja pressitud õis, aga pabereid ei ole. „Noh. See oli see osa, mis loeb.“","The box holds the letter and a pressed blossom, but no papers. ""Well. That was the part that mattered."""
+ENDING_KEPT,Alles %d / %d,Kept %d of %d
 MANOR_HOME,Kodutalu,Home farm
 LOC_LANDMARK,Maamärk,The landmark
 LOC_FARMSTEAD,Talu,The farmstead
 ITEM_REGISTER,Vakuraamat,The register
 EX_REGISTER,Raamat aastate vahel. Võta see.,A book between the years. Take it.
 NOTICE_REGISTER_FOUND,Vakuraamat. Ava see (Tab) ja vali lehekülg.,The register. Open it (Tab) and choose a page.
-OBJ_FIND_REGISTER,Leia raamat.,Find the register.
-OBJ_VISIT_ERAS,Käi läbi kõik aastad.,Visit every year.
-OBJ_RETURN,Vii mälestusese aastasse 1798.,Take the keepsake back to 1798.
-OBJ_SIT,Mine tagasi aastasse 2026 ja räägi lõpuni.,Go back to 2026 and finish the conversation.
-ENDING_KEPT_TITLE,Alles,Kept
-ENDING_KEPT_TEXT,Kivi seisab. Keegi mäletab.,The stone stands. Somebody remembers.
-ENDING_LOST_TITLE,Kadunud,Lost
-ENDING_LOST_TEXT,Maa võttis omad tagasi. Lood jäid.,The land took back its own. The stories stayed.
-ENDING_KEPT,Alles %d / %d,Kept %d of %d
 CODEX_REAL_TITLE,Päris,Real
-CODEX_REAL,"Maa: Kvissentali, Maa- ja Ruumiameti kõrgusandmed ja ortofoto.","The ground: Kvissentali, from the Land Board's elevation data and orthophoto."
+CODEX_REAL,"Maa: Kvissentali, Maa- ja Ruumiameti kõrgusandmed, ortofoto ja ajaloolised kaardid, meetri täpsusega.","The ground: Kvissentali, from the Land Board's elevation data, orthophoto and historical maps, to the metre."
 CODEX_INVENTED_TITLE,Välja mõeldud,Invented
-CODEX_INVENTED,Inimesed ja lugu.,The people and the story.
-NPC_1798,Kohalik (1798),A local (1798)
+CODEX_INVENTED,"Inimesed, nende nimed ja lugu on kokku pandud lugude klotsidest; ükski neist ei kujuta päris inimest.","The people, their names and the story are assembled from story blocks; none depicts a real person."
 EX_LANDMARK_1798,Maamärk aastal 1798.,The landmark in 1798.
-EX_KEPT_1798,"Kivi, mille keegi siia pani. Nimi on veel loetav.",A stone somebody set here. The name is still legible.
 POST_1798,Pood (1798),The shop (1798)
 POST_1798_TEXT,Ostetakse ja müüakse selle aasta raha eest.,Buying and selling for this year's money.
-NPC_1938,Kohalik (1938),A local (1938)
 EX_LANDMARK_1938,Maamärk aastal 1938.,The landmark in 1938.
-EX_KEPT_1938,"Kivi, mille keegi siia pani. Nimi on veel loetav.",A stone somebody set here. The name is still legible.
 POST_1938,Pood (1938),The shop (1938)
 POST_1938_TEXT,Ostetakse ja müüakse selle aasta raha eest.,Buying and selling for this year's money.
-NPC_2026,Kohalik (2026),A local (2026)
 EX_LANDMARK_2026,Maamärk aastal 2026.,The landmark in 2026.
-EX_KEPT_2026,"Kivi, mille keegi siia pani. Nimi on veel loetav.",A stone somebody set here. The name is still legible.
 POST_2026,Pood (2026),The shop (2026)
 POST_2026_TEXT,Ostetakse ja müüakse selle aasta raha eest.,Buying and selling for this year's money.
-ENDING_KEPT_TEXT_TITLE,Alles,Kept
-ENDING_LOST_TEXT_TITLE,Kadunud,Lost

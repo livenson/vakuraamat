@@ -139,37 +139,48 @@ static func slug(name: String) -> String:
 func create_world(name: String, x: float, y: float, size: int = 1024, eras: String = "1798,1938,2026") -> Dictionary:
 	var id := slug(name)
 	var base := service_url()
+	var error := ""
 	if not await service_alive():
-		return {"ok": false, "id": id, "error": tr("MENU_SERVICE_DOWN") % base}
-	if not in_estonia(x, y):
-		return {"ok": false, "id": id, "error": tr("MENU_OUTSIDE_ESTONIA")}
-	var body := JSON.stringify({"id": id, "name": name, "x": x, "y": y, "size": size, "eras": eras})
-	var r := await _http(base + "/tile", HTTPClient.METHOD_POST, body)
-	if not r.ok:
-		return {"ok": false, "id": id, "error": r.body if r.body != "" else "HTTP %d" % r.code}
+		error = tr("MENU_SERVICE_DOWN") % base
+	elif not in_estonia(x, y):
+		error = tr("MENU_OUTSIDE_ESTONIA")
+	if error == "":
+		var body := JSON.stringify({"id": id, "name": name, "x": x, "y": y, "size": size, "eras": eras})
+		var r := await _http(base + "/tile", HTTPClient.METHOD_POST, body)
+		if not r.ok:
+			error = r.body if r.body != "" else "HTTP %d" % r.code
+	if error == "":
+		error = await _wait_for_job(base, id)
+	if error == "":
+		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cache"))
+		var zip_path := "user://cache/%s.zip" % id
+		var dl := await _http(base + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path)
+		if not dl.ok:
+			error = "download: HTTP %d" % dl.code
+		elif not install_zip(zip_path, id):
+			error = "could not unpack " + zip_path
+	if error == "":
+		Sites.scan()
+		Sites.select(id)
+	return {"ok": error == "", "id": id, "error": error}
+
+
+## Poll the job until it is done; "" on success, else the error text.
+func _wait_for_job(base: String, id: String) -> String:
 	while true:
 		var st := await _http(base + "/status?id=" + id)
 		if not st.ok:
-			return {"ok": false, "id": id, "error": "status: HTTP %d" % st.code}
+			return "status: HTTP %d" % st.code
 		var d = JSON.parse_string(st.body)
 		if typeof(d) != TYPE_DICTIONARY:
-			return {"ok": false, "id": id, "error": "bad status"}
+			return "bad status"
 		progress.emit(tr("MENU_GENERATING") % str(d.get("stage", "")))
 		if d.get("error", "") != "":
-			return {"ok": false, "id": id, "error": str(d.error)}
+			return str(d.error)
 		if bool(d.get("done", false)):
-			break
+			return ""
 		await get_tree().create_timer(1.5).timeout
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cache"))
-	var zip_path := "user://cache/%s.zip" % id
-	var dl := await _http(base + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path)
-	if not dl.ok:
-		return {"ok": false, "id": id, "error": "download: HTTP %d" % dl.code}
-	if not install_zip(zip_path, id):
-		return {"ok": false, "id": id, "error": "could not unpack " + zip_path}
-	Sites.scan()
-	Sites.select(id)
-	return {"ok": true, "id": id, "error": ""}
+	return ""
 
 
 ## Unpack a service zip: site/* -> user://sites/<id>/, tile/* -> user://tiles/<tile>/.

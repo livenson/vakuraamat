@@ -1,0 +1,14 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/items/artifact_item.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "harvest_letter"
+display_name_key = "ITEM_HARVEST_LETTER"
+description_key = "ITEM_HARVEST_LETTER_DESC"
+can_cross_eras = true
+linked_consequence_point_id = "cp_letter"
+valid_delivery_target = "npc_era_2026"
+origin_era = "era_1938"
+delivery_era = "era_2026"

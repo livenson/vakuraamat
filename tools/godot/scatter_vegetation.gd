@@ -20,6 +20,9 @@ func _init() -> void:
 	var terrain := Terrain3D.new()
 	terrain.data_directory = dir + "/data"
 	terrain.assets = load(dir + "/terrain_assets.tres")
+	# Headless initialisation drops the ground texture assets (no texture arrays can be built);
+	# keep a copy so the save does not lose them.
+	var texture_list: Array = terrain.assets.texture_list.duplicate()
 	get_root().add_child(terrain)
 	await process_frame
 	if terrain.data == null or terrain.data.region_locations.is_empty():
@@ -33,6 +36,6 @@ func _init() -> void:
 		var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(layout_path))
 		exclusions = layout.get("exclusions", [])
 	var builder := TerrainBuilder.new()
-	var counts: Array = await builder.scatter(terrain, dir, exclusions)
+	var counts: Array = await builder.scatter(terrain, dir, exclusions, 1798, texture_list)
 	print("[scatter_vegetation] saved -> %s (%d instances)" % [dir, counts.reduce(func(a, b): return a + b, 0)])
 	quit()

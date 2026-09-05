@@ -211,9 +211,11 @@ func classify(img: Image, canopy: Image = null) -> Image:
 
 ## Scatter trees, bushes and grass by land-cover class and canopy height; save into the region file.
 ## `exclusions` are [x, z, r] circles kept clear. Returns instance counts per rule.
-func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value: int = 1798) -> Array:
+## `keep_textures`: the ground texture list to write back (headless initialisation drops it from
+## the loaded assets, so the tool captures it before the node enters the tree).
+func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value: int = 1798, keep_textures: Array = []) -> Array:
 	var assets: Terrain3DAssets = terrain.assets
-	var texture_list: Array = assets.texture_list.duplicate()   # headless init drops textures; keep them
+	var texture_list: Array = keep_textures if not keep_textures.is_empty() else assets.texture_list.duplicate()
 	for i in RULES.size():
 		var r: Dictionary = RULES[i]
 		var ma := Terrain3DMeshAsset.new()

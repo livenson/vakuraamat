@@ -96,7 +96,7 @@ ink:
 
 test:
 	@python3 tools/validate_site.py --all | grep -E "OK|FAILED"
-	@for t in boot_test site_test userpack_test playthrough_test farming_test hunting_test economy_test; do \
+	@for t in boot_test site_test userpack_test playthrough_test story_test farming_test hunting_test economy_test; do \
 	  printf "%-18s " $$t; $(GODOT) --headless --path . res://tools/godot/$$t.tscn 2>&1 | grep -E "PASSED|FAILED" | head -1; done
 
 lint:

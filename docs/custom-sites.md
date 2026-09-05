@@ -77,6 +77,19 @@ Scripted equivalent: `curl -X POST :8765/tile -d '{"name":"Aakre","x":629807,"y"
 `/status?id=aakre`, `/download?id=aakre`, then
 `godot --headless --path . res://tools/godot/install_pack.tscn -- --zip=aakre.zip --id=aakre`.
 
+## Quest blocks: generated stories
+
+`blocks/*.json` is a library of self-contained consequences (one artifact or one choice, one flag, a
+few props in the later eras, a few lines per era role). `tools/compose_story.py` picks blocks for a
+site, maps their era roles (oldest, middle, newest) onto the pack's eras, names one NPC per era from
+era-appropriate name lists, and writes the pack's items, consequence points, scene nodes, ink knots
+(each NPC's menu is the concatenation of the blocks' options for that era), strings, objectives and
+ending tiers. The composition is deterministic for a seed; `make site` derives the seed from the
+centre coordinates, `--seed` and `--blocks` override it. Five blocks exist: keepsake, well (a choice),
+grafts, deed, letter (the bonus that gates the best ending). `tools/godot/story_test.tscn` plays any
+composed pack through from prologue to epilogue using only the pack's data. See `blocks/README.md`
+for the schema; add a block by adding a file.
+
 ## Iterating
 
 | Change | Then run |
