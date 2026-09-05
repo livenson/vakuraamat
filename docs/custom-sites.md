@@ -208,6 +208,22 @@ Doors, tenant name plates and interiors also attach to streamed neighbour tiles 
 from that pack's `tenants.json` through `Tenants.of`); parcel outlines stay on the origin tile, whose
 ledger is the one town.
 
+### Things you can use inside
+
+Interaction components after Cogito's patterns (MIT, credited in `THIRD_PARTY.md`), all
+`Interactable` subclasses in `scripts/interaction/`:
+
+- `SwingDoor`: the leaf on every building door; E swings it away from you, you step through, it
+  closes by itself after five seconds.
+- `LightSwitch`: the shade under every interior lamp; E turns that lamp off and on.
+- `Carryable`: cardboard boxes in storage rooms, halls and workshops are rigid bodies you pick up
+  with E, carry in front of you and put down with E again (they drop if they get stuck).
+- `Readable`: the notice board beside the entrance opens a page of the book with the building's
+  register row, its tenants and its plot's owner (`UiManager.show_sheet`).
+
+Check flags: `--enter="<address>@<deg>"` puts you inside, `--leave` steps back out and turns you
+to face the door.
+
 ## Cadastral units, roads and what stands on a plot
 
 `make parcels SITE=<id>` fetches the cadastral units of the tile (Maa-amet cadastre WFS: number,

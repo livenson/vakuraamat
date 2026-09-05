@@ -40,7 +40,7 @@ func _ready() -> void:
 		door = doors[0]
 	var b: FootprintBuilding = door.building
 	_check(door.prompt() == tr("UI_PROMPT_ENTER") and door.label() != "", "door prompt/label before entering")
-	door.interact(world.player)
+	await door.interact(world.player)
 	await get_tree().process_frame
 	_check(interiors.inside == b, "not inside after interact")
 	var root: Node3D = b.get_node_or_null("Interior_%d" % b.building_id)
@@ -65,11 +65,11 @@ func _ready() -> void:
 	_check(Geometry2D.is_point_in_polygon(Vector2(local.x, local.z), b.polygon), "player not inside the footprint: %s" % local)
 	_check(not b._mesh_node.visible and b._body_node.collision_layer == 0, "exterior still shown or solid")
 	_check(door.prompt() == tr("UI_PROMPT_LEAVE"), "door prompt inside")
-	door.interact(world.player)
+	await door.interact(world.player)
 	await get_tree().process_frame
 	_check(interiors.inside == null and b._mesh_node.visible and b._body_node.collision_layer == 1 and not root.visible, "exterior not restored")
 	# in again, then walk far away: the manager notices and restores the exterior
-	door.interact(world.player)
+	await door.interact(world.player)
 	await get_tree().process_frame
 	world.player.set_pose(b.global_position + Vector3(60, 5, 60), 0.0, 0.0)
 	await get_tree().create_timer(0.3).timeout

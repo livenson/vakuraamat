@@ -7,6 +7,7 @@ signal target_changed(target: Interactable)
 
 var target: Interactable = null
 var blocked := false
+var carrying: Node = null   # the Carryable held (E puts it down)
 
 
 func _ready() -> void:
@@ -29,8 +30,15 @@ func _physics_process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if blocked or target == null:
+	if blocked:
 		return
-	if event.is_action_pressed("interact"):
-		target.interact(get_parent().get_parent())
+	if not event.is_action_pressed("interact"):
+		return
+	if carrying and is_instance_valid(carrying):
+		carrying.drop()
 		get_viewport().set_input_as_handled()
+		return
+	if target == null:
+		return
+	target.interact(get_parent().get_parent())
+	get_viewport().set_input_as_handled()

@@ -253,6 +253,8 @@ func _build(b: FootprintBuilding) -> Node3D:
 				gap = _project_u(door_pt, a, c)
 			_wall(root, a, c, y0, y1, wall_mat, b.kind, gap, float(f.width) + 0.3)
 		_partition_walls(root, walls, y0, y1, accent_mat, b.kind)
+		if k == 0:
+			_notice_board(root, b, poly, door_edge, door_pt, y0)
 		if not top:
 			_ramp(root, ramp_room.poly, ramp_edge, y0, fh, wall_mat)
 		var storey_rooms: Array = rooms if k == 0 else upper
@@ -269,6 +271,7 @@ func _build(b: FootprintBuilding) -> Node3D:
 				light.omni_attenuation = 1.0
 				light.shadow_enabled = false
 				root.add_child(light)
+				_fixture(root, light)
 			var avoid: Array = room.doorways.duplicate()
 			var skip: Array = []
 			if k == 0:
@@ -1092,6 +1095,10 @@ func _place(room: Dictionary, name: String, spot: Dictionary) -> bool:
 			if at.distance_to(q[0]) < r + q[1] + 0.25:
 				return false
 	var node := _piece(name, size, PIECES[name][1])
+	if name == "cardboardBoxClosed":
+		var box := Carryable.new()
+		box.setup(node, size, 4.0)
+		node = box
 	var y: float = spot.get("y", room.y0) if spot.has("y") and spot.y != 0.0 else room.y0
 	node.position = Vector3(at.x, y, at.y)
 	var dir: Vector2 = spot.dir
@@ -1208,6 +1215,100 @@ static func _lamp_spots(poly: PackedVector2Array) -> Array:
 
 
 # ---------------------------------------------------------------- geometry helpers
+
+## The lamp's fixture: a glowing shade under the light with a switch on it (E turns the light off).
+func _fixture(root: Node3D, light: OmniLight3D) -> void:
+	var shade := MeshInstance3D.new()
+	var m := CylinderMesh.new()
+	m.top_radius = 0.16
+	m.bottom_radius = 0.22
+	m.height = 0.14
+	shade.mesh = m
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.95, 0.93, 0.86)
+	mat.emission_enabled = true
+	mat.emission = Color(1.0, 0.92, 0.75)
+	mat.emission_energy_multiplier = 1.5
+	shade.material_override = mat
+	var sw := LightSwitch.new()
+	sw.position = light.position + Vector3(0, 0.05, 0)
+	sw.lights = [light]
+	sw.glow_mats = [mat]
+	sw.add_child(shade)
+	sw.setup(0.3)
+	root.add_child(sw)
+
+
+## A notice board beside the entrance: the building's register sheet, its tenants and its plot.
+func _notice_board(root: Node3D, b: FootprintBuilding, poly: PackedVector2Array, door_edge: int, door_pt: Vector2, y0: float) -> void:
+	if door_edge < 0:
+		return
+	var a := poly[door_edge]
+	var c := poly[(door_edge + 1) % poly.size()]
+	var dir := (c - a).normalized()
+	var inward := Vector2(-dir.y, dir.x)
+	if not Geometry2D.is_point_in_polygon(a + dir * 0.5 + inward * 0.5, poly):
+		inward = -inward
+	var along := 1.3 if door_pt.distance_to(c) > 2.2 else -1.3
+	var at := door_pt + dir * along + inward * 0.06
+	if not Geometry2D.is_point_in_polygon(at + inward * 0.3, poly):
+		return
+	var board := Readable.new()
+	board.name = "NoticeBoard"
+	board.position = Vector3(at.x, y0 + 1.55, at.y)
+	board.rotation.y = -atan2(dir.y, dir.x)
+	var frame := MeshInstance3D.new()
+	var fm := BoxMesh.new()
+	fm.size = Vector3(0.9, 0.7, 0.04)
+	frame.mesh = fm
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.35, 0.28, 0.2)
+	frame.material_override = mat
+	board.add_child(frame)
+	var paper := MeshInstance3D.new()
+	var pm := BoxMesh.new()
+	pm.size = Vector3(0.6, 0.5, 0.02)
+	paper.mesh = pm
+	var pmat := StandardMaterial3D.new()
+	pmat.albedo_color = Color(0.93, 0.9, 0.82)
+	paper.material_override = pmat
+	paper.position = Vector3(0, 0, 0.02)
+	board.add_child(paper)
+	board.setup(tr("UI_NOTICE_BOARD"), _register_sheet(b), Vector3(0.9, 0.7, 0.2))
+	root.add_child(board)
+
+
+## What the registers say about a building, as a page: the register row, the tenants, the plot.
+func _register_sheet(b: FootprintBuilding) -> String:
+	var lines: Array[String] = []
+	lines.append(tr("UI_SHEET_REGISTER") % (b.address if b.address != "" else str(b.building_id)))
+	var bits: Array[String] = []
+	if b.purpose != "":
+		bits.append(b.purpose)
+	if b.year > 0:
+		bits.append(str(b.year))
+	var st := b.storeys()
+	bits.append(tr("UI_FLOORS") % int(st.floors))
+	if b.facade != "":
+		bits.append(b.facade)
+	if b.roof_cover != "":
+		bits.append(b.roof_cover)
+	lines.append(" · ".join(bits))
+	if b.ehr != "":
+		lines.append("EHR " + b.ehr)
+	lines.append("")
+	lines.append(tr("UI_SHEET_TENANTS"))
+	var names: Array = Tenants.active_names(Sites.pack_of(b), b.tunnus)
+	if names.is_empty():
+		lines.append(tr("UI_SHEET_NO_TENANTS"))
+	for n in names:
+		lines.append("  " + str(n))
+	var p := Ledger.parcel(b.tunnus)
+	if not p.is_empty():
+		lines.append("")
+		lines.append(tr("UI_SHEET_OWNER") % [b.tunnus, str(p.get("owner_name", ""))])
+	return "\n".join(lines)
+
 
 func _door_label(b: FootprintBuilding) -> String:
 	var d: Node = b.get_node_or_null("Door")
