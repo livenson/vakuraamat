@@ -13,18 +13,18 @@ in the repo right now.
 
 | | |
 |---|---|
-| ![1938: the manor as the village school](docs/screenshots/manor_1938.jpg) 1938, the manor as the village school | ![1938: Kaseoja farm and the pond](docs/screenshots/farm_1938.jpg) 1938, Kaseoja farm by the pond |
-| ![1798: the manor](docs/screenshots/manor_1798.jpg) 1798, the manor | ![1798: the barn-dwelling](docs/screenshots/barn_1798.jpg) 1798, the barn-dwelling |
-| ![2026: the ruin](docs/screenshots/ruin_2026.jpg) 2026, the ruin where the register is found | ![2026: Leida at the oak](docs/screenshots/oak_leida.jpg) 2026, Leida at the oak |
-| ![The road into the village](docs/screenshots/forest_road.jpg) The road into the village, real trees from the laser scan | ![The register](docs/screenshots/register.jpg) The register: the era switch |
-| ![The journal](docs/screenshots/journal.jpg) The journal: ledger, blended era maps, codex | ![Trading](docs/screenshots/trade.jpg) Trading, era-local goods and money |
-| ![Building](docs/screenshots/build.jpg) Building at the farm, on its real cadastral unit | ![Debug map](docs/screenshots/debug_map.jpg) Debug map (M): everything in the era, click to teleport |
+| ![The front page: the menu as a ledger page with the plate of the square kilometre](docs/screenshots/menu.jpg) The front page: the menu as ruled ledger entries, the plate of your square kilometre with its cadastral units | ![The plots: land value, price, owner and yield, nearest first](docs/screenshots/plots.jpg) The book (Tab): the plots nearest you with land value, price, owner and monthly yield, Guide and Go on every row |
+| ![A Kvissentali street with real buildings and tenant name plates](docs/screenshots/street.jpg) A Kvissentali street: real buildings, real tenants on their name plates, the town notice on connecting | ![Inside a company's building: rooms, a doorway, windows onto the street](docs/screenshots/shop.jpg) Inside a company's building: rooms with doorways, furniture by use, the windows look out at the street |
+| ![Inside a dwelling: a bedroom](docs/screenshots/home.jpg) Inside a dwelling: a bedroom, the floor above the ground, the exterior door open to the street | ![The town feed: real headlines next to the game's events](docs/screenshots/news.jpg) The town feed (N): the region's real headlines and planning notices next to the game's own events |
+| ![Locations: packs you have, the tile service, suggested places, the town](docs/screenshots/locations.jpg) Locations: the packs you have, what the tile service can make, suggested places, the town address | ![Debug map: every tenant and plot on the orthophoto, click to teleport](docs/screenshots/map.jpg) Debug map (M): every plot and tenant on the orthophoto, click to teleport |
+| ![Palupera: the rural pack](docs/screenshots/palupera.jpg) Palupera, the rural pack: 58 plots around the old manor site | ![The road into Palupera, real trees from the laser scan](docs/screenshots/forest_road.jpg) The road into Palupera, real trees from the laser scan |
 
-All ground, buildings' positions, tree heights and the ponds come from Maa- ja Ruumiamet open data
-of the real Palupera village square; the manor, the family and the story are fiction.
+All ground, buildings, tree heights, plots, land values and company names come from Maa- ja
+Ruumiamet and Business Register open data of the real places; the prices that move, the tenants
+that fall behind and the families that bid are the game's rules.
 
-Place and story are a **site pack** (`sites/<id>/`): Palupera is the original, Kvissentali (Tartu)
-a scaffold, and any 1 km² of Estonia can be added with two make targets. See
+Every place is a **site pack** (`sites/<id>/`): Kvissentali (Tartu) is the first town, Palupera the
+rural second, and any 1 km² of Estonia can be added with two make targets. See
 [docs/custom-sites.md](docs/custom-sites.md) and the section below.
 
 ## Status: present-day economy on real plots
