@@ -66,32 +66,50 @@ def run_job(job):
         stage("scaffold", 0.05)
         new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid, template="palupera",
                           force=True, root=ws, template_root=ROOT, texture_mode="path", seed=job.get("seed"), block_ids=job.get("blocks"))
-        stage("fetching Maa-amet data", 0.1)
-        subprocess.run([sys.executable, os.path.join(ROOT, "tools/pipeline/fetch_tile.py"), "--project", ws, "--site", sid,
-                        "--raw-dir", os.path.join(ROOT, "data_raw")], check=True)
-        stage("measured trees", 0.5)
+        stage("Maa-amet data", 0.1)
+        # the fetcher reports its steps as "[progress] <0..1> <text>" lines: they become the stage
+        proc = subprocess.Popen([sys.executable, os.path.join(ROOT, "tools/pipeline/fetch_tile.py"), "--project", ws, "--site", sid,
+                                 "--raw-dir", os.path.join(ROOT, "data_raw")], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        for line in proc.stdout:
+            line = line.rstrip("\n")
+            if line.startswith("[progress] "):
+                _, frac, text = line.split(" ", 2)
+                stage("Maa-amet: " + text, 0.1 + 0.35 * float(frac))
+            elif line:
+                print(line, flush=True)
+        if proc.wait() != 0:
+            raise RuntimeError("fetch_tile.py failed")
+        stage("measured trees", 0.46)
         try:
             fetch_trees.fetch(sid, root=ws)
         except Exception as e:  # noqa: BLE001 - optional layer
             log(f"{sid}: tree dataset unavailable ({e}); statistical scatter")
-        stage("building register", 0.55)
+        stage("building register", 0.5)
         try:
-            fetch_buildings.fetch(sid, root=ws)
+            fetch_buildings.fetch(sid, root=ws, progress=lambda f, t: stage(t, 0.5 + 0.1 * f))
         except Exception as e:  # noqa: BLE001 - the register is optional; the nDSM massing stands in
             log(f"{sid}: building register unavailable ({e}); using laser massing")
-        stage("cadastre and roads", 0.58)
-        for mod in (fetch_parcels, fetch_roads):
-            try:
-                mod.fetch(sid, root=ws)
-            except Exception as e:  # noqa: BLE001 - optional layers
-                log(f"{sid}: {mod.__name__} unavailable ({e})")
-        stage("tenants and market", 0.59)
-        for name, fn in (("tenants", fetch_tenants.fetch), ("market", market.derive)):
-            try:
-                fn(sid, root=ws)
-            except Exception as e:  # noqa: BLE001 - optional layers
-                log(f"{sid}: {name} unavailable ({e})")
-        stage("buildings, water, anchors", 0.6)
+        stage("cadastre", 0.61)
+        try:
+            fetch_parcels.fetch(sid, root=ws)
+        except Exception as e:  # noqa: BLE001 - optional layer
+            log(f"{sid}: fetch_parcels unavailable ({e})")
+        stage("roads", 0.63)
+        try:
+            fetch_roads.fetch(sid, root=ws)
+        except Exception as e:  # noqa: BLE001 - optional layer
+            log(f"{sid}: fetch_roads unavailable ({e})")
+        stage("tenants (business register)", 0.64)
+        try:
+            fetch_tenants.fetch(sid, root=ws)
+        except Exception as e:  # noqa: BLE001 - optional layer
+            log(f"{sid}: tenants unavailable ({e})")
+        stage("market snapshot", 0.66)
+        try:
+            market.derive(sid, root=ws)
+        except Exception as e:  # noqa: BLE001 - optional layer
+            log(f"{sid}: market unavailable ({e})")
+        stage("buildings, water, boats, anchors", 0.67)
         _, _, anchors = extract_features.extract(sid, root=ws)
         stage("layout", 0.7)
         new_site.apply_anchors(sid, anchors, root=ws)

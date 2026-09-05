@@ -56,6 +56,11 @@ def log(msg):
     print(f"[fetch_tile] {msg}", flush=True)
 
 
+def progress(frac, text):
+    """A line the tile service turns into the job's stage: `[progress] <0..1> <text>`."""
+    print(f"[progress] {frac:.3f} {text}", flush=True)
+
+
 def run(cmd, quiet=False):
     if not quiet:
         log("$ " + " ".join(str(c) for c in cmd))
@@ -210,6 +215,7 @@ def fetch_dem(xmin, ymin, xmax, ymax, out_r32, raw_dir, name="tile"):
     return zmin, zmax, sheets
 
 
+
 def fetch_ortho(xmin, ymin, xmax, ymax, out_jpg, px):
     """Latest nationwide orthophoto (EESTIFOTO) for a bbox from the fotokaart WMS, as JPEG."""
     px = min(px, WMS_MAX_PX)
@@ -299,14 +305,18 @@ def main():
                                                         [(xmin + 1, ymin + 1), (xmax - 1, ymin + 1), (xmin + 1, ymax - 1), (xmax - 1, ymax - 1)]})
     a.sheet = sheets[0]
     log(f"map sheet(s) {','.join(sheets)}")
+    progress(0.02, "map sheets " + ",".join(sheets))
 
     # --- DTM ---------------------------------------------------------------
     dtm_urls, dtm_paths = [], []
-    for sh in sheets:
+    for i, sh in enumerate(sheets):
         url = dtm_download_url(sh)
         fname = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)["f"][0]
         dtm_urls.append(url)
+        cached = os.path.exists(os.path.join(raw_dir, fname))
+        progress(0.05 + 0.4 * i / len(sheets), f"1 m ground model, sheet {sh} ({i + 1}/{len(sheets)}{', cached' if cached else ', ~74 MB'})")
         dtm_paths.append(download(url, os.path.join(raw_dir, fname)))
+    progress(0.5, "clipping the ground model")
     dtm_url = dtm_urls[0]
     dtm_name = ",".join(os.path.basename(p) for p in dtm_paths)
     dtm_path = dtm_paths[0]
@@ -341,6 +351,7 @@ def main():
         "CRS": "EPSG:3301", "BBOX": f"{ymin},{xmin},{ymax},{xmax}",  # WMS 1.3 axis order for EPSG:3301 is northing,easting
         "WIDTH": px, "HEIGHT": px, "FORMAT": "image/jpeg",
     }
+    progress(0.56, "orthophoto, 25 cm")
     ortho_path = os.path.join(out_dir, "ortho.jpg")
     if os.path.exists(ortho_path):
         os.remove(ortho_path)
@@ -350,9 +361,11 @@ def main():
             sys.exit("WMS did not return a JPEG (service exception?) - see ortho.jpg")
 
     # --- Canopy / object heights --------------------------------------------
+    progress(0.62, "canopy heights (nDSM)")
     canopy = fetch_canopy(a, raw_dir, out_dir, xmin, ymin, xmax, ymax) if not a.no_canopy else None
 
     # --- Historical ground maps for the eras ----------------------------------
+    progress(0.9, "historical maps" if era_maps else "writing the tile")
     fetched_maps = fetch_era_maps(era_maps, out_dir, xmin, ymin, xmax, ymax, a.map_px)
 
     # --- Metadata ----------------------------------------------------------
