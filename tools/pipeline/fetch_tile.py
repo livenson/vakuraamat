@@ -185,6 +185,45 @@ def fetch_era_maps(era_maps, out_dir, xmin, ymin, xmax, ymax, px):
     return done
 
 
+def fetch_dem(xmin, ymin, xmax, ymax, out_r32, raw_dir, name="tile"):
+    """Estonian 1 m DTM for a bbox as raw float32 (mosaics the 1:10 000 sheets it touches). Returns (zmin, zmax, sheets)."""
+    sheets = sorted({sheet_for_point(x, y, raw_dir) for x, y in [(xmin + 1, ymin + 1), (xmax - 1, ymin + 1), (xmin + 1, ymax - 1), (xmax - 1, ymax - 1)]})
+    paths = []
+    for sh in sheets:
+        url = dtm_download_url(sh)
+        fname = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)["f"][0]
+        paths.append(download(url, os.path.join(raw_dir, fname)))
+    src = paths[0]
+    if len(paths) > 1:
+        src = os.path.join(raw_dir, f"{name}_dtm_src.vrt")
+        run(["gdalbuildvrt", "-q", src] + paths)
+    clipped = os.path.join(raw_dir, f"{name}_dtm_{int(xmax - xmin)}m.tif")
+    run(["gdal_translate", "-q", "-projwin", xmin, ymax, xmax, ymin, src, clipped])
+    zmin, zmax, nodata = gdal_stats(clipped)
+    if nodata is not None and shutil.which("gdal_fillnodata"):
+        run(["gdal_fillnodata", "-q", clipped, clipped + ".filled.tif"])
+        os.replace(clipped + ".filled.tif", clipped)
+        zmin, zmax, _ = gdal_stats(clipped)
+    raw_out = os.path.join(raw_dir, f"{name}_heightmap.r32")
+    run(["gdal_translate", "-q", "-of", "ENVI", "-ot", "Float32", clipped, raw_out])
+    shutil.copyfile(raw_out, out_r32)
+    return zmin, zmax, sheets
+
+
+def fetch_ortho(xmin, ymin, xmax, ymax, out_jpg, px):
+    """Latest nationwide orthophoto (EESTIFOTO) for a bbox from the fotokaart WMS, as JPEG."""
+    px = min(px, WMS_MAX_PX)
+    q = {"SERVICE": "WMS", "VERSION": "1.3.0", "REQUEST": "GetMap", "LAYERS": "EESTIFOTO", "STYLES": "",
+         "CRS": "EPSG:3301", "BBOX": f"{ymin},{xmin},{ymax},{xmax}", "WIDTH": px, "HEIGHT": px, "FORMAT": "image/jpeg"}
+    if os.path.exists(out_jpg):
+        os.remove(out_jpg)
+    download(WMS + "?" + urllib.parse.urlencode(q), out_jpg)
+    with open(out_jpg, "rb") as f:
+        if f.read(3) != b"\xff\xd8\xff":
+            sys.exit("WMS did not return a JPEG (service exception?) - see ortho.jpg")
+    return out_jpg
+
+
 def gdal_stats(path):
     info = run(["gdalinfo", "-stats", path], quiet=True)
     zmin = float(re.search(r"STATISTICS_MINIMUM=([-\d.]+)", info).group(1))
@@ -235,6 +274,10 @@ def main():
     # Keep Godot's importer out of the raw GeoTIFF/ENVI files.
     open(os.path.join(raw_dir, ".gdignore"), "a").close()
 
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import sources
+    if sources.for_point(a.center[0], a.center[1]) is None:
+        sys.exit("no data adapter covers this point (tools/pipeline/sources.py --list); only Estonia is implemented")
     half = a.size / 2
     xmin, ymin = int(round(a.center[0] - half)), int(round(a.center[1] - half))
     xmax, ymax = xmin + a.size, ymin + a.size
