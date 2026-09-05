@@ -73,6 +73,12 @@ Estonian Land Board Open Data License — **free for commercial and non-commerci
 - The ADS address id (`ads_adr_id`) matches the Building Register's `adrId` for the same address,
   which gives an exact company-to-building join without geocoding.
 
+### 1.12 Official Announcements and regional news
+- Ametlikud Teadaanded publishes every legally required notice; the URI search
+  (`/ee/{publisher}/{type}/{subtype}/{y}/{m}/{d}/{nr}/xml`) returns XML with typed inputs, some of
+  them addresses. Only planning and auction kinds are used, as metadata; notice text and names are not.
+- ERR's RSS may be embedded freely; Postimees regional feeds are used for headlines and links only.
+
 ## 2. Target game artifacts
 
 Each raw data type maps to one or more of these final in-engine artifacts:
@@ -175,6 +181,11 @@ can join a hand-exported Maa-amet XLSX (`--xlsx`) as `transactions`. Both files 
 matches by ADS id, then by a normalised street + number key against parcel and building addresses,
 then by farm name. Precedence and statistics are in the module docstring; the file keeps `match`
 and `via` per company so the game and the validator can tell an exact tenant from a street neighbour.
+
+### 3.10 Feeds → town events
+`tools/news_feeder.py` reads the feeds and notices, keeps title, source, link, date and area, dedupes
+by id, and calls the town module's `post_event` reducer (or writes `news.json` locally). The module
+keeps the newest 300 events; the game shows them in the N panel next to its own sales, rents and bids.
 
 ## 4. Recommended toolchain summary
 

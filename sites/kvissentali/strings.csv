@@ -132,3 +132,5 @@ POST_1938_TEXT,Ostetakse ja müüakse selle aasta raha eest.,Buying and selling 
 EX_LANDMARK_2026,Maamärk aastal 2026.,The landmark in 2026.
 POST_2026,Pood (2026),The shop (2026)
 POST_2026_TEXT,Ostetakse ja müüakse selle aasta raha eest.,Buying and selling for this year's money.
+CODEX_DATA_TITLE,Andmed,Data
+CODEX_DATA,"Kaardiandmed: Maa- ja Ruumiamet 2026. Maa maksustamishind 2022: Maakataster, Maa- ja Ruumiamet. Ettevõtted: Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0). Teated: Ametlikud Teadaanded (ainult pealkiri ja link). Uudised: ERR ja Postimees (pealkirjad ja lingid).","Map data: Maa- ja Ruumiamet 2026. Land values 2022: the cadastre, Maa- ja Ruumiamet. Companies: e-Business Register open data, Centre of Registers and Information Systems (CC BY 4.0). Notices: Official Announcements (title and link only). News: ERR and Postimees (headlines and links)."

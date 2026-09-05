@@ -21,6 +21,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import compose_story  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+CREDIT_ET = 'Maa maksustamishind 2022: Maakataster, Maa- ja Ruumiamet. Ettevõtted: Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0). Teated: Ametlikud Teadaanded (ainult pealkiri ja link). Uudised: ERR ja Postimees (pealkirjad ja lingid).'
+CREDIT_EN = 'Land values 2022: the cadastre, Maa- ja Ruumiamet. Companies: e-Business Register open data, Centre of Registers and Information Systems (CC BY 4.0). Notices: Official Announcements (title and link only). News: ERR and Postimees (headlines and links).'
 
 # ---------------------------------------------------------------- EPSG:3301 (L-EST97) -> WGS84
 A_GRS80 = 6378137.0
@@ -339,6 +341,7 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
     S("NOTICE_REGISTER_FOUND", "Vakuraamat. Ava see (Tab) ja vali lehekülg.", "The register. Open it (Tab) and choose a page.")
     S("CODEX_REAL_TITLE", "Päris", "Real"); S("CODEX_REAL", f"Maa: {name}, Maa- ja Ruumiameti kõrgusandmed, ortofoto ja ajaloolised kaardid, meetri täpsusega.", f"The ground: {name}, from the Land Board's elevation data, orthophoto and historical maps, to the metre.")
     S("CODEX_INVENTED_TITLE", "Välja mõeldud", "Invented"); S("CODEX_INVENTED", "Inimesed, nende nimed ja lugu on kokku pandud lugude klotsidest; ükski neist ei kujuta päris inimest.", "The people, their names and the story are assembled from story blocks; none depicts a real person.")
+    S("CODEX_DATA_TITLE", "Andmed", "Data"); S("CODEX_DATA", "Kaardiandmed: Maa- ja Ruumiamet 2026. %s" % CREDIT_ET, "Map data: Maa- ja Ruumiamet 2026. %s" % CREDIT_EN)
     for e, y in zip(eras, years):
         S(f"EX_LANDMARK_{y}", f"Maamärk aastal {y}.", f"The landmark in {y}.")
         S(f"POST_{y}", f"Pood ({y})", f"The shop ({y})"); S(f"POST_{y}_TEXT", "Ostetakse ja müüakse selle aasta raha eest.", "Buying and selling for this year's money.")
@@ -395,7 +398,7 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
         "objectives": comp["objectives"],
         "register_nudge": {"chapter": 1, "era": oldest},
         "ending": comp["ending"],
-        "codex": ["CODEX_REAL", "CODEX_INVENTED"],
+        "codex": ["CODEX_REAL", "CODEX_INVENTED", "CODEX_DATA"],
         "debug": {"build_node": "Manor_home_farm"},
         "story": {"seed": seed, "blocks": comp["blocks"], "npcs": {e: comp["npcs"][e]["name"] for e in eras}, "coop_flags": comp["coop_flags"]},
     }
