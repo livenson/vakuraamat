@@ -16,6 +16,9 @@ class_name TileStreamer
 extends Node3D
 
 const AMBIENT := ["Buildings", "Roads", "Parcels", "Traffic", "Village"]
+
+signal tile_ready(loc: Vector2i, root: Node3D)     # after _load, and again when set_era re-instances a tile's Era
+signal tile_unloaded(loc: Vector2i)                 # before the root is freed; tiles[loc].root is still valid
 const RETRY_S := 90.0
 const NOTICE_GAP_S := 4.0
 
@@ -207,6 +210,7 @@ func _load(loc: Vector2i) -> void:
 	t.state = "ready"
 	_hide_haze(loc)
 	print("[Tiles] %s ready at %s" % [pack, loc])
+	tile_ready.emit(loc, root)
 	if _hold != Vector3.INF and tile_of(_hold) == loc:
 		world._snap(world.player, 1.0)
 		_hold = Vector3.INF
@@ -253,6 +257,7 @@ func set_era(era_id: String) -> void:
 	for loc in tiles:
 		if loc != Vector2i.ZERO and is_ready(loc):
 			_set_tile_era(loc, era_id)
+			tile_ready.emit(loc, tiles[loc].root)
 
 
 func set_hour(hour: float) -> void:
@@ -296,6 +301,7 @@ func _hide_haze(loc: Vector2i) -> void:
 
 func _unload(loc: Vector2i) -> void:
 	var t: Dictionary = tiles[loc]
+	tile_unloaded.emit(loc)
 	if t.get("root"):
 		t.root.queue_free()
 	world.terrain.data.remove_regionl(loc, true)

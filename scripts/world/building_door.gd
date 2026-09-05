@@ -31,7 +31,7 @@ func setup(b: FootprintBuilding, f: Dictionary) -> void:
 func label() -> String:
 	if building == null:
 		return ""
-	var names: Array = Ledger.tenants_of(building.tunnus).filter(func(x): return x.status == "R").map(func(x): return str(x.name)) if building.tunnus != "" else []
+	var names: Array = Tenants.active_names(Sites.pack_of(building), building.tunnus)
 	if not names.is_empty():
 		return str(names[0])
 	return building.address if building.address != "" else tr("UI_BUILDING")

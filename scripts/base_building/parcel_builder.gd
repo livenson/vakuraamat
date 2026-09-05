@@ -13,6 +13,8 @@ func setup(w: Node3D) -> void:
 	world = w
 	Sites.load_dir(Sites.data_dir("structures"), _defs)
 	Ledger.parcel_changed.connect(func(_t): refresh())
+	if w.streamer:
+		w.streamer.tile_ready.connect(func(_loc: Vector2i, root: Node3D): _sign_buildings(root))
 	refresh()
 
 
@@ -58,17 +60,17 @@ func refresh() -> void:
 			_built.erase(id)
 
 
-## Tenant name plates on the real buildings of the origin tile (the register links each building to
-## its cadastral unit). Returns false until the layer is loaded so refresh() tries again.
-func _sign_buildings() -> bool:
-	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
-	if layer == null:
+## Tenant name plates on the real buildings of the origin layer, or of a streamed tile's root when given
+## (the register links each building to its cadastral unit). Returns false until the layer is loaded.
+func _sign_buildings(scope: Node = null) -> bool:
+	var layer: Node = scope if scope else world.get_node("EraLayers").get_node_or_null(GameState.current_era)
+	if layer == null or not is_instance_valid(layer):
 		return false
 	var n := 0
 	for b in layer.find_children("*", "FootprintBuilding", true, false):
 		if b.tunnus == "" or b.kind == "outbuilding":
 			continue
-		var names: Array = Ledger.tenants_of(b.tunnus).filter(func(t): return t.status == "R").map(func(t): return str(t.name))
+		var names: Array = Tenants.active_names(Sites.pack_of(b), b.tunnus)
 		if names.is_empty():
 			continue
 		b.set_sign("\n".join(names.slice(0, 2)) + ("\n+%d" % (names.size() - 2) if names.size() > 2 else ""))
