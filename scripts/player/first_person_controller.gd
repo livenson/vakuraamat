@@ -21,6 +21,19 @@ var input_enabled := true      # false while a UI panel or dialogue is open
 var _pitch := 0.0
 
 
+func pitch() -> float:
+	return _pitch
+
+
+## Place the walker: position, yaw (radians) and camera pitch (radians). Used by report replay.
+func set_pose(pos: Vector3, yaw: float, pitch_rad: float) -> void:
+	global_position = pos
+	rotation.y = yaw
+	_pitch = clampf(pitch_rad, -PI / 2 + 0.05, PI / 2 - 0.05)
+	camera.rotation.x = _pitch
+	velocity = Vector3.ZERO
+
+
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 

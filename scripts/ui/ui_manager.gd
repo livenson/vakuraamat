@@ -44,6 +44,7 @@ var build: PanelContainer
 var _manor_ctl: ManorController = null
 var debug_map: PanelContainer
 var pause: PanelContainer
+var report_panel: PanelContainer
 var _debug_canvas: Control
 var _open_panel: Control = null
 
@@ -69,6 +70,8 @@ func _ready() -> void:
 	build = _build_panel("UI_BUILD")
 	debug_map = _build_panel("UI_DEBUG_MAP")
 	pause = _build_panel("UI_MENU")
+	report_panel = _build_panel("UI_REPORT_TITLE")
+	report_panel.custom_minimum_size = Vector2(640, 0)
 	pause.custom_minimum_size = Vector2(600, 0)
 	debug_map.custom_minimum_size = Vector2(1180, 840)
 	_center_panel(debug_map)
@@ -409,6 +412,11 @@ func _unhandled_input(event: InputEvent) -> void:
 			_next_line()
 			get_viewport().set_input_as_handled()
 		return
+	if event.is_action_pressed("report"):
+		if _open_panel != report_panel:
+			Reporter.snapshot(world)   # the frame as seen, before the panel covers it
+			_toggle(report_panel, _fill_report)
+		return
 	if event.is_action_pressed("register"):
 		_toggle(register, _fill_register)
 	elif event.is_action_pressed("inventory"):
@@ -430,6 +438,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _filler_for(p: Control) -> Callable:
 	if p == register: return _fill_register
+	if p == report_panel: return _fill_report
 	if p == inventory: return _fill_inventory
 	if p == debug_map: return _fill_debug_map
 	if p == pause: return _fill_pause
@@ -453,6 +462,35 @@ func _clear_body(p: PanelContainer) -> VBoxContainer:
 		if c.name != "Title":
 			c.queue_free()
 	return body
+
+
+# --- issue report (F8): the frame is already grabbed; type what is wrong, where, how it should be
+func _fill_report() -> void:
+	var body := _clear_body(report_panel)
+	body.get_node("Title").text = tr("UI_REPORT_TITLE")
+	var hint := Label.new()
+	hint.text = tr("UI_REPORT_HINT")
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint.add_theme_font_size_override("font_size", 14)
+	body.add_child(hint)
+	var t := TextEdit.new()
+	t.custom_minimum_size = Vector2(600, 160)
+	t.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
+	body.add_child(t)
+	var row := HBoxContainer.new()
+	body.add_child(row)
+	var send := Button.new()
+	send.text = tr("UI_REPORT_SEND")
+	send.pressed.connect(func():
+		var path := Reporter.capture(t.text.strip_edges(), world)
+		_close()
+		show_notice(tr("UI_REPORT_SENT") % path.get_file()))
+	row.add_child(send)
+	var cancel := Button.new()
+	cancel.text = tr("UI_CLOSE")
+	cancel.pressed.connect(_close)
+	row.add_child(cancel)
+	t.call_deferred("grab_focus")
 
 
 # --- pause menu (Esc)

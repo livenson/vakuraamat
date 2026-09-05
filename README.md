@@ -89,6 +89,10 @@ and Maa-amet's LOD2 3D models (roof shapes); a building appears only in the eras
 of use, coloured by its materials, with a chimney where there is a flue. In towns, every tree stands
 where the laser scan found it, at its measured height (Maa-amet single-tree models).
 
+**Report and fix loop:** F8 in the game saves a report (frame, note, position, target, nearby buildings,
+recent errors, a save); `tools/dev.py` replays it, hot reloads scripts, scenes or pack data into the
+running game, or restarts it at the same spot. See [docs/dev-loop.md](docs/dev-loop.md).
+
 **Other countries:** the data side is one adapter class per country (`tools/pipeline/sources.py`);
 only Estonia exists so far, the planned ones are listed there.
 

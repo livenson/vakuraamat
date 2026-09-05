@@ -23,6 +23,9 @@ The design and plan documents in the repo root are authoritative: `vakuraamat-im
   goods, crops, animals), `narrative/` (ink), `strings.csv`. `make scenes SITE=<id>` regenerates
   `sites/<id>/scenes/*.tscn`; do not hand-edit those scenes. Engine code (`scripts/`, `scenes/`)
   must not reference a site by name; go through `Sites` (manifest, `data_dir`, `layout`, `tile`).
+- Playtest loop: reports from F8 land in `user://reports/` (feed.log); `python3 tools/dev.py reload|restart|replay|
+  teleport|era|screenshot` talks to the running debug game through `user://dev/commands.jsonl`
+  (`DevChannel` autoload). See `docs/dev-loop.md`.
 - Country data adapters: `tools/pipeline/sources.py` (Estonia implemented; add a class per country).
 - Buildings come from `tools/pipeline/fetch_buildings.py` (ETAK polygons + Building Register attributes +
   Geo3D LOD2 roofs) into `sites/<id>/buildings.json`; the `footprints` scene node filters them by era year.

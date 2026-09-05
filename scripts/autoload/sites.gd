@@ -37,6 +37,10 @@ func _ensure() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--site="):
 			wanted = a.trim_prefix("--site=")
+		elif a.begins_with("--report="):
+			var rep = JSON.parse_string(FileAccess.get_file_as_string(a.trim_prefix("--report=")))
+			if typeof(rep) == TYPE_DICTIONARY:
+				wanted = str(rep.get("site", wanted))
 	if wanted == "":
 		var cfg := ConfigFile.new()
 		if cfg.load(SETTINGS) == OK:
@@ -77,6 +81,13 @@ func select(id: String, remember: bool = true) -> void:
 		cfg.set_value("site", "id", id)
 		cfg.save(SETTINGS)
 	site_changed.emit(id)
+
+
+## Re-read the active pack from disk (dev hot reload): registries and strings follow via site_changed.
+func reload_active() -> void:
+	_ensure()
+	_activate(active)
+	site_changed.emit(active)
 
 
 func _activate(id: String) -> void:
