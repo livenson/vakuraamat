@@ -41,11 +41,88 @@ func refresh() -> void:
 			var root := Node3D.new()
 			root.name = "Improvement_%d" % id
 			root.position = at
+			_dress(root, d)
+			var plate := Label3D.new()
+			plate.text = tr(d.display_name_key)
+			plate.font_size = 40
+			plate.pixel_size = 0.008
+			plate.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+			plate.modulate = Color(0.98, 0.92, 0.75)
+			plate.outline_modulate = Color(0.1, 0.08, 0.06)
+			plate.outline_size = 8
+			plate.no_depth_test = false
+			plate.position = Vector3(0, d.size.y + 1.0, 0)
+			root.add_child(plate)
+			add_child(root)
+			_built[id] = root
+	for id in _built.keys():
+		if not seen.has(id):
+			_built[id].queue_free()
+			_built.erase(id)
+
+
+## What a structure looks like: a kiosk and a hall are a box with a roof slab; parking a slab with
+## painted bays; a solar table rows of tilted dark panels on legs; a playground a sand pit with a frame.
+func _dress(root: Node3D, d: StructureDefinition) -> void:
+	var m := StandardMaterial3D.new()
+	m.albedo_color = d.color
+	match str(d.id):
+		"parking":
+			var slab := CSGBox3D.new()
+			slab.size = Vector3(d.size.x, 0.12, d.size.z)
+			slab.position.y = 0.06
+			slab.material = m
+			root.add_child(slab)
+			var paint := StandardMaterial3D.new()
+			paint.albedo_color = Color(0.92, 0.92, 0.88)
+			var bays := maxi(2, int(d.size.x / 2.5))
+			for i in bays + 1:
+				var line := CSGBox3D.new()
+				line.size = Vector3(0.12, 0.02, d.size.z * 0.8)
+				line.position = Vector3(-d.size.x / 2.0 + i * d.size.x / bays, 0.13, 0)
+				line.material = paint
+				root.add_child(line)
+		"solar_table":
+			var leg_mat := StandardMaterial3D.new()
+			leg_mat.albedo_color = Color(0.5, 0.5, 0.52)
+			var rows := maxi(1, int(d.size.z / 2.0))
+			for r in rows:
+				var panel := CSGBox3D.new()
+				panel.size = Vector3(d.size.x, 0.06, 1.7)
+				panel.position = Vector3(0, 1.2, -d.size.z / 2.0 + 1.0 + r * 2.0)
+				panel.rotation.x = deg_to_rad(-30)
+				panel.material = m
+				root.add_child(panel)
+				for sx in [-d.size.x / 2.0 + 0.5, d.size.x / 2.0 - 0.5]:
+					var leg := CSGBox3D.new()
+					leg.size = Vector3(0.1, 1.0, 0.1)
+					leg.position = Vector3(sx, 0.5, panel.position.z)
+					leg.material = leg_mat
+					root.add_child(leg)
+		"playground":
+			var sand := CSGBox3D.new()
+			sand.size = Vector3(d.size.x, 0.15, d.size.z)
+			sand.position.y = 0.075
+			var sm := StandardMaterial3D.new()
+			sm.albedo_color = Color(0.85, 0.78, 0.6)
+			sand.material = sm
+			root.add_child(sand)
+			for sx in [-1.0, 1.0]:
+				for sz in [-1.0, 1.0]:
+					var post := CSGBox3D.new()
+					post.size = Vector3(0.12, d.size.y, 0.12)
+					post.position = Vector3(sx * 1.2, d.size.y / 2.0, sz * 0.9)
+					post.material = m
+					root.add_child(post)
+			var bar := CSGBox3D.new()
+			bar.size = Vector3(2.6, 0.1, 0.1)
+			bar.position = Vector3(0, d.size.y, 0.9)
+			bar.material = m
+			root.add_child(bar)
+		_:
 			var box := CSGBox3D.new()
 			box.size = d.size
 			box.position.y = d.size.y * 0.5
-			var m := StandardMaterial3D.new()
-			m.albedo_color = d.color
 			box.material = m
 			root.add_child(box)
 			var roof := CSGBox3D.new()
@@ -55,12 +132,6 @@ func refresh() -> void:
 			rm.albedo_color = d.color.darkened(0.45)
 			roof.material = rm
 			root.add_child(roof)
-			add_child(root)
-			_built[id] = root
-	for id in _built.keys():
-		if not seen.has(id):
-			_built[id].queue_free()
-			_built.erase(id)
 
 
 ## The real buildings as ground rectangles: [global transform, half extent] per footprint group.

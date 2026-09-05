@@ -123,6 +123,39 @@ def find_anchors(heights, canopy, ortho, buildings):
             {"register": register, "spawn": spawn, "landmark": landmark, "farm": farm, "trade": trade, "field": fld}.items()}
 
 
+def on_industrial_land(pond, site_dir):
+    """A flat dark depression on production or business land is a solar field, a yard or a roof, not a pond
+    (parcels.json, when the cadastre was fetched before this step)."""
+    path = os.path.join(site_dir, "parcels.json")
+    if not os.path.exists(path):
+        return False
+    try:
+        units = json.load(open(path)).get("parcels", [])
+    except (OSError, ValueError):
+        return False
+    x, z = pond["x"], pond["z"]
+    for u in units:
+        purposes = u.get("purpose") or []
+        if not any(pp in ("TOOTMISMAA", "ARIMAA", "ÄRIMAA") for pp in purposes):
+            continue
+        poly = u.get("polygon") or []
+        if len(poly) >= 3 and point_in_polygon(x, z, poly):
+            return True
+    return False
+
+
+def point_in_polygon(x, z, poly):
+    inside = False
+    j = len(poly) - 1
+    for i in range(len(poly)):
+        xi, zi = poly[i][0], poly[i][1]
+        xj, zj = poly[j][0], poly[j][1]
+        if (zi > z) != (zj > z) and x < (xj - xi) * (z - zi) / ((zj - zi) or 1e-9) + xi:
+            inside = not inside
+        j = i
+    return inside
+
+
 def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2.5, root=ROOT):
     site_dir = os.path.join(root, "sites", site)
     m = json.load(open(os.path.join(site_dir, "site.json")))
@@ -182,6 +215,7 @@ def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2
         col = ortho[ys, xs].mean(axis=0)
         ponds.append({"area": int(len(pix)), "x": round(float(xs.min() + xs.max() + 1) / 2, 1), "z": round(float(ys.min() + ys.max() + 1) / 2, 1),
                       "w": w, "d": d, "level": round(level, 2), "color": [round(float(c), 2) for c in col]})
+    ponds = [p for p in ponds if not on_industrial_land(p, site_dir)]
     ponds.sort(key=lambda p: -p["area"])
     log(f"{len(ponds)} still-water patches (>= {min_pond} m²)")
 

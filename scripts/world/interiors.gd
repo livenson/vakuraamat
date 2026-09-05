@@ -10,7 +10,15 @@ const KIT := "res://assets/vendor/kenney_furniture_kit/glb/"
 const WALL := 0.25          # inner wall inset from the footprint
 const SLAB := 0.12
 const MAX_FLOORS := 4
-const PLANT_IDS := [5, 6, 7, 8, 9]   # TerrainBuilder.RULES bushes, grass, clover; trees (0..4) are measured and never touched
+const PLANT_IDS := [5, 6, 7, 8, 9]
+## Interior paint per building: [outer walls, inner walls]. Contemporary schemes: an off-white with a
+## muted accent (sage, dusty blue, clay, warm grey, ochre, deep green).
+const PAINTS := [
+	[Color(0.94, 0.92, 0.87), Color(0.72, 0.76, 0.66)], [Color(0.93, 0.93, 0.9), Color(0.6, 0.68, 0.74)],
+	[Color(0.95, 0.91, 0.84), Color(0.78, 0.6, 0.5)], [Color(0.9, 0.9, 0.88), Color(0.62, 0.6, 0.57)],
+	[Color(0.96, 0.94, 0.88), Color(0.82, 0.7, 0.45)], [Color(0.92, 0.93, 0.9), Color(0.36, 0.48, 0.42)],
+	[Color(0.95, 0.93, 0.9), Color(0.85, 0.82, 0.75)], [Color(0.9, 0.92, 0.93), Color(0.45, 0.5, 0.6)],
+]   # TerrainBuilder.RULES bushes, grass, clover; trees (0..4) are measured and never touched
 const ROOM_AREA := {"home": 28.0, "office": 45.0, "shop": 120.0, "workshop": 120.0}   # split rooms while larger than this
 const MIN_ROOM := 9.0
 const MAX_DEPTH := 3
@@ -185,8 +193,12 @@ func _build(b: FootprintBuilding) -> Node3D:
 	root.visible = false
 	b.add_child(root)
 	var wall_mat := StandardMaterial3D.new()
-	wall_mat.albedo_color = Color(0.93, 0.9, 0.84)
+	var paint: Array = PAINTS[hash("paint_%d" % b.building_id) % PAINTS.size()]
+	wall_mat.albedo_color = paint[0]
 	wall_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var accent_mat := StandardMaterial3D.new()
+	accent_mat.albedo_color = paint[1]
+	accent_mat.cull_mode = BaseMaterial3D.CULL_DISABLED
 	var floor_mat := StandardMaterial3D.new()
 	floor_mat.albedo_color = Color(0.55, 0.42, 0.28) if b.kind == "dwelling" else Color(0.6, 0.6, 0.58)
 	floor_mat.roughness = 0.7
@@ -240,7 +252,7 @@ func _build(b: FootprintBuilding) -> Node3D:
 			if k == 0 and i == door_edge:
 				gap = _project_u(door_pt, a, c)
 			_wall(root, a, c, y0, y1, wall_mat, b.kind, gap, float(f.width) + 0.3)
-		_partition_walls(root, walls, y0, y1, wall_mat, b.kind)
+		_partition_walls(root, walls, y0, y1, accent_mat, b.kind)
 		if not top:
 			_ramp(root, ramp_room.poly, ramp_edge, y0, fh, wall_mat)
 		var storey_rooms: Array = rooms if k == 0 else upper
@@ -249,7 +261,7 @@ func _build(b: FootprintBuilding) -> Node3D:
 			for spot in _lamp_spots(room.poly):
 				var light := OmniLight3D.new()
 				light.position = Vector3(spot.x, y0 + minf(2.2, fh - 0.6), spot.y)
-				light.light_color = Color(1.0, 0.9, 0.75)
+				light.light_color = Color(1.0, 0.95, 0.88)
 				var room_area: float = absf(_area(room.poly))
 				light.light_energy = clampf(room_area / 12.0, 1.2, 4.0)   # a small room needs a small lamp, or the walls blow out
 				light.light_specular = 0.2
@@ -998,7 +1010,7 @@ func _plan_grid(room: Dictionary, step: Dictionary, single: bool) -> void:
 	for at in spots:
 		if count >= cap:
 			break
-		var spot := {"at": at, "dir": w.dir, "y": room.y0}
+		var spot := {"at": at, "dir": w.dir, "y": room.y0, "clear": CLEAR + maxf(size.x, size.z) * 0.5 + 0.8}   # a free-standing piece leaves the way in
 		if not _place(room, str(step.piece), spot):
 			continue
 		count += 1
@@ -1009,10 +1021,10 @@ func _plan_grid(room: Dictionary, step: Dictionary, single: bool) -> void:
 			_place(room, str(step.front), {"at": at - w.inward * ((size.z + fs.z) * 0.5 + 0.1), "dir": w.dir, "y": room.y0, "grouped": true})
 		if step.has("around"):
 			var cs: Vector3 = PIECES[step.around][0]
-			for side in [[w.inward, w.dir], [-w.inward, -w.dir], [w.dir, -w.inward], [-w.dir, w.inward]]:
-				var off: Vector2 = side[0]
+			for off in [w.inward, -w.inward, w.dir, -w.dir]:
 				var gap: float = (size.z if off.is_equal_approx(w.inward) or off.is_equal_approx(-w.inward) else size.x) * 0.5 + cs.z * 0.5 + 0.1
-				_place(room, str(step.around), {"at": at + off * gap, "dir": side[1], "y": room.y0, "grouped": true})
+				# a piece's front is the inward side of its "wall" direction: face the table from the outside
+				_place(room, str(step.around), {"at": at + off * gap, "dir": Vector2(-off.y, off.x), "y": room.y0, "grouped": true})
 
 
 ## One piece per free corner (0.5 m off both walls), skipping corners near a doorway.
@@ -1070,8 +1082,9 @@ func _place(room: Dictionary, name: String, spot: Dictionary) -> bool:
 	var at: Vector2 = spot.at
 	if not Geometry2D.is_point_in_polygon(at, room.poly):
 		return false
+	var clear: float = float(spot.get("clear", CLEAR))
 	for p in room.avoid:
-		if at.distance_to(p) < CLEAR:
+		if at.distance_to(p) < clear:
 			return false
 	var r := maxf(size.x, size.z) * 0.5
 	if not bool(spot.get("grouped", false)):

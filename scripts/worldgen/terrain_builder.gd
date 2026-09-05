@@ -311,8 +311,12 @@ func classify(img: Image, canopy: Image = null) -> Image:
 				id = 2   # deep shadow: under canopy
 			else:
 				id = 4   # brown bare or ploughed soil
-			if canopy != null and canopy.get_pixel(x, y).r >= 2.5 and id != 3:
-				id = 2
+			if canopy != null:
+				var ch: float = canopy.get_pixel(x, y).r
+				if ch >= 2.5 and id != 3:
+					id = 2
+				elif id == 2 and ch < 1.0 and v < 0.3:
+					id = 4   # dark but nothing stands on it: open water (rivers are not in the still-water file); no scatter
 			counts[id] += 1
 			var bits: int = Terrain3DUtil.enc_base(id) | Terrain3DUtil.enc_overlay(id) | Terrain3DUtil.enc_blend(0)
 			ctrl.set_pixel(x, y, Color(Terrain3DUtil.as_float(bits), 0, 0, 1))
@@ -348,7 +352,8 @@ func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Arr
 		var conifer := int(t[4]) == 1
 		var scene: String
 		if conifer:
-			scene = "tree_juniper" if h < 7.0 else ("tree_pine" if h >= 14.0 or rng.randf() < 0.5 else "tree_spruce")
+			# young conifers are small spruces: the juniper model is a sprawling bush that reads as a fallen tree at 6 m
+			scene = "tree_spruce" if h < 7.0 else ("tree_pine" if h >= 14.0 or rng.randf() < 0.5 else "tree_spruce")
 		else:
 			scene = "tree_birch"
 		if not rule_index.has(scene):
@@ -356,7 +361,7 @@ func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Arr
 		pos.y = terrain.data.get_height(pos)
 		if is_nan(pos.y):
 			continue
-		var s := clampf(h / MODEL_HEIGHT[scene], 0.4, 3.0)
+		var s := clampf(h / MODEL_HEIGHT[scene], 0.2, 3.0)
 		var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * s)
 		var i: int = rule_index[scene]
 		batches[i].append(Transform3D(basis, pos))
