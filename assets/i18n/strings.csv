@@ -256,3 +256,9 @@ MENU_COPY,Kopeeri,Copy
 MENU_COPIED,Kopeeritud.,Copied.
 MENU_SAVE,Salvesta,Save
 MENU_SAVED,Salvestatud.,Saved.
+BTN_GUIDE,Juhata,Guide
+BTN_GUIDE_TIP,Näita kompassil ja ekraanil teed selle maatükini,Point the compass and the screen marker at this plot
+BTN_TELEPORT,Mine,Go
+BTN_TELEPORT_TIP,Hüppa kohe sinna,Jump there now
+NOTICE_GUIDE_SET,Teejuht: %s,Guiding you to %s
+NOTICE_GUIDE_ARRIVED,Kohal: %s,You are at %s

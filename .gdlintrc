@@ -7,3 +7,4 @@ disable:
   - class-definitions-order
 # ui_manager.gd builds every panel in code and is over the default 1000-line limit.
 max-file-lines: 1500
+max-public-methods: 60   # the Ledger facade and its backends are wide by design
