@@ -131,3 +131,45 @@ NOTICE_BIKE_OFF,Maha tuldud.,Off the bike.
 NOTICE_EDGE_PENDING,Sealpoolne maa on alles mõõtmisel – oota hetk,The land beyond is still being surveyed. Wait a moment
 NOTICE_EDGE_NONE,Sealpool kaarti ei ole,There is no map beyond here
 NOTICE_TILE_READY,Naaberala on valmis,The next stretch of land is ready
+CUR_EUR,€,€
+MONTH_1,jaanuar,January
+MONTH_2,veebruar,February
+MONTH_3,märts,March
+MONTH_4,aprill,April
+MONTH_5,mai,May
+MONTH_6,juuni,June
+MONTH_7,juuli,July
+MONTH_8,august,August
+MONTH_9,september,September
+MONTH_10,oktoober,October
+MONTH_11,november,November
+MONTH_12,detsember,December
+LEDGER_NO_MONEY,Raha ei jätku.,Not enough money.
+LEDGER_NOT_FOR_SALE,See maatükk ei ole müügis.,This plot is not for sale.
+LEDGER_NOT_OWNER,See ei ole sinu maatükk.,This is not your plot.
+LEDGER_ALREADY_OWNER,See on juba sinu oma.,You already own this.
+LEDGER_NOT_BIDDABLE,Sellele maatükile ei saa pakkumist teha.,No bids can be made on this plot.
+LEDGER_NO_BID,Sellist pakkumist ei ole.,No such bid.
+LEDGER_BIDDER_BROKE,Pakkujal ei ole enam raha.,The bidder no longer has the money.
+LEDGER_NO_OBLIGATION,Sellist kohustust ei ole.,No such obligation.
+LEDGER_NO_STRUCTURE,Sellist ehitist ei ole.,No such structure.
+LEDGER_ALREADY_BUILT,See on juba ehitatud.,Already built.
+LEDGER_REQUIRES,Enne on vaja midagi muud ehitada.,Something else must be built first.
+LEDGER_WRONG_PURPOSE,See ei sobi selle maa sihtotstarbega.,This does not fit the plot's purpose.
+LEDGER_NO_ARREARS,Võlgnevusi ei ole.,No arrears.
+LEDGER_NO_PARCEL,Siin ei ole katastriüksust.,No cadastral unit here.
+LEDGER_NO_PARCEL_HERE,Sa ei seisa ühelgi maatükil.,You are not standing on a plot.
+LEDGER_NOT_SEEDED,Linn ei ole veel avatud.,The town is not open yet.
+LEDGER_NOT_JOINED,Sa ei ole linnaga liitunud.,You have not joined the town.
+LEDGER_HASH_MISMATCH,Sinu kaart erineb linna omast: genereeri ala uuesti.,Your map differs from the town's: regenerate the area.
+LEDGER_NOT_ADMIN,Ainult linna avaja saab seda teha.,Only the town's founder can do that.
+LEDGER_NOT_DEBUG,Ainult arenduslinnas.,Only in a development town.
+LEDGER_BAD_NAME,Nimi ei sobi.,That name will not do.
+LEDGER_OFFLINE_ONLY,Ainult võrguta mängus.,Only when playing offline.
+NOTICE_TOWN_ONLINE,Linnaga ühendatud: %s,Connected to the town: %s
+NOTICE_TOWN_OFFLINE,Linna ei leitud, mängid oma raamatuga.,No town found; playing with your own ledger.
+NOTICE_BOUGHT,Ostetud: %s,Bought: %s
+NOTICE_RENT,Üür laekus: %d €,Rent received: %d €
+NOTICE_TAX_DUE,Maamaks ootab maksmist: %d €,Land tax due: %d €
+NOTICE_BID_RECEIVED,Pakkumine maatükile %s: %d €,An offer for %s: %d €
+NOTICE_MONTH,Uus kuu: %s,A new month: %s
