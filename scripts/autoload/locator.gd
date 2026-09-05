@@ -3,7 +3,7 @@
 # user://sites/<id> and user://tiles/<id>. The world then builds the Terrain3D data on first visit.
 extends Node
 
-signal progress(text: String)
+signal progress(text: String, fraction: float)
 
 const SETTINGS := "user://settings.cfg"
 const DEFAULT_SERVICE := "http://127.0.0.1:8765"
@@ -188,6 +188,7 @@ func create_world(name: String, x: float, y: float, size: int = 1024, eras: Stri
 func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, eras: String = "2026", seed_value: int = -1, blocks: Array = []) -> Dictionary:
 	var base := service_url()
 	var error := ""
+	progress.emit(tr("MENU_STAGE_SERVICE"), 0.0)
 	if not await ensure_service():
 		error = tr("MENU_SERVICE_DOWN") % base
 	elif not in_estonia(x, y):
@@ -199,6 +200,7 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 		if not blocks.is_empty():
 			req["blocks"] = blocks
 		var body := JSON.stringify(req)
+		progress.emit(tr("MENU_STAGE_REQUEST"), 0.02)
 		var r := await http(base + "/tile", HTTPClient.METHOD_POST, body)
 		if not r.ok:
 			error = r.body if r.body != "" else "HTTP %d" % r.code
@@ -207,11 +209,14 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 	if error == "":
 		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cache"))
 		var zip_path := "user://cache/%s.zip" % id
+		progress.emit(tr("MENU_STAGE_DOWNLOAD"), 0.93)
 		var dl := await http(base + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path)
 		if not dl.ok:
 			error = "download: HTTP %d" % dl.code
-		elif not install_zip(zip_path, id):
-			error = "could not unpack " + zip_path
+		else:
+			progress.emit(tr("MENU_STAGE_INSTALL"), 0.97)
+			if not install_zip(zip_path, id):
+				error = "could not unpack " + zip_path
 	return {"ok": error == "", "id": id, "error": error}
 
 
@@ -224,7 +229,7 @@ func _wait_for_job(base: String, id: String) -> String:
 		var d = JSON.parse_string(st.body)
 		if typeof(d) != TYPE_DICTIONARY:
 			return "bad status"
-		progress.emit(tr("MENU_GENERATING") % str(d.get("stage", "")))
+		progress.emit(str(d.get("stage", "")), clampf(float(d.get("progress", 0.0)) * 0.9, 0.03, 0.9))
 		if d.get("error", "") != "":
 			return str(d.error)
 		if bool(d.get("done", false)):

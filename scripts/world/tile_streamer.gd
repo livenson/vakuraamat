@@ -53,7 +53,7 @@ func setup(w: Node3D) -> void:
 	for a in OS.get_cmdline_user_args():
 		if a == "--no-stream":
 			enabled = false
-	Locator.progress.connect(func(text: String): _stage = text)
+	Locator.progress.connect(func(text: String, _f: float): _stage = text)
 
 
 func pack_for(loc: Vector2i) -> String:

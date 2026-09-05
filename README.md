@@ -66,10 +66,11 @@ godot --path . -- --site=kvissentali
 ```
 
 **Anywhere in Estonia, from the menu:** start with `tools/play.sh` (it launches the tile service, a loopback Python service that
-runs the pipeline on demand), then *New location...* in the main menu: type an address, a place, or
-coordinates (or *Use my location*), pick a result, *Create the world*. The service fetches the Maa-amet
-data, places the story skeleton on detected anchors and returns a pack; the game installs it under
-`user://` and builds the terrain on first visit.
+runs the pipeline on demand), then *Locations* in the main menu: type an address, a place, or
+coordinates (or *Use my location*), pick a result, *Create the world*. A progress sheet follows the
+service through its stages (Maa-amet data, the building register, the cadastre, tenants and market,
+packing; usually a couple of minutes) and the game installs the pack under `user://` and builds the
+terrain on first visit.
 
 **Generated packs:** packs made by `make site` or the tile service are complete town packs: a landmark, the
 real footprints, roads, parcels with land values, tenants, the market snapshot, traffic and a bicycle.

@@ -169,6 +169,11 @@ static func page_box(border: bool = true, margin: int = 24) -> StyleBoxFlat:
 	return _flat(PAGE, INK if border else Color.TRANSPARENT, 1 if border else 0, 2, margin, margin)
 
 
+## A plain filled box with an optional hairline (progress bars, swatches).
+static func box(fill: Color, border: Color = Color.TRANSPARENT, width: int = 0) -> StyleBoxFlat:
+	return _flat(fill, border, width)
+
+
 ## Paper grain to lay over a page at a few percent alpha (generated, tiled).
 static func grain() -> Texture2D:
 	if _grain:

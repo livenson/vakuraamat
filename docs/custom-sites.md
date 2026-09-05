@@ -146,8 +146,11 @@ variations rather than font overrides: `TitleLabel`, `HeadLabel`, `SubheadLabel`
 `DetailLabel`, `ColumnLabel` for text, `PrimaryButton`, `TextButton`, `RowButton` for buttons. Money
 goes through `BookTheme.money()` (thousands grouped), dates through `Ledger.date_for()`. The front
 page's plate (`scripts/ui/map_plate.gd`) draws the pack's cadastral units over its orthophoto and
-fills the saved book's plots; `tools/godot/menu_shot.tscn` screenshots the menu (`--locations` for
-the second page).
+fills the saved book's plots. *Create the world* and *Install and play* freeze the Locations page under
+a progress sheet (the service's stage, a bar, the elapsed time; `Locator.progress(text, fraction)`)
+until the pack is installed or the job fails with its error and a Close button.
+`tools/godot/menu_shot.tscn` screenshots the menu (`--locations` for the second page, `--creating`
+or `--failed` for the sheet).
 
 ## Real buildings: ETAK footprints, the Building Register, LOD2 roofs
 
