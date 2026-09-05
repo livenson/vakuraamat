@@ -1,10 +1,11 @@
 {
-  "_doc": "What stands on a cadastral unit, by its registered purpose (siht1), size, ownership and the era year. The first matching rule wins; kit null = nothing. Packs may override with sites/<id>/parcel_rules.json. Kits are built by scripts/world/parcel_kit.gd.",
+  "_doc": "What stands on a cadastral unit, by its registered purpose (siht1), size, ownership and the era year. The first matching rule wins; kit null = nothing. needs_rows: only when the orthophoto shows regular rows on the unit (solar parks). Packs may override with sites/<id>/parcel_rules.json. Kits are built by scripts/world/parcel_kit.gd.",
   "rules": [
     {"id": "playground", "purpose": ["ULDKASUTATAV_MAA"], "max_area": 4000, "ownership": ["Munitsipaalomand"], "from_year": 1980, "kit": "playground"},
     {"id": "park", "purpose": ["ULDKASUTATAV_MAA"], "min_area": 4000, "from_year": 1950, "kit": "park"},
     {"id": "garden", "purpose": ["ELAMUMAA"], "max_area": 3500, "from_year": 1950, "kit": "hedge"},
     {"id": "public_buildings", "purpose": ["UHISKONDLIKE_EHITISTE_MAA"], "from_year": 1950, "kit": "park"},
+    {"id": "solar_park", "purpose": ["TOOTMISMAA"], "min_area": 5000, "from_year": 2010, "needs_rows": true, "kit": "solar"},
     {"id": "industrial", "purpose": ["TOOTMISMAA"], "from_year": 1950, "kit": "fence"},
     {"id": "transport", "purpose": ["TRANSPORDIMAA"], "kit": null}
   ]

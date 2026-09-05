@@ -53,6 +53,59 @@ def color(c):
     return "Color(%.3f, %.3f, %.3f, 1)" % tuple(c)
 
 
+
+def stripe_rows(ortho_path, size_m, polygon):
+    """Regular rows in the orthophoto inside a parcel (solar parks, orchards, greenhouses): returns
+    (period_m, row_angle_deg) when a strong periodic pattern with a 3-20 m period exists, else None.
+    row_angle is the direction the rows run, degrees from +x (east) towards +z (south)."""
+    try:
+        import numpy as np
+        from PIL import Image, ImageDraw
+    except ImportError:
+        return None
+    if not ortho_path or not os.path.exists(ortho_path):
+        return None
+    key = ("ortho", ortho_path)
+    img = stripe_rows.cache.get(key)
+    if img is None:
+        img = np.asarray(Image.open(ortho_path).convert("L"), dtype=np.float32)
+        stripe_rows.cache[key] = img
+    px = img.shape[0] / float(size_m)
+    poly = [(p[0] * px, p[1] * px) for p in polygon]
+    mask_img = Image.new("L", img.shape[::-1], 0)
+    ImageDraw.Draw(mask_img).polygon(poly, fill=255)
+    mask = np.asarray(mask_img) > 0
+    if mask.sum() < 200:
+        return None
+    ys, xs = np.where(mask)
+    y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
+    m = mask[y0:y1, x0:x1]
+    patch = img[y0:y1, x0:x1].copy()
+    patch -= patch[m].mean()
+    patch[~m] = 0.0
+    spec = np.abs(np.fft.fftshift(np.fft.fft2(patch)))
+    h, w = spec.shape
+    yy, xx = np.mgrid[0:h, 0:w]
+    fy = (yy - h // 2) / float(h)
+    fx = (xx - w // 2) / float(w)
+    freq = np.hypot(fx, fy)
+    with np.errstate(divide="ignore"):
+        period = np.where(freq > 0, 1.0 / (freq * px + 1e-9), 0.0)
+    band = (period > 3.0) & (period < 20.0)
+    if not band.any():
+        return None
+    peak_i = np.unravel_index(np.argmax(np.where(band, spec, 0.0)), spec.shape)
+    peak = spec[peak_i]
+    median = float(np.median(spec[band]))
+    if median <= 0 or peak / median < 25.0:
+        return None
+    freq_angle = math.degrees(math.atan2(fy[peak_i], fx[peak_i]))
+    return float(period[peak_i]), freq_angle + 90.0
+
+
+stripe_rows.cache = {}
+
+
 class Scene:
     """Text-scene writer: external/sub resources and a flat node list with parent paths."""
 
@@ -261,14 +314,17 @@ class Scene:
         sc = self.ext_res("Script", "res://scripts/world/road_network.gd")
         self.node("Roads", "Node3D", ".", f'script = ExtResource("{sc}")\nsource = "{source_rel}"\nmetadata/no_snap = true')
 
-    def parcels(self, units, rules, year, exclusions=()):
-        """Cadastral units -> kits by assets/data/parcel_rules.json (first matching rule; kit null = nothing)."""
+    def parcels(self, units, rules, year, exclusions=(), ortho_path=None, size_m=1024):
+        """Cadastral units -> kits by assets/data/parcel_rules.json (first matching rule; kit null = nothing).
+        A rule with "needs_rows" only matches when the orthophoto shows regular rows on the unit
+        (solar parks); the kit then gets row_period and row_angle."""
         sc = self.ext_res("Script", "res://scripts/world/parcel_kit.gd")
         self.group("Parcels", ".", 0, 0)
         n = 0
         for u in units:
             purposes = u.get("purpose") or []
             kit = None
+            rows = None
             for r in rules:
                 if r.get("purpose") and not any(p in r["purpose"] for p in purposes):
                     continue
@@ -281,6 +337,10 @@ class Scene:
                     continue
                 if year is not None and (("from_year" in r and year < r["from_year"]) or ("until_year" in r and year > r["until_year"])):
                     continue
+                if r.get("needs_rows"):
+                    rows = stripe_rows(ortho_path, size_m, u["polygon"])
+                    if rows is None:
+                        continue
                 kit = r.get("kit")
                 break
             if not kit:
@@ -290,7 +350,8 @@ class Scene:
             pts = ", ".join(f"{p[0] - u['x']:.1f}, {p[1] - u['z']:.1f}" for p in u["polygon"])
             name = "P" + str(u.get("tunnus", n)).replace(":", "_")
             self.group(name, "Parcels", u["x"], u["z"])
-            self.node("Kit", "Node3D", f"Parcels/{name}", f'script = ExtResource("{sc}")\nkit = "{kit}"\ntunnus = "{u.get("tunnus", "")}"\npolygon = PackedVector2Array({pts})')
+            extra = f"\nrow_period = {rows[0]:.2f}\nrow_angle = {rows[1]:.1f}" if rows else ""
+            self.node("Kit", "Node3D", f"Parcels/{name}", f'script = ExtResource("{sc}")\nkit = "{kit}"\ntunnus = "{u.get("tunnus", "")}"\npolygon = PackedVector2Array({pts}){extra}')
             n += 1
         return n
 
@@ -320,6 +381,22 @@ class Interpreter:
         self.base_env = {k: (list(v) if isinstance(v, list) else v) for k, v in layout.items() if k not in ("exclusions", "pads")}
         self.base_env.update({n: getattr(math, n) for n in ("pi", "tau", "cos", "sin", "sqrt", "radians")})
         self.problems = []
+
+    def manifest(self):
+        try:
+            return json.load(open(os.path.join(self.site_dir, "site.json")))
+        except (OSError, ValueError):
+            return {}
+
+    def tile_size(self):
+        return int(self.manifest().get("terrain", {}).get("size", 1024))
+
+    def ortho_path(self):
+        """The tile's orthophoto (assets/terrain/<tile>/ortho.jpg next to the sites/ root), if fetched."""
+        tile = self.manifest().get("terrain", {}).get("tile") or os.path.basename(self.site_dir)
+        root = os.path.dirname(os.path.dirname(self.site_dir))
+        p = os.path.join(root, "assets", "terrain", tile, "ortho.jpg")
+        return p if os.path.exists(p) else None
 
     # --- values --------------------------------------------------------------
     def num(self, v, env, default=None):
@@ -455,7 +532,7 @@ class Interpreter:
                     units = json.load(open(src)).get("parcels", [])
                     rules = json.load(open(rules_path)).get("rules", [])
                     year = self.num(n.get("year"), env) if n.get("year") is not None else None
-                    s.parcels(units, rules, int(year) if year is not None else None, self.layout.get("exclusions", []))
+                    s.parcels(units, rules, int(year) if year is not None else None, self.layout.get("exclusions", []), self.ortho_path(), self.tile_size())
             elif t == "footprints":
                 src = os.path.join(self.site_dir, n.get("source", "buildings.json"))
                 if os.path.exists(src):

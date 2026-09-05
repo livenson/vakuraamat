@@ -116,7 +116,7 @@ func _place(delta: float) -> void:
 			_body.position.y = absf(sin(_t * 6.0)) * 0.05 * (_speed_now / maxf(speed, 0.1))
 			_body.rotation.z = sin(_t * 6.0) * 0.03
 	for w in _wheels:
-		w.rotate_object_local(Vector3.RIGHT, -_speed_now * delta / 0.32)
+		w.rotate_object_local(Vector3.RIGHT, -_speed_now * delta / 0.32)   # roughly a 0.3 m wheel radius
 
 
 # ---------------------------------------------------------------- bodies
@@ -203,7 +203,39 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 	return root
 
 
+const CAR_KIT := "res://assets/vendor/kenney_car_kit/glb/"
+const CAR_MODELS := ["sedan", "sedan", "sedan-sports", "hatchback-sports", "hatchback-sports", "suv", "suv-luxury", "van", "delivery", "taxi", "truck"]
+const CAR_SCALE := 1.7   # the kit's sedan is 2.55 m long; a real one about 4.3 m
+
+
+## A car from the Kenney Car Kit (CC0) when it is installed, else the box car. Pre-1950 cars are a
+## sedan painted near black; later ones keep the kit's colours with a slight tint for variety.
 func _make_car(year: int) -> Node3D:
+	var name: String = "sedan" if year < 1950 else CAR_MODELS[rng.randi() % CAR_MODELS.size()]
+	var path := CAR_KIT + name + ".glb"
+	if not ResourceLoader.exists(path):
+		return _make_box_car(year)
+	var root := Node3D.new()
+	var model: Node3D = load(path).instantiate()
+	model.rotation.y = PI            # the kit's front is +Z; agents face -Z
+	model.scale = Vector3.ONE * CAR_SCALE
+	root.add_child(model)
+	var tint := Color(0.12, 0.12, 0.13) if year < 1950 else Color(1, 1, 1).lerp(CAR_PAINT[rng.randi() % CAR_PAINT.size()], 0.25)
+	for mi in model.find_children("*", "MeshInstance3D", true, false):
+		if mi.name.begins_with("wheel"):
+			_wheels.append(mi)
+			continue
+		for si in mi.mesh.get_surface_count():
+			var m: Material = mi.mesh.surface_get_material(si)
+			if m is BaseMaterial3D:
+				var c: BaseMaterial3D = m.duplicate()
+				c.albedo_color = c.albedo_color * tint
+				c.roughness = 0.35
+				mi.set_surface_override_material(si, c)
+	return root
+
+
+func _make_box_car(year: int) -> Node3D:
 	var root := Node3D.new()
 	var paint: Color = CAR_PAINT[rng.randi() % CAR_PAINT.size()] if year >= 1950 else Color(0.08, 0.08, 0.09)
 	var glass := Color(0.15, 0.2, 0.25)

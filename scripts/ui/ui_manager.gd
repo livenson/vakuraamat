@@ -49,6 +49,9 @@ var codes_label: Label            # K: cadastral number, building codes, road, r
 var codes_on := false
 var _codes_lines: MeshInstance3D = null
 var _debug_canvas: Control
+var _debug_bg: TextureRect
+var _debug_bg_tile := Vector2i(9999, 9999)
+var _tile_ortho: Dictionary = {}      # pack id -> ImageTexture of its orthophoto (debug map background)
 var _open_panel: Control = null
 
 
@@ -104,6 +107,8 @@ func _process(_delta: float) -> void:
 		_refresh_codes()
 	if marker:
 		marker.queue_redraw()
+	if _debug_canvas and is_instance_valid(_debug_canvas) and debug_map.visible:
+		_debug_canvas.queue_redraw()
 
 
 ## Heading in degrees, 0 = north (-Z), 90 = east (+X).
@@ -981,6 +986,8 @@ func _fill_debug_map() -> void:
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	bg.modulate = Color(0.75, 0.75, 0.75)
 	stack.add_child(bg)
+	_debug_bg = bg
+	_debug_bg_tile = Vector2i.ZERO
 	_debug_canvas = Control.new()
 	_debug_canvas.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_debug_canvas.draw.connect(_draw_debug_map.bind(_debug_canvas))
@@ -1002,8 +1009,18 @@ func _draw_debug_map(c: Control) -> void:
 	var origin: Vector2 = f[0]
 	var side: float = f[1]
 	var font := ThemeDB.fallback_font
+	# the map shows the 1024 m tile the player stands in: the site's tile or a streamed neighbour
+	var loc := Vector2i.ZERO
+	var pack := Sites.active
+	if world.streamer:
+		loc = world.streamer.tile_of(player.global_position)
+		pack = str(world.streamer.tiles.get(loc, {}).get("pack", ""))
+	var off := Vector2(loc.x, loc.y) * 1024.0
+	if loc != _debug_bg_tile and is_instance_valid(_debug_bg):
+		_debug_bg.texture = _tile_texture(loc, pack)
+		_debug_bg_tile = loc
 	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
-	if layer:
+	if layer and loc == Vector2i.ZERO:
 		for n in layer.find_children("*", "Interactable", true, false):
 			if not n.visible or not n.is_visible_in_tree():
 				continue
@@ -1013,7 +1030,7 @@ func _draw_debug_map(c: Control) -> void:
 					kind = k
 			if n.name == "RegisterBook":
 				kind = "register"
-			var p: Vector2 = origin + Vector2(n.global_position.x, n.global_position.z) / 1024.0 * side
+			var p: Vector2 = origin + (Vector2(n.global_position.x, n.global_position.z) - off) / 1024.0 * side
 			var col: Color = DEBUG_COLORS.get(kind, Color.WHITE)
 			c.draw_circle(p, 5, col)
 			c.draw_circle(p, 5, Color.BLACK, false, 1.0)
@@ -1021,7 +1038,7 @@ func _draw_debug_map(c: Control) -> void:
 			c.draw_string(font, p + Vector2(7, 4), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.BLACK)
 			c.draw_string(font, p + Vector2(6, 3), text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11, col)
 	# the player and heading
-	var pp := origin + Vector2(player.global_position.x, player.global_position.z) / 1024.0 * side
+	var pp := origin + (Vector2(player.global_position.x, player.global_position.z) - off) / 1024.0 * side
 	var fwd := -player.global_transform.basis.z
 	c.draw_line(pp, pp + Vector2(fwd.x, fwd.z) * 18, Color.WHITE, 2.0)
 	c.draw_circle(pp, 6, Color.WHITE)
@@ -1031,6 +1048,23 @@ func _draw_debug_map(c: Control) -> void:
 	c.draw_line(origin + Vector2(side - 18, 40), origin + Vector2(side - 18, 22), GOLD, 2.0)
 	c.draw_line(origin + Vector2(10, side - 10), origin + Vector2(10 + side * 100.0 / 1024.0, side - 10), Color.WHITE, 2.0)
 	c.draw_string(font, origin + Vector2(10, side - 14), "100 m", HORIZONTAL_ALIGNMENT_LEFT, -1, 11, Color.WHITE)
+	var tile_text := "tile %d,%d  %s" % [loc.x, loc.y, pack if pack != "" else "(not loaded)"]
+	c.draw_string(font, origin + Vector2(11, 19), tile_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.BLACK)
+	c.draw_string(font, origin + Vector2(10, 18), tile_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, GOLD)
+
+
+## Background of the debug map for a tile: the era drape of the site's own tile, the orthophoto of a
+## streamed neighbour (read from its tile directory once), nothing while a tile is still loading.
+func _tile_texture(loc: Vector2i, pack: String) -> Texture2D:
+	if loc == Vector2i.ZERO:
+		var newest := GameState.eras_in_order()
+		return newest[-1].texture() if not newest.is_empty() else null
+	if pack == "":
+		return null
+	if not _tile_ortho.has(pack):
+		var img := Image.load_from_file(Sites.tile_dir_of(pack) + "/ortho.jpg")
+		_tile_ortho[pack] = ImageTexture.create_from_image(img) if img else null
+	return _tile_ortho[pack]
 
 
 func _debug_map_input(event: InputEvent) -> void:
@@ -1039,6 +1073,8 @@ func _debug_map_input(event: InputEvent) -> void:
 		var local: Vector2 = (event.position - f[0]) / f[1] * 1024.0
 		if local.x < 0 or local.y < 0 or local.x > 1024 or local.y > 1024:
 			return
+		if world.streamer:
+			local += Vector2(_debug_bg_tile.x, _debug_bg_tile.y) * 1024.0
 		player.velocity = Vector3.ZERO
 		player.global_position = Vector3(local.x, 200.0, local.y)
 		world._snap(player, 1.0)

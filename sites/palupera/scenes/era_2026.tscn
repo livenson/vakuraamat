@@ -1930,9 +1930,11 @@ script = ExtResource("1")
 
 [node name="Kit" type="Node3D" parent="Parcels/P17101_001_1998"]
 script = ExtResource("15")
-kit = "fence"
+kit = "solar"
 tunnus = "17101:001:1998"
 polygon = PackedVector2Array(-112.7, 114.3, -14.5, 65.8, 57.8, 132.9, 70.0, 130.4, 110.9, 121.6, 163.1, 110.7, 200.6, 93.2, 213.2, 85.8, -213.2, -132.9)
+row_period = 6.19
+row_angle = 0.0
 
 [node name="P58201_001_0228" type="Node3D" parent="Parcels"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 534.3, 0, 602.1)

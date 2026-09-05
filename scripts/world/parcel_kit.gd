@@ -7,6 +7,8 @@ extends Node3D
 @export var kit := ""                         # playground | park | hedge | fence
 @export var tunnus := ""                      # cadastral number, for the codes overlay
 @export var polygon: PackedVector2Array = PackedVector2Array()   # boundary around the origin (x east, y = z south)
+@export var row_period := 6.0                 # solar: metres between rows (from the orthophoto)
+@export var row_angle := 0.0                  # solar: direction the rows run, degrees from east towards south
 
 var _st := SurfaceTool.new()
 var _colors: Array[Color] = []
@@ -26,6 +28,10 @@ func _ready() -> void:
 		"fence":
 			set_meta("no_snap", true)
 			_boundary(2.0, 0.08, Color(0.45, 0.45, 0.42), 0.4, false)
+		"solar":
+			set_meta("no_snap", true)
+			_solar()
+			_boundary(1.8, 0.06, Color(0.5, 0.5, 0.48), 0.5, false)
 	if _colors.is_empty():
 		return
 	var mi := MeshInstance3D.new()
@@ -44,11 +50,11 @@ func _ready() -> void:
 	add_child(body)
 
 
-func _box(center: Vector3, size: Vector3, col: Color, yaw := 0.0) -> void:
+func _box(center: Vector3, size: Vector3, col: Color, yaw := 0.0, tilt := 0.0) -> void:
 	if _colors.is_empty():
 		_st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	_colors.append(col)
-	var b := Basis(Vector3.UP, yaw)
+	var b := Basis(Vector3.UP, yaw) * Basis(Vector3.RIGHT, tilt)
 	var h := size / 2.0
 	var c := [Vector3(-h.x, -h.y, -h.z), Vector3(h.x, -h.y, -h.z), Vector3(h.x, h.y, -h.z), Vector3(-h.x, h.y, -h.z),
 			Vector3(-h.x, -h.y, h.z), Vector3(h.x, -h.y, h.z), Vector3(h.x, h.y, h.z), Vector3(-h.x, h.y, h.z)]
@@ -140,6 +146,44 @@ func _boundary(h: float, thickness: float, col: Color, seg: float, gaps: bool) -
 			var t := (k + 0.5) * seg
 			var p := a + dir * t + inward
 			_box(Vector3(p.x, _ground(p) + h / 2.0 - 0.15, p.y), Vector3(seg * 0.95, h, thickness + 0.0), col, -atan2(dir.y, dir.x))
+
+
+## Solar park: tables of panels along the rows the orthophoto shows, tilted 35 degrees towards the
+## south (rows run east-west in Estonia), on posts, every row_period metres, inside the boundary.
+func _solar() -> void:
+	var dir := Vector2(cos(deg_to_rad(row_angle)), sin(deg_to_rad(row_angle)))
+	if dir.y < 0.0:
+		dir = -dir   # keep one consistent handedness so the "south" side is the same for every row
+	var nrm := Vector2(-dir.y, dir.x)   # points towards +z (south) for east-west rows
+	var lo_n := INF
+	var hi_n := -INF
+	var lo_d := INF
+	var hi_d := -INF
+	for p in polygon:
+		lo_n = minf(lo_n, p.dot(nrm))
+		hi_n = maxf(hi_n, p.dot(nrm))
+		lo_d = minf(lo_d, p.dot(dir))
+		hi_d = maxf(hi_d, p.dot(dir))
+	var period := maxf(row_period, 3.0)
+	var table := 3.0
+	var panel := Color(0.09, 0.11, 0.2)
+	var frame := Color(0.6, 0.6, 0.62)
+	var yaw := -atan2(dir.y, dir.x)
+	var placed := 0
+	var o := lo_n + period * 0.5
+	while o < hi_n and placed < 3000:
+		var t := lo_d + table * 0.5
+		while t < hi_d:
+			var p := nrm * o + dir * t
+			var a := p - dir * (table * 0.5 + 1.0)
+			var b := p + dir * (table * 0.5 + 1.0)
+			if Geometry2D.is_point_in_polygon(p, polygon) and Geometry2D.is_point_in_polygon(a, polygon) and Geometry2D.is_point_in_polygon(b, polygon):
+				var g := _ground(p)
+				_box(Vector3(p.x, g + 1.25, p.y), Vector3(table * 0.96, 0.05, 2.0), panel, yaw, deg_to_rad(35.0))
+				_box(Vector3(p.x, g + 0.55, p.y), Vector3(0.08, 1.1, 0.08), frame)
+				placed += 1
+			t += table
+		o += period
 
 
 ## Terrain height under a kit-local point, in kit space (the kit itself stays at y 0).
