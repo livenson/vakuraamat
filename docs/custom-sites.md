@@ -154,6 +154,19 @@ models (trunk position, height, crown diameter, conifer or deciduous) for the ti
 matching species and scale instead of the statistical scatter, and keeps the statistical bushes and
 grass. Tiles without coverage are unchanged.
 
+## Other countries
+
+Everything the pipeline fetches for a place sits behind one interface, `tools/pipeline/sources.py`:
+a metric CRS and coverage box, `dem`, `ortho`, optional `canopy`, `historical`, `buildings`, `trees`,
+`geocode`, `reverse`. Estonia is the one implemented adapter (Maa-amet DTM, nDSM, orthophoto and
+historical WMS, in-ADS gazetteer, ETAK + Building Register + Geo3D buildings, Geo3D trees).
+`fetch_tile.py` refuses points no adapter covers, and `python3 tools/pipeline/sources.py --list`
+prints the implemented and planned adapters (Finland, Latvia, the Netherlands, Denmark, Switzerland,
+the UK, the US, and a coarse global fallback with what each would use). Adding a country means
+writing one adapter class and registering it; the game side (packs, blocks, services) is unchanged.
+The Estonian-specific parts that would still need a per-country answer are the historical map layers
+per era and the story blocks' cultural texture.
+
 ## Iterating
 
 | Change | Then run |

@@ -26,6 +26,10 @@ func _ready() -> void:
 	GameState.world = self
 	var tile_dir := Sites.tile_dir()
 	fade.color.a = 1.0
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--screenshot="):
+			player.input_enabled = false   # deterministic captures: no mouse motion while the ground builds
+			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if (terrain.data == null or terrain.data.region_locations.is_empty()) and TerrainBuilder.has_inputs(tile_dir):
 		await _build_terrain(tile_dir)   # downloaded tile: inputs present, region data not yet built
 	if terrain.data == null or terrain.data.region_locations.is_empty():
@@ -175,6 +179,11 @@ func _build_terrain(tile_dir: String) -> void:
 	var ok: bool = await builder.import(terrain, tile_dir, layout)
 	if ok:
 		await builder.scatter(terrain, tile_dir, layout.get("exclusions", []))
+	# let Terrain3D rebuild its clipmap and collision around the camera before anyone is placed on it
+	terrain.set_camera(player.camera)
+	terrain.data.update_maps()
+	for i in 3:
+		await get_tree().process_frame
 	label.queue_free()
 
 

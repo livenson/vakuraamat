@@ -89,6 +89,9 @@ and Maa-amet's LOD2 3D models (roof shapes); a building appears only in the eras
 of use, coloured by its materials, with a chimney where there is a flue. In towns, every tree stands
 where the laser scan found it, at its measured height (Maa-amet single-tree models).
 
+**Other countries:** the data side is one adapter class per country (`tools/pipeline/sources.py`);
+only Estonia exists so far, the planned ones are listed there.
+
 **Friends:** `make world-service`, then *Share this world* in the Locations panel gives a code; a
 friend enters it under *Visit* and plays your world (regenerated on their side, starting from your
 committed consequences). What they trigger there comes back to you as deliveries the next time you
