@@ -53,6 +53,13 @@ Every report becomes an event in the session; Claude reads the JSON and the scre
   pid (`"pid": 0` means all). `tools/dev.py` targets the newest instance by default; `--pid <n>`
   picks one and `--all` broadcasts; `python3 tools/dev.py instances` lists them.
 
+## Aerial checks
+
+`--fly` starts the player flying; `--spawn=x,z[,yaw[,height[,pitch]]]` places them (a height keeps
+them in the air, a pitch in degrees tilts the view), e.g. a border check from the air:
+`godot --path . res://scenes/world/world.tscn -- --site=kvissentali --fly --spawn=940,500,-90,110,-28 --screenshot=/tmp/a.png`.
+`--no-stream` keeps neighbouring tiles from loading during measurements.
+
 ## K: codes overlay
 
 K toggles an overlay with the cadastral unit under you (number, purpose, area, owner, X-GIS link),

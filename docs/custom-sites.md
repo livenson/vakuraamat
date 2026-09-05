@@ -236,6 +236,30 @@ also starts either service itself when it runs from the source tree and the conf
 local (`Locator.spawn_local`), so `godot --path .` works too; exported builds need a service URL
 in `settings.cfg` (`[service] url`, `worlds_url`).
 
+## Water, fish, ground and people
+
+Every still-water patch in a pack's water file becomes a `Pond`: a rippling surface
+(`assets/shaders/lake.gdshader`, adapted from the MIT Realistic Water Shader: gentle Gerstner
+waves, drifting ripple normals, depth-based colour by Beer's law with refraction of what lies
+below, foam along the shore), a basin carved into the terrain at load time (only where the laser
+DTM was flat at the water level, so land inside a patch's bounding box stays), and a school of fish
+circling below the surface (a MultiMesh, animated within 70 m of the player). Streamed tiles get
+their ponds too. Vegetation is never scattered on water patches (`TerrainBuilder.water_exclusions`).
+
+Ground and facade textures are CC0 sets from Poly Haven, fetched and packed by
+`tools/pipeline/fetch_polyhaven.py` (record in `assets/textures/POLYHAVEN.json`): five terrain
+materials (meadow, field, forest floor, gravel, soil) and ten building materials (plaster, brick,
+concrete, prefab panel, boards, logs, roof tiles, corrugated iron, reed, fieldstone) that
+`FootprintBuilding` picks from the Building Register's facade and roof texts.
+
+People are MakeHuman figures generated headlessly with MPFB2 in Blender
+(`tools/blender/make_humans.py`; MPFB extension and the CC0 system asset pack required): eight
+variants (men and women, young to old, casual, work and elegant suits) with the game-engine rig,
+exported to `assets/models/humans/*.glb`. `HumanFigure` drives them without animation clips: a
+procedural gait (hip and knee swing, arm counter-swing, torso sway) for walkers, standing poses
+(stand, arms folded, holding, sitting on the bicycle) for NPCs and riders, and era tints on the
+clothes. Preview them with `godot --path . res://tools/godot/figure_preview.tscn -- --screenshot=/abs/out.png`.
+
 ## Iterating
 
 | Change | Then run |

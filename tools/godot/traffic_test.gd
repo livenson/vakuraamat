@@ -49,6 +49,9 @@ func _ready() -> void:
 	var kinds := {}
 	for ag in traffic.agents:
 		kinds[ag.kind] = kinds.get(ag.kind, 0) + 1
+		if ag.kind == "walker" and HumanFigure.available():
+			var fig: HumanFigure = ag._body as HumanFigure
+			_check(fig != null and fig.skeleton != null and fig._bones.has("thigh_l"), "walker is not a rigged HumanFigure")
 	print("[traffic] %d agents after 6 s: %s" % [traffic.agents.size(), kinds])
 	for ag in traffic.agents:
 		var h: float = world.terrain.data.get_height(ag.global_position)

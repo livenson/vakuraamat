@@ -62,7 +62,8 @@ func carve(terrain: Terrain3D) -> void:
 			var gp := Vector3(origin.x + x, 0.0, origin.z + z)
 			var h := terrain.data.get_height(gp)
 			var target := level - d
-			if not is_nan(h) and h > target:
+			# only ground the laser saw as flat water gets a bed; land inside the patch's bounding box stays
+			if not is_nan(h) and h > target and absf(h - level) < 0.35:
 				terrain.data.set_height(gp, target)
 				changed += 1
 	if changed > 0:
@@ -70,7 +71,7 @@ func carve(terrain: Terrain3D) -> void:
 
 
 func _make_fish() -> void:
-	var n := clampi(int(area / 250.0), 3, 24)
+	var n := clampi(int(area / 150.0), 4, 30)
 	var mesh := _fish_mesh()
 	var mm := MultiMesh.new()
 	mm.transform_format = MultiMesh.TRANSFORM_3D
@@ -88,7 +89,7 @@ func _make_fish() -> void:
 		var c := Vector2(rng.randf_range(-half.x, half.x), rng.randf_range(-half.y, half.y)) * 0.7
 		var r := Vector2(rng.randf_range(2.0, maxf(3.0, half.x * 0.5)), rng.randf_range(1.5, maxf(2.5, half.y * 0.5)))
 		_fish_state.append({"c": c, "r": r, "w": rng.randf_range(0.15, 0.4) * (1.0 if rng.randf() < 0.5 else -1.0),
-				"phase": rng.randf() * TAU, "depth": rng.randf_range(0.35, 1.1), "len": rng.randf_range(0.18, 0.42)})
+				"phase": rng.randf() * TAU, "depth": rng.randf_range(0.25, 0.8), "len": rng.randf_range(0.3, 0.6)})
 	_t = rng.randf() * 100.0
 	_update_fish()
 
@@ -124,9 +125,9 @@ static func _fish_mesh() -> ArrayMesh:
 		st.add_vertex(v)
 	var mesh := st.commit()
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.32, 0.36, 0.28)
-	mat.roughness = 0.35
-	mat.metallic = 0.3
+	mat.albedo_color = Color(0.72, 0.74, 0.66)   # pale, readable through the water's tint
+	mat.roughness = 0.4
+	mat.metallic = 0.2
 	mat.metallic_specular = 0.7
 	mesh.surface_set_material(0, mat)
 	return mesh
