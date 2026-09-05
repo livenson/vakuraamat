@@ -22,7 +22,7 @@
       {"type": "group", "name": "Ruin", "at": "manor", "children": [
         {"type": "building", "name": "RuinModel", "model": "res://assets/models/buildings/ruin.glb", "yaw_deg": 180},
         {"type": "examine", "name": "RuinExamine", "key": "EX_MANOR_2026", "loc": "LOC_MANOR", "label": "LOC_MANOR", "at": [0, "-manor_size[1] / 2 - 3"]},
-        {"type": "register", "name": "RegisterBook", "at": [0, "-manor_size[1] / 2 + 5"]}
+        {"type": "register", "name": "RegisterBook", "at": [0, "-manor_size[1] / 2 + 5"], "text": "EX_REGISTER_2026"}
       ]},
       {"type": "group", "name": "OrchardKept", "at": "orchard", "flag": "cellar_opened", "visible_when": true, "children": [
         {"type": "repeat", "count": 6, "children": [

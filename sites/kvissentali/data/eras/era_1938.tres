@@ -1,0 +1,19 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/era/era_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/terrain/kvissentali/era_1938_cadastral.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "era_1938"
+display_name_key = "ERA_1938_NAME"
+year_label = "1938"
+scene_path = "res://sites/kvissentali/scenes/era_1938.tscn"
+texture_strength = 0.4
+ground_tint = Color(1.0, 0.97, 0.9, 1)
+default_time_of_day = 9.5
+order = 1
+narrative_story = "res://sites/kvissentali/narrative/era_1938.ink.json"
+currency_key = "CUR_1938"
+starting_money = 150
+terrain_texture = ExtResource("2")

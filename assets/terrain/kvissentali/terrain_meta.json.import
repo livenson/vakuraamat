@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://ci4vnwgvjauj"
+valid=false
+
+[deps]
+
+source_file="res://assets/terrain/kvissentali/terrain_meta.json"
+
+[params]
+
+compress=true

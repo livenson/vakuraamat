@@ -1,0 +1,99 @@
+{
+  "id": "kvissentali",
+  "name_key": "SITE_KVISSENTALI",
+  "subtitle_key": "SITE_KVISSENTALI_SUBTITLE",
+  "description": "Kvissentali: scaffolded site pack. Replace the placeholder story.",
+  "terrain": {
+    "tile": "kvissentali",
+    "center": [
+      657600.0,
+      6477150.0
+    ],
+    "size": 1024,
+    "latitude": 58.40625,
+    "longitude": 26.69666,
+    "utc_offset": 3.0,
+    "date": [
+      2026,
+      9,
+      3
+    ],
+    "era_maps": {
+      "era_1798": {
+        "layer": "yheverstakaart",
+        "file": "era_1798_verst.png"
+      },
+      "era_1938": {
+        "layer": "kk1940",
+        "file": "era_1938_cadastral.png"
+      }
+    }
+  },
+  "start": {
+    "era": "era_2026",
+    "spawn": [
+      512.0,
+      532.0
+    ],
+    "yaw_deg": 0
+  },
+  "water": "water_2026.json",
+  "buildings": "buildings_2026.json",
+  "locations": {
+    "LOC_LANDMARK": "landmark",
+    "LOC_FARMSTEAD": "farm"
+  },
+  "objectives": [
+    {
+      "when": "register_locked",
+      "key": "OBJ_FIND_REGISTER",
+      "target": "RegisterBook",
+      "lift": 1.2
+    },
+    {
+      "chapter": 1,
+      "key": "OBJ_VISIT_ERAS"
+    },
+    {
+      "chapter": 2,
+      "key": "OBJ_RETURN",
+      "target": "Local1798",
+      "era": "era_1798",
+      "lift": 2.2
+    },
+    {
+      "chapter": 3,
+      "not_flag": "epilogue",
+      "key": "OBJ_SIT",
+      "target": "Local2026",
+      "era": "era_2026",
+      "lift": 2.2
+    }
+  ],
+  "register_nudge": {
+    "chapter": 1,
+    "era": "era_1798"
+  },
+  "ending": {
+    "trigger_flag": "epilogue",
+    "counted_flags": [
+      "keepsake_returned"
+    ],
+    "tiers": [
+      {
+        "min_kept": 1,
+        "key": "ENDING_KEPT_TEXT"
+      },
+      {
+        "key": "ENDING_LOST_TEXT"
+      }
+    ]
+  },
+  "codex": [
+    "CODEX_REAL",
+    "CODEX_INVENTED"
+  ],
+  "debug": {
+    "build_node": "Manor_home_farm"
+  }
+}

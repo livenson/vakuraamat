@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://brs5tsnp03dd"
+valid=false
+
+[deps]
+
+source_file="res://sites/kvissentali/scenes.json"
+
+[params]
+
+compress=true

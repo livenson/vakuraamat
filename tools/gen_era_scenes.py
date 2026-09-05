@@ -28,7 +28,7 @@ PRIMITIVES
   box          name size y color [at rot]        torus  name inner outer color [y]
   examine      name key [loc label at]           story_point  name knot speaker text [loc label radius]
   npc          name id knot label color at [height yaw pose]
-  pickup       name item examine at              register  name [at]     (the vakuraamat itself)
+  pickup       name item examine at              register  name [at text]  (the vakuraamat itself)
   tree         name at scale [yaw scene]         repeat    count var children   (var is i by default)
   scatter      prefix count radius scale=[min,max] [seed scene]           random trees in a disc
   farm_plots   at count seeds                    trade_post  at key color
@@ -145,9 +145,9 @@ class Scene:
                 self.nodes[i] = n + f'\nmetadata/footprint = Vector2({w}, {d})'
                 return
 
-    def register(self, name, parent, x, z):
+    def register(self, name, parent, x, z, text_key="EX_REGISTER"):
         rp = self.ext_res("Script", "res://scripts/interaction/register_pickup.gd")
-        self.node(name, "Node3D", parent, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {x}, 0, {z})\nscript = ExtResource("{rp}")')
+        self.node(name, "Node3D", parent, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {x}, 0, {z})\nscript = ExtResource("{rp}")\ntext_key = "{text_key}"')
         path = f"{parent}/{name}" if parent != "." else name
         self.node("BookMesh", "CSGBox3D", path, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)\nsize = Vector3(0.45, 0.12, 0.32)\nmaterial = {self.mat((0.45, 0.25, 0.1), 0.6)}')
         self.node("Plinth", "CSGBox3D", path, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)\nsize = Vector3(0.9, 0.9, 0.7)\nmaterial = {self.mat((0.7, 0.68, 0.62))}')
@@ -199,14 +199,20 @@ class Scene:
         sc = self.ext_res("Script", "res://scripts/hunting/hunting_spawner.gd")
         self.node("HuntingSpawner", "Node3D", ".", f'script = ExtResource("{sc}")\nera_id = "{self.era}"\nmax_animals = {max_animals}')
 
+    def mesh_box(self, name, parent, size, y_center, c):
+        """A BoxMesh instance: cheaper than CSG when there are hundreds (village massing)."""
+        mesh = self.sub_res("BoxMesh", f"size = Vector3({size[0]}, {size[1]}, {size[2]})", "BM")
+        m = self.mat(c)
+        self.node(name, "MeshInstance3D", parent, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, {y_center}, 0)\nmesh = {mesh}\nsurface_material_override/0 = {m}')
+
     def village(self, buildings):
         """Real building footprints (from the nDSM) as simple massing boxes."""
         self.group("Village", ".", 0, 0)
         for i, b in enumerate(buildings):
             self.group(f"B{i}", "Village", b["x"], b["z"])
             self.footprint(f"Village/B{i}", b["w"], b["d"])
-            self.box("Mass", f"Village/B{i}", (b["w"], b["h"] + 3.0, b["d"]), b["h"] / 2 - 1.5, tuple(min(1.0, k * 0.9) for k in b["color"]))
-            self.box("Roof", f"Village/B{i}", (b["w"] + 0.6, 0.25, b["d"] + 0.6), b["h"] + 0.12, tuple(k * 0.6 for k in b["color"]))
+            self.mesh_box("Mass", f"Village/B{i}", (b["w"], b["h"] + 3.0, b["d"]), b["h"] / 2 - 1.5, tuple(min(1.0, k * 0.9) for k in b["color"]))
+            self.mesh_box("Roof", f"Village/B{i}", (b["w"] + 0.6, 0.25, b["d"] + 0.6), b["h"] + 0.12, tuple(k * 0.6 for k in b["color"]))
 
     def write(self, path):
         sc = self.ext_res("Script", "res://scripts/era/era_controller.gd")
@@ -324,7 +330,7 @@ class Interpreter:
                 s.pickup(name, parent, n["item"], n.get("examine", ""), x, z)
             elif t == "register":
                 x, z = self.pos(n.get("at"), env)
-                s.register(name or "RegisterBook", parent, x, z)
+                s.register(name or "RegisterBook", parent, x, z, self.txt(n.get("text", "EX_REGISTER"), env))
             elif t == "tree":
                 x, z = self.pos(n.get("at"), env)
                 s.tree(name, parent, x, z, self.num(n.get("scale", 1.0), env), self.yaw(n, env), n.get("scene", "res://assets/vegetation/tree_juniper.tscn"))

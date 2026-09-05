@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://datck2uf31dbj"
+
+[deps]
+
+files=["res://sites/kvissentali/strings.et.translation", "res://sites/kvissentali/strings.en.translation"]
+
+source_file="res://sites/kvissentali/strings.csv"
+dest_files=["res://sites/kvissentali/strings.et.translation", "res://sites/kvissentali/strings.en.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

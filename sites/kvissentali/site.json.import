@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://7y8u8rov5e64"
+valid=false
+
+[deps]
+
+source_file="res://sites/kvissentali/site.json"
+
+[params]
+
+compress=true

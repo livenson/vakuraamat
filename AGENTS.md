@@ -4,7 +4,10 @@ Read this before changing anything. `CLAUDE.md` points here; the human-facing ov
 
 ## What this is
 A Godot 4.7 (GDScript) game on real Estonian terrain from Maa-amet open data. Three eras of one
-1 km² tile (Palupera), scripted cross-era consequences, era-local farming/hunting/trading/building.
+1 km² tile, scripted cross-era consequences, era-local farming/hunting/trading/building. Every
+place-and-story is a **site pack** under `sites/<id>/` (Palupera is the original; Kvissentali a
+scaffold); the engine reads the active pack through the `Sites` autoload and never names a site.
+Authoring guide: `docs/custom-sites.md`.
 The design and plan documents in the repo root are authoritative: `vakuraamat-implementation-plan.md`
 (architecture rules), `vakuraamat-first-iteration-design.md` (content), `vakuraamat-language-notes.md`,
 `vakuraamat-maaamet-data-pipeline.md`, `vakuraamat-visual-upgrade-plan.md`.
@@ -15,19 +18,29 @@ The design and plan documents in the repo root are authoritative: `vakuraamat-im
   `TimelineState`, `ConsequencePoint` or `ArtifactItem`; the tests grep for it.
 - Every third-party file gets a row in `THIRD_PARTY.md` in the same commit (the project will be
   open source). Prefer CC0/MIT. Nothing from Fab/Megascans.
-- Positions are authored in `data/site_layout.json`; `tools/gen_era_scenes.py` regenerates
-  `scenes/eras/*.tscn`. Do not hand-edit those scenes.
+- Site content lives in `sites/<id>/`: `site.json` (manifest), `layout.json` (positions),
+  `scenes.json` (era layers), `data/` (eras, consequence points, items, manors, structures, trade
+  goods, crops, animals), `narrative/` (ink), `strings.csv`. `make scenes SITE=<id>` regenerates
+  `sites/<id>/scenes/*.tscn`; do not hand-edit those scenes. Engine code (`scripts/`, `scenes/`)
+  must not reference a site by name; go through `Sites` (manifest, `data_dir`, `layout`, `tile`).
+- Core UI strings stay in `assets/i18n/strings.csv`; story/place strings go in the pack's
+  `strings.csv` (imported to `.translation` next to it; `make import` after editing).
 - Generated data is not committed: `assets/terrain/*/data`, tree meshes and impostor atlases. Rebuild
   with `make tile` / `make trees`. Large stable binaries are in git LFS (`.gitattributes`).
 
 ## Commands
-- `make setup` once; `make test` and `make lint` before every commit (the lint workflow runs on
+- `make setup` once; `make test` before every commit (validates every pack, boots every pack, then
+  the Palupera story tests); `make lint`; `make export` for a macOS build.
+- New location: `make site SITE=<id> NAME="..." CENTER="<easting> <northing>"` then `make tile SITE=<id>`
+  (fetches DTM/nDSM/orthophoto/historical maps, builds terrain, derives buildings and water,
+  generates scenes, validates). `make validate` is pure python and fast; run it after editing a pack.
   GitHub too: gdlint with `.gdlintrc`, ruff with `ruff.toml`, shellcheck); `make export` for a macOS build.
 - Godot headless scripts: `godot --headless --path . -s res://tools/godot/<tool>.gd` for SceneTree
   tools; scenes that need autoloads run as `godot --headless --path . res://tools/godot/<test>.tscn`.
 - zsh does not word-split unquoted variables: when looping over argument strings use `${=args}`.
 - Screenshots for visual checks: `godot --path . res://scenes/world/world.tscn -- --screenshot=/abs.png
-  --frames=400 --era=era_1938 --spawn=x,z,yaw --open=register|journal|map|trade|build|menu`.
+  --frames=400 --era=era_1938 --spawn=x,z,yaw --open=register|journal|map|trade|build|menu`;
+  add `--site=<id>` for another pack.
 
 ## Conventions and pitfalls
 - Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`
@@ -50,5 +63,7 @@ The design and plan documents in the repo root are authoritative: `vakuraamat-im
   corner and `import_terrain.gd` levels pads listed in the layout.
 
 ## Tests
-`tools/godot/*_test.tscn`: boot (autoloads, data, ink, save), playthrough (all five consequences,
-chapters, endings, save round-trip), farming, hunting, economy (trading + building). Keep them green.
+`tools/godot/*_test.tscn`: boot (autoloads, data, ink, save), site (every pack: registries, era
+scenes, translations, ink), playthrough (all five Palupera consequences, chapters, endings, save
+round-trip), farming, hunting, economy (trading + building). Keep them green. `tools/validate_site.py`
+checks pack references without Godot.

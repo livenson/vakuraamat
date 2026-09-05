@@ -1,0 +1,303 @@
+{
+ "colors": {
+  "darkwood": [
+   0.3,
+   0.22,
+   0.14
+  ],
+  "stone": [
+   0.55,
+   0.53,
+   0.5
+  ]
+ },
+ "fragments": {},
+ "eras": {
+  "era_1798": {
+   "nodes": [
+    {
+     "type": "npc",
+     "name": "Local1798",
+     "id": "npc_era_1798",
+     "knot": "greeter",
+     "label": "NPC_1798",
+     "color": [
+      0.4,
+      0.35,
+      0.3
+     ],
+     "at": {
+      "ref": "register",
+      "offset": [
+       6,
+       4
+      ]
+     },
+     "height": 1.7,
+     "yaw": 2.6
+    },
+    {
+     "type": "group",
+     "name": "Landmark",
+     "at": "landmark",
+     "children": [
+      {
+       "type": "examine",
+       "name": "LandmarkExamine",
+       "key": "EX_LANDMARK_1798",
+       "loc": "LOC_LANDMARK",
+       "label": "LOC_LANDMARK"
+      }
+     ]
+    },
+    {
+     "type": "trade_post",
+     "at": "trade",
+     "key": "POST_1798",
+     "color": [
+      0.7,
+      0.65,
+      0.5
+     ]
+    },
+    {
+     "type": "farm_plots",
+     "at": {
+      "ref": "farm",
+      "offset": [
+       8,
+       12
+      ]
+     },
+     "count": 2,
+     "seeds": [
+      "seed_rye",
+      "seed_oats"
+     ]
+    },
+    {
+     "type": "hunting",
+     "max_animals": 6
+    }
+   ]
+  },
+  "era_1938": {
+   "nodes": [
+    {
+     "type": "npc",
+     "name": "Local1938",
+     "id": "npc_era_1938",
+     "knot": "greeter",
+     "label": "NPC_1938",
+     "color": [
+      0.5,
+      0.35,
+      0.3
+     ],
+     "at": {
+      "ref": "register",
+      "offset": [
+       6,
+       4
+      ]
+     },
+     "height": 1.7,
+     "yaw": 2.6
+    },
+    {
+     "type": "group",
+     "name": "Landmark",
+     "at": "landmark",
+     "children": [
+      {
+       "type": "examine",
+       "name": "LandmarkExamine",
+       "key": "EX_LANDMARK_1938",
+       "loc": "LOC_LANDMARK",
+       "label": "LOC_LANDMARK"
+      }
+     ]
+    },
+    {
+     "type": "trade_post",
+     "at": "trade",
+     "key": "POST_1938",
+     "color": [
+      0.7,
+      0.65,
+      0.5
+     ]
+    },
+    {
+     "type": "group",
+     "name": "Kept",
+     "at": "landmark",
+     "flag": "keepsake_returned",
+     "visible_when": true,
+     "children": [
+      {
+       "type": "instance",
+       "name": "Stone",
+       "scene": "res://assets/models/props/boundary_stone.glb",
+       "at": [
+        3,
+        0
+       ],
+       "yaw_deg": 20
+      },
+      {
+       "type": "examine",
+       "name": "KeptExamine",
+       "key": "EX_KEPT_1938",
+       "label": "LOC_LANDMARK",
+       "at": [
+        3,
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "type": "manor_site",
+     "id": "home_farm",
+     "at": "farm"
+    },
+    {
+     "type": "farm_plots",
+     "at": {
+      "ref": "farm",
+      "offset": [
+       8,
+       12
+      ]
+     },
+     "count": 2,
+     "seeds": [
+      "seed_rye",
+      "seed_oats",
+      "seed_potato"
+     ]
+    },
+    {
+     "type": "hunting",
+     "max_animals": 6
+    }
+   ]
+  },
+  "era_2026": {
+   "nodes": [
+    {
+     "type": "register",
+     "name": "RegisterBook",
+     "at": "register"
+    },
+    {
+     "type": "npc",
+     "name": "Local2026",
+     "id": "npc_era_2026",
+     "knot": "greeter",
+     "label": "NPC_2026",
+     "color": [
+      0.6000000000000001,
+      0.35,
+      0.3
+     ],
+     "at": {
+      "ref": "register",
+      "offset": [
+       6,
+       4
+      ]
+     },
+     "height": 1.7,
+     "yaw": 2.6
+    },
+    {
+     "type": "group",
+     "name": "Landmark",
+     "at": "landmark",
+     "children": [
+      {
+       "type": "examine",
+       "name": "LandmarkExamine",
+       "key": "EX_LANDMARK_2026",
+       "loc": "LOC_LANDMARK",
+       "label": "LOC_LANDMARK"
+      }
+     ]
+    },
+    {
+     "type": "trade_post",
+     "at": "trade",
+     "key": "POST_2026",
+     "color": [
+      0.7,
+      0.65,
+      0.5
+     ]
+    },
+    {
+     "type": "group",
+     "name": "Kept",
+     "at": "landmark",
+     "flag": "keepsake_returned",
+     "visible_when": true,
+     "children": [
+      {
+       "type": "instance",
+       "name": "Stone",
+       "scene": "res://assets/models/props/boundary_stone.glb",
+       "at": [
+        3,
+        0
+       ],
+       "yaw_deg": 20
+      },
+      {
+       "type": "examine",
+       "name": "KeptExamine",
+       "key": "EX_KEPT_2026",
+       "label": "LOC_LANDMARK",
+       "at": [
+        3,
+        0
+       ]
+      }
+     ]
+    },
+    {
+     "type": "pickup",
+     "name": "Keepsake",
+     "item": "keepsake",
+     "examine": "ITEM_KEEPSAKE_DESC",
+     "at": {
+      "ref": "register",
+      "offset": [
+       -4,
+       3
+      ]
+     }
+    },
+    {
+     "type": "village",
+     "source": "buildings_2026.json"
+    },
+    {
+     "type": "farm_plots",
+     "at": {
+      "ref": "farm",
+      "offset": [
+       8,
+       12
+      ]
+     },
+     "count": 2,
+     "seeds": [
+      "seed_cabbage",
+      "seed_potato"
+     ]
+    }
+   ]
+  }
+ }
+}

@@ -1,4 +1,4 @@
-[gd_scene load_steps=56 format=3]
+[gd_scene load_steps=84 format=3]
 
 [ext_resource type="Script" path="res://scripts/interaction/conditional.gd" id="1"]
 [ext_resource type="PackedScene" path="res://assets/models/props/oak.glb" id="2"]
@@ -41,138 +41,222 @@ size = Vector3(1.4, 1.2, 1.0)
 albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M8"]
+[sub_resource type="BoxMesh" id="BM8"]
+size = Vector3(18, 8.6, 20)
+
+[sub_resource type="StandardMaterial3D" id="M9"]
 albedo_color = Color(0.487, 0.471, 0.370, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M9"]
+[sub_resource type="BoxMesh" id="BM10"]
+size = Vector3(18.6, 0.25, 20.6)
+
+[sub_resource type="StandardMaterial3D" id="M11"]
 albedo_color = Color(0.325, 0.314, 0.247, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M10"]
+[sub_resource type="BoxMesh" id="BM12"]
+size = Vector3(17, 11.3, 15)
+
+[sub_resource type="StandardMaterial3D" id="M13"]
 albedo_color = Color(0.516, 0.499, 0.387, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M11"]
+[sub_resource type="BoxMesh" id="BM14"]
+size = Vector3(17.6, 0.25, 15.6)
+
+[sub_resource type="StandardMaterial3D" id="M15"]
 albedo_color = Color(0.344, 0.332, 0.258, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M12"]
+[sub_resource type="BoxMesh" id="BM16"]
+size = Vector3(8, 11.2, 32)
+
+[sub_resource type="StandardMaterial3D" id="M17"]
 albedo_color = Color(0.579, 0.570, 0.472, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M13"]
+[sub_resource type="BoxMesh" id="BM18"]
+size = Vector3(8.6, 0.25, 32.6)
+
+[sub_resource type="StandardMaterial3D" id="M19"]
 albedo_color = Color(0.386, 0.380, 0.314, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M14"]
+[sub_resource type="BoxMesh" id="BM20"]
+size = Vector3(60, 9.4, 81)
+
+[sub_resource type="StandardMaterial3D" id="M21"]
 albedo_color = Color(0.665, 0.729, 0.741, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M15"]
+[sub_resource type="BoxMesh" id="BM22"]
+size = Vector3(60.6, 0.25, 81.6)
+
+[sub_resource type="StandardMaterial3D" id="M23"]
 albedo_color = Color(0.443, 0.486, 0.494, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M16"]
+[sub_resource type="BoxMesh" id="BM24"]
+size = Vector3(44, 13.1, 70)
+
+[sub_resource type="StandardMaterial3D" id="M25"]
 albedo_color = Color(0.867, 0.872, 0.872, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M17"]
+[sub_resource type="BoxMesh" id="BM26"]
+size = Vector3(44.6, 0.25, 70.6)
+
+[sub_resource type="StandardMaterial3D" id="M27"]
 albedo_color = Color(0.578, 0.581, 0.581, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M18"]
+[sub_resource type="BoxMesh" id="BM28"]
+size = Vector3(12, 9.3, 13)
+
+[sub_resource type="StandardMaterial3D" id="M29"]
 albedo_color = Color(0.356, 0.411, 0.427, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M19"]
+[sub_resource type="BoxMesh" id="BM30"]
+size = Vector3(12.6, 0.25, 13.6)
+
+[sub_resource type="StandardMaterial3D" id="M31"]
 albedo_color = Color(0.237, 0.274, 0.284, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M20"]
+[sub_resource type="BoxMesh" id="BM32"]
+size = Vector3(22, 9.2, 5)
+
+[sub_resource type="StandardMaterial3D" id="M33"]
 albedo_color = Color(0.730, 0.725, 0.638, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M21"]
+[sub_resource type="BoxMesh" id="BM34"]
+size = Vector3(22.6, 0.25, 5.6)
+
+[sub_resource type="StandardMaterial3D" id="M35"]
 albedo_color = Color(0.487, 0.484, 0.425, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M22"]
+[sub_resource type="BoxMesh" id="BM36"]
+size = Vector3(12, 9.4, 9)
+
+[sub_resource type="StandardMaterial3D" id="M37"]
 albedo_color = Color(0.335, 0.323, 0.270, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M23"]
+[sub_resource type="BoxMesh" id="BM38"]
+size = Vector3(12.6, 0.25, 9.6)
+
+[sub_resource type="StandardMaterial3D" id="M39"]
 albedo_color = Color(0.223, 0.215, 0.180, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M24"]
+[sub_resource type="BoxMesh" id="BM40"]
+size = Vector3(26, 11.9, 33)
+
+[sub_resource type="StandardMaterial3D" id="M41"]
 albedo_color = Color(0.679, 0.532, 0.475, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M25"]
+[sub_resource type="BoxMesh" id="BM42"]
+size = Vector3(26.6, 0.25, 33.6)
+
+[sub_resource type="StandardMaterial3D" id="M43"]
 albedo_color = Color(0.453, 0.355, 0.317, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M26"]
+[sub_resource type="BoxMesh" id="BM44"]
+size = Vector3(33, 12.0, 25)
+
+[sub_resource type="StandardMaterial3D" id="M45"]
 albedo_color = Color(0.655, 0.418, 0.353, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M27"]
+[sub_resource type="BoxMesh" id="BM46"]
+size = Vector3(33.6, 0.25, 25.6)
+
+[sub_resource type="StandardMaterial3D" id="M47"]
 albedo_color = Color(0.437, 0.278, 0.235, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M28"]
+[sub_resource type="BoxMesh" id="BM48"]
+size = Vector3(32, 11.9, 24)
+
+[sub_resource type="StandardMaterial3D" id="M49"]
 albedo_color = Color(0.664, 0.495, 0.431, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M29"]
+[sub_resource type="BoxMesh" id="BM50"]
+size = Vector3(32.6, 0.25, 24.6)
+
+[sub_resource type="StandardMaterial3D" id="M51"]
 albedo_color = Color(0.443, 0.330, 0.287, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M30"]
+[sub_resource type="BoxMesh" id="BM52"]
+size = Vector3(14, 8.5, 12)
+
+[sub_resource type="StandardMaterial3D" id="M53"]
 albedo_color = Color(0.593, 0.664, 0.678, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M31"]
+[sub_resource type="BoxMesh" id="BM54"]
+size = Vector3(14.6, 0.25, 12.6)
+
+[sub_resource type="StandardMaterial3D" id="M55"]
 albedo_color = Color(0.395, 0.443, 0.452, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M32"]
+[sub_resource type="BoxMesh" id="BM56"]
+size = Vector3(33, 10.7, 20)
+
+[sub_resource type="StandardMaterial3D" id="M57"]
 albedo_color = Color(0.627, 0.546, 0.446, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M33"]
+[sub_resource type="BoxMesh" id="BM58"]
+size = Vector3(33.6, 0.25, 20.6)
+
+[sub_resource type="StandardMaterial3D" id="M59"]
 albedo_color = Color(0.418, 0.364, 0.297, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M34"]
+[sub_resource type="BoxMesh" id="BM60"]
+size = Vector3(12, 15.0, 9)
+
+[sub_resource type="StandardMaterial3D" id="M61"]
 albedo_color = Color(0.582, 0.581, 0.500, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M35"]
+[sub_resource type="BoxMesh" id="BM62"]
+size = Vector3(12.6, 0.25, 9.6)
+
+[sub_resource type="StandardMaterial3D" id="M63"]
 albedo_color = Color(0.388, 0.387, 0.333, 1)
 roughness = 0.9
 
-[sub_resource type="BoxShape3D" id="TP_era_2026_36"]
+[sub_resource type="BoxShape3D" id="TP_era_2026_64"]
 size = Vector3(2.6, 2.4, 2.2)
 
-[sub_resource type="StandardMaterial3D" id="M37"]
+[sub_resource type="StandardMaterial3D" id="M65"]
 albedo_color = Color(0.420, 0.380, 0.320, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M38"]
+[sub_resource type="StandardMaterial3D" id="M66"]
 albedo_color = Color(0.850, 0.850, 0.800, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M39"]
+[sub_resource type="StandardMaterial3D" id="M67"]
 albedo_color = Color(0.500, 0.450, 0.300, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M40"]
+[sub_resource type="StandardMaterial3D" id="M68"]
 albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M41"]
+[sub_resource type="StandardMaterial3D" id="M69"]
 albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
@@ -209,6 +293,7 @@ label_key = "LOC_MANOR"
 [node name="RegisterBook" type="Node3D" parent="Ruin"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -11.0)
 script = ExtResource("5")
+text_key = "EX_REGISTER_2026"
 
 [node name="BookMesh" type="CSGBox3D" parent="Ruin/RegisterBook"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)
@@ -532,210 +617,210 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 117.0, 0, 169.7)
 script = ExtResource("1")
 metadata/footprint = Vector2(18, 20)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B0"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 1.2999999999999998, 0)
-size = Vector3(18, 8.6, 20)
-material = SubResource("M8")
+[node name="Mass" type="MeshInstance3D" parent="Village/B0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2999999999999998, 0)
+mesh = SubResource("BM8")
+surface_material_override/0 = SubResource("M9")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B0"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 5.72, 0)
-size = Vector3(18.6, 0.25, 20.6)
-material = SubResource("M9")
+[node name="Roof" type="MeshInstance3D" parent="Village/B0"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.72, 0)
+mesh = SubResource("BM10")
+surface_material_override/0 = SubResource("M11")
 
 [node name="B1" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 131.0, 0, 182.2)
 script = ExtResource("1")
 metadata/footprint = Vector2(17, 15)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B1"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.6500000000000004, 0)
-size = Vector3(17, 11.3, 15)
-material = SubResource("M10")
+[node name="Mass" type="MeshInstance3D" parent="Village/B1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6500000000000004, 0)
+mesh = SubResource("BM12")
+surface_material_override/0 = SubResource("M13")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B1"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 8.42, 0)
-size = Vector3(17.6, 0.25, 15.6)
-material = SubResource("M11")
+[node name="Roof" type="MeshInstance3D" parent="Village/B1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.42, 0)
+mesh = SubResource("BM14")
+surface_material_override/0 = SubResource("M15")
 
 [node name="B2" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 440.0, 0, 209.7)
 script = ExtResource("1")
 metadata/footprint = Vector2(8, 32)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B2"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.5999999999999996, 0)
-size = Vector3(8, 11.2, 32)
-material = SubResource("M12")
+[node name="Mass" type="MeshInstance3D" parent="Village/B2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5999999999999996, 0)
+mesh = SubResource("BM16")
+surface_material_override/0 = SubResource("M17")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B2"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 8.319999999999999, 0)
-size = Vector3(8.6, 0.25, 32.6)
-material = SubResource("M13")
+[node name="Roof" type="MeshInstance3D" parent="Village/B2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 8.319999999999999, 0)
+mesh = SubResource("BM18")
+surface_material_override/0 = SubResource("M19")
 
 [node name="B3" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 411.0, 0, 283.0)
 script = ExtResource("1")
 metadata/footprint = Vector2(60, 81)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B3"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 1.7000000000000002, 0)
-size = Vector3(60, 9.4, 81)
-material = SubResource("M14")
+[node name="Mass" type="MeshInstance3D" parent="Village/B3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7000000000000002, 0)
+mesh = SubResource("BM20")
+surface_material_override/0 = SubResource("M21")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B3"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 6.5200000000000005, 0)
-size = Vector3(60.6, 0.25, 81.6)
-material = SubResource("M15")
+[node name="Roof" type="MeshInstance3D" parent="Village/B3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5200000000000005, 0)
+mesh = SubResource("BM22")
+surface_material_override/0 = SubResource("M23")
 
 [node name="B4" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 452.5, 0, 281.6)
 script = ExtResource("1")
 metadata/footprint = Vector2(44, 70)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B4"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 3.55, 0)
-size = Vector3(44, 13.1, 70)
-material = SubResource("M16")
+[node name="Mass" type="MeshInstance3D" parent="Village/B4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.55, 0)
+mesh = SubResource("BM24")
+surface_material_override/0 = SubResource("M25")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B4"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 10.219999999999999, 0)
-size = Vector3(44.6, 0.25, 70.6)
-material = SubResource("M17")
+[node name="Roof" type="MeshInstance3D" parent="Village/B4"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10.219999999999999, 0)
+mesh = SubResource("BM26")
+surface_material_override/0 = SubResource("M27")
 
 [node name="B5" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 958.5, 0, 356.1)
 script = ExtResource("1")
 metadata/footprint = Vector2(12, 13)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B5"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 1.65, 0)
-size = Vector3(12, 9.3, 13)
-material = SubResource("M18")
+[node name="Mass" type="MeshInstance3D" parent="Village/B5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.65, 0)
+mesh = SubResource("BM28")
+surface_material_override/0 = SubResource("M29")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B5"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 6.42, 0)
-size = Vector3(12.6, 0.25, 13.6)
-material = SubResource("M19")
+[node name="Roof" type="MeshInstance3D" parent="Village/B5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.42, 0)
+mesh = SubResource("BM30")
+surface_material_override/0 = SubResource("M31")
 
 [node name="B6" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 394.3, 0, 378.7)
 script = ExtResource("1")
 metadata/footprint = Vector2(22, 5)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B6"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 1.6, 0)
-size = Vector3(22, 9.2, 5)
-material = SubResource("M20")
+[node name="Mass" type="MeshInstance3D" parent="Village/B6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
+mesh = SubResource("BM32")
+surface_material_override/0 = SubResource("M33")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B6"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 6.32, 0)
-size = Vector3(22.6, 0.25, 5.6)
-material = SubResource("M21")
+[node name="Roof" type="MeshInstance3D" parent="Village/B6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.32, 0)
+mesh = SubResource("BM34")
+surface_material_override/0 = SubResource("M35")
 
 [node name="B7" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 849.6, 0, 391.8)
 script = ExtResource("1")
 metadata/footprint = Vector2(12, 9)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B7"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 1.7000000000000002, 0)
-size = Vector3(12, 9.4, 9)
-material = SubResource("M22")
+[node name="Mass" type="MeshInstance3D" parent="Village/B7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.7000000000000002, 0)
+mesh = SubResource("BM36")
+surface_material_override/0 = SubResource("M37")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B7"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 6.5200000000000005, 0)
-size = Vector3(12.6, 0.25, 9.6)
-material = SubResource("M23")
+[node name="Roof" type="MeshInstance3D" parent="Village/B7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 6.5200000000000005, 0)
+mesh = SubResource("BM38")
+surface_material_override/0 = SubResource("M39")
 
 [node name="B8" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 769.7, 0, 466.8)
 script = ExtResource("1")
 metadata/footprint = Vector2(26, 33)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B8"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.95, 0)
-size = Vector3(26, 11.9, 33)
-material = SubResource("M24")
+[node name="Mass" type="MeshInstance3D" parent="Village/B8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.95, 0)
+mesh = SubResource("BM40")
+surface_material_override/0 = SubResource("M41")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B8"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 9.02, 0)
-size = Vector3(26.6, 0.25, 33.6)
-material = SubResource("M25")
+[node name="Roof" type="MeshInstance3D" parent="Village/B8"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.02, 0)
+mesh = SubResource("BM42")
+surface_material_override/0 = SubResource("M43")
 
 [node name="B9" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 725.0, 0, 480.0)
 script = ExtResource("1")
 metadata/footprint = Vector2(33, 25)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B9"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 3.0, 0)
-size = Vector3(33, 12.0, 25)
-material = SubResource("M26")
+[node name="Mass" type="MeshInstance3D" parent="Village/B9"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.0, 0)
+mesh = SubResource("BM44")
+surface_material_override/0 = SubResource("M45")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B9"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 9.12, 0)
-size = Vector3(33.6, 0.25, 25.6)
-material = SubResource("M27")
+[node name="Roof" type="MeshInstance3D" parent="Village/B9"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.12, 0)
+mesh = SubResource("BM46")
+surface_material_override/0 = SubResource("M47")
 
 [node name="B10" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 679.1, 0, 504.2)
 script = ExtResource("1")
 metadata/footprint = Vector2(32, 24)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B10"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.95, 0)
-size = Vector3(32, 11.9, 24)
-material = SubResource("M28")
+[node name="Mass" type="MeshInstance3D" parent="Village/B10"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.95, 0)
+mesh = SubResource("BM48")
+surface_material_override/0 = SubResource("M49")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B10"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 9.02, 0)
-size = Vector3(32.6, 0.25, 24.6)
-material = SubResource("M29")
+[node name="Roof" type="MeshInstance3D" parent="Village/B10"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.02, 0)
+mesh = SubResource("BM50")
+surface_material_override/0 = SubResource("M51")
 
 [node name="B11" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 465.0, 0, 536.9)
 script = ExtResource("1")
 metadata/footprint = Vector2(14, 12)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B11"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 1.25, 0)
-size = Vector3(14, 8.5, 12)
-material = SubResource("M30")
+[node name="Mass" type="MeshInstance3D" parent="Village/B11"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+mesh = SubResource("BM52")
+surface_material_override/0 = SubResource("M53")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B11"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 5.62, 0)
-size = Vector3(14.6, 0.25, 12.6)
-material = SubResource("M31")
+[node name="Roof" type="MeshInstance3D" parent="Village/B11"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.62, 0)
+mesh = SubResource("BM54")
+surface_material_override/0 = SubResource("M55")
 
 [node name="B12" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 309.4, 0, 559.1)
 script = ExtResource("1")
 metadata/footprint = Vector2(33, 20)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B12"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.35, 0)
-size = Vector3(33, 10.7, 20)
-material = SubResource("M32")
+[node name="Mass" type="MeshInstance3D" parent="Village/B12"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.35, 0)
+mesh = SubResource("BM56")
+surface_material_override/0 = SubResource("M57")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B12"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 7.82, 0)
-size = Vector3(33.6, 0.25, 20.6)
-material = SubResource("M33")
+[node name="Roof" type="MeshInstance3D" parent="Village/B12"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 7.82, 0)
+mesh = SubResource("BM58")
+surface_material_override/0 = SubResource("M59")
 
 [node name="B13" type="Node3D" parent="Village"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 946.1, 0, 816.3)
 script = ExtResource("1")
 metadata/footprint = Vector2(12, 9)
 
-[node name="Mass" type="CSGBox3D" parent="Village/B13"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 4.5, 0)
-size = Vector3(12, 15.0, 9)
-material = SubResource("M34")
+[node name="Mass" type="MeshInstance3D" parent="Village/B13"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 4.5, 0)
+mesh = SubResource("BM60")
+surface_material_override/0 = SubResource("M61")
 
-[node name="Roof" type="CSGBox3D" parent="Village/B13"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 12.12, 0)
-size = Vector3(12.6, 0.25, 9.6)
-material = SubResource("M35")
+[node name="Roof" type="MeshInstance3D" parent="Village/B13"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 12.12, 0)
+mesh = SubResource("BM62")
+surface_material_override/0 = SubResource("M63")
 
 [node name="TradePost" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 484.0, 0, 535)
@@ -748,27 +833,27 @@ metadata/footprint = Vector2(3.0, 2.4)
 [node name="Base" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, -1.0, 0)
 size = Vector3(3.0, 2.0, 2.4)
-material = SubResource("M37")
+material = SubResource("M65")
 
 [node name="Stall" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 0.55, 0)
 size = Vector3(2.4, 1.1, 1.2)
-material = SubResource("M38")
+material = SubResource("M66")
 
 [node name="Awning" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.2, -0.3)
 size = Vector3(2.8, 0.12, 2.0)
-material = SubResource("M39")
+material = SubResource("M67")
 
 [node name="PostA" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, -1.3, 1.1, -1.2)
 size = Vector3(0.1, 2.2, 0.1)
-material = SubResource("M40")
+material = SubResource("M68")
 
 [node name="PostB" type="CSGBox3D" parent="TradePost"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 1.3, 1.1, -1.2)
 size = Vector3(0.1, 2.2, 0.1)
-material = SubResource("M41")
+material = SubResource("M69")
 
 [node name="Body3D" type="StaticBody3D" parent="TradePost"]
 collision_layer = 2
@@ -776,4 +861,4 @@ collision_mask = 0
 
 [node name="Shape" type="CollisionShape3D" parent="TradePost/Body3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
-shape = SubResource("TP_era_2026_36")
+shape = SubResource("TP_era_2026_64")

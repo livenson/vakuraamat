@@ -1,0 +1,106 @@
+keys,et,en
+SITE_KVISSENTALI,Kvissentali,Kvissentali
+SITE_KVISSENTALI_SUBTITLE,"Kvissentali: kolm aastat, sama maa.","Kvissentali: three years, the same ground."
+ERA_1798_NAME,Aasta 1798,The year 1798
+ERA_1938_NAME,Aasta 1938,The year 1938
+ERA_2026_NAME,Aasta 2026,The year 2026
+CUR_1798,kopikat,kopecks
+CUR_1938,senti,cents
+CUR_2026,senti,cents
+ANIMAL_BLACK_GROUSE,Tedr,Black grouse
+ANIMAL_HARE,Jänes,Hare
+ANIMAL_ROE_DEER,Metskits,Roe deer
+CROP_CABBAGE,Kapsas,Cabbage
+CROP_OATS,Kaer,Oats
+CROP_POTATO,Kartul,Potato
+CROP_RYE,Rukis,Rye
+ITEM_CABBAGE,Kapsas,Cabbage
+ITEM_CABBAGE_DESC,Kaks pead. Rasked.,Two heads. Heavy.
+ITEM_COFFEE,Kohv,Coffee
+ITEM_COFFEE_DESC,Pool kilo. Poemüüja imestas.,Half a kilo. The shopkeeper was surprised.
+ITEM_GROUSE,Tedr,Black grouse
+ITEM_GROUSE_DESC,"Must lind, raske kui kivi.","A black bird, heavy as a stone."
+ITEM_HARE_MEAT,Jänes,Hare
+ITEM_HARE_MEAT_DESC,Üks jänes. Kubjas ei tohi teada.,One hare. The steward must not know.
+ITEM_HYMNBOOK,Lauluraamat,Hymnbook
+ITEM_HYMNBOOK_DESC,"Vana kirjaviis. Nimi esilehel: Kaseoja Mart, kirjutatud kellegi teise käega.","Old orthography. A name on the flyleaf: Kaseoja Mart, in someone else's hand."
+ITEM_KEROSENE,Petrool,Kerosene
+ITEM_KEROSENE_DESC,Lambi jaoks.,For the lamp.
+ITEM_MILK_CHURN_LID,Piimanõu kaas,Milk-churn lid
+ITEM_MILK_CHURN_LID_DESC,Piimaühingu number on peale löödud.,The dairy cooperative's number is stamped on it.
+ITEM_NAILS,Naelad,Nails
+ITEM_NAILS_DESC,Paberisse keeratud. Juhan loeb need üle.,Wrapped in paper. Juhan will count them.
+ITEM_OATS,Kaer,Oats
+ITEM_OATS_DESC,Vihk kaeru.,A sheaf of oats.
+ITEM_POTATOES,Kartulid,Potatoes
+ITEM_POTATOES_DESC,"Korv kartuleid, muld küljes.","A basket of potatoes, soil still on them."
+ITEM_RUSTED_TOOL,Roostes tööriist,Rusted tool
+ITEM_RUSTED_TOOL_DESC,Kellegi sirp. Terast on vähe alles.,Someone's sickle. Not much steel left.
+ITEM_RYE,Rukis,Rye
+ITEM_RYE_DESC,Vihk. Leib on selle sees kuskil.,A sheaf. Bread is in there somewhere.
+ITEM_SALT,Sool,Salt
+ITEM_SALT_DESC,Kotike soola. Kallim kui kõik muu.,A bag of salt. Dearer than anything else.
+ITEM_SEED_CABBAGE,Kapsaseeme,Cabbage seed
+ITEM_SEED_CABBAGE_DESC,"Paberkotis, poe oma.","In a paper packet, from the shop."
+ITEM_SEED_OATS,Kaeraseeme,Oat seed
+ITEM_SEED_OATS_DESC,"Hobustele ja inimestele, selles järjekorras.","For horses and people, in that order."
+ITEM_SEED_POTATO,Seemnekartul,Seed potato
+ITEM_SEED_POTATO_DESC,Idud juba väljas.,Already sprouting.
+ITEM_SEED_RYE,Rukkiseeme,Rye seed
+ITEM_SEED_RYE_DESC,Kotike. Eelmise aasta oma.,A small sack. Last year's.
+ITEM_TALLOW_CANDLE,Rasvaküünal,Tallow candle
+ITEM_TALLOW_CANDLE_DESC,Vinab. Põleb.,Smokes. Burns.
+ITEM_TIMBER,Palgid,Timber
+ITEM_TIMBER_DESC,"Kuus palki, kooritud.","Six logs, debarked."
+ITEM_VENISON,Kitseliha,Venison
+ITEM_VENISON_DESC,"Metskitse liha, riidesse mässitud.","Roe deer meat, wrapped in cloth."
+STRUCT_BARN,Laut,Barn
+STRUCT_BARN_DESC,"Kahele lehmale ja hobusele, kui hobune tuleb.","For two cows and a horse, if the horse comes."
+STRUCT_DAIRY_STAND,Piimapukk,Milk stand
+STRUCT_DAIRY_STAND_DESC,Pargi väravas. Ühingu auto peatub siin.,At the park gate. The cooperative's lorry stops here.
+STRUCT_SAUNA,Saun,Sauna
+STRUCT_SAUNA_DESC,Laupäeviti. Aino nõuab.,Saturdays. Aino insists.
+STRUCT_STOREHOUSE,Ait,Storehouse
+STRUCT_STOREHOUSE_DESC,Vilja jaoks. Kõik algab aidast.,For the grain. Everything starts with a storehouse.
+STRUCT_SWING,Külakiik,Village swing
+STRUCT_SWING_DESC,Jaanipäevaks.,For midsummer.
+CP1_KEEPSAKE_TRIGGER,Sa andsid mälestuseseme tagasi aastal 1798.,You returned the keepsake in 1798.
+CP1_KEEPSAKE_EFFECT,Mälestusese jõudis koju. Hilisematel aastatel seisab maamärgi juures kivi.,The keepsake came home. In the later years a stone stands by the landmark.
+ITEM_KEEPSAKE,Mälestusese,Keepsake
+ITEM_KEEPSAKE_DESC,"Vana ese, mis ei kuulu sellesse aastasse.",An old thing that does not belong to this year.
+MANOR_HOME,Kodutalu,Home farm
+LOC_LANDMARK,Maamärk,The landmark
+LOC_FARMSTEAD,Talu,The farmstead
+ITEM_REGISTER,Vakuraamat,The register
+EX_REGISTER,Raamat aastate vahel. Võta see.,A book between the years. Take it.
+NOTICE_REGISTER_FOUND,Vakuraamat. Ava see (Tab) ja vali lehekülg.,The register. Open it (Tab) and choose a page.
+OBJ_FIND_REGISTER,Leia raamat.,Find the register.
+OBJ_VISIT_ERAS,Käi läbi kõik aastad.,Visit every year.
+OBJ_RETURN,Vii mälestusese aastasse 1798.,Take the keepsake back to 1798.
+OBJ_SIT,Mine tagasi aastasse 2026 ja räägi lõpuni.,Go back to 2026 and finish the conversation.
+ENDING_KEPT_TITLE,Alles,Kept
+ENDING_KEPT_TEXT,Kivi seisab. Keegi mäletab.,The stone stands. Somebody remembers.
+ENDING_LOST_TITLE,Kadunud,Lost
+ENDING_LOST_TEXT,Maa võttis omad tagasi. Lood jäid.,The land took back its own. The stories stayed.
+ENDING_KEPT,Alles %d / %d,Kept %d of %d
+CODEX_REAL_TITLE,Päris,Real
+CODEX_REAL,"Maa: Kvissentali, Maa- ja Ruumiameti kõrgusandmed ja ortofoto.","The ground: Kvissentali, from the Land Board's elevation data and orthophoto."
+CODEX_INVENTED_TITLE,Välja mõeldud,Invented
+CODEX_INVENTED,Inimesed ja lugu.,The people and the story.
+NPC_1798,Kohalik (1798),A local (1798)
+EX_LANDMARK_1798,Maamärk aastal 1798.,The landmark in 1798.
+EX_KEPT_1798,"Kivi, mille keegi siia pani. Nimi on veel loetav.",A stone somebody set here. The name is still legible.
+POST_1798,Pood (1798),The shop (1798)
+POST_1798_TEXT,Ostetakse ja müüakse selle aasta raha eest.,Buying and selling for this year's money.
+NPC_1938,Kohalik (1938),A local (1938)
+EX_LANDMARK_1938,Maamärk aastal 1938.,The landmark in 1938.
+EX_KEPT_1938,"Kivi, mille keegi siia pani. Nimi on veel loetav.",A stone somebody set here. The name is still legible.
+POST_1938,Pood (1938),The shop (1938)
+POST_1938_TEXT,Ostetakse ja müüakse selle aasta raha eest.,Buying and selling for this year's money.
+NPC_2026,Kohalik (2026),A local (2026)
+EX_LANDMARK_2026,Maamärk aastal 2026.,The landmark in 2026.
+EX_KEPT_2026,"Kivi, mille keegi siia pani. Nimi on veel loetav.",A stone somebody set here. The name is still legible.
+POST_2026,Pood (2026),The shop (2026)
+POST_2026_TEXT,Ostetakse ja müüakse selle aasta raha eest.,Buying and selling for this year's money.
+ENDING_KEPT_TEXT_TITLE,Alles,Kept
+ENDING_LOST_TEXT_TITLE,Kadunud,Lost

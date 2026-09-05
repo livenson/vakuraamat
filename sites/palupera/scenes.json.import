@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://cv0w8g3bdy7w5"
+valid=false
+
+[deps]
+
+source_file="res://sites/palupera/scenes.json"
+
+[params]
+
+compress=true
