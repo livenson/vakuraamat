@@ -77,6 +77,15 @@ func _ready() -> void:
 	tw.tween_property(fade, "color:a", 0.0, FADE_TIME)
 	_ready_done = true
 	Friends.pull_deliveries()
+	Ledger.start(Sites.active)
+	var marks := ParcelMarks.new()
+	marks.name = "ParcelMarks"
+	add_child(marks)
+	marks.setup(self)
+	var builder := ParcelBuilder.new()
+	builder.name = "ParcelBuilder"
+	add_child(builder)
+	builder.setup(self)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--screenshot="):
 			_screenshot_path = a.trim_prefix("--screenshot=")

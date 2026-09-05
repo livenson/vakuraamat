@@ -46,6 +46,8 @@ var debug_map: PanelContainer
 var pause: PanelContainer
 var report_panel: PanelContainer
 var codes_label: Label            # K: cadastral number, building codes, road, registry links
+var ledger_panel: LedgerPanel    # V (Tab once the register goes): the town's book
+var news_panel: NewsPanel        # N: the town feed
 var codes_on := false
 var _codes_lines: MeshInstance3D = null
 var _debug_canvas: Control
@@ -78,6 +80,24 @@ func _ready() -> void:
 	pause = _build_panel("UI_MENU")
 	report_panel = _build_panel("UI_REPORT_TITLE")
 	report_panel.custom_minimum_size = Vector2(640, 0)
+	ledger_panel = LedgerPanel.new()
+	add_child(ledger_panel)
+	ledger_panel.setup(world)
+	_center_panel(ledger_panel)
+	ledger_panel.show_parcel.connect(func(t):
+		var marks: Node = world.get_node_or_null("ParcelMarks")
+		if marks:
+			marks.flash(t))
+	news_panel = NewsPanel.new()
+	add_child(news_panel)
+	news_panel.setup()
+	_center_panel(news_panel)
+	news_panel.show_parcel.connect(func(t):
+		_close()
+		ledger_panel.open_parcel(t)
+		_open(ledger_panel))
+	Ledger.player_changed.connect(_refresh_era_label)
+	Ledger.month_changed.connect(func(_m): _refresh_era_label())
 	pause.custom_minimum_size = Vector2(600, 0)
 	debug_map.custom_minimum_size = Vector2(1180, 840)
 	_center_panel(debug_map)
@@ -345,6 +365,8 @@ func _refresh_era_label() -> void:
 		4: chap = "  ·  " + tr("UI_EPILOGUE")
 		_: chap = "  ·  " + tr("UI_CHAPTER") % GameState.chapter
 	era_label.text = "%s  %s   %s%s" % [era.year_label, tr(era.display_name_key), world.clock_string(), chap]
+	if Ledger.local() != null:
+		era_label.text = "%s   %s   %s   %s%s" % [Sites.display_name(Sites.active), Ledger.date_string(), world.clock_string(), Ledger.format_money(Ledger.cash()), chap]
 	var obj := _objective()
 	if obj != "":
 		era_label.text += "\n" + obj
@@ -430,7 +452,13 @@ func _unhandled_input(event: InputEvent) -> void:
 			Reporter.snapshot(world)   # the frame as seen, before the panel covers it
 			_toggle(report_panel, _fill_report)
 		return
-	if event.is_action_pressed("register"):
+	if event.is_action_pressed("ledger"):
+		_toggle(ledger_panel, ledger_panel.fill)
+	elif event.is_action_pressed("news"):
+		_toggle(news_panel, news_panel.fill)
+	elif event.is_action_pressed("buy_here"):
+		_buy_here()
+	elif event.is_action_pressed("register"):
 		_toggle(register, _fill_register)
 	elif event.is_action_pressed("inventory"):
 		_toggle(inventory, _fill_inventory)
@@ -451,6 +479,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _filler_for(p: Control) -> Callable:
 	if p == register: return _fill_register
+	if p == ledger_panel: return ledger_panel.fill
+	if p == news_panel: return news_panel.fill
 	if p == report_panel: return _fill_report
 	if p == inventory: return _fill_inventory
 	if p == debug_map: return _fill_debug_map
@@ -518,6 +548,14 @@ func _refresh_codes() -> void:
 	lines.append(tr("UI_CODES_PARCEL") + ": " + (Parcels.describe(u) if not u.is_empty() else "-"))
 	if not u.is_empty():
 		lines.append("   " + str(u.get("link", "")))
+		var row := Ledger.parcel(u.tunnus)
+		if not row.is_empty():
+			var owner: String = tr("UI_LEDGER_YOU") if Ledger.is_mine(u.tunnus) else str(row.owner_name)
+			lines.append("   %s: %s   %s: %s   %s: %s%s" % [tr("UI_CODES_OWNER"), owner, tr("UI_LEDGER_COL_PRICE"), Ledger.format_money(int(row.price)),
+				tr("UI_LEDGER_COL_YIELD"), Ledger.format_money(Ledger.yield_of(u.tunnus)), tr("UI_PER_MONTH")])
+			var names := Ledger.tenants_of(u.tunnus).map(func(t): return str(t.name))
+			if not names.is_empty():
+				lines.append("   " + tr("UI_CODES_TENANT") + ": " + ", ".join(names))
 	var links := Reporter.links_for(pos, interactor.target, layer)
 	if links.has("etak_id"):
 		lines.append(tr("UI_CODES_BUILDING") + ": ETAK %d   %s" % [int(links.etak_id), str(links.get("ehr", ""))])
@@ -528,6 +566,19 @@ func _refresh_codes() -> void:
 		lines.append(tr("UI_CODES_TARGET") + ": %s  %s" % [interactor.target.name, str(interactor.target.get_path())])
 	codes_label.text = "\n".join(lines)
 	_draw_parcel(u)
+
+
+## B: open the book at the plot under the player's feet.
+func _buy_here() -> void:
+	if _open_panel and _open_panel != ledger_panel:
+		return
+	var u := Parcels.at(player.global_position)
+	if u.is_empty() or Ledger.parcel(u.tunnus).is_empty():
+		show_notice(tr("LEDGER_NO_PARCEL_HERE"))
+		return
+	ledger_panel.open_parcel(u.tunnus)
+	if _open_panel != ledger_panel:
+		_open(ledger_panel)
 
 
 ## The current cadastral unit's boundary as a line strip just above the ground.
@@ -970,6 +1021,18 @@ func _fill_debug_map() -> void:
 		for c in Farming.crops_for_era(GameState.current_era):
 			Inventory.add(c.seed_item_id))
 	row.add_child(bm)
+	var be := Button.new()
+	be.text = "+ 50 000 €"
+	be.pressed.connect(func():
+		Ledger.debug_grant(50000)
+		_fill_debug_map())
+	row.add_child(be)
+	var bn := Button.new()
+	bn.text = tr("UI_LEDGER_MONTH") + " →"
+	bn.pressed.connect(func():
+		Ledger.debug_advance_month()
+		_fill_debug_map())
+	row.add_child(bn)
 	var hint := Label.new()
 	hint.text = tr("UI_DEBUG_MAP_HINT")
 	hint.add_theme_font_size_override("font_size", 13)
@@ -1090,6 +1153,8 @@ func debug_open(which: String) -> void:
 		"journal": _toggle(journal, _fill_journal)
 		"inventory": _toggle(inventory, _fill_inventory)
 		"map": _toggle(debug_map, _fill_debug_map)
+		"ledger": _toggle(ledger_panel, ledger_panel.fill)
+		"news": _toggle(news_panel, news_panel.fill)
 		"menu": _toggle(pause, _fill_pause)
 		"trade", "build":
 			var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
