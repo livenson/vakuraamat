@@ -19,7 +19,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools")); sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
-import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads  # noqa: E402
+import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads, market  # noqa: E402
 
 GEOCODER = "https://inaadress.maaamet.ee/inaadress/gazetteer?results=8&features=EHAK,TANAV,KATASTRIYKSUS,EHITISHOONE&address="
 JOBS = {}
@@ -85,6 +85,11 @@ def run_job(job):
                 mod.fetch(sid, root=ws)
             except Exception as e:  # noqa: BLE001 - optional layers
                 log(f"{sid}: {mod.__name__} unavailable ({e})")
+        stage("market", 0.59)
+        try:
+            market.derive(sid, root=ws)
+        except Exception as e:  # noqa: BLE001 - optional layer
+            log(f"{sid}: market snapshot unavailable ({e})")
         stage("buildings, water, anchors", 0.6)
         _, _, anchors = extract_features.extract(sid, root=ws)
         stage("layout", 0.7)

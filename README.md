@@ -88,6 +88,11 @@ roads; every cadastral unit gets what its registered purpose implies (`assets/da
 playground, park benches, garden hedge, industrial fence); buildings have textured facades by material,
 window rows per floor, doors and chimneys. K shows the cadastral number, building codes and registry links.
 
+**Land values:** every cadastral unit carries its official 2022 land value in euros (`land_value` in
+`parcels.json`, from the same Maa-amet cadastre service), and `make market` derives `market.json`, the
+median euros per m² by intended purpose. These are taxation values, labelled as such; a hand-exported
+Maa-amet transaction table can be joined with `make market XLSX=<file>`.
+
 **Real buildings and trees:** every building in a tile comes from the topographic database (footprint),
 the Building Register (year built, floors, purpose, facade and roof materials, heating, water, solar)
 and Maa-amet's LOD2 3D models (roof shapes); a building appears only in the eras after its first year

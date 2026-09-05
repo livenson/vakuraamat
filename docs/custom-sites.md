@@ -171,6 +171,18 @@ Register link, the nearest road (name, type, width, surface), the target node pa
 unit's boundary on the ground; the links are copied to the clipboard. F8 reports carry the same
 `parcel`, `road` and `links` fields.
 
+### Land values and the market snapshot
+
+Every unit in `parcels.json` also carries `land_value`, the taxation value in euros from Maa-amet's 2022
+regular land valuation (`maks_hind` in the same WFS response), `land_value_per_m2`, the EHAK settlement
+code (`ehak`), `settlement`, `county` and `ads_oid`. The file's `summary` block aggregates the codes,
+names and the valued total for the tools that key on them. `make market` (also part of `make tile`)
+derives `market.json`: median euros per m² per intended purpose, quartiles and counts, plus an `all`
+row. These are taxation values, not sale prices; if you export a table from Maa-amet's transaction
+statistics environment (https://www.maaruum.ee/kinnisvara/htraru/, XLSX only), `make market
+XLSX=<file>` joins it as `transactions`, which the game prefers when present. Older packs without
+`land_value` still load; re-run `make parcels SITE=<id>` to add it.
+
 ## Traffic and the bicycle
 
 The `traffic` node (`{"type": "traffic", "year": 2026, "density": 1.0, "max_agents": 40}`) builds a
