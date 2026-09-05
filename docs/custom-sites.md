@@ -118,6 +118,24 @@ town server the same rules run in your own offline book (`LocalLedger`); a month
 real minutes and pays rents, raises land tax and lets the Kask, Tamm and Lepik families bid on
 your plots. `--open=ledger` and `--open=news` work with `--screenshot`.
 
+### Hosting a town for friends
+
+The local server answers only on this machine. For a town others can join, publish the same module
+to SpacetimeDB's Maincloud (free tier) and point the game at it:
+
+```sh
+spacetime login                                     # once; opens the browser
+make town SITE=kvissentali SERVER=maincloud         # publish + seed the town there
+```
+
+Then set the server to `https://maincloud.spacetimedb.com` in the Locations panel's Town section and
+share the town address the panel shows; a friend pastes the server into their own Town section,
+generates the same tile (same centre, same pipeline) and joins. A pack whose `parcels.json` or
+`tenants.json` differs gets a `LEDGER_HASH_MISMATCH`; re-run `make parcels` and `make tenants` on both
+sides, or share the pack. Keep the news flowing with a scheduled `make news SITE=<id> SERVER=maincloud`
+(cron `*/15 * * * *`, or a launchd `StartInterval` of 900 with `SPACETIME_TOKEN` in its environment).
+SpacetimeDB's licence allows one production instance per project; Maincloud counts as that.
+
 ## Real buildings: ETAK footprints, the Building Register, LOD2 roofs
 
 `make buildings SITE=<id>` (part of `make tile`, and of every tile-service job) writes

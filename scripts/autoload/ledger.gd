@@ -360,7 +360,7 @@ func _on_town_state(ok: bool, err: String) -> void:
 		_last_event_id = int(events(1)[0].id) if events(1).size() > 0 else 0
 		status_changed.emit(true, tr("UI_ONLINE") % town_name)
 		if not was:
-			EventBus.notice.emit(tr("NOTICE_TOWN_ONLINE") % town_name)
+			EventBus.notice.emit(tr("NOTICE_TOWN_ONLINE") % Sites.display_name(Sites.active))
 		parcel_changed.emit("")
 		player_changed.emit()
 		month_changed.emit(month())

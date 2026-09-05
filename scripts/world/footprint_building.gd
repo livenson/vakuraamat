@@ -28,6 +28,7 @@ var _trim := SurfaceTool.new()
 var _wall_faces: Array = []   # {pts: Array[Vector3], n: Vector3, t: Vector3, umin, umax, ymin, ymax}
 
 static var _models: Dictionary = {}   # source path -> {id -> lod2 dict}
+var _sign: Label3D
 
 
 var _walls := SurfaceTool.new()
@@ -394,3 +395,24 @@ func _openings() -> void:
 		_quad_on_face(_trim, longest, u, y0, door_w + 0.16, door_h + 0.1, 0.02)
 		var door := _windows if kind != "dwelling" else _trim
 		_quad_on_face(door, longest, u, y0, door_w, door_h, 0.05)
+
+
+## A name plate above the building: the tenants of its cadastral unit (empty text removes it).
+func set_sign(text: String) -> void:
+	if text == "":
+		if _sign:
+			_sign.queue_free()
+			_sign = null
+		return
+	if _sign == null:
+		_sign = Label3D.new()
+		_sign.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+		_sign.font_size = 40
+		_sign.pixel_size = 0.012
+		_sign.outline_size = 10
+		_sign.modulate = Color(0.98, 0.9, 0.7)
+		_sign.visibility_range_end = 140.0
+		_sign.no_depth_test = false
+		add_child(_sign)
+	_sign.text = text
+	_sign.position = Vector3(0, height + 1.2, 0)
