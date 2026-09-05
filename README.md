@@ -102,6 +102,10 @@ parcels, owners, prices, tenants, bids, obligations and news. `make server` runs
 `make town SITE=kvissentali` publishes and seeds the town from the pack. See
 [docs/custom-sites.md](docs/custom-sites.md#towns-the-shared-ledger).
 
+**News:** `make news` pushes the region's real headlines (ERR, Postimees) and official planning and
+auction notices into the town feed as headline, source and link; `make news-local` keeps them in the
+pack for offline play. Press N in the game.
+
 **Real buildings and trees:** every building in a tile comes from the topographic database (footprint),
 the Building Register (year built, floors, purpose, facade and roof materials, heating, water, solar)
 and Maa-amet's LOD2 3D models (roof shapes); a building appears only in the eras after its first year

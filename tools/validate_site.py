@@ -286,6 +286,14 @@ def validate(site, rep, root=ROOT):
                 rep.err(f"{who}: sole proprietor (a private person) in tenants.json")
         if tenants["tenants"] and not any(t.get("match") == "exact" for t in tenants["tenants"]):
             rep.warn("tenants.json: no tenant matched a parcel or building")
+    news = load_json("news.json", ("events",))
+    if news:
+        for e in news["events"]:
+            if not (e.get("id") and e.get("kind") in ("news", "official", "macro") and e.get("title") and e.get("url")):
+                rep.err(f"news.json {e.get('id')}: needs id, kind news|official|macro, title and url")
+            for k in ("avaldaja", "andmeandja", "adressaat", "kinnitatud_sisu", "body", "description"):
+                if k in e:
+                    rep.err(f"news.json {e.get('id')}: must not store {k}")
     market = load_json("market.json", ("by_purpose", "source"))
     if market:
         if not market["by_purpose"]:

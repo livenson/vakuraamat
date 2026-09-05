@@ -6,7 +6,7 @@ SITE ?= palupera
 TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
 CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
-.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate tile-service world-service buildings real-trees dev-watch parcels roads market tenants module server town
+.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate tile-service world-service buildings real-trees dev-watch parcels roads market tenants module server town news news-local
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, gdal, git-lfs; npm for ink), pull LFS files, first Godot import"
@@ -27,6 +27,8 @@ help:
 	@echo "make module           build the town ledger module (server/vakuraamat, Rust -> wasm; needs rustup with the wasm32 target)"
 	@echo "make server           run a local SpacetimeDB (spacetime start, 127.0.0.1:3300, log under the user dir)"
 	@echo "make town             publish the module as SITE's town (name from tools/town_admin.py) to SERVER and seed it from the pack"
+	@echo "make news             push real regional headlines and official notices into SITE's town (tools/news_feeder.py --once)"
+	@echo "make news-local       write them to sites/$(SITE)/news.json for offline play instead"
 	@echo "make market           derive sites/$(SITE)/market.json (land value medians per purpose; XLSX=<maa-amet export> joins transaction statistics)"
 
 setup:
@@ -105,6 +107,12 @@ server:
 town: module
 	PATH="$(STDB_PATH)" spacetime publish -s $(SERVER) -p server/vakuraamat -y $(TOWN)
 	PATH="$(STDB_PATH)" python3 tools/town_admin.py seed --site $(SITE) --server $(SERVER) --db $(TOWN) $(if $(DEBUG),--debug)
+
+news:
+	PATH="$(STDB_PATH)" python3 tools/news_feeder.py --site $(SITE) --db $(TOWN) --server $(SERVER) --once
+
+news-local:
+	python3 tools/news_feeder.py --site $(SITE) --local --once
 
 market:
 	python3 tools/pipeline/market.py --site $(SITE) $(if $(XLSX),--xlsx $(XLSX))

@@ -237,6 +237,20 @@ so their premises can stand empty in the game. `--stats` prints the match statis
 unmatched street numbers, which is the loop for tuning the normaliser. Kvissentali matches about
 260 companies, four in five exactly; Palupera about 30.
 
+### News: the town feed
+
+`make news` (or `tools/news_feeder.py --once`) pulls the region's headlines (ERR items tagged Eesti,
+Tartu Postimees and Lõuna-Eesti Postimees for Tartu county, ERR alone elsewhere) and Official
+Announcements of the planning and auction kinds whose address names the pack's settlement or
+municipality, and posts them into the town through the `post_event` reducer with the publisher's
+token. Only the headline or a composed notice title, the source, the date and the link are stored;
+notice bodies, publishers and addressees never are, and person-directed notice kinds are not fetched
+at all. `make news-local` writes the same items to `sites/<id>/news.json` (ignored by git) for offline
+play. State lives in `data_raw/news/<town>.json` so reruns only add new items; `--dry-run` prints
+them. Feeds and area names come from `parcels.json`'s `summary`; `sites/<id>/news_config.json` can
+override `feeds`, `names` and `notice_types`. For a standing feed, a launchd job or cron line running
+`make news SITE=<id>` every 15 minutes is enough.
+
 ## Traffic and the bicycle
 
 The `traffic` node (`{"type": "traffic", "year": 2026, "density": 1.0, "max_agents": 40}`) builds a

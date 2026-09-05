@@ -104,7 +104,8 @@
   },
   "codex": [
     "CODEX_REAL",
-    "CODEX_INVENTED"
+    "CODEX_INVENTED",
+    "CODEX_DATA"
   ],
   "debug": {
     "build_node": "Manor_home_farm"
