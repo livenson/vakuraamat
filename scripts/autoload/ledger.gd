@@ -240,15 +240,21 @@ func monthly_income() -> int:
 
 ## "september 2026": the pack's terrain date plus the elapsed months.
 func date_string() -> String:
-	var t: Dictionary = Sites.get_value("terrain", {})
+	return date_for(month())
+
+
+## The month name and year `m` months after the pack's terrain date.
+func date_for(m: int, pack: String = "") -> String:
+	var t: Dictionary = (Sites.manifest_for(pack) if pack != "" else Sites.manifest).get("terrain", {})
 	var date: Array = t.get("date", [2026, 1, 1]) if typeof(t) == TYPE_DICTIONARY else [2026, 1, 1]
-	var idx := int(date[1]) - 1 + month()
+	var idx := int(date[1]) - 1 + m
 	var year := int(date[0]) + int(idx / 12)
 	return "%s %d" % [tr("MONTH_%d" % (idx % 12 + 1)), year]
 
 
+## Whole euros with thousands grouped: "250 000 €".
 func format_money(amount: int) -> String:
-	return "%d %s" % [amount, tr("CUR_EUR")]
+	return BookTheme.money(amount)
 
 
 # ---------------------------------------------------------------- actions (await them)

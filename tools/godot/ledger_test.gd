@@ -31,7 +31,7 @@ func _ready() -> void:
 	_check(roads.size() > 0 and roads.all(func(p): return not p.sellable), "transport land must not be sellable")
 	_check(Ledger.cash() == 250000, "starting cash %d" % Ledger.cash())
 	_check(Ledger.date_string() == "September 2026", "date string %s" % Ledger.date_string())
-	_check(Ledger.format_money(1200) == "1200 €", "money format %s" % Ledger.format_money(1200))
+	_check(Ledger.format_money(1200) == "1\u202f200\u00a0€" and Ledger.format_money(-250000) == "-250\u202f000\u00a0€", "money format %s" % Ledger.format_money(1200))
 
 	# buying: too expensive, then an affordable tenanted plot
 	var tenanted := sellable.filter(func(p): return Ledger.tenants_of(p.tunnus).size() > 0 and int(p.price) <= 200000)

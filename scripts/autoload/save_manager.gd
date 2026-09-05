@@ -71,5 +71,21 @@ func saved_site(slot: String = AUTOSAVE) -> String:
 	return str(data.get("site", "")) if typeof(data) == TYPE_DICTIONARY else ""
 
 
+## What a save holds, without loading it: site, when, the month, the cash (offline books) and the town.
+func summary(slot: String = AUTOSAVE) -> Dictionary:
+	if not has_save(slot):
+		return {}
+	var data = JSON.parse_string(FileAccess.get_file_as_string(slot_path(slot)))
+	if typeof(data) != TYPE_DICTIONARY or int(data.get("version", 0)) < 3:
+		return {}
+	var ledger: Dictionary = data.get("ledger", {})
+	var local: Dictionary = ledger.get("local", {})
+	var players: Dictionary = local.get("players", {})
+	var me: Dictionary = players.get(str(int(local.get("me_id", 1))), {})
+	return {"site": str(data.get("site", "")), "saved_at": str(data.get("saved_at", "")), "month": int(local.get("month", 0)),
+		"cash": int(me.get("cash", 0)) if not me.is_empty() else -1, "town": str(ledger.get("town", "")), "backend": str(ledger.get("backend", "local")),
+		"owned": local.get("parcels", {}).keys()}
+
+
 func autosave() -> void:
 	save(AUTOSAVE)
