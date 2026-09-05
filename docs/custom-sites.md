@@ -61,7 +61,7 @@ The **New location...** button in the main menu takes an address, a place name, 
 for a pack:
 
 ```sh
-make tile-service          # python3 tools/tile_service.py, loopback port 8765; needs GDAL, numpy, node
+make tile-service          # python3 tools/tile_service.py, loopback port 8765; needs GDAL, numpy, node (tools/play.sh starts it for you)
 ```
 
 The service runs the same steps as `make site` + `make tile` in a workspace under `data_raw/service/`
@@ -201,6 +201,40 @@ the UK, the US, and a coarse global fallback with what each would use). Adding a
 writing one adapter class and registering it; the game side (packs, blocks, services) is unchanged.
 The Estonian-specific parts that would still need a per-country answer are the historical map layers
 per era and the story blocks' cultural texture.
+
+## Endless map: neighbouring tiles
+
+A pack is one 1024 m tile, but the world does not end there. `TileStreamer` (a child of the world)
+treats the map as a grid of tiles with the active pack at (0,0). When the player comes within
+300 m of a neighbouring tile, its pack is loaded: from `user://sites` if it is installed, else
+requested from the tile service (`Locator.fetch_pack`, one job at a time), downloaded and installed
+first. Loading means: the Terrain3D region at the grid offset (built from the tile inputs on first
+use, about 5 s, and cached as that tile's own `data/terrain3d_00_00.res`, so later visits take well
+under a second and the pack also works as an origin), the current era's ambient nodes (Buildings,
+Roads, Parcels, Traffic, Village; story nodes of neighbour packs are dropped) under an offset root
+that carries the pack id, and the ponds. Era switches swap the neighbours' content too. Tiles more
+than one step from the player's tile are unloaded (memory only; the caches stay).
+
+Neighbour pack ids come from the tile centre in L-EST97 (`t<easting>_<northing>`), so tiles
+generated for one origin are reused by every origin on the same grid. Until a tile is ready the
+player is held at the edge with a notice ("The land beyond is still being surveyed"); if the
+service is unreachable, "There is no map beyond here" and a retry every 90 s. `--no-stream`
+disables streaming (screenshots, measurements). Nodes that read pack files must resolve them
+through `Sites.path_in(Sites.pack_of(self), ...)` and sample the terrain in global space
+(`to_global`), because a streamed tile sits at an offset; `Parcels.at(pos)` already does.
+
+Known limits: the historical drapes (verst map, 1940 cadastral map) cover the origin tile only,
+neighbours show their orthophoto colour under the detail materials in every era; traffic agents
+stay inside their tile's road graph.
+
+## Starting everything
+
+`tools/play.sh [--site=<id>] [--windowed]` (or `make play ARGS="..."`) starts the tile service
+(port 8765) and the world service (port 8766) if they are not running, keeps their logs under the
+user directory (`logs/tile_service.log`, `logs/world_service.log`) and launches the game. The game
+also starts either service itself when it runs from the source tree and the configured URL is
+local (`Locator.spawn_local`), so `godot --path .` works too; exported builds need a service URL
+in `settings.cfg` (`[service] url`, `worlds_url`).
 
 ## Iterating
 

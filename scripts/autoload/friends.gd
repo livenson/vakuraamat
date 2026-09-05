@@ -48,9 +48,12 @@ func _setting(section: String, key: String, value: Variant) -> void:
 	cfg.save(SETTINGS)
 
 
+## The world service, started from the source tree if it is not running (Locator.spawn_local).
 func alive() -> bool:
 	var r := await Locator.http(service_url() + "/health")
-	return r.ok
+	if r.ok:
+		return true
+	return await Locator.spawn_local("tools/world_service.py", 8766, service_url() + "/health")
 
 
 ## Publish the active site as a world descriptor. Returns {ok, code, error}.

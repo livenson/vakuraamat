@@ -99,10 +99,12 @@ func _place(delta: float) -> void:
 	var d := graph.dir_at(edge, s, forward)
 	var right := Vector2(-d.y, d.x)
 	var p := graph.point_at(edge, s) + right * lateral
-	var h: float = _terrain.data.get_height(Vector3(p.x, 0, p.y)) if _terrain else 0.0
+	var parent := get_parent() as Node3D
+	var gp := parent.to_global(Vector3(p.x, 0.0, p.y)) if parent else Vector3(p.x, 0.0, p.y)
+	var h: float = _terrain.data.get_height(gp) if _terrain else 0.0
 	if is_nan(h):
 		h = global_position.y
-	global_position = Vector3(p.x, h + 0.1, p.y)
+	global_position = Vector3(gp.x, h + 0.1, gp.z)
 	if d.length_squared() > 0.0:
 		rotation.y = atan2(-d.x, -d.y)
 	if kind == "walker" and _body:

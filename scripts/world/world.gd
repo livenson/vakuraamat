@@ -13,6 +13,8 @@ const FADE_TIME := 1.2
 @onready var fade: ColorRect = $UI/Fade
 
 var georef: TerrainGeoref
+var streamer: TileStreamer          # neighbouring tiles around this pack's tile (endless map)
+var _water_mat: ShaderMaterial
 var _screenshot_path := ""
 var _fx := ["sdfgi", "ssao", "ssil", "fog", "glow", "grade"]   # --fx=a,b,c limits the effects (measurement)
 var _screenshot_frame := 240
@@ -41,7 +43,11 @@ func _ready() -> void:
 	terrain.set_camera(player.camera)
 	_configure_sky()
 	_apply_orthophoto()
-	_place_water()
+	place_water(Sites.active, self)
+	streamer = TileStreamer.new()
+	streamer.name = "Tiles"
+	add_child(streamer)
+	streamer.setup(self)
 	fade.color.a = 1.0
 	await get_tree().process_frame
 	var report := _report_from_args()
@@ -80,11 +86,19 @@ func _ready() -> void:
 		elif a.begins_with("--frames="):
 			_screenshot_frame = int(a.trim_prefix("--frames="))
 		elif a.begins_with("--spawn="):
+			# x,z[,yaw[,height[,pitch]]]: a height keeps the player in the air (with --fly), else snapped to the ground
 			var parts := a.trim_prefix("--spawn=").split(",")
 			player.global_position = Vector3(float(parts[0]), 200.0, float(parts[1]))
 			if parts.size() > 2:
 				player.rotation.y = deg_to_rad(float(parts[2]))
-			_snap(player, 1.0)
+			if parts.size() > 3:
+				player.global_position.y = float(parts[3])
+			else:
+				_snap(player, 1.0)
+			if parts.size() > 4:
+				player.set_pose(player.global_position, player.rotation.y, deg_to_rad(float(parts[4])))
+		elif a == "--fly":
+			player.flying = true
 		elif a.begins_with("--era="):
 			GameState.register_unlocked = true
 			GameState.switch_era(a.trim_prefix("--era="))
@@ -151,6 +165,10 @@ func _process(_delta: float) -> void:
 		var current: EraController = _era_nodes.get(GameState.current_era)
 		if current:
 			current.set_hour(sky.tod.current_time)
+		if streamer:
+			streamer.set_hour(sky.tod.current_time)
+	if streamer:
+		streamer.guard(player)
 	if _screenshot_path.is_empty():
 		return
 	_frames += 1
@@ -175,6 +193,8 @@ func apply_era(era: EraDefinition, first_visit: bool) -> void:
 		layers.add_child(node)
 		_era_nodes[era.id] = node
 	node.activate()
+	if streamer:
+		streamer.set_era(era.id)
 	_push_out_of_buildings(node)
 	_set_drape(era)
 	if first_visit and sky.tod:
@@ -231,7 +251,7 @@ func _build_terrain(tile_dir: String) -> void:
 	var layout := Sites.layout()
 	var ok: bool = await builder.import(terrain, tile_dir, layout)
 	if ok:
-		await builder.scatter(terrain, tile_dir, layout.get("exclusions", []))
+		await builder.scatter(terrain, tile_dir, layout.get("exclusions", []) + TerrainBuilder.water_exclusions(Sites.path(str(Sites.get_value("water", "")))))
 	# let Terrain3D rebuild its clipmap and collision around the camera before anyone is placed on it
 	terrain.set_camera(player.camera)
 	terrain.data.update_maps()
@@ -314,24 +334,25 @@ func _push_out_of_buildings(layer: Node) -> void:
 			return
 
 
-## Still water from the site's water file (flat patches in the laser DTM): the same ponds in every era.
-func _place_water() -> void:
-	var rel := str(Sites.get_value("water", ""))
-	if rel == "" or not FileAccess.file_exists(Sites.path(rel)):
+## Still water from a pack's water file (flat patches in the laser DTM): the same ponds in every era.
+## `root` is the world for the active pack, a streamed tile's offset root for a neighbour. Each pond
+## carves its basin into the terrain and keeps its fish (Pond).
+func place_water(pack: String, root: Node3D) -> void:
+	var rel := str(Sites.manifest_for(pack).get("water", ""))
+	if rel == "" or not FileAccess.file_exists(Sites.path_in(pack, rel)):
 		return
-	var ponds: Array = JSON.parse_string(FileAccess.get_file_as_string(Sites.path(rel)))
-	var mat := ShaderMaterial.new()
-	mat.shader = load("res://assets/shaders/water.gdshader")
-	mat.set_shader_parameter("normal_map", load("res://assets/textures/water_normal.png"))
+	var ponds: Array = JSON.parse_string(FileAccess.get_file_as_string(Sites.path_in(pack, rel)))
+	if _water_mat == null:
+		_water_mat = ShaderMaterial.new()
+		_water_mat.shader = load("res://assets/shaders/lake.gdshader")
+		_water_mat.set_shader_parameter("normalmap_a", load("res://assets/textures/water/Water_N_A.png"))
+		_water_mat.set_shader_parameter("foam_sampler", load("res://assets/textures/water/Foam.png"))
 	for p in ponds:
-		var mi := MeshInstance3D.new()
-		var pm := PlaneMesh.new()
-		pm.size = Vector2(float(p.w) + 4.0, float(p.d) + 4.0)
-		mi.mesh = pm
-		mi.material_override = mat
-		mi.position = Vector3(float(p.x), float(p.level) + 0.08, float(p.z))
-		mi.name = "Pond"
-		add_child(mi)
+		var pond := Pond.new()
+		pond.name = "Pond"
+		pond.setup(p, _water_mat)
+		root.add_child(pond)
+		pond.carve(terrain)
 
 
 func _snap(node: Node3D, lift: float) -> void:

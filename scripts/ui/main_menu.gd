@@ -285,7 +285,7 @@ func _small(parent: Node, key: String, cb: Callable) -> void:
 
 
 func _fill_service_packs() -> void:
-	var alive: bool = await Locator.service_alive()
+	var alive: bool = await Locator.ensure_service()
 	if not is_instance_valid(_service_box):
 		return
 	for c in _service_box.get_children():

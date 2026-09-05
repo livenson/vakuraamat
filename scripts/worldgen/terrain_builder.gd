@@ -36,8 +36,9 @@ const RULES := [
 	{"scene": "clover", "ids": [0], "per_100m2": 5.0, "scale": Vector2(0.8, 1.3), "range": 40.0, "shadows": false},
 ]
 
-var yielding := false          # await a frame every YIELD_ROWS rows (runtime use)
+var yielding := false          # await a frame every yield_rows rows (runtime use)
 var tree: SceneTree = null     # needed when yielding
+var yield_rows := 32           # smaller while streaming a neighbour tile behind a running game
 const YIELD_ROWS := 32
 
 
@@ -65,8 +66,10 @@ func _tick(stage: String, f: float) -> void:
 
 
 ## Height + control + colour maps into `terrain` (already in the tree, data object present).
-## `layout` supplies "pads" to level. Returns false on bad inputs.
-func import(terrain: Terrain3D, tile_dir: String, layout: Dictionary, z_scale_override: float = -1.0) -> bool:
+## `layout` supplies "pads" to level. `loc` other than (0,0): a streamed neighbour tile, imported
+## as the region at that grid location and cached as the tile's own origin region file.
+## Returns false on bad inputs.
+func import(terrain: Terrain3D, tile_dir: String, layout: Dictionary, z_scale_override: float = -1.0, loc: Vector2i = Vector2i.ZERO) -> bool:
 	var meta := read_meta(tile_dir)
 	if meta.is_empty():
 		push_error("missing %s/terrain_meta.json" % tile_dir)
@@ -92,13 +95,22 @@ func import(terrain: Terrain3D, tile_dir: String, layout: Dictionary, z_scale_ov
 			var c := ortho.get_pixel(x, y)
 			c.a = NEUTRAL_ROUGHNESS_ALPHA
 			ortho.set_pixel(x, y, c)
-		if y % YIELD_ROWS == 0:
+		if y % yield_rows == 0:
 			await _tick("colour", 0.1 + 0.2 * y / size)
 	if terrain.data == null:
 		push_error("Terrain3D has no data object (data_directory must exist before it enters the tree)")
 		return false
 	if terrain.region_size != size:
 		terrain.region_size = size
+
+	var canopy := load_canopy(tile_dir, meta, size)
+	if loc != Vector2i.ZERO:
+		var control_n := await classify(ortho, canopy)
+		terrain.data.import_images([height_img, control_n, ortho], Vector3(loc.x * size, 0.0, loc.y * size), 0.0, z_scale)
+		terrain.data.calc_height_range(true)
+		save_region_as_origin(terrain, loc, tile_dir)
+		await _tick("saved", 0.6)
+		return true
 
 	var assets_path := tile_dir + "/terrain_assets.tres"
 	var assets: Terrain3DAssets = load(assets_path) if ResourceLoader.exists(assets_path) else Terrain3DAssets.new()
@@ -117,7 +129,6 @@ func import(terrain: Terrain3D, tile_dir: String, layout: Dictionary, z_scale_ov
 	terrain.assets = assets
 	var texture_list: Array = assets.texture_list.duplicate()
 
-	var canopy := load_canopy(tile_dir, meta, size)
 	var control := await classify(ortho, canopy)
 	terrain.data.import_images([height_img, control, ortho], Vector3.ZERO, 0.0, z_scale)
 	terrain.data.calc_height_range(true)
@@ -130,6 +141,46 @@ func import(terrain: Terrain3D, tile_dir: String, layout: Dictionary, z_scale_ov
 		push_error("could not save %s (%d)" % [assets_path, err])
 	await _tick("saved", 0.6)
 	return true
+
+
+## A streamed region written back as the tile's own origin region (terrain3d_00_00.res), so the
+## next visit loads it directly and the pack works as an origin site as well.
+static func save_region_as_origin(terrain: Terrain3D, loc: Vector2i, tile_dir: String) -> void:
+	var r: Terrain3DRegion = terrain.data.get_region(loc)
+	if r == null:
+		return
+	var copy: Terrain3DRegion = r.duplicate(true)
+	copy.set_location(Vector2i.ZERO)
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(tile_dir + "/data"))
+	var err := copy.save(tile_dir + "/data/terrain3d_00_00.res", false)
+	if err != OK:
+		push_warning("could not cache region %s for %s (%d)" % [loc, tile_dir, err])
+
+
+## True when (x, z) falls in an exclusion: a circle [x, z, r] or a rectangle [x, z, w, d] (centre, size).
+static func excluded(x: float, z: float, exclusions: Array) -> bool:
+	for e in exclusions:
+		if e.size() >= 4:
+			if absf(x - float(e[0])) <= float(e[2]) * 0.5 and absf(z - float(e[1])) <= float(e[3]) * 0.5:
+				return true
+		elif Vector2(x, z).distance_to(Vector2(float(e[0]), float(e[1]))) < float(e[2]):
+			return true
+	return false
+
+
+## A pack's still-water patches (its water file, see World.place_water) as rectangle exclusions
+## with a 2 m margin: nothing grows in a pond. Takes a path, not a pack: the headless tools run
+## without the Sites autoload.
+static func water_exclusions(water_path: String) -> Array:
+	var out: Array = []
+	if water_path == "" or not FileAccess.file_exists(water_path):
+		return out
+	var text := FileAccess.get_file_as_string(water_path)
+	var parsed = JSON.parse_string(text) if text != "" else null
+	if typeof(parsed) == TYPE_ARRAY:
+		for p in parsed:
+			out.append([float(p.x), float(p.z), float(p.w) + 4.0, float(p.d) + 4.0])
+	return out
 
 
 ## Level the ground under authored buildings ("pads": x, z, w, d in tile metres): the footprint
@@ -203,7 +254,7 @@ func classify(img: Image, canopy: Image = null) -> Image:
 			counts[id] += 1
 			var bits: int = Terrain3DUtil.enc_base(id) | Terrain3DUtil.enc_overlay(id) | Terrain3DUtil.enc_blend(0)
 			ctrl.set_pixel(x, y, Color(Terrain3DUtil.as_float(bits), 0, 0, 1))
-		if y % YIELD_ROWS == 0:
+		if y % yield_rows == 0:
 			await _tick("land cover", 0.3 + 0.3 * y / size)
 	print("[terrain_builder] control map: meadow %d  field %d  canopy %d  gravel %d  soil %d texels" % counts)
 	return ctrl
@@ -212,7 +263,7 @@ func classify(img: Image, canopy: Image = null) -> Image:
 ## Trees from trees.json ([x, z, height, crown, conifer]) as instances of the rule whose species fits:
 ## conifers become pines (tall) or spruces, deciduous trees birches; junipers for small conifers.
 ## Returns true when the tile had measured trees.
-func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Array, rng: RandomNumberGenerator, batches: Array, colors: Array) -> bool:
+func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Array, rng: RandomNumberGenerator, batches: Array, colors: Array, origin: Vector3 = Vector3.ZERO) -> bool:
 	var path := tile_dir + "/trees.json"
 	if not FileAccess.file_exists(path):
 		return false
@@ -224,13 +275,8 @@ func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Arr
 		rule_index[RULES[i].scene] = i
 	var placed := 0
 	for t in parsed.trees:
-		var pos := Vector3(float(t[0]), 0.0, float(t[1]))
-		var excluded := false
-		for e in exclusions:
-			if Vector2(pos.x, pos.z).distance_to(Vector2(float(e[0]), float(e[1]))) < float(e[2]):
-				excluded = true
-				break
-		if excluded:
+		var pos := Vector3(float(t[0]), 0.0, float(t[1])) + origin
+		if excluded(pos.x - origin.x, pos.z - origin.z, exclusions):
 			continue
 		var h := float(t[2])
 		var conifer := int(t[4]) == 1
@@ -259,10 +305,13 @@ func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Arr
 ## `exclusions` are [x, z, r] circles kept clear. Returns instance counts per rule.
 ## `keep_textures`: the ground texture list to write back (headless initialisation drops it from
 ## the loaded assets, so the tool captures it before the node enters the tree).
-func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value: int = 1798, keep_textures: Array = []) -> Array:
+## `loc` other than (0,0): a streamed neighbour region; the mesh assets are already set up by the
+## origin, only that region is populated and its file cached.
+func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value: int = 1798, keep_textures: Array = [], loc: Vector2i = Vector2i.ZERO) -> Array:
 	var assets: Terrain3DAssets = terrain.assets
 	var texture_list: Array = keep_textures if not keep_textures.is_empty() else assets.texture_list.duplicate()
-	for i in RULES.size():
+	var origin := Vector3(loc.x * terrain.region_size, 0.0, loc.y * terrain.region_size)
+	for i in (RULES.size() if loc == Vector2i.ZERO else 0):
 		var r: Dictionary = RULES[i]
 		var ma := Terrain3DMeshAsset.new()
 		ma.name = r.scene
@@ -280,7 +329,8 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 		ma.cast_shadows = 1 if r.shadows else 0
 		assets.set_mesh_asset(i, ma)
 		terrain.instancer.clear_by_mesh(i)
-	var ctrl: Image = terrain.data.control_maps[0]
+	var region: Terrain3DRegion = terrain.data.get_region(loc)
+	var ctrl: Image = region.get_control_map() if region else terrain.data.control_maps[0]
 	var size := ctrl.get_width()
 	var canopy: Image = null
 	var meta := read_meta(tile_dir)
@@ -295,16 +345,11 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 		colors.append(PackedColorArray())
 	# Measured single trees (Maa-amet Geo3D, tools/pipeline/fetch_trees.py) replace the statistical
 	# tree rules where the dataset covers the tile; bushes and grass stay statistical.
-	var measured := _place_measured_trees(terrain, tile_dir, exclusions, rng, batches, colors)
+	var measured := _place_measured_trees(terrain, tile_dir, exclusions, rng, batches, colors, origin)
 	for y in size:
 		for x in size:
 			var id := Terrain3DUtil.get_base(Terrain3DUtil.as_uint(ctrl.get_pixel(x, y).r))
-			var excluded := false
-			for e in exclusions:
-				if Vector2(x, y).distance_to(Vector2(float(e[0]), float(e[1]))) < float(e[2]):
-					excluded = true
-					break
-			if excluded:
+			if excluded(x, y, exclusions):
 				continue
 			var h: float = canopy.get_pixel(x, y).r if canopy else -1.0
 			for i in RULES.size():
@@ -316,7 +361,7 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 				if canopy and r.has("height") and (h < r.height.x or h >= r.height.y):
 					continue
 				if rng.randf() < r.per_100m2 / 100.0:
-					var pos := Vector3(x + rng.randf(), 0.0, y + rng.randf())
+					var pos := Vector3(x + rng.randf(), 0.0, y + rng.randf()) + origin
 					pos.y = terrain.data.get_height(pos)
 					var s: float = rng.randf_range(r.scale.x, r.scale.y)
 					if canopy and MODEL_HEIGHT.has(r.scene) and h > 0.0:
@@ -325,7 +370,7 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 					batches[i].append(Transform3D(basis, pos))
 					var v: float = rng.randf_range(0.72, 1.08)
 					colors[i].append(Color(v * rng.randf_range(0.9, 1.15), v, v * rng.randf_range(0.8, 1.0)))
-		if y % YIELD_ROWS == 0:
+		if y % yield_rows == 0:
 			await _tick("vegetation", 0.6 + 0.35 * y / size)
 	var counts := []
 	for i in RULES.size():
@@ -333,6 +378,10 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 			terrain.instancer.add_transforms(i, batches[i], colors[i], i == RULES.size() - 1)
 		counts.append(batches[i].size())
 		print("[terrain_builder] %-18s %6d instances" % [RULES[i].scene, batches[i].size()])
+	if loc != Vector2i.ZERO:
+		save_region_as_origin(terrain, loc, tile_dir)
+		await _tick("done", 1.0)
+		return counts
 	terrain.data.save_directory(tile_dir + "/data")
 	assets.texture_list = texture_list
 	ResourceSaver.save(assets, tile_dir + "/terrain_assets.tres")

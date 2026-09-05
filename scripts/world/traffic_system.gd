@@ -19,8 +19,9 @@ var _rng := RandomNumberGenerator.new()
 
 
 func _ready() -> void:
-	graph = RoadGraph.from_pack()
-	_rng.seed = hash(Sites.active) + year
+	var pack := Sites.pack_of(self)
+	graph = RoadGraph.from_pack(pack)
+	_rng.seed = hash(pack) + year
 
 
 ## Share of each kind by era year.
@@ -57,7 +58,8 @@ func _physics_process(delta: float) -> void:
 	if _timer > 0.0:
 		return
 	_timer = 1.0
-	var centre := Vector2(player.global_position.x, player.global_position.z)
+	var lp := to_local(player.global_position)   # the graph is in pack-local metres (streamed tiles sit at an offset)
+	var centre := Vector2(lp.x, lp.z)
 	for a in agents:
 		if a.global_position.distance_to(player.global_position) > despawn:
 			a.queue_free()

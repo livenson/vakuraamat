@@ -19,7 +19,7 @@ var roads: Array = []
 
 
 func _ready() -> void:
-	var text := FileAccess.get_file_as_string(Sites.path(source))
+	var text := FileAccess.get_file_as_string(Sites.path_in(Sites.pack_of(self), source))
 	var parsed = JSON.parse_string(text) if text != "" else null
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return
@@ -84,7 +84,7 @@ func _ribbon(st: SurfaceTool, pts: Array[Vector2], half: float, terrain: Terrain
 		var p := pts[i] + normal * offset
 		var side := normal * half
 		for s in [p + side, p - side]:
-			var h := terrain.data.get_height(Vector3(s.x, 0, s.y))
+			var h := terrain.data.get_height(to_global(Vector3(s.x, 0, s.y)))
 			if is_nan(h):
 				h = 0.0
 			(left if s == p + side else right).append(Vector3(s.x, h + up, s.y))
@@ -102,7 +102,8 @@ func _ribbon(st: SurfaceTool, pts: Array[Vector2], half: float, terrain: Terrain
 func nearest(pos: Vector3, max_dist := 12.0) -> Dictionary:
 	var best := {}
 	var best_d := max_dist
-	var p2 := Vector2(pos.x, pos.z)
+	var local := to_local(pos)
+	var p2 := Vector2(local.x, local.z)
 	for r in roads:
 		var pts: Array = r.points
 		for i in range(pts.size() - 1):
