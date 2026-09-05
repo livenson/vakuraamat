@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://ck7qh01jy17aa"
+valid=false
+
+[deps]
+
+source_file="res://assets/data/economy.json"
+
+[params]
+
+compress=true

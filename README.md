@@ -97,6 +97,11 @@ Maa-amet transaction table can be joined with `make market XLSX=<file>`.
 open data and are matched to parcels and buildings (`tenants.json`, `make tenants`), by the address
 id the Building Register shares with the company register where possible, else by street and number.
 
+**Towns (shared ledger):** `server/vakuraamat/` is a SpacetimeDB module holding a tile's ledger:
+parcels, owners, prices, tenants, bids, obligations and news. `make server` runs SpacetimeDB locally,
+`make town SITE=kvissentali` publishes and seeds the town from the pack. See
+[docs/custom-sites.md](docs/custom-sites.md#towns-the-shared-ledger).
+
 **Real buildings and trees:** every building in a tile comes from the topographic database (footprint),
 the Building Register (year built, floors, purpose, facade and roof materials, heating, water, solar)
 and Maa-amet's LOD2 3D models (roof shapes); a building appears only in the eras after its first year

@@ -114,6 +114,21 @@ option checks `visiting()`. They are listed in the ledger but not counted for th
 player is never blocked. The URLs of both services live in `user://settings.cfg` (`[service] url`,
 `[service] worlds_url`); your player name for deliveries is `[player] name`.
 
+## Towns: the shared ledger
+
+A town is one SpacetimeDB database holding a tile's ledger: parcels with land values and prices,
+owners, tenants, bids, obligations, improvements, presence and the news feed. Nothing else is
+shared; every client regenerates the tile from Maa-amet data. The module lives in
+`server/vakuraamat/` (Rust, see its README); `make module` builds it, `make server` runs a local
+SpacetimeDB on 127.0.0.1:3300, and `make town SITE=<id>` publishes the module under the pack's town
+name and seeds it from `parcels.json`, `tenants.json`, the pack's structures and
+`assets/data/economy.json` through `tools/town_admin.py`. The town name (`tools/town_admin.py name`)
+encodes the tile centre and a hash of the pack's parcel and tenant files, so a regenerated pack is a
+new town and a client whose pack differs is refused. `DEBUG=1 make town` allows `grant_cash` for
+local play. The Godot client is the vendored `addons/SpacetimeDB` SDK with bindings generated into
+`spacetime_bindings/` (`godot --headless --path . --script res://addons/SpacetimeDB/cli.gd` after
+publishing the module as `vakuraamat`; commit the result).
+
 ## Real buildings: ETAK footprints, the Building Register, LOD2 roofs
 
 `make buildings SITE=<id>` (part of `make tile`, and of every tile-service job) writes

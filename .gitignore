@@ -16,3 +16,7 @@ assets/terrain/*/data/
 assets/models/trees/*_impostor.png
 assets/models/trees/*_impostor.png.import
 assets/models/trees/*_mesh.res
+# SpacetimeDB codegen scratch (bindings themselves are committed)
+spacetime_bindings/codegen_debug/
+# Rust build output of the town module
+server/vakuraamat/target/

@@ -1,0 +1,8 @@
+[package]
+name = "vakuraamat-rules"
+version = "0.1.0"
+edition = "2021"
+description = "Pure economy arithmetic of the Vakuraamat town ledger, testable without SpacetimeDB"
+license = "MIT"
+
+[dependencies]
