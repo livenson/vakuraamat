@@ -112,7 +112,7 @@ ink:
 
 test:
 	@python3 tools/validate_site.py --all | grep -E "OK|FAILED"
-	@for t in boot_test site_test userpack_test friends_test devchannel_test traffic_test playthrough_test story_test farming_test hunting_test economy_test; do \
+	@for t in boot_test site_test userpack_test friends_test devchannel_test traffic_test streaming_test playthrough_test story_test farming_test hunting_test economy_test; do \
 	  printf "%-18s " $$t; timeout 180 $(GODOT) --headless --path . res://tools/godot/$$t.tscn -- --site=palupera 2>&1 | grep -E "PASSED|FAILED" | head -1; if [ "$${PIPESTATUS[0]}" = 124 ]; then echo "TIMEOUT (stuck after 180 s)"; fi; done
 
 lint:
@@ -125,6 +125,9 @@ export:
 
 clean-generated:
 	rm -rf assets/terrain/$(TILE)/data assets/models/trees/*_impostor.png assets/models/trees/*_mesh.res
+
+play:
+	tools/play.sh $(ARGS)
 
 tile-service:
 	python3 tools/tile_service.py --port 8765

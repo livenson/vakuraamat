@@ -8,9 +8,9 @@ var node_edges: Dictionary = {}       # node id -> Array[int]
 var _nodes: PackedVector2Array = PackedVector2Array()
 
 
-static func from_pack() -> RoadGraph:
+static func from_pack(pack: String = "") -> RoadGraph:
 	var g := RoadGraph.new()
-	var text := FileAccess.get_file_as_string(Sites.path("roads.json"))
+	var text := FileAccess.get_file_as_string(Sites.path_in(pack if pack != "" else Sites.active, "roads.json"))
 	var parsed = JSON.parse_string(text) if text != "" else null
 	if typeof(parsed) == TYPE_DICTIONARY:
 		g.build(parsed.get("roads", []))

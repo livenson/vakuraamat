@@ -1,0 +1,107 @@
+{
+ "buildings/brick": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "red_brick_03",
+  "url": "https://polyhaven.com/a/red_brick_03"
+ },
+ "buildings/concrete": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "painted_concrete",
+  "url": "https://polyhaven.com/a/painted_concrete"
+ },
+ "buildings/logs": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "old_planks_02",
+  "url": "https://polyhaven.com/a/old_planks_02"
+ },
+ "buildings/metalroof": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "corrugated_iron_02",
+  "url": "https://polyhaven.com/a/corrugated_iron_02"
+ },
+ "buildings/panel": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "concrete_wall_006",
+  "url": "https://polyhaven.com/a/concrete_wall_006"
+ },
+ "buildings/plaster": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "plastered_wall",
+  "url": "https://polyhaven.com/a/plastered_wall"
+ },
+ "buildings/rock": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "brick_wall_006",
+  "url": "https://polyhaven.com/a/brick_wall_006"
+ },
+ "buildings/rooftiles": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "roof_tiles_14",
+  "url": "https://polyhaven.com/a/roof_tiles_14"
+ },
+ "buildings/thatch": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "reed_roof_03",
+  "url": "https://polyhaven.com/a/reed_roof_03"
+ },
+ "buildings/woodsiding": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "wood_planks_grey",
+  "url": "https://polyhaven.com/a/wood_planks_grey"
+ },
+ "terrain/field": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "leafy_grass",
+  "url": "https://polyhaven.com/a/leafy_grass"
+ },
+ "terrain/forest_floor": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "brown_mud_leaves_01",
+  "url": "https://polyhaven.com/a/brown_mud_leaves_01"
+ },
+ "terrain/gravel": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "gravel_floor",
+  "url": "https://polyhaven.com/a/gravel_floor"
+ },
+ "terrain/meadow": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "aerial_grass_rock",
+  "url": "https://polyhaven.com/a/aerial_grass_rock"
+ },
+ "terrain/soil": {
+  "fetched": "2026-09-05",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "aerial_mud_1",
+  "url": "https://polyhaven.com/a/aerial_mud_1"
+ }
+}

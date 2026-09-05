@@ -130,6 +130,39 @@ func path(rel: String) -> String:
 	return str(_root_of.get(active, ROOT)) + active + "/" + rel
 
 
+## Root a pack was found under (res://sites/ or user://sites/).
+func root_of(id: String) -> String:
+	_ensure()
+	return str(_root_of.get(id, ROOT))
+
+
+## Path of a file inside any installed pack (active or a streamed neighbour).
+func path_in(id: String, rel: String) -> String:
+	return root_of(id) + id + "/" + rel
+
+
+## The pack a scene node belongs to: the nearest ancestor carrying a "pack_id" meta (a streamed
+## neighbour tile's root), else the active site.
+func pack_of(node: Node) -> String:
+	var n := node
+	while n:
+		if n.has_meta("pack_id"):
+			return str(n.get_meta("pack_id"))
+		n = n.get_parent()
+	return active
+
+
+## Tile directory of any installed pack (see tile_dir).
+func tile_dir_of(id: String) -> String:
+	if id == active:
+		return tile_dir()
+	var t := str(manifest_for(id).get("terrain", {}).get("tile", id))
+	var shipped := "res://assets/terrain/%s" % t
+	if FileAccess.file_exists(shipped + "/terrain_meta.json"):
+		return shipped
+	return USER_TILES + t
+
+
 func data_dir(sub: String) -> String:
 	return path("data/" + sub + "/")
 

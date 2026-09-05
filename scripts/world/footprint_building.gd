@@ -72,7 +72,7 @@ func _ready() -> void:
 func _model() -> Dictionary:
 	if source == "" or building_id == 0:
 		return {}
-	var path := Sites.path(source)
+	var path := Sites.path_in(Sites.pack_of(self), source)
 	if not _models.has(path):
 		var table := {}
 		var text := FileAccess.get_file_as_string(path)
@@ -246,17 +246,23 @@ func _textured(name: String, tint: Color, scale: float, rough := 0.9) -> Standar
 	return m
 
 
-## Facade material text -> texture: plaster for rendered, block and board facades; wood siding for
-## timber; a warm-tinted plaster stands in for brick (no brick texture in the set).
+## Facade material text -> texture (Poly Haven CC0 sets, see tools/pipeline/fetch_polyhaven.py):
+## timber boards, logs, brick, fieldstone, prefab panels, concrete; rendered walls get plaster.
 func _wall_material() -> StandardMaterial3D:
 	var f := facade.to_lower()
 	if f == "" and kind == "outbuilding":
 		return _textured("woodsiding", wall_color.lightened(0.15), 0.5)
-	if "puit" in f or "laudis" in f or "palk" in f:
+	if "palk" in f:
+		return _textured("logs", wall_color.lightened(0.2), 0.5)
+	if "puit" in f or "laudis" in f:
 		return _textured("woodsiding", wall_color.lightened(0.25), 0.5)
 	if "tellis" in f:
-		return _textured("plaster", wall_color, 0.8, 0.95)
-	if "kivi" in f or "paekivi" in f:
+		return _textured("brick", wall_color.lightened(0.3), 0.6, 0.85)
+	if "paneel" in f or "raudbetoon" in f:
+		return _textured("panel", wall_color.lightened(0.2), 0.45, 0.9)
+	if "betoon" in f:
+		return _textured("concrete", wall_color.lightened(0.15), 0.5, 0.9)
+	if "kivi" in f or "paekivi" in f or "maakivi" in f:
 		return _textured("rock", wall_color.lightened(0.2), 0.4)
 	return _textured("plaster", wall_color.lightened(0.05), 0.6)
 
@@ -267,6 +273,8 @@ func _roof_material() -> StandardMaterial3D:
 		return _textured("rooftiles", roof_color.lightened(0.35), 0.7, 0.8)
 	if "roo" in r or "õlg" in r:
 		return _textured("thatch", roof_color.lightened(0.4), 0.6)
+	if "plekk" in r or "profiil" in r:
+		return _textured("metalroof", roof_color.lightened(0.3), 0.6, 0.5)
 	var m := StandardMaterial3D.new()
 	m.albedo_color = roof_color
 	m.cull_mode = BaseMaterial3D.CULL_DISABLED

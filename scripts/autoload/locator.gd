@@ -63,6 +63,35 @@ func service_alive() -> bool:
 	return r.ok
 
 
+## The tile service, started from the source tree if it is not running (see spawn_local).
+func ensure_service() -> bool:
+	if await service_alive():
+		return true
+	return await spawn_local("tools/tile_service.py", 8765, service_url() + "/health")
+
+
+## Start one of the Python services (tools/*.py) as a background process when the game runs from
+## the source tree and the configured URL is local; exported builds and remote URLs leave it alone.
+## Waits until /health answers (up to ~15 s). The process outlives the game; tools/play.sh manages it.
+func spawn_local(script_rel: String, port: int, health_url: String) -> bool:
+	if OS.has_feature("template") or DisplayServer.get_name() == "headless" or not (health_url.contains("127.0.0.1") or health_url.contains("localhost")):
+		return false   # exported builds, headless tests and remote services: never spawn
+	var script := ProjectSettings.globalize_path("res://" + script_rel)
+	if not FileAccess.file_exists(script):
+		return false
+	var pid := OS.create_process("python3", [script, "--port", str(port)])
+	if pid <= 0:
+		push_warning("could not start %s" % script_rel)
+		return false
+	print("[Locator] started %s (pid %d)" % [script_rel, pid])
+	for i in 30:
+		await get_tree().create_timer(0.5).timeout
+		var r := await http(health_url)
+		if r.ok:
+			return true
+	return false
+
+
 ## Places for a query: "E N" in L-EST97, "lat, lon", or an address / place name via in-ADS.
 ## Returns [{name, x, y}].
 func geocode(q: String) -> Array:
@@ -147,9 +176,19 @@ static func slug(name: String) -> String:
 ## Returns {ok, id, error}.
 func create_world(name: String, x: float, y: float, size: int = 1024, eras: String = "1798,1938,2026", id_override: String = "", seed_value: int = -1, blocks: Array = []) -> Dictionary:
 	var id := id_override if id_override != "" else slug(name)
+	var r := await fetch_pack(id, name, x, y, size, eras, seed_value, blocks)
+	if r.ok:
+		Sites.scan()
+		Sites.select(id)
+	return r
+
+
+## Generate (or reuse from the service cache), download and install a pack without activating it:
+## the world streamer uses this for neighbouring tiles. Returns {ok, id, error}.
+func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, eras: String = "1798,1938,2026", seed_value: int = -1, blocks: Array = []) -> Dictionary:
 	var base := service_url()
 	var error := ""
-	if not await service_alive():
+	if not await ensure_service():
 		error = tr("MENU_SERVICE_DOWN") % base
 	elif not in_estonia(x, y):
 		error = tr("MENU_OUTSIDE_ESTONIA")
@@ -173,9 +212,6 @@ func create_world(name: String, x: float, y: float, size: int = 1024, eras: Stri
 			error = "download: HTTP %d" % dl.code
 		elif not install_zip(zip_path, id):
 			error = "could not unpack " + zip_path
-	if error == "":
-		Sites.scan()
-		Sites.select(id)
 	return {"ok": error == "", "id": id, "error": error}
 
 

@@ -35,6 +35,10 @@ func _init() -> void:
 	if FileAccess.file_exists(layout_path):
 		var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(layout_path))
 		exclusions = layout.get("exclusions", [])
+	var manifest_text := FileAccess.get_file_as_string("res://sites/%s/site.json" % site)
+	var manifest = JSON.parse_string(manifest_text) if manifest_text != "" else null
+	if typeof(manifest) == TYPE_DICTIONARY and manifest.get("water", "") != "":
+		exclusions = exclusions + TerrainBuilder.water_exclusions("res://sites/%s/%s" % [site, manifest.water])   # nothing grows in the ponds
 	var builder := TerrainBuilder.new()
 	var counts: Array = await builder.scatter(terrain, dir, exclusions, 1798, texture_list)
 	print("[scatter_vegetation] saved -> %s (%d instances)" % [dir, counts.reduce(func(a, b): return a + b, 0)])
