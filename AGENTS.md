@@ -29,6 +29,8 @@ The design and plan documents in the repo root are authoritative: `vakuraamat-im
   --frames=400 --era=era_1938 --spawn=x,z,yaw --open=register|journal|map|trade|build`.
 
 ## Conventions and pitfalls
+- Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`
+  (or `--fullscreen`).
 - Ink: Estonian lines with `# en:` tags; choices `[et %% en]` (ink reserves `|`); `# me` marks the
   player; `# speaker: KEY` overrides. Compile with `make ink`. EXTERNAL functions are listed in
   `scripts/autoload/narrative.gd`.
