@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3]
+[gd_scene load_steps=33 format=3]
 
 [ext_resource type="Script" path="res://scripts/interaction/conditional.gd" id="1"]
 [ext_resource type="PackedScene" path="res://assets/models/props/oak.glb" id="2"]
@@ -15,8 +15,10 @@
 [ext_resource type="Script" path="res://scripts/world/footprint_building.gd" id="13"]
 [ext_resource type="Script" path="res://scripts/world/road_network.gd" id="14"]
 [ext_resource type="Script" path="res://scripts/world/parcel_kit.gd" id="15"]
-[ext_resource type="Script" path="res://scripts/trading/trade_post.gd" id="16"]
-[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="17"]
+[ext_resource type="Script" path="res://scripts/world/traffic_system.gd" id="16"]
+[ext_resource type="Script" path="res://scripts/interaction/bicycle.gd" id="17"]
+[ext_resource type="Script" path="res://scripts/trading/trade_post.gd" id="18"]
+[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="19"]
 
 [sub_resource type="StandardMaterial3D" id="M1"]
 albedo_color = Color(0.450, 0.250, 0.100, 1)
@@ -68,7 +70,7 @@ albedo_color = Color(0.300, 0.220, 0.140, 1)
 roughness = 0.9
 
 [node name="era_2026" type="Node3D"]
-script = ExtResource("17")
+script = ExtResource("19")
 era_id = "era_2026"
 
 [node name="Oak" type="Node3D" parent="."]
@@ -2032,9 +2034,20 @@ kit = "hedge"
 tunnus = "58201:002:2500"
 polygon = PackedVector2Array(-5.1, -36.0, -28.3, -25.6, -29.4, -1.9, -10.9, 36.0, 29.3, 22.2, 5.1, -26.0)
 
+[node name="Traffic" type="Node3D" parent="."]
+script = ExtResource("16")
+year = 2026
+density = 1.0
+max_agents = 40
+metadata/no_snap = true
+
+[node name="Bicycle" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 492, 0, 539)
+script = ExtResource("17")
+
 [node name="TradePost" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 484.0, 0, 535)
-script = ExtResource("16")
+script = ExtResource("18")
 era_id = "era_2026"
 post_name_key = "POST_2026"
 intro_key = "POST_2026_TEXT"

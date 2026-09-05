@@ -362,6 +362,8 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
         if e == newest:
             nodes.append({"type": "roads", "source": "roads.json"})
             nodes.append({"type": "parcels", "source": "parcels.json", "year": y})
+            nodes.append({"type": "traffic", "year": y})
+            nodes.append({"type": "bicycle", "name": "Bicycle", "at": {"ref": "register", "offset": [4, 5]}})
         elif e == newest:
             nodes.append({"type": "village", "source": "buildings_2026.json"})
         if e == mid:

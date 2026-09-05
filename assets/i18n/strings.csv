@@ -123,3 +123,8 @@ NOTICE_FLY_ON,"Lend sees (F): Shift ja Ctrl kiirendavad, vaata ja liigu",Fly on 
 NOTICE_FLY_OFF,Lend väljas,Fly off
 NOTICE_TELEPORT,"Teleport %d, %d","Teleported to %d, %d"
 NOTICE_HOME,Algus,Back at the start
+UI_PROMPT_RIDE,Sõida,Ride
+ITEM_BICYCLE,Jalgratas,Bicycle
+EX_BICYCLE,"Jalgratas. E: sõida; E uuesti, kui midagi ei vaata: tule maha.","A bicycle. E to ride; E again, looking at nothing, to get off."
+NOTICE_BIKE_ON,"Rattal. Shift kiiremini, E maha.","On the bike. Shift to go faster, E to get off."
+NOTICE_BIKE_OFF,Maha tuldud.,Off the bike.

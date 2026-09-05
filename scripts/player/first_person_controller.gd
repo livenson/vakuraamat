@@ -18,7 +18,10 @@ enum Gait { WALK, SPRINT, DASH }
 
 var flying := false
 var input_enabled := true      # false while a UI panel or dialogue is open
+var riding: Node3D = null      # the parked Bicycle we sit on, or null
 var _pitch := 0.0
+var _bike_view: Node3D = null
+var _ride_speed := 0.0
 
 
 func pitch() -> float:
@@ -52,6 +55,9 @@ func _unhandled_input(event: InputEvent) -> void:
 		flying = not flying
 		velocity = Vector3.ZERO
 		EventBus.notice.emit(tr("NOTICE_FLY_ON") if flying else tr("NOTICE_FLY_OFF"))
+	elif riding and event.is_action_pressed("interact"):
+		dismount()
+		get_viewport().set_input_as_handled()
 	elif event.is_action_pressed("teleport"):
 		_teleport_to_view()
 	elif event.is_action_pressed("teleport_home"):
@@ -83,6 +89,43 @@ func _teleport_to_view() -> void:
 			return
 
 
+## Sit on a parked bicycle: it disappears from the ground and its frame shows under the camera.
+func mount(bike: Node3D) -> void:
+	if riding:
+		return
+	riding = bike
+	bike.visible = false
+	for c in bike.find_children("*", "CollisionShape3D", true, false):
+		c.set_deferred("disabled", true)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(bike.name)
+	_bike_view = TrafficAgent.build_bike(false, rng, Color.WHITE)
+	_bike_view.position = Vector3(0, -1.55, -0.35)
+	_bike_view.rotation.y = PI
+	add_child(_bike_view)
+	camera.position.y -= 0.25
+	flying = false
+	_ride_speed = 0.0
+	EventBus.notice.emit(tr("NOTICE_BIKE_ON"))
+
+
+## Step off: the bicycle stands where we are.
+func dismount() -> void:
+	if riding == null:
+		return
+	riding.global_position = global_position + global_transform.basis * Vector3(0.8, 0, -0.6)
+	riding.rotation.y = rotation.y
+	riding.visible = true
+	for c in riding.find_children("*", "CollisionShape3D", true, false):
+		c.set_deferred("disabled", false)
+	riding = null
+	if _bike_view:
+		_bike_view.queue_free()
+		_bike_view = null
+	camera.position.y += 0.25
+	EventBus.notice.emit(tr("NOTICE_BIKE_OFF"))
+
+
 func gait() -> Gait:
 	if Input.is_action_pressed("dash"):
 		return Gait.DASH
@@ -94,12 +137,16 @@ func gait() -> Gait:
 func current_speed() -> float:
 	if flying:
 		return fly_speed * {Gait.WALK: 1.0, Gait.SPRINT: 2.5, Gait.DASH: 6.0}[gait()]
+	if riding:
+		return {Gait.WALK: 6.5, Gait.SPRINT: 10.0, Gait.DASH: 14.0}[gait()]
 	return {Gait.WALK: walk_speed, Gait.SPRINT: sprint_speed, Gait.DASH: dash_speed}[gait()]
 
 
 func mode_label() -> String:
 	if flying:
 		return "FLY %.0f m/s" % current_speed()
+	if riding:
+		return "BIKE %.0f m/s" % _ride_speed
 	return {Gait.WALK: "walk", Gait.SPRINT: "sprint", Gait.DASH: "dash"}[gait()]
 
 
@@ -109,6 +156,20 @@ func _physics_process(delta: float) -> void:
 		# Move along the camera's look direction so pitch gives free vertical travel.
 		var dir := (camera.global_transform.basis * Vector3(input.x, 0.0, input.y)).normalized()
 		global_position += dir * current_speed() * delta
+		return
+
+	if riding:
+		# a bicycle keeps rolling: the input steers the target speed, momentum does the rest; no jumping
+		var target := (transform.basis * Vector3(input.x * 0.4, 0.0, input.y)).normalized() * current_speed() if input.length() > 0.1 else Vector3.ZERO
+		var horizontal := Vector3(velocity.x, 0, velocity.z).lerp(target, minf(1.0, delta * (2.0 if input.y < 0 else 1.2)))
+		_ride_speed = horizontal.length()
+		velocity.x = horizontal.x
+		velocity.z = horizontal.z
+		if not is_on_floor():
+			velocity.y -= 9.8 * delta
+		else:
+			velocity.y = 0.0
+		move_and_slide()
 		return
 
 	if not is_on_floor():

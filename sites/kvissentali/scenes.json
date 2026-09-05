@@ -485,6 +485,21 @@
      "year": 2026
     },
     {
+     "type": "traffic",
+     "year": 2026
+    },
+    {
+     "type": "bicycle",
+     "name": "Bicycle",
+     "at": {
+      "ref": "register",
+      "offset": [
+       4,
+       5
+      ]
+     }
+    },
+    {
      "type": "farm_plots",
      "at": {
       "ref": "farm",

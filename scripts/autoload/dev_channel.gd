@@ -1,6 +1,8 @@
 # Autoload "DevChannel": the developer's way into a running game (debug builds only). Commands are
 # JSON lines appended to user://dev/commands.jsonl (tools/dev.py writes them); results go to
-# user://dev/results.log. Hot reload where Godot allows it, restart at the same spot where it does not.
+# user://dev/results.log. Each game registers user://dev/instances/<pid>.json; a command with a "pid"
+# is executed only by that game (pid 0 = every game). Hot reload where Godot allows it, restart at the
+# same spot where it does not.
 #   {"reload": ["res://scripts/ui/ui_manager.gd", "res://sites/x/scenes/era_2026.tscn", "res://sites/x/strings.csv"]}
 #   {"restart": true}   {"teleport": [x, z, yaw_deg]}   {"era": "era_1938"}   {"screenshot": "/abs.png"}
 #   {"report": "note"}  {"note": "printed to the log"}  {"quit": true}
@@ -9,6 +11,7 @@ extends Node
 const DIR := "user://dev/"
 const CMD := "user://dev/commands.jsonl"
 const RESULTS := "user://dev/results.log"
+const INSTANCES := "user://dev/instances/"   # <pid>.json per running game; commands carry the target pid
 
 var enabled := false
 var _offset := 0
@@ -29,7 +32,21 @@ func _ready() -> void:
 	_timer.autostart = true
 	_timer.timeout.connect(_poll)
 	add_child(_timer)
-	print("[DevChannel] listening on %s" % ProjectSettings.globalize_path(CMD))
+	_register()
+	print("[DevChannel] listening on %s as pid %d" % [ProjectSettings.globalize_path(CMD), OS.get_process_id()])
+
+
+func _register() -> void:
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(INSTANCES))
+	var f := FileAccess.open(INSTANCES + str(OS.get_process_id()) + ".json", FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify({"pid": OS.get_process_id(), "started": Time.get_datetime_string_from_system(), "site": Sites.active, "args": OS.get_cmdline_user_args()}))
+		f.close()
+
+
+func _exit_tree() -> void:
+	if enabled:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(INSTANCES + str(OS.get_process_id()) + ".json"))
 
 
 func _poll() -> void:
@@ -44,10 +61,12 @@ func _poll() -> void:
 	f.close()
 	for line in chunk.split("\n", false):
 		var cmd = JSON.parse_string(line)
-		if typeof(cmd) == TYPE_DICTIONARY:
-			execute(cmd)
-		else:
+		if typeof(cmd) != TYPE_DICTIONARY:
 			_result("bad json: " + line)
+		elif cmd.has("pid") and int(cmd.pid) != OS.get_process_id() and int(cmd.pid) != 0:
+			continue   # addressed to another running game
+		else:
+			execute(cmd)
 
 
 ## Run one command; results are logged and returned.

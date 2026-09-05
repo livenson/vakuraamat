@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://ciolr3mwvjala"
+valid=false
+
+[deps]
+
+source_file="res://assets/terrain/kvissentali/trees.json"
+
+[params]
+
+compress=true

@@ -13,6 +13,8 @@
     python3 tools/dev.py era <era_id>
     python3 tools/dev.py screenshot </abs/path.png>
     python3 tools/dev.py results                    # tail the command results log
+    python3 tools/dev.py instances                  # running games (pid, site); commands go to the newest,
+                                                    # or use --pid <n> / --all before the command
 
 Commands are JSON lines appended to <userdir>/dev/commands.jsonl, read by the DevChannel autoload
 twice a second; results land in <userdir>/dev/results.log. Reports live in <userdir>/reports/.
@@ -31,9 +33,45 @@ def user_dir():
     return os.path.expanduser("~/.local/share/godot/app_userdata/Vakuraamat")
 
 
+def instances():
+    """Running games: [{pid, started, site, args}] newest first (stale entries of dead pids are dropped)."""
+    d = os.path.join(user_dir(), "dev", "instances")
+    out = []
+    if not os.path.isdir(d):
+        return out
+    for f in os.listdir(d):
+        if not f.endswith(".json"):
+            continue
+        try:
+            info = json.load(open(os.path.join(d, f)))
+            os.kill(int(info["pid"]), 0)
+            out.append(info)
+        except (ProcessLookupError, PermissionError, ValueError, KeyError, json.JSONDecodeError):
+            try:
+                os.remove(os.path.join(d, f))
+            except OSError:
+                pass
+    return sorted(out, key=lambda i: i.get("started", ""), reverse=True)
+
+
+TARGET = {"pid": None, "all": False}
+
+
 def send(cmd):
     d = os.path.join(user_dir(), "dev")
     os.makedirs(d, exist_ok=True)
+    if TARGET["all"]:
+        cmd["pid"] = 0
+    elif TARGET["pid"]:
+        cmd["pid"] = TARGET["pid"]
+    else:
+        inst = instances()
+        if not inst:
+            print("no running game registered under dev/instances; sending to whichever starts next"); cmd["pid"] = 0
+        else:
+            cmd["pid"] = inst[0]["pid"]
+            if len(inst) > 1:
+                print(f"{len(inst)} games running; targeting the newest, pid {inst[0]['pid']} ({inst[0].get('site')}). Use --pid or --all.")
     with open(os.path.join(d, "commands.jsonl"), "a", encoding="utf-8") as f:
         f.write(json.dumps(cmd, ensure_ascii=False) + "\n")
     print("sent", json.dumps(cmd, ensure_ascii=False))
@@ -66,7 +104,16 @@ def report_path(arg):
 def main(argv):
     if not argv or argv[0] in ("-h", "--help"):
         print(__doc__); return 0
+    while argv and argv[0] in ("--all", "--pid"):
+        if argv[0] == "--all":
+            TARGET["all"] = True; argv = argv[1:]
+        else:
+            TARGET["pid"] = int(argv[1]); argv = argv[2:]
     cmd, args = argv[0], argv[1:]
+    if cmd == "instances":
+        for i in instances():
+            print(f"pid {i['pid']}  since {i.get('started')}  site {i.get('site')}  {' '.join(i.get('args', []))}")
+        return 0
     rdir = os.path.join(user_dir(), "reports")
     if cmd == "watch":
         tail(os.path.join(rdir, "feed.log"))
