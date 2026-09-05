@@ -16,6 +16,9 @@ UI_CONTINUE,Edasi,Continue
 UI_NEW_GAME,Uus mäng,New game
 UI_CONTINUE_GAME,Jätka,Continue
 UI_QUIT,Välju,Quit
+UI_MENU,Menüü,Menu
+UI_SAVE_MENU,Salvesta ja mine peamenüüsse,Save and go to main menu
+UI_SAVE_QUIT,Salvesta ja välju,Save and quit
 UI_CHAPTER_COMMIT,"%s. peatükk lõppes. See, mis on tehtud, jääb nüüd tehtuks.",Chapter %s ends. What is done now stays done.
 UI_CHAPTER_COMMIT_FIRST,Peatükk lõppes. Igal peatüki lõpul jäävad sinu valikud lõplikuks. Peatüki sees võid ümber otsustada.,A chapter has ended. At the end of every chapter your choices become permanent. Within a chapter you may change your mind.
 UI_PROMPT_EXAMINE,Vaata,Look
@@ -23,7 +26,6 @@ UI_PROMPT_TALK,Räägi,Talk
 UI_PROMPT_TAKE,Võta,Take
 UI_PROMPT_OPEN,Ava,Open
 UI_PROMPT_USE,Kasuta,Use
-UI_KEYS,E tegutse   Tab vakuraamat   J päevik   I kott   L keel,E interact   Tab register   J journal   I bag   L language
 NOTICE_REGISTER_NEW_LINE,Vakuraamatu %s lehel on uus rida.,The register's %s page has a new line on it.
 NOTICE_LEFT_BEHIND,"%s jäi sinna, kus sa seisid. Ainult see, mis raamatusse kuulub, tuleb kaasa.",%s stayed where you stood. Only what belongs to the book comes along.
 NOTICE_ARTIFACT_TAKEN,%s. See kuulub raamatusse; see tuleb sinuga läbi aastate.,%s. It belongs to the book; it comes with you through the years.
@@ -222,4 +224,4 @@ OBJ_MEET_1938,"1938: leia Aino talu juurest, Juhan põhjapõllult, maamõõtja m
 OBJ_SIT,"Kui oled valmis, mine 2026. aastasse ja istu Leidaga tamme all.","When you are ready, go to 2026 and sit with Leida under the oak."
 UI_DEBUG_MAP,Silumiskaart,Debug map
 UI_DEBUG_MAP_HINT,Klõps kaardil: teleport. M sulgeb.,Click the map to teleport. M closes.
-UI_KEYS,E tegutse   Tab vakuraamat   J päevik   I kott   L keel   M silumiskaart,E interact   Tab register   J journal   I bag   L language   M debug map
+UI_KEYS,E tegutse   Tab vakuraamat   J päevik   I kott   L keel   M silumiskaart   Esc menüü,E interact   Tab register   J journal   I bag   L language   M debug map   Esc menu

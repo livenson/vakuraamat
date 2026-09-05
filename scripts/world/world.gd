@@ -67,6 +67,11 @@ func _ready() -> void:
 			get_tree().create_timer(2.0).timeout.connect(ui.debug_open.bind(a.trim_prefix("--open=")))
 
 
+func _exit_tree() -> void:
+	if GameState.world == self:
+		GameState.world = null
+
+
 func _process(_delta: float) -> void:
 	if sky and sky.tod:
 		Farming.tick_clock(sky.tod.current_time)

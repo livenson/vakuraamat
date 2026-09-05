@@ -26,7 +26,7 @@ The design and plan documents in the repo root are authoritative: `vakuraamat-im
   tools; scenes that need autoloads run as `godot --headless --path . res://tools/godot/<test>.tscn`.
 - zsh does not word-split unquoted variables: when looping over argument strings use `${=args}`.
 - Screenshots for visual checks: `godot --path . res://scenes/world/world.tscn -- --screenshot=/abs.png
-  --frames=400 --era=era_1938 --spawn=x,z,yaw --open=register|journal|map|trade|build`.
+  --frames=400 --era=era_1938 --spawn=x,z,yaw --open=register|journal|map|trade|build|menu`.
 
 ## Conventions and pitfalls
 - Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`
