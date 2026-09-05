@@ -137,17 +137,11 @@ class Scene:
         cy = math.cos(yaw) * scale; sy = math.sin(yaw) * scale
         return f'transform = Transform3D({cy:.4f}, 0, {sy:.4f}, 0, {scale}, 0, {-sy:.4f}, 0, {cy:.4f}, {x}, {y}, {z})'
 
-    def group(self, name, parent, x, z, flag=None, visible_when=True, min_chapter=0, lift=0.0):
-        sc = self.ext_res("Script", "res://scripts/interaction/conditional.gd")
-        props = f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {x}, 0, {z})\nscript = ExtResource("{sc}")'
-        if flag:
-            props += f'\nflag = "{flag}"\nvisible_when = {"true" if visible_when else "false"}'
-        if min_chapter:
-            props += f'\nmin_chapter = {min_chapter}'
+    def group(self, name, parent, x, z, lift=0.0):
+        props = self.xf(x, z)
         if lift:
-            props += f'\nmetadata/lift = {lift}'
+            props += f"\nmetadata/lift = {lift}"
         self.node(name, "Node3D", parent, props)
-
     def box(self, name, parent, size, y_center, c, x=0, z=0, rot=0):
         m = self.mat(c)
         self.node(name, "CSGBox3D", parent, f'{self.xf(x, z, rot, 1.0, y_center)}\nsize = Vector3({size[0]}, {size[1]}, {size[2]})\nmaterial = {m}')
@@ -162,14 +156,6 @@ class Scene:
         if loc: p += f'\nlocation_id = "{loc}"'
         if label: p += f'\nlabel_key = "{label}"'
         self.node(name, None, parent, p, instance=i)
-
-    def npc(self, name, parent, npc_id, knot, label, c, x, z, height=1.7, yaw=0.0, pose="stand"):
-        i = self.ext_res("PackedScene", "res://scenes/npc/npc.tscn")
-        self.node(name, None, parent, f'{self.xf(x, z, yaw)}\nnpc_id = "{npc_id}"\nknot = "{knot}"\nlabel_key = "{label}"\nbody_color = {color(c)}\nheight = {height}\npose = "{pose}"', instance=i)
-
-    def pickup(self, name, parent, item, examine, x, z):
-        i = self.ext_res("PackedScene", "res://scenes/props/pickup.tscn")
-        self.node(name, None, parent, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {x}, 0, {z})\nitem_id = "{item}"\nera_id = "{self.era}"\nexamine_key = "{examine}"', instance=i)
 
     def tree(self, name, parent, x, z, scale, yaw=0.0, scene="res://assets/vegetation/tree_juniper.tscn"):
         i = self.ext_res("PackedScene", scene)
@@ -203,60 +189,6 @@ class Scene:
             if n.startswith(f'[node name="{parent.split("/")[-1]}" ') and 'metadata/footprint' not in n:
                 self.nodes[i] = n + f'\nmetadata/footprint = Vector2({w}, {d})'
                 return
-
-    def register(self, name, parent, x, z, text_key="EX_REGISTER"):
-        rp = self.ext_res("Script", "res://scripts/interaction/register_pickup.gd")
-        self.node(name, "Node3D", parent, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {x}, 0, {z})\nscript = ExtResource("{rp}")\ntext_key = "{text_key}"')
-        path = f"{parent}/{name}" if parent != "." else name
-        self.node("BookMesh", "CSGBox3D", path, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)\nsize = Vector3(0.45, 0.12, 0.32)\nmaterial = {self.mat((0.45, 0.25, 0.1), 0.6)}')
-        self.node("Plinth", "CSGBox3D", path, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)\nsize = Vector3(0.9, 0.9, 0.7)\nmaterial = {self.mat((0.7, 0.68, 0.62))}')
-        self.collider(path, self.sub_res("SphereShape3D", "radius = 1.2", "S"), 0.6)
-
-    def story_point(self, name, parent, knot, speaker, text, loc, label, radius=1.8):
-        sp = self.ext_res("Script", "res://scripts/interaction/story_point.gd")
-        self.node(name, "Node3D", parent, f'script = ExtResource("{sp}")\nknot = "{knot}"\nspeaker_key = "{speaker}"\ntext_key = "{text}"\nlocation_id = "{loc}"\nlabel_key = "{label}"')
-        path = f"{parent}/{name}" if parent != "." else name
-        self.collider(path, self.sub_res("SphereShape3D", f"radius = {radius}", "S"), 1.0)
-
-    def farm_plots(self, origin, n, seeds):
-        """Farming: plots in a row plus a seed bin, all era-local."""
-        self.group("Farming", ".", *origin)
-        for i in range(n):
-            self.instance(f"Plot{i}", "Farming", "res://scenes/farming/farm_plot.tscn",
-                          f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {i * 5.5}, 0, 0)\nplot_id = "plot{i}"\nera_id = "{self.era}"')
-        sb = self.ext_res("Script", "res://scripts/farming/seed_bin.gd")
-        shape = self.sub_res("BoxShape3D", "size = Vector3(1.4, 1.2, 1.0)", f"SB_{self.era}_")
-        self.node("SeedBin", "Node3D", "Farming", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, 0)\nscript = ExtResource("{sb}")\nera_id = "{self.era}"\nseed_item_ids = Array[String]([{", ".join(chr(34) + x + chr(34) for x in seeds)}])')
-        self.box("Bin", "Farming/SeedBin", (1.2, 0.9, 0.8), 0.45, DARKWOOD)
-        self.collider("Farming/SeedBin", shape, 0.6)
-
-    def trade_post(self, pos, key, box_color):
-        """Trading: one post per era, era-local goods and money."""
-        sc = self.ext_res("Script", "res://scripts/trading/trade_post.gd")
-        shape = self.sub_res("BoxShape3D", "size = Vector3(2.6, 2.4, 2.2)", f"TP_{self.era}_")
-        self.node("TradePost", "Node3D", ".", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {pos[0]}, 0, {pos[1]})\nscript = ExtResource("{sc}")\nera_id = "{self.era}"\npost_name_key = "{key}"\nintro_key = "{key}_TEXT"')
-        self.footprint("TradePost", 3.0, 2.4)
-        self.box("Base", "TradePost", (3.0, 2.0, 2.4), -1.0, SKIRT)
-        self.box("Stall", "TradePost", (2.4, 1.1, 1.2), 0.55, box_color)
-        self.box("Awning", "TradePost", (2.8, 0.12, 2.0), 2.2, (0.5, 0.45, 0.3), 0, -0.3)
-        self.box("PostA", "TradePost", (0.1, 2.2, 0.1), 1.1, DARKWOOD, -1.3, -1.2)
-        self.box("PostB", "TradePost", (0.1, 2.2, 0.1), 1.1, DARKWOOD, 1.3, -1.2)
-        self.collider("TradePost", shape, 1.1)
-
-    def manor_site(self, manor_id, pos):
-        """Base building: a marker post the player builds from."""
-        sc = self.ext_res("Script", "res://scripts/base_building/manor_controller.gd")
-        shape = self.sub_res("BoxShape3D", "size = Vector3(1.6, 2.4, 1.6)", f"MS_{manor_id}_")
-        name = f"Manor_{manor_id}"
-        self.node(name, "Node3D", ".", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {pos[0]}, 0, {pos[1]})\nscript = ExtResource("{sc}")\nmanor_id = "{manor_id}"')
-        self.box("Post", name, (0.25, 2.0, 0.25), 1.0, DARKWOOD)
-        self.box("Sign", name, (1.2, 0.5, 0.08), 1.7, (0.85, 0.8, 0.6))
-        self.collider(name, shape, 1.2)
-
-    def hunting(self, max_animals=8):
-        """Hunting: a spawner that keeps animals around the player on their land cover."""
-        sc = self.ext_res("Script", "res://scripts/hunting/hunting_spawner.gd")
-        self.node("HuntingSpawner", "Node3D", ".", f'script = ExtResource("{sc}")\nera_id = "{self.era}"\nmax_animals = {max_animals}')
 
     def mesh_box(self, name, parent, size, y_center, c):
         """A BoxMesh instance: cheaper than CSG when there are hundreds (village massing)."""
@@ -461,7 +393,7 @@ class Interpreter:
             child_path = name if parent == "." else f"{parent}/{name}"
             if t == "group":
                 x, z = self.pos(n.get("at"), env)
-                s.group(name, parent, x, z, n.get("flag"), n.get("visible_when", True), int(n.get("min_chapter", 0)), self.num(n.get("lift", 0.0), env))
+                s.group(name, parent, x, z, self.num(n.get("lift", 0.0), env))
                 self.emit(s, child_path, n.get("children", []), env)
             elif t == "use":
                 frag = self.fragments.get(n.get("fragment"))
@@ -488,17 +420,6 @@ class Interpreter:
             elif t == "examine":
                 x, z = self.pos(n.get("at"), env)
                 s.examine(name, parent, self.txt(n["key"], env), self.txt(n.get("loc", ""), env), self.txt(n.get("label", ""), env), x, z)
-            elif t == "story_point":
-                s.story_point(name, parent, n["knot"], n.get("speaker", ""), self.txt(n.get("text", ""), env), n.get("loc", ""), n.get("label", ""), self.num(n.get("radius", 1.8), env))
-            elif t == "npc":
-                x, z = self.pos(n.get("at"), env)
-                s.npc(name, parent, n["id"], n["knot"], n["label"], self.col(n.get("color", [0.5, 0.4, 0.3]), env), x, z, self.num(n.get("height", 1.7), env), self.yaw(n, env), n.get("pose", "stand"))
-            elif t == "pickup":
-                x, z = self.pos(n.get("at"), env)
-                s.pickup(name, parent, n["item"], n.get("examine", ""), x, z)
-            elif t == "register":
-                x, z = self.pos(n.get("at"), env)
-                s.register(name or "RegisterBook", parent, x, z, self.txt(n.get("text", "EX_REGISTER"), env))
             elif t == "tree":
                 x, z = self.pos(n.get("at"), env)
                 s.tree(name, parent, x, z, self.num(n.get("scale", 1.0), env), self.yaw(n, env), n.get("scene", "res://assets/vegetation/tree_juniper.tscn"))
@@ -508,14 +429,6 @@ class Interpreter:
                 for i in range(int(self.num(n.get("count", 10), env))):
                     a = rng.random() * math.tau; r = rng.random() ** 0.5 * r_max
                     s.tree(f"{n.get('prefix', 'Tree')}{i}", parent, round(math.cos(a) * r, 1), round(math.sin(a) * r, 1), round(rng.uniform(smin, smax), 2), rng.random() * 6.28, n.get("scene", "res://assets/vegetation/tree_juniper.tscn"))
-            elif t == "farm_plots":
-                s.farm_plots(self.pos(n.get("at"), env), int(self.num(n.get("count", 2), env)), n.get("seeds", []))
-            elif t == "trade_post":
-                s.trade_post(self.pos(n.get("at"), env), n["key"], self.col(n.get("color", [0.7, 0.65, 0.5]), env))
-            elif t == "manor_site":
-                s.manor_site(n["id"], self.pos(n.get("at"), env))
-            elif t == "hunting":
-                s.hunting(int(self.num(n.get("max_animals", 8), env)))
             elif t == "traffic":
                 if os.path.exists(os.path.join(self.site_dir, "roads.json")):
                     s.traffic(self.num(n.get("year", 2026), env), self.num(n.get("density", 1.0), env), self.num(n.get("max_agents", 40), env))

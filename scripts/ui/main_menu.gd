@@ -45,8 +45,6 @@ func _build() -> void:
 	box.add_child(sub)
 	var where := Label.new()
 	where.text = "%s: %s" % [tr("MENU_SITE"), Sites.display_name(Sites.active)]
-	if Friends.visiting_code != "":
-		where.text += "   " + tr("MENU_VISITING") % [Friends.visiting_owner, Friends.visiting_code]
 	where.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	where.add_theme_font_size_override("font_size", 14)
 	box.add_child(where)
@@ -85,7 +83,6 @@ func _build() -> void:
 func _start_new_game(site_id: String = "") -> void:
 	if site_id != "" and site_id != Sites.active:
 		Sites.select(site_id)
-	Friends.stop_visiting()
 	GameState.reset()
 	get_tree().change_scene_to_file("res://scenes/world/world.tscn")
 
@@ -227,46 +224,6 @@ func _build_locations_panel() -> void:
 		cfg.save(Sites.SETTINGS))
 	urow.add_child(offline)
 
-	# --- friends
-	_section(list, "MENU_FRIENDS")
-	var frow := HBoxContainer.new()
-	list.add_child(frow)
-	var code := Friends.my_code(Sites.active)
-	var share := Button.new()
-	share.text = tr("MENU_WORLD_CODE") % code if code != "" else tr("MENU_SHARE_WORLD")
-	share.add_theme_font_size_override("font_size", 16)
-	share.pressed.connect(func():
-		_status.text = "..."
-		var res: Dictionary = await Friends.publish()
-		if res.ok:
-			share.text = tr("MENU_WORLD_CODE") % res.code
-			DisplayServer.clipboard_set(res.code)
-			_status.text = tr("MENU_WORLD_CODE") % res.code
-		else:
-			_status.text = str(res.error))
-	frow.add_child(share)
-	var vl := Label.new()
-	vl.text = "   " + tr("MENU_VISIT") + ": "
-	frow.add_child(vl)
-	_code_edit = LineEdit.new()
-	_code_edit.placeholder_text = "ABC234"
-	_code_edit.custom_minimum_size = Vector2(110, 0)
-	_code_edit.max_length = 6
-	frow.add_child(_code_edit)
-	_small(frow, "MENU_VISIT_GO", func():
-		_status.text = "..."
-		var cb := func(t: String): _status.text = t
-		Friends.status.connect(cb)
-		Locator.progress.connect(cb)
-		var res: Dictionary = await Friends.visit(_code_edit.text)
-		Friends.status.disconnect(cb)
-		Locator.progress.disconnect(cb)
-		if not res.ok:
-			_status.text = str(res.error)
-			return
-		GameState.reset()
-		get_tree().change_scene_to_file("res://scenes/world/world.tscn"))
-
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -396,7 +353,7 @@ func _create(name: String, x: float, y: float, id_override: String = "") -> void
 	var cb := func(t: String): _status.text = t
 	Locator.progress.connect(cb)
 	_status.text = tr("MENU_GENERATING") % "..."
-	var res: Dictionary = await Locator.create_world(name, x, y, 1024, "1798,1938,2026", id_override)
+	var res: Dictionary = await Locator.create_world(name, x, y, 1024, "2026", id_override)
 	Locator.progress.disconnect(cb)
 	if not res.ok:
 		_status.text = str(res.error)

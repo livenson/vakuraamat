@@ -199,7 +199,7 @@ class Handler(BaseHTTPRequestHandler):
         name = str(req.get("name") or "Site").strip()[:60]
         sid = slug(str(req.get("id") or name))
         size = int(req.get("size") or 1024)
-        eras = str(req.get("eras") or "1798,1938,2026")
+        eras = "2026"   # the present-day layer; older eras belong to the historical game (tag v0.9-historical)
         if not (369000 < x < 740000 and 6377000 < y < 6635000):
             return self._json(400, {"error": "outside Estonia"})
         with LOCK:

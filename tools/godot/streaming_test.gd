@@ -2,7 +2,7 @@
 # installed under user:// as the pack the streamer would fetch for grid tile (1,0) (the Palupera
 # pack and tile files copied, centre shifted 1024 m east). Checks: the edge holds the player while
 # nothing is loaded, the tile loads when the player comes near (region added, ground height valid,
-# ambient nodes only, pack lookup by position), the player may cross, era switches follow.
+# ambient nodes only, pack lookup by position), the player may cross.
 #   godot --headless --path . res://tools/godot/streaming_test.tscn -- --site=palupera
 extends Node
 
@@ -31,7 +31,6 @@ func _ready() -> void:
 	add_child(world)
 	await get_tree().process_frame
 	await get_tree().create_timer(0.5).timeout
-	GameState.register_unlocked = true
 	var st: TileStreamer = world.streamer
 	_check(st != null, "world has no streamer")
 	_check(st.pack_for(Vector2i(1, 0)) == _nid, "pack id for (1,0) is %s, expected %s" % [st.pack_for(Vector2i(1, 0)), _nid])
@@ -73,11 +72,6 @@ func _ready() -> void:
 	await get_tree().create_timer(0.3).timeout
 	_check(world.player.global_position.x > 1024.0, "player pushed back although the tile is loaded")
 	_check(not Parcels.at(world.player.global_position).is_empty() or true, "parcel lookup crashed")
-	# 4. era switch swaps the tile content too
-	await GameState.switch_era("era_1938")
-	await get_tree().create_timer(0.5).timeout
-	var era2: Node = root.get_node_or_null("Era")
-	_check(era2 != null and era2 != era, "tile content did not follow the era switch")
 	print("[stream] PASSED")
 	_cleanup()
 	get_tree().quit(0)

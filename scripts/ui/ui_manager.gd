@@ -1,12 +1,11 @@
-# All in-game UI, built in code: HUD, notices, dialogue box, the register (era switch),
-# inventory, journal (ledger + maps), chapter notices and the ending. Opening any panel
-# blocks player input and frees the mouse.
+# All in-game UI, built in code: HUD (place, month, clock, cash), notices, the vakuraamat book
+# (LedgerPanel, Tab), the town feed (NewsPanel, N), the journal, the K codes overlay, the debug map,
+# the pause menu and F8 reports. Opening any panel frees the mouse and blocks gameplay input.
 extends CanvasLayer
 
 const GOLD := Color(0.85, 0.68, 0.25)
 const PAPER := Color(0.93, 0.88, 0.76)
 const INK := Color(0.16, 0.12, 0.08)
-var _locations := {}   # LOC_* -> tile metres, from the site's layout.json via manifest "locations"
 
 var world: Node3D
 var player: CharacterBody3D
@@ -22,31 +21,13 @@ var era_label: Label
 var keys_label: Label
 var _notice_tween: Tween
 
-var dialogue: PanelContainer
-var speaker_label: Label
-var text_label: RichTextLabel
-var choice_box: VBoxContainer
-var _line_queue: Array = []
-var _pending_choices: Array = []
-var _dialogue_ended := false
 
-var register: PanelContainer
-var inventory: PanelContainer
 var journal: PanelContainer
-var ledger_box: VBoxContainer
-var map_slider: HSlider
-var map_rects: Dictionary = {}
-var map_markers: Control
-var ending: PanelContainer
-var trade: PanelContainer
-var _trade_post: TradePost = null
-var build: PanelContainer
-var _manor_ctl: ManorController = null
 var debug_map: PanelContainer
 var pause: PanelContainer
 var report_panel: PanelContainer
 var codes_label: Label            # K: cadastral number, building codes, road, registry links
-var ledger_panel: LedgerPanel    # V (Tab once the register goes): the town's book
+var ledger_panel: LedgerPanel    # Tab: the town's book
 var _guide: Dictionary = {}      # {tunnus, pos, label}: the plot the HUD arrow points at
 var news_panel: NewsPanel        # N: the town feed
 var codes_on := false
@@ -60,23 +41,12 @@ var _open_panel: Control = null
 
 func _ready() -> void:
 	var layout: Dictionary = Sites.layout()
-	var locs: Dictionary = Sites.get_value("locations", {})
-	for loc_key in locs:
-		var v: Array = layout.get(str(locs[loc_key]), [])
-		if v.size() >= 2:
-			_locations[loc_key] = Vector2(float(v[0]), float(v[1]))
 	world = get_parent()
 	player = world.get_node("Player")
 	interactor = player.get_node("Camera3D/Interactor")
 	interactor.target_changed.connect(_on_target_changed)
 	_build_hud()
-	_build_dialogue()
-	register = _build_panel("UI_REGISTER_TITLE")
-	inventory = _build_panel("UI_INVENTORY")
 	journal = _build_panel("UI_JOURNAL")
-	ending = _build_panel("")
-	trade = _build_panel("UI_TRADE")
-	build = _build_panel("UI_BUILD")
 	debug_map = _build_panel("UI_DEBUG_MAP")
 	pause = _build_panel("UI_MENU")
 	report_panel = _build_panel("UI_REPORT_TITLE")
@@ -107,17 +77,6 @@ func _ready() -> void:
 	move_child($Fade, get_child_count() - 1)
 	EventBus.notice.connect(show_notice)
 	EventBus.era_changed.connect(func(_e): _refresh_era_label())
-	EventBus.chapter_committed.connect(_on_chapter_committed)
-	EventBus.register_opened.connect(func(): show_notice(tr("UI_REGISTER_TITLE")))
-	EventBus.flag_changed.connect(func(f, v):
-		if f == _ending_flag() and v:
-			call_deferred("_show_ending"))
-	EventBus.item_added.connect(func(_i, _e):
-		if _open_panel == inventory:
-			_fill_inventory())
-	Narrative.line.connect(_on_line)
-	Narrative.choices.connect(_on_choices)
-	Narrative.ended.connect(_on_dialogue_ended)
 	_refresh_era_label()
 
 
@@ -138,27 +97,6 @@ func _process(_delta: float) -> void:
 func _heading_deg() -> float:
 	var fwd := -player.global_transform.basis.z
 	return fmod(rad_to_deg(atan2(fwd.x, -fwd.z)) + 360.0, 360.0)
-
-
-## The first matching rule of the site manifest's "objectives": {when: register_locked} |
-## {chapter, flag, not_flag} conditions, "key" for the HUD text, optional "target" node name
-## (with "era" and "lift") for the marker.
-func _current_objective() -> Dictionary:
-	for o in Sites.get_value("objectives", []):
-		if o.get("when", "") == "register_locked":
-			if not GameState.register_unlocked:
-				return o
-			continue
-		if not GameState.register_unlocked:
-			continue
-		if o.has("chapter") and GameState.chapter != int(o.chapter):
-			continue
-		if o.has("flag") and not TimelineState.has_flag(str(o.flag)):
-			continue
-		if o.has("not_flag") and TimelineState.has_flag(str(o.not_flag)):
-			continue
-		return o
-	return {}
 
 
 ## Point the HUD arrow at a plot (again on the same plot: clear it).
@@ -190,26 +128,15 @@ func teleport_to(tunnus: String) -> void:
 	show_notice(tr("NOTICE_TELEPORT") % [int(p.x), int(p.z)])
 
 
-## World position of the current objective, or null.
+## World position the HUD arrow points at (the guided plot), or null.
 func _objective_target() -> Variant:
-	if not _guide.is_empty():
-		if player.global_position.distance_to(_guide.pos) < 12.0:
-			show_notice(tr("NOTICE_GUIDE_ARRIVED") % str(_guide.label))
-			_guide = {}
-		else:
-			return _guide.pos
-	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
-	if layer == null:
+	if _guide.is_empty():
 		return null
-	var o := _current_objective()
-	if not o.has("target") or (o.has("era") and GameState.current_era != str(o.era)):
+	if player.global_position.distance_to(_guide.pos) < 12.0:
+		show_notice(tr("NOTICE_GUIDE_ARRIVED") % str(_guide.label))
+		_guide = {}
 		return null
-	var n: Node = layer.find_child(str(o.target), true, false)
-	return n.global_position + Vector3(0, float(o.get("lift", 1.5)), 0) if n else null
-
-
-func _ending_flag() -> String:
-	return str(Sites.get_value("ending", {}).get("trigger_flag", "epilogue"))
+	return _guide.pos
 
 
 func _draw_marker() -> void:
@@ -335,32 +262,6 @@ func _label(parent: Control, size: int) -> Label:
 	return l
 
 
-func _build_dialogue() -> void:
-	dialogue = PanelContainer.new()
-	dialogue.set_anchors_preset(Control.PRESET_BOTTOM_WIDE)
-	dialogue.offset_left = 160
-	dialogue.offset_right = -160
-	dialogue.offset_top = -260
-	dialogue.offset_bottom = -30
-	dialogue.visible = false
-	add_child(dialogue)
-	var v := VBoxContainer.new()
-	v.add_theme_constant_override("separation", 8)
-	dialogue.add_child(v)
-	speaker_label = Label.new()
-	speaker_label.add_theme_font_size_override("font_size", 18)
-	speaker_label.add_theme_color_override("font_color", GOLD)
-	v.add_child(speaker_label)
-	text_label = RichTextLabel.new()
-	text_label.bbcode_enabled = true
-	text_label.fit_content = true
-	text_label.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	text_label.add_theme_font_size_override("normal_font_size", 20)
-	v.add_child(text_label)
-	choice_box = VBoxContainer.new()
-	v.add_child(choice_box)
-
-
 func _center_panel(p: Control) -> void:
 	p.set_anchors_and_offsets_preset(Control.PRESET_CENTER, Control.PRESET_MODE_MINSIZE)
 	p.grow_horizontal = Control.GROW_DIRECTION_BOTH
@@ -388,8 +289,7 @@ func _build_panel(title_key: String) -> PanelContainer:
 
 # ---------------------------------------------------------------- HUD
 func _objective() -> String:
-	var o := _current_objective()
-	return tr(str(o.key)) if o.has("key") else ""
+	return tr("NOTICE_GUIDE_SET") % str(_guide.label) if not _guide.is_empty() else ""
 
 
 func _refresh_era_label() -> void:
@@ -397,14 +297,8 @@ func _refresh_era_label() -> void:
 	if era == null:
 		era_label.text = ""
 		return
-	var chap := ""
-	match GameState.chapter:
-		0: chap = ""
-		4: chap = "  ·  " + tr("UI_EPILOGUE")
-		_: chap = "  ·  " + tr("UI_CHAPTER") % GameState.chapter
-	era_label.text = "%s  %s   %s%s" % [era.year_label, tr(era.display_name_key), world.clock_string(), chap]
-	if Ledger.local() != null:
-		era_label.text = "%s   %s   %s   %s%s" % [Sites.display_name(Sites.active), Ledger.date_string(), world.clock_string(), Ledger.format_money(Ledger.cash()), chap]
+	var badge := ("   ·   " + tr("UI_ONLINE") % Ledger.town_name) if Ledger.online else ""
+	era_label.text = "%s   %s   %s   %s%s" % [Sites.display_name(Sites.active), Ledger.date_string(), world.clock_string(), Ledger.format_money(Ledger.cash()), badge]
 	var obj := _objective()
 	if obj != "":
 		era_label.text += "\n" + obj
@@ -433,14 +327,6 @@ func show_notice(text: String) -> void:
 	_notice_tween.tween_property(notice_label, "modulate:a", 0.0, 1.0)
 
 
-func _on_chapter_committed(chapter: int) -> void:
-	if chapter == 0:
-		return
-	var key := "UI_CHAPTER_COMMIT_FIRST" if not TimelineState.has_flag("told_commit") else "UI_CHAPTER_COMMIT"
-	TimelineState.set_flag("told_commit", true)
-	show_notice(tr(key) % str(chapter) if key == "UI_CHAPTER_COMMIT" else tr(key))
-
-
 # ---------------------------------------------------------------- panels
 func _open(p: Control) -> void:
 	if _open_panel and _open_panel != p:
@@ -454,8 +340,7 @@ func _close() -> void:
 	if _open_panel:
 		_open_panel.visible = false
 		_open_panel = null
-	if not dialogue.visible:
-		_set_gameplay_input(true)
+	_set_gameplay_input(true)
 
 
 func _set_gameplay_input(on: bool) -> void:
@@ -476,12 +361,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if _open_panel == pause:
 		return
-	if dialogue.visible:
-		if event.is_action_pressed("interact") or event.is_action_pressed("ui_accept") \
-				or (event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT):
-			_next_line()
-			get_viewport().set_input_as_handled()
-		return
 	if event.is_action_pressed("codes"):
 		_toggle_codes()
 		return
@@ -496,10 +375,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		_toggle(news_panel, news_panel.fill)
 	elif event.is_action_pressed("buy_here"):
 		_buy_here()
-	elif event.is_action_pressed("register"):
-		_toggle(register, _fill_register)
-	elif event.is_action_pressed("inventory"):
-		_toggle(inventory, _fill_inventory)
 	elif event.is_action_pressed("journal"):
 		_toggle(journal, _fill_journal)
 	elif event.is_action_pressed("debug_map"):
@@ -516,17 +391,13 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _filler_for(p: Control) -> Callable:
-	var fillers := {register: _fill_register, ledger_panel: ledger_panel.fill, news_panel: news_panel.fill, report_panel: _fill_report,
-		inventory: _fill_inventory, debug_map: _fill_debug_map, pause: _fill_pause}
+	var fillers := {ledger_panel: ledger_panel.fill, news_panel: news_panel.fill, report_panel: _fill_report, debug_map: _fill_debug_map, pause: _fill_pause}
 	return fillers.get(p, _fill_journal)
 
 
 func _toggle(p: PanelContainer, fill: Callable) -> void:
 	if _open_panel == p:
 		_close()
-		return
-	if p == register and not GameState.register_unlocked:
-		show_notice(tr("UI_REGISTER_LOCKED"))
 		return
 	fill.call()
 	_open(p)
@@ -711,349 +582,18 @@ func _pause_button(body: VBoxContainer, text: String, cb: Callable) -> Button:
 	return b
 
 
-# --- register: the era switch
-func _fill_register() -> void:
-	var body := _clear_body(register)
-	body.get_node("Title").text = tr("UI_REGISTER_TITLE")
-	var hint := Label.new()
-	hint.text = tr("UI_REGISTER_HINT")
-	body.add_child(hint)
-	for era in GameState.eras_in_order():
-		var b := Button.new()
-		var mark := ""
-		for e in Journal.entries:
-			if era.id in e.era_to and not TimelineState.has_flag("seen_%s_%s" % [e.flag, era.id]):
-				mark = "   ✦"
-		var nd: Dictionary = Sites.get_value("register_nudge", {})
-		var nudge := "   ←" if (not nd.is_empty() and GameState.chapter == int(nd.get("chapter", 1)) and era.id == str(nd.get("era", "")) and not GameState.visited_eras.has(era.id)) else ""
-		b.text = "%s   %s%s%s" % [era.year_label, tr(era.display_name_key), mark, nudge]
-		b.add_theme_font_size_override("font_size", 24)
-		b.disabled = era.id == GameState.current_era
-		b.pressed.connect(_on_era_pressed.bind(era.id))
-		body.add_child(b)
-	var closeb := Button.new()
-	closeb.text = tr("UI_CLOSE")
-	closeb.pressed.connect(_close)
-	body.add_child(closeb)
-
-
-func _on_era_pressed(era_id: String) -> void:
-	_close()
-	var left: Array = Inventory.local_items(GameState.current_era)
-	if left.size() > 0 and not TimelineState.has_flag("taught_local_items"):
-		TimelineState.set_flag("taught_local_items", true)
-		show_notice(tr("NOTICE_LEFT_BEHIND") % tr(GameState.item(left[0]).display_name_key))
-	await GameState.switch_era(era_id)
-	for e in Journal.entries:
-		if era_id in e.era_to:
-			TimelineState.flags["seen_%s_%s" % [e.flag, era_id]] = true
-
-
-# --- inventory
-func _fill_inventory() -> void:
-	var body := _clear_body(inventory)
-	body.get_node("Title").text = tr("UI_INVENTORY")
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 24)
-	h.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	body.add_child(h)
-	for tier in [["UI_ARTIFACTS", Inventory.artifacts, true], ["UI_LOCAL_ITEMS", Inventory.local_items(GameState.current_era), false]]:
-		var col := VBoxContainer.new()
-		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		h.add_child(col)
-		var t := Label.new()
-		t.text = tr(tier[0])
-		t.add_theme_font_size_override("font_size", 20)
-		if tier[2]:
-			t.add_theme_color_override("font_color", GOLD)
-		col.add_child(t)
-		if tier[1].is_empty():
-			var e := Label.new()
-			e.text = tr("UI_EMPTY")
-			col.add_child(e)
-		for id in tier[1]:
-			var item := GameState.item(id)
-			var row := PanelContainer.new()
-			var vb := VBoxContainer.new()
-			row.add_child(vb)
-			var n := Label.new()
-			n.text = ("✦ " if tier[2] else "· ") + tr(item.display_name_key)
-			n.add_theme_font_size_override("font_size", 18)
-			if tier[2]:
-				n.add_theme_color_override("font_color", GOLD)
-			vb.add_child(n)
-			var d := Label.new()
-			d.text = tr(item.description_key)
-			d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			vb.add_child(d)
-			col.add_child(row)
-	var closeb := Button.new()
-	closeb.text = tr("UI_CLOSE")
-	closeb.pressed.connect(_close)
-	body.add_child(closeb)
-
-
-# --- journal: ledger + maps
-func _fill_journal() -> void:
-	var body := _clear_body(journal)
-	body.get_node("Title").text = tr("UI_JOURNAL")
-	var tabs := TabContainer.new()
-	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	body.add_child(tabs)
-	# ledger
-	var scroll := ScrollContainer.new()
-	scroll.name = tr("UI_LEDGER")
-	tabs.add_child(scroll)
-	ledger_box = VBoxContainer.new()
-	ledger_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	ledger_box.add_theme_constant_override("separation", 10)
-	scroll.add_child(ledger_box)
-	if Journal.entries.is_empty():
-		var e := Label.new()
-		e.text = tr("UI_LEDGER_EMPTY")
-		ledger_box.add_child(e)
-	for e in Journal.entries:
-		var l := Label.new()
-		l.text = "%s  —  %s" % [e.get("game_time", ""), tr(e.text_key)]
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		l.custom_minimum_size = Vector2(700, 0)
-		ledger_box.add_child(l)
-	# maps
-	var maps := VBoxContainer.new()
-	maps.name = tr("UI_MAPS")
-	tabs.add_child(maps)
-	var stack := Control.new()
-	stack.custom_minimum_size = Vector2(400, 400)
-	stack.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	maps.add_child(stack)
-	map_rects.clear()
-	var order := GameState.eras_in_order()
-	for era in order:
-		var id: String = era.id
-		var r := TextureRect.new()
-		r.texture = era.texture()
-		r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		r.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		r.set_anchors_preset(Control.PRESET_FULL_RECT)
-		stack.add_child(r)
-		map_rects[id] = r
-	map_markers = Control.new()
-	map_markers.set_anchors_preset(Control.PRESET_FULL_RECT)
-	map_markers.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	stack.add_child(map_markers)
-	map_markers.draw.connect(_draw_markers.bind(map_markers))
-	var row := HBoxContainer.new()
-	maps.add_child(row)
-	var l1 := Label.new()
-	l1.text = order[0].year_label if not order.is_empty() else ""
-	row.add_child(l1)
-	map_slider = HSlider.new()
-	map_slider.min_value = 0
-	map_slider.max_value = maxi(order.size() - 1, 1)
-	map_slider.step = 0.01
-	map_slider.value = map_slider.max_value
-	map_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	map_slider.value_changed.connect(func(_v): _update_map_blend())
-	row.add_child(map_slider)
-	var l3 := Label.new()
-	l3.text = order[-1].year_label if not order.is_empty() else ""
-	row.add_child(l3)
-	_update_map_blend()
-	# codex: what is attested history and what is invented (design doc 6)
-	var codex := ScrollContainer.new()
-	codex.name = tr("UI_CODEX")
-	tabs.add_child(codex)
-	var cb := VBoxContainer.new()
-	cb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	cb.add_theme_constant_override("separation", 8)
-	codex.add_child(cb)
-	for k in Sites.get_value("codex", []):
-		var h := Label.new()
-		h.text = tr(k + "_TITLE")
-		h.add_theme_color_override("font_color", GOLD)
-		h.add_theme_font_size_override("font_size", 18)
-		cb.add_child(h)
-		var t := Label.new()
-		t.text = tr(k)
-		t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		t.custom_minimum_size = Vector2(700, 0)
-		cb.add_child(t)
-	var closeb := Button.new()
-	closeb.text = tr("UI_CLOSE")
-	closeb.pressed.connect(_close)
-	body.add_child(closeb)
-
-
-# --- trading (Phase 4): era-local goods for era-local money
-func open_trade(post: TradePost) -> void:
-	_trade_post = post
-	_fill_trade()
-	_open(trade)
-
-
-func _fill_trade() -> void:
-	var era: String = _trade_post.era_id
-	var body := _clear_body(trade)
-	body.get_node("Title").text = tr(_trade_post.post_name_key)
-	var bal := Label.new()
-	bal.text = tr("UI_BALANCE") % Trading.format_money(Trading.balance(era), era)
-	bal.add_theme_font_size_override("font_size", 18)
-	bal.add_theme_color_override("font_color", GOLD)
-	body.add_child(bal)
-	var h := HBoxContainer.new()
-	h.add_theme_constant_override("separation", 24)
-	h.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	body.add_child(h)
-	for side in [["UI_SELL", true], ["UI_BUY", false]]:
-		var col := VBoxContainer.new()
-		col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		h.add_child(col)
-		var t := Label.new()
-		t.text = tr(side[0])
-		t.add_theme_font_size_override("font_size", 20)
-		col.add_child(t)
-		var scroll := ScrollContainer.new()
-		scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
-		col.add_child(scroll)
-		var list := VBoxContainer.new()
-		list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		scroll.add_child(list)
-		var bag: Array = Inventory.local_items(era)
-		for g in Trading.goods_for(era):
-			var selling: bool = side[1]
-			var price: int = g.sell_price if selling else g.buy_price
-			if price <= 0:
-				continue
-			var item := GameState.item(g.item_id)
-			var count: int = bag.count(g.item_id)
-			if selling and count == 0:
-				continue
-			var b := Button.new()
-			b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-			b.text = "%s%s   %s" % [tr(item.display_name_key), ("  ×%d" % count) if selling else "", Trading.format_money(price, era)]
-			b.disabled = (not selling) and Trading.balance(era) < price
-			b.pressed.connect(_on_trade.bind(g, selling))
-			list.add_child(b)
-	var closeb := Button.new()
-	closeb.text = tr("UI_CLOSE")
-	closeb.pressed.connect(_close)
-	body.add_child(closeb)
-
-
-func _on_trade(g: TradeGood, selling: bool) -> void:
-	var era: String = _trade_post.era_id
-	var ok: bool = Trading.sell(g, era) if selling else Trading.buy(g, era)
-	if not ok:
-		show_notice(tr("TRADE_NO_MONEY") if not selling else tr("TRADE_NOTHING_TO_SELL"))
-	_fill_trade()
-
-
-# --- base building (Phase 5): one panel, no spreadsheet
-func open_build(ctl: ManorController) -> void:
-	_manor_ctl = ctl
-	_fill_build()
-	_open(build)
-
-
-func _fill_build() -> void:
-	var m: ManorDefinition = _manor_ctl.manor
-	var body := _clear_body(build)
-	body.get_node("Title").text = tr(m.display_name_key)
-	var info := Label.new()
-	info.text = tr("BUILD_LEVEL") % [tr(m.display_name_key), Manors.development_level(m.id), m.structures.size()] + "   ·   " + tr("UI_BALANCE") % Trading.format_money(Trading.balance(m.era_id), m.era_id)
-	body.add_child(info)
-	var parcel := Label.new()
-	parcel.text = "Katastritunnus / cadastral unit: " + m.cadastral_parcel_id
-	parcel.add_theme_font_size_override("font_size", 13)
-	body.add_child(parcel)
-	for sid in m.structures:
-		var st: StructureDefinition = Manors.structures[sid]
-		var row := PanelContainer.new()
-		var vb := VBoxContainer.new()
-		row.add_child(vb)
-		var h := HBoxContainer.new()
-		vb.add_child(h)
-		var n := Label.new()
-		n.text = tr(st.display_name_key)
-		n.add_theme_font_size_override("font_size", 18)
-		n.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		h.add_child(n)
-		var why := Manors.can_build(m, st)
-		var b := Button.new()
-		b.text = tr("BUILD_ALREADY") if why == "BUILD_ALREADY" else tr("BUILD_PROMPT")
-		b.disabled = why != ""
-		b.pressed.connect(func():
-			Manors.build(m, st)
-			_fill_build())
-		h.add_child(b)
-		var d := Label.new()
-		var cost := []
-		for item in st.cost_items:
-			cost.append("%d × %s" % [int(st.cost_items[item]), tr(GameState.item(item).display_name_key)])
-		cost.append(Trading.format_money(st.cost_money, m.era_id))
-		d.text = tr(st.description_key) + "\n" + tr("BUILD_COST") % ", ".join(cost) + (("   ·   " + tr(why) % tr(Manors.structures[st.requires].display_name_key)) if why == "BUILD_REQUIRES" else ("   ·   " + tr(why) if why != "" and why != "BUILD_ALREADY" else ""))
-		d.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		d.add_theme_font_size_override("font_size", 14)
-		vb.add_child(d)
-		body.add_child(row)
-	var closeb := Button.new()
-	closeb.text = tr("UI_CLOSE")
-	closeb.pressed.connect(_close)
-	body.add_child(closeb)
-
-
 # --- debug map (temporary): everything in the current era, click to teleport
 const DEBUG_COLORS := {
-	"NPC": Color(1.0, 0.8, 0.2), "Pickup": Color(0.4, 1.0, 0.4), "Examinable": Color(1, 1, 1),
-	"StoryPoint": Color(1.0, 0.55, 0.2), "FarmPlot": Color(0.7, 0.45, 0.2), "SeedBin": Color(0.9, 0.6, 0.3),
-	"TradePost": Color(0.3, 0.9, 1.0), "ManorController": Color(1.0, 0.4, 0.9), "Animal": Color(0.8, 0.8, 0.5),
-	"register": Color(1.0, 0.25, 0.25),
+	"Examinable": Color(1, 1, 1), "Bicycle": Color(0.3, 0.9, 1.0),
 }
 
 
 func _fill_debug_map() -> void:
 	var body := _clear_body(debug_map)
-	body.get_node("Title").text = tr("UI_DEBUG_MAP") + "   ·   " + GameState.current_era + "   ·   " + tr("UI_CHAPTER") % GameState.chapter
+	body.get_node("Title").text = tr("UI_DEBUG_MAP") + "   ·   " + Sites.active + "   ·   " + Ledger.date_string()
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 	body.add_child(row)
-	for era in GameState.eras_in_order():
-		var b := Button.new()
-		b.text = era.year_label
-		b.disabled = era.id == GameState.current_era
-		b.pressed.connect(func():
-			GameState.register_unlocked = true
-			await GameState.switch_era(era.id)
-			_fill_debug_map())
-		row.add_child(b)
-	var bc := Button.new()
-	bc.text = tr("UI_CHAPTER") % (GameState.chapter + 1) + " →"
-	bc.pressed.connect(func():
-		GameState.register_unlocked = true
-		GameState.end_chapter()
-		_fill_debug_map())
-	row.add_child(bc)
-	var ba := Button.new()
-	ba.text = "+ artifacts"
-	ba.pressed.connect(func():
-		for id in ["register_page", "ploughshare", "manor_key", "aino_letter"]:
-			if not Inventory.has(id):
-				Inventory.add(id))
-	row.add_child(ba)
-	var bf := Button.new()
-	bf.text = "+ all flags"
-	bf.pressed.connect(func():
-		for cp in GameState.consequence_points.values():
-			TimelineState.set_flag(cp.flag_name, true)
-		_fill_debug_map())
-	row.add_child(bf)
-	var bm := Button.new()
-	bm.text = "+ money/seed"
-	bm.pressed.connect(func():
-		Trading.add_money(GameState.current_era, 500)
-		for c in Farming.crops_for_era(GameState.current_era):
-			Inventory.add(c.seed_item_id))
-	row.add_child(bm)
 	var be := Button.new()
 	be.text = "+ 50 000 €"
 	be.pressed.connect(func():
@@ -1124,8 +664,6 @@ func _draw_debug_map(c: Control) -> void:
 			for k in DEBUG_COLORS:
 				if n.get_class() == k or (n.get_script() and n.get_script().get_global_name() == k):
 					kind = k
-			if n.name == "RegisterBook":
-				kind = "register"
 			var p: Vector2 = origin + (Vector2(n.global_position.x, n.global_position.z) - off) / 1024.0 * side
 			var col: Color = DEBUG_COLORS.get(kind, Color.WHITE)
 			c.draw_circle(p, 5, col)
@@ -1182,9 +720,7 @@ func _debug_map_input(event: InputEvent) -> void:
 ## Debug hook for verification runs: open a panel by name.
 func debug_open(which: String) -> void:
 	match which:
-		"register": _toggle(register, _fill_register)
 		"journal": _toggle(journal, _fill_journal)
-		"inventory": _toggle(inventory, _fill_inventory)
 		"map": _toggle(debug_map, _fill_debug_map)
 		"ledger": _toggle(ledger_panel, ledger_panel.fill)
 		"town":
@@ -1192,160 +728,49 @@ func debug_open(which: String) -> void:
 			_toggle(ledger_panel, ledger_panel.fill)
 		"news": _toggle(news_panel, news_panel.fill)
 		"menu": _toggle(pause, _fill_pause)
-		"trade", "build":
-			var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
-			if layer:
-				var n: Node = layer.find_child("TradePost", true, false) if which == "trade" else _debug_build_node(layer)
-				if n:
-					n.interact(player)
 
 
-## The manor the debug "build" hook opens: the manifest's debug.build_node, else the first one.
-func _debug_build_node(layer: Node) -> Node:
-	var bn: String = str(Sites.get_value("debug", {}).get("build_node", ""))
-	var n: Node = layer.find_child(bn, true, false) if bn != "" else null
-	if n == null:
-		var all := layer.find_children("*", "ManorController", true, false)
-		n = all[0] if not all.is_empty() else null
-	return n
-
-
-func _update_map_blend() -> void:
-	# slider 0..N-1 across the eras in order; each upper layer fades in over the ones below
-	var v: float = map_slider.value
-	var order := GameState.eras_in_order()
-	for i in order.size():
-		var r: TextureRect = map_rects.get(order[i].id)
-		if r:
-			r.modulate.a = 1.0 if i == 0 else clampf(v - (i - 1), 0.0, 1.0)
-	map_markers.queue_redraw()
-
-
-func _draw_markers(c: Control) -> void:
-	var size := c.size
-	var side := minf(size.x, size.y)
-	var origin := (size - Vector2(side, side)) * 0.5
-	for id in _locations:
-		if not Journal.visited.has(id):
-			continue
-		var p: Vector2 = origin + _locations[id] / 1024.0 * side
-		c.draw_circle(p, 6, GOLD)
-		c.draw_circle(p, 6, INK, false, 1.5)
-		c.draw_string(ThemeDB.fallback_font, p + Vector2(9, 5), tr(id), HORIZONTAL_ALIGNMENT_LEFT, -1, 14, INK)
-	# the player
-	var pp := Vector2(player.global_position.x, player.global_position.z)
-	c.draw_circle(origin + pp / 1024.0 * side, 4, Color.WHITE)
-
-
-# ---------------------------------------------------------------- dialogue
-func _on_line(text: String, speaker: String, _tags: Array) -> void:
-	_line_queue.append([speaker, text])
-	if not dialogue.visible:
-		dialogue.visible = true
-		_dialogue_ended = false
-		_set_gameplay_input(false)
-		_next_line()
-
-
-func _on_choices(options: Array) -> void:
-	_pending_choices = options
-	if _line_queue.is_empty():
-		_show_choices()
-
-
-func _on_dialogue_ended() -> void:
-	_dialogue_ended = true
-	if _line_queue.is_empty():
-		_end_dialogue()
-
-
-func _next_line() -> void:
-	if not _line_queue.is_empty():
-		var l: Array = _line_queue.pop_front()
-		speaker_label.text = tr(l[0]) if l[0] != "" else ""
-		text_label.text = l[1]
-		for c in choice_box.get_children():
-			c.queue_free()
-		if _line_queue.is_empty() and not _pending_choices.is_empty():
-			_show_choices()
-		elif _line_queue.is_empty() and _dialogue_ended:
-			var b := Button.new()
-			b.text = tr("UI_CLOSE")
-			b.pressed.connect(_end_dialogue)
-			choice_box.add_child(b)
-		return
-	if not _pending_choices.is_empty():
-		return
-	if _dialogue_ended:
-		_end_dialogue()
-
-
-func _show_choices() -> void:
-	for c in choice_box.get_children():
-		c.queue_free()
-	for o in _pending_choices:
-		var b := Button.new()
-		b.text = o.text
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		b.add_theme_font_size_override("font_size", 18)
-		b.pressed.connect(_choose.bind(o.index))
-		choice_box.add_child(b)
-
-
-func _choose(index: int) -> void:
-	_pending_choices = []
-	for c in choice_box.get_children():
-		c.queue_free()
-	Narrative.choose(index)
-
-
-func _end_dialogue() -> void:
-	dialogue.visible = false
-	_line_queue.clear()
-	_pending_choices = []
-	if _open_panel == null:
-		_set_gameplay_input(true)
-
-
-# ---------------------------------------------------------------- ending
-## Ending tier from the site manifest "ending": count the "counted_flags" that are set, note the
-## optional "bonus_flag", pick the first tier whose min_kept (and bonus, if required) is met.
-func _show_ending() -> void:
-	var rules: Dictionary = Sites.get_value("ending", {})
-	var counted: Array = rules.get("counted_flags", [])
-	var kept := 0
-	for f in counted:
-		if TimelineState.has_flag(str(f)):
-			kept += 1
-	var bonus_flag := str(rules.get("bonus_flag", ""))
-	var bonus := bonus_flag != "" and TimelineState.has_flag(bonus_flag)
-	var key := ""
-	for tier in rules.get("tiers", []):
-		if kept >= int(tier.get("min_kept", 0)) and (bonus or not bool(tier.get("bonus", false))):
-			key = str(tier.get("key", ""))
-			break
-	var body := _clear_body(ending)
-	body.get_node("Title").text = tr(key + "_TITLE") if key != "" else ""
-	var t := Label.new()
-	t.text = tr(key) if key != "" else ""
-	if bonus and kept < counted.size() and rules.has("partial_key"):
-		t.text += "\n\n" + tr(str(rules.partial_key))
-	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	t.custom_minimum_size = Vector2(700, 0)
-	t.add_theme_font_size_override("font_size", 19)
-	body.add_child(t)
-	var kept_l := Label.new()
-	kept_l.text = tr("ENDING_KEPT") % [kept, counted.size()]
-	body.add_child(kept_l)
-	var again := Button.new()
-	again.text = tr("UI_PLAY_AGAIN")
-	again.pressed.connect(func():
-		GameState.reset()
-		get_tree().change_scene_to_file("res://scenes/ui/main_menu.tscn"))
-	body.add_child(again)
-	var quit := Button.new()
-	quit.text = tr("UI_QUIT")
-	quit.pressed.connect(func(): get_tree().quit())
-	body.add_child(quit)
-	SaveManager.autosave()
-	_open(ending)
+# --- journal (J): my own ledger lines and the codex
+func _fill_journal() -> void:
+	var body := _clear_body(journal)
+	body.get_node("Title").text = tr("UI_JOURNAL")
+	var tabs := TabContainer.new()
+	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_child(tabs)
+	var scroll := ScrollContainer.new()
+	scroll.name = tr("UI_LEDGER")
+	tabs.add_child(scroll)
+	var box := VBoxContainer.new()
+	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	box.add_theme_constant_override("separation", 6)
+	scroll.add_child(box)
+	var mine := Ledger.events(200, true)
+	if mine.is_empty():
+		var e := Label.new()
+		e.text = tr("UI_LEDGER_EMPTY")
+		box.add_child(e)
+	for e in mine:
+		var l := Label.new()
+		var amount := ("   %+d %s" % [int(e.amount), tr("CUR_EUR")]) if int(e.amount) != 0 else ""
+		l.text = "M%d  —  %s%s" % [int(e.month), str(e.title), amount]
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size = Vector2(700, 0)
+		box.add_child(l)
+	var codex := ScrollContainer.new()
+	codex.name = tr("UI_CODEX")
+	tabs.add_child(codex)
+	var cbox := VBoxContainer.new()
+	cbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cbox.add_theme_constant_override("separation", 8)
+	codex.add_child(cbox)
+	for k in Sites.get_value("codex", []):
+		var t := Label.new()
+		t.text = tr(str(k) + "_TITLE")
+		t.add_theme_font_size_override("font_size", 18)
+		t.add_theme_color_override("font_color", GOLD)
+		cbox.add_child(t)
+		var l := Label.new()
+		l.text = tr(str(k))
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.custom_minimum_size = Vector2(700, 0)
+		cbox.add_child(l)

@@ -1,43 +1,18 @@
-# Registry of eras, consequence points and items, plus the current era, chapter and the
-# orchestration of era switching and chapter commits. Autoload "GameState".
-# The world scene registers itself here so switches can be applied to it.
-# Registries load from the active site pack (Sites.data_dir) and reload when it changes.
+# Autoload "GameState": the era registry (one present-day layer per pack), the current layer, the
+# running world and the new-game / continue orchestration. Economic state lives in Ledger.
 extends Node
 
-var eras: Dictionary = {}                 # id -> EraDefinition
-var consequence_points: Dictionary = {}   # id -> ConsequencePoint
-var items: Dictionary = {}                # id -> ItemBase
-var _cp_by_flag: Dictionary = {}
-
+var eras: Dictionary = {}                 # id -> EraDefinition (one per pack today)
 var current_era: String = ""
-var chapter: int = 0                      # 0 prologue, 1..3 chapters, 4 epilogue
-var visited_eras: Dictionary = {}         # era_id -> true
-var register_unlocked: bool = false
 var world: Node = null                    # the World scene, if running
 var pending_load := false                 # main menu asked for "Continue"
 var menu_open_locations := false          # pause menu asked the main menu to open the Locations panel
-var preset_flags: Dictionary = {}         # committed flags a visited world starts with (Friends.visit)
 
 
 ## Fresh game state (new game from the menu).
 func reset() -> void:
 	current_era = ""
-	chapter = 0
-	visited_eras = {}
-	register_unlocked = false
 	pending_load = false
-	TimelineState.flags = {}
-	for f in preset_flags:
-		TimelineState.flags[f] = true
-	TimelineState.commit()
-	Inventory.artifacts = []
-	Inventory.local = {}
-	Journal.entries = []
-	Journal.visited = {}
-	Trading.money = {}
-	for e in eras.values():
-		Trading.money[e.id] = e.starting_money
-	Manors.built = {}
 	Ledger.reset_local(Sites.active)
 
 
@@ -49,15 +24,8 @@ func _ready() -> void:
 ## (Re)load the registries from the active site pack.
 func reload() -> void:
 	eras.clear()
-	consequence_points.clear()
-	items.clear()
-	_cp_by_flag.clear()
 	Sites.load_dir(Sites.data_dir("eras"), eras)
-	Sites.load_dir(Sites.data_dir("consequence_points"), consequence_points)
-	Sites.load_dir(Sites.data_dir("items"), items)
-	for cp in consequence_points.values():
-		_cp_by_flag[cp.flag_name] = cp
-	print("[GameState] site %s: %d eras, %d consequence points, %d items" % [Sites.active, eras.size(), consequence_points.size(), items.size()])
+	print("[GameState] site %s: %d layer(s)" % [Sites.active, eras.size()])
 
 
 func era(id: String) -> EraDefinition:
@@ -70,78 +38,17 @@ func eras_in_order() -> Array:
 	return list
 
 
-func item(id: String) -> ItemBase:
-	return items.get(id)
-
-
-func consequence(id: String) -> ConsequencePoint:
-	return consequence_points.get(id)
-
-
-func consequence_for_flag(flag_name: String) -> ConsequencePoint:
-	return _cp_by_flag.get(flag_name)
-
-
-## The one place a consequence flag is set. Returns false if the point is unknown.
-func trigger_consequence(cp_id: String) -> bool:
-	var cp := consequence(cp_id)
-	if cp == null:
-		push_error("unknown consequence point %s" % cp_id)
-		return false
-	TimelineState.set_flag(cp.flag_name, true)
-	EventBus.consequence_triggered.emit(cp_id)
-	# Soft nudge to witness (design doc 2.5 step 4).
-	var targets := cp.affected_eras.map(func(e): return era(e).year_label if era(e) else e)
-	EventBus.notice.emit(tr("NOTICE_REGISTER_NEW_LINE") % ", ".join(targets))
-	return true
-
-
-## Deliver an artifact to its target: consumes the item and triggers its consequence.
-func deliver_artifact(item_id: String, target_id: String) -> bool:
-	var it := item(item_id)
-	if not (it is ArtifactItem) or it.valid_delivery_target != target_id or not Inventory.has(item_id):
-		return false
-	Inventory.remove(item_id)
-	return trigger_consequence(it.linked_consequence_point_id)
-
-
+## Load a layer (the pack's single present-day scene) into the world.
 func switch_era(era_id: String) -> void:
 	if not eras.has(era_id) or era_id == current_era:
 		return
 	var from := current_era
 	EventBus.era_change_started.emit(from, era_id)
 	current_era = era_id
-	var first_visit: bool = not visited_eras.has(era_id)
-	visited_eras[era_id] = true
 	if world:
-		await world.apply_era(era(era_id), first_visit)
+		await world.apply_era(era(era_id), true)
 	EventBus.era_changed.emit(era_id)
-	_check_chapter_rules()
 	SaveManager.autosave()
-
-
-func unlock_register() -> void:
-	if register_unlocked:
-		return
-	register_unlocked = true
-	EventBus.register_opened.emit()
-	if chapter == 0:
-		end_chapter()   # prologue commits when the book is first opened
-
-
-## Ends the current chapter: commits pending flags and autosaves (design doc 2.6).
-func end_chapter() -> void:
-	TimelineState.commit()
-	EventBus.chapter_committed.emit(chapter)
-	chapter += 1
-	EventBus.chapter_changed.emit(chapter)
-	SaveManager.autosave()
-
-
-func _check_chapter_rules() -> void:
-	# Chapter 1 ends once all three eras have been visited at least once.
-	if chapter == 1 and visited_eras.size() >= eras.size():
-		end_chapter()
 
 
 func clock_string() -> String:
@@ -151,22 +58,13 @@ func clock_string() -> String:
 
 
 func to_dict() -> Dictionary:
-	var d := {
-		"current_era": current_era, "chapter": chapter, "visited_eras": visited_eras.duplicate(),
-		"register_unlocked": register_unlocked,
-		"visiting": Friends.visiting_code, "visiting_owner": Friends.visiting_owner,
-	}
+	var d := {"current_era": current_era}
 	if world and world.has_method("to_dict"):
 		d["world"] = world.to_dict()
 	return d
 
 
 func from_dict(d: Dictionary) -> void:
-	chapter = int(d.get("chapter", 0))
-	visited_eras = d.get("visited_eras", {}).duplicate()
-	register_unlocked = bool(d.get("register_unlocked", false))
-	Friends.visiting_code = str(d.get("visiting", ""))
-	Friends.visiting_owner = str(d.get("visiting_owner", ""))
 	var era_id: String = d.get("current_era", "")
 	if world and world.has_method("from_dict"):
 		world.from_dict(d.get("world", {}))

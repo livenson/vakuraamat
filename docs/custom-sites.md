@@ -13,46 +13,41 @@ one pack exists. Saves record their site and switch to it on Continue.
 
 | File | What it is | Made by |
 |---|---|---|
-| `site.json` | manifest: terrain tile, centre, latitude, era ground maps, start, journal locations, objectives, register nudge, ending rules, codex keys | `tools/new_site.py`, then edited |
+| `site.json` | manifest: terrain tile, centre, latitude, start position, named locations, codex keys | `tools/new_site.py`, then edited |
 | `layout.json` | named positions in tile metres (x east, z south), `exclusions` (x, z, r) kept free of scattered vegetation, `pads` (x, z, w, d) levelled under buildings at import | hand, via the debug map (M) |
-| `scenes.json` | the era layers: what stands where in each era, which flags show or hide it | hand |
-| `scenes/<era>.tscn` | generated era scenes (do not hand-edit) | `make scenes` |
-| `data/eras/*.tres` | one `EraDefinition` per era: id, year, order, scene, story, ground texture, currency, starting money | scaffold; `make era-maps` relinks textures |
-| `data/consequence_points/*.tres` | one flag each, its trigger era and affected eras, journal text keys | hand |
-| `data/items/*.tres` | `ItemBase` (era-local) and `ArtifactItem` (crosses eras; one consequence, one delivery target) | hand / copied from the template |
-| `data/manors`, `data/structures`, `data/trade_goods`, `data/crops`, `data/animals` | building, trading, farming, hunting content, all keyed by era id | copied from the template with eras remapped, then edited |
-| `narrative/<era>.ink` (+ `.ink.json`) | one ink story per era; NPC knots; Estonian lines with `# en:` tags, choices as `[et %% en]` | hand; `make ink` |
+| `scenes.json` | the layer: landmarks, props, the real footprints, roads, parcels, traffic, the bicycle | hand |
+| `scenes/era_2026.tscn` | the generated layer scene (do not hand-edit) | `make scenes` |
+| `data/eras/era_2026.tres` | the one `EraDefinition`: id, year, scene, ground texture (the orthophoto) | scaffold |
+| `data/structures/*.tres` | what can be built on an owned plot: cost in euros, rent bonus, allowed purposes, prerequisite | copied from the template, then edited |
+| `parcels.json` | cadastral units with 2022 land values, purposes, ownership form, polygons | `make parcels` |
+| `buildings.json` | real buildings: footprints, register attributes, addresses, cadastral links, LOD2 roofs | `make buildings` |
+| `tenants.json` | Business Register companies matched to the plots and buildings | `make tenants` |
+| `market.json` | median land value per m² by purpose | `make market` |
+| `roads.json`, `buildings_2026.json`, `water_2026.json` | ETAK roads, laser building massing, still water | `make roads`, `make features` |
 | `strings.csv` | the pack's translation keys (`keys,et,en`); core UI keys stay in `assets/i18n/strings.csv` | hand |
-| `buildings_2026.json`, `water_2026.json` | real building massing and still water derived from the laser data | `make features`, then pruned by hand |
 
-The terrain itself lives in `assets/terrain/<tile>/` (heightmap, canopy, orthophoto, era maps
-committed; Terrain3D region data generated) and is referenced by `terrain.tile`, so two stories
-can share one ground.
+The terrain itself lives in `assets/terrain/<tile>/` (heightmap, canopy, orthophoto committed;
+Terrain3D region data generated) and is referenced by `terrain.tile`. Packs made by the historical
+game (they carry a `story`, `objectives` or `ending` in the manifest) are skipped by `Sites.scan`.
 
 ## Making a new pack
 
 ```sh
-make site SITE=kvissentali NAME="Kvissentali" CENTER="657600 6477150"   # ERAS=1798,1938,2026
-make tile SITE=kvissentali      # Maa-amet DTM, nDSM, orthophoto, historical maps; Terrain3D import;
-                                # vegetation; buildings + water; scenes; validation  (~10 min, network)
+make site SITE=kvissentali NAME="Kvissentali" CENTER="657600 6477150"
+make tile SITE=kvissentali      # Maa-amet DTM, nDSM, orthophoto; Terrain3D import; vegetation; buildings,
+                                # parcels with land values, tenants, market, roads; scenes; validation  (~10 min, network)
 godot --path . -- --site=kvissentali
+make town SITE=kvissentali      # optional: open it as a shared town on the local SpacetimeDB
 ```
 
-`make site` writes a complete, boring, working story: a register near the spawn, one NPC per era,
-one artifact found in the newest era and handed back in the oldest, whose delivery puts a stone by
-the landmark in every later era, a trade post per era, farm plots and a home farm in the middle
-era, hunting in the older eras, the real village massing in the newest. It copies the template
-pack's crops, animals, structures, trade goods and the items they need, remapping era ids by
-order, so farming, hunting, trading and building work on day one. Replace the story, keep the
-pattern.
+`make site` writes a working town pack: a landmark near the spawn, the real footprints, roads,
+parcels, traffic and a bicycle, the template's structures, and the codex strings. Everything the
+economy needs comes from `make tile`.
 
 Choosing the centre: open the Maa-amet map (kaart.maaamet.ee), read the L-EST97 easting and
 northing of the point you want in the middle, or geocode an address with
 `https://inaadress.maaamet.ee/inaadress/gazetteer?address=<name>`. The 1:10 000 sheet grid
-does not matter; sheets are mosaicked. The historical WMS (`kaart.maaamet.ee/wms/ajalooline`)
-covers all of Estonia; the layers used per era year are chosen in `tools/new_site.py`
-(`era_map_for`): one-verst map before 1923, the 1930-44 cadastral map to 1944, Soviet 1:10 000
-to 1990, the 1994-98 base map to 2004, the orthophoto after that.
+does not matter; sheets are mosaicked.
 
 ## Any point in Estonia from inside the game
 
@@ -77,19 +72,6 @@ Scripted equivalent: `curl -X POST :8765/tile -d '{"name":"Aakre","x":629807,"y"
 `/status?id=aakre`, `/download?id=aakre`, then
 `godot --headless --path . res://tools/godot/install_pack.tscn -- --zip=aakre.zip --id=aakre`.
 
-## Quest blocks: generated stories
-
-`blocks/*.json` is a library of self-contained consequences (one artifact or one choice, one flag, a
-few props in the later eras, a few lines per era role). `tools/compose_story.py` picks blocks for a
-site, maps their era roles (oldest, middle, newest) onto the pack's eras, names one NPC per era from
-era-appropriate name lists, and writes the pack's items, consequence points, scene nodes, ink knots
-(each NPC's menu is the concatenation of the blocks' options for that era), strings, objectives and
-ending tiers. The composition is deterministic for a seed; `make site` derives the seed from the
-centre coordinates, `--seed` and `--blocks` override it. Five blocks exist: keepsake, well (a choice),
-grafts, deed, letter (the bonus that gates the best ending). `tools/godot/story_test.tscn` plays any
-composed pack through from prologue to epilogue using only the pack's data. See `blocks/README.md`
-for the schema; add a block by adding a file.
-
 ## The Locations panel
 
 *Locations...* in the main menu (and in the pause menu, which saves first) lists the packs you have
@@ -97,22 +79,6 @@ for the schema; add a block by adding a file.
 (Install and play), suggested Estonian places to generate with one click
 (`assets/data/suggested_places.json`), a place search (address, place name, coordinates, or your IP
 location), and the friends section.
-
-## Friends: shared worlds and deliveries
-
-`make world-service` runs `tools/world_service.py` (loopback port 8766, JSON files under
-`data_raw/worlds/`). *Share this world* publishes the active pack as a descriptor: where it is, how
-its story was composed (seed, blocks), which consequence flags you have committed; you get a
-six-letter code (also copied to the clipboard). A friend enters the code under *Visit*: their game
-regenerates the same pack through their tile service (`visit_<code>`), starts it with your committed
-flags, and posts every consequence they trigger there as a *delivery*. When you next load your
-world, the deliveries are pulled and applied as consequences, with a ledger line and a notice naming
-the friend. Your committed flags are republished at every chapter end.
-
-Co-op blocks (`"coop": true`, e.g. `blocks/bell.json`) can only be completed by a visitor: the ink
-option checks `visiting()`. They are listed in the ledger but not counted for the ending, so a solo
-player is never blocked. The URLs of both services live in `user://settings.cfg` (`[service] url`,
-`[service] worlds_url`); your player name for deliveries is `[player] name`.
 
 ## Towns: the shared ledger
 

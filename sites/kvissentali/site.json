@@ -17,17 +17,7 @@
       2026,
       9,
       3
-    ],
-    "era_maps": {
-      "era_1798": {
-        "layer": "yheverstakaart",
-        "file": "era_1798_verst.png"
-      },
-      "era_1938": {
-        "layer": "kk1940",
-        "file": "era_1938_cadastral.png"
-      }
-    }
+    ]
   },
   "start": {
     "era": "era_2026",
@@ -46,87 +36,9 @@
     "LOC_WELL": "farm",
     "LOC_ORCHARD": "field"
   },
-  "objectives": [
-    {
-      "when": "register_locked",
-      "key": "OBJ_FIND_REGISTER",
-      "target": "RegisterBook",
-      "lift": 1.2
-    },
-    {
-      "chapter": 1,
-      "key": "OBJ_VISIT_ERAS"
-    },
-    {
-      "chapter": 2,
-      "key": "OBJ_DELIVER",
-      "target": "Local1798",
-      "era": "era_1798",
-      "lift": 2.2
-    },
-    {
-      "chapter": 3,
-      "not_flag": "epilogue",
-      "key": "OBJ_SIT",
-      "target": "Local2026",
-      "era": "era_2026",
-      "lift": 2.2
-    }
-  ],
-  "register_nudge": {
-    "chapter": 1,
-    "era": "era_1798"
-  },
-  "ending": {
-    "trigger_flag": "epilogue",
-    "counted_flags": [
-      "boundary_marked",
-      "well_kept",
-      "keepsake_returned",
-      "orchard_planted"
-    ],
-    "tiers": [
-      {
-        "min_kept": 4,
-        "key": "ENDING_ALL",
-        "bonus": true
-      },
-      {
-        "min_kept": 2,
-        "key": "ENDING_SOME"
-      },
-      {
-        "key": "ENDING_NONE"
-      }
-    ],
-    "bonus_flag": "letter_delivered",
-    "partial_key": "ENDING_BOX_PARTIAL"
-  },
   "codex": [
     "CODEX_REAL",
     "CODEX_INVENTED",
     "CODEX_DATA"
-  ],
-  "debug": {
-    "build_node": "Manor_home_farm"
-  },
-  "story": {
-    "seed": 34750,
-    "blocks": [
-      "deed",
-      "letter",
-      "well",
-      "keepsake",
-      "bell",
-      "grafts"
-    ],
-    "npcs": {
-      "era_1798": "Peep",
-      "era_1938": "Elmar",
-      "era_2026": "Kadri"
-    },
-    "coop_flags": [
-      "bell_hung"
-    ]
-  }
+  ]
 }

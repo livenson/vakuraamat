@@ -13,438 +13,8 @@
  },
  "fragments": {},
  "eras": {
-  "era_1798": {
-   "nodes": [
-    {
-     "type": "npc",
-     "name": "Local1798",
-     "id": "npc_era_1798",
-     "knot": "greeter",
-     "label": "NPC_1798",
-     "color": [
-      0.4,
-      0.35,
-      0.3
-     ],
-     "at": {
-      "ref": "register",
-      "offset": [
-       6,
-       4
-      ]
-     },
-     "height": 1.7,
-     "yaw": 2.6
-    },
-    {
-     "type": "group",
-     "name": "Landmark",
-     "at": "landmark",
-     "children": [
-      {
-       "type": "examine",
-       "name": "LandmarkExamine",
-       "key": "EX_LANDMARK_1798",
-       "loc": "LOC_LANDMARK",
-       "label": "LOC_LANDMARK"
-      }
-     ]
-    },
-    {
-     "type": "trade_post",
-     "at": "trade",
-     "key": "POST_1798",
-     "color": [
-      0.7,
-      0.65,
-      0.5
-     ]
-    },
-    {
-     "type": "footprints",
-     "source": "buildings.json",
-     "year": 1798,
-     "include_undated": false
-    },
-    {
-     "type": "farm_plots",
-     "at": {
-      "ref": "farm",
-      "offset": [
-       8,
-       12
-      ]
-     },
-     "count": 2,
-     "seeds": [
-      "seed_rye",
-      "seed_oats"
-     ]
-    },
-    {
-     "type": "hunting",
-     "max_animals": 6
-    },
-    {
-     "type": "group",
-     "name": "WellStoryGroup",
-     "at": "farm",
-     "offset": [
-      14,
-      -8
-     ],
-     "children": [
-      {
-       "type": "story_point",
-       "name": "WellStory",
-       "knot": "well_choice",
-       "speaker": "NPC_1798",
-       "text": "EX_WELL_OPEN",
-       "loc": "LOC_WELL",
-       "label": "LOC_WELL",
-       "radius": 1.8
-      }
-     ]
-    },
-    {
-     "type": "group",
-     "name": "WellSite",
-     "at": "farm",
-     "offset": [
-      14,
-      -8
-     ],
-     "children": [
-      {
-       "type": "torus",
-       "name": "HalfRing",
-       "inner": 0.8,
-       "outer": 1.2,
-       "color": "stone",
-       "y": 0.15
-      }
-     ]
-    },
-    {
-     "type": "pickup",
-     "name": "Pickup_bell_clapper",
-     "item": "bell_clapper",
-     "examine": "ITEM_BELL_CLAPPER_DESC",
-     "at": {
-      "ref": "landmark",
-      "offset": [
-       6,
-       -5
-      ]
-     }
-    },
-    {
-     "type": "pickup",
-     "name": "Pickup_graft_bundle",
-     "item": "graft_bundle",
-     "examine": "ITEM_GRAFT_BUNDLE_DESC",
-     "at": {
-      "ref": "farm",
-      "offset": [
-       -6,
-       7
-      ]
-     }
-    }
-   ]
-  },
-  "era_1938": {
-   "nodes": [
-    {
-     "type": "npc",
-     "name": "Local1938",
-     "id": "npc_era_1938",
-     "knot": "greeter",
-     "label": "NPC_1938",
-     "color": [
-      0.5,
-      0.35,
-      0.3
-     ],
-     "at": {
-      "ref": "register",
-      "offset": [
-       6,
-       4
-      ]
-     },
-     "height": 1.7,
-     "yaw": 2.6
-    },
-    {
-     "type": "group",
-     "name": "Landmark",
-     "at": "landmark",
-     "children": [
-      {
-       "type": "examine",
-       "name": "LandmarkExamine",
-       "key": "EX_LANDMARK_1938",
-       "loc": "LOC_LANDMARK",
-       "label": "LOC_LANDMARK"
-      }
-     ]
-    },
-    {
-     "type": "trade_post",
-     "at": "trade",
-     "key": "POST_1938",
-     "color": [
-      0.7,
-      0.65,
-      0.5
-     ]
-    },
-    {
-     "type": "footprints",
-     "source": "buildings.json",
-     "year": 1938,
-     "include_undated": false
-    },
-    {
-     "type": "manor_site",
-     "id": "home_farm",
-     "at": "farm"
-    },
-    {
-     "type": "farm_plots",
-     "at": {
-      "ref": "farm",
-      "offset": [
-       8,
-       12
-      ]
-     },
-     "count": 2,
-     "seeds": [
-      "seed_rye",
-      "seed_oats",
-      "seed_potato"
-     ]
-    },
-    {
-     "type": "hunting",
-     "max_animals": 6
-    },
-    {
-     "type": "pickup",
-     "name": "Pickup_deed_page",
-     "item": "deed_page",
-     "examine": "ITEM_DEED_PAGE_DESC",
-     "at": {
-      "ref": "landmark",
-      "offset": [
-       -6,
-       4
-      ]
-     }
-    },
-    {
-     "type": "group",
-     "name": "Gate",
-     "at": "field",
-     "offset": [
-      18,
-      6
-     ],
-     "flag": "boundary_marked",
-     "visible_when": true,
-     "children": [
-      {
-       "type": "box",
-       "name": "PostA",
-       "size": [
-        0.18,
-        2.2,
-        0.18
-       ],
-       "y": 1.1,
-       "color": "darkwood",
-       "at": [
-        -1.2,
-        0
-       ]
-      },
-      {
-       "type": "box",
-       "name": "PostB",
-       "size": [
-        0.18,
-        2.2,
-        0.18
-       ],
-       "y": 1.1,
-       "color": "darkwood",
-       "at": [
-        1.2,
-        0
-       ]
-      },
-      {
-       "type": "box",
-       "name": "Beam",
-       "size": [
-        2.8,
-        0.15,
-        0.15
-       ],
-       "y": 2.1,
-       "color": "darkwood"
-      },
-      {
-       "type": "examine",
-       "name": "GateExamine",
-       "key": "EX_GATE_KEPT",
-       "loc": "LOC_FIELD",
-       "label": "LOC_FIELD"
-      }
-     ]
-    },
-    {
-     "type": "group",
-     "name": "GateGone",
-     "at": "field",
-     "offset": [
-      18,
-      6
-     ],
-     "flag": "boundary_marked",
-     "visible_when": false,
-     "children": [
-      {
-       "type": "examine",
-       "name": "NoGateExamine",
-       "key": "EX_GATE_GONE",
-       "loc": "LOC_FIELD",
-       "label": "LOC_FIELD"
-      }
-     ]
-    },
-    {
-     "type": "pickup",
-     "name": "Pickup_harvest_letter",
-     "item": "harvest_letter",
-     "examine": "ITEM_HARVEST_LETTER_DESC",
-     "at": {
-      "ref": "farm",
-      "offset": [
-       5,
-       -9
-      ]
-     }
-    },
-    {
-     "type": "group",
-     "name": "WellRing",
-     "at": "farm",
-     "offset": [
-      14,
-      -8
-     ],
-     "flag": "well_kept",
-     "visible_when": true,
-     "children": [
-      {
-       "type": "torus",
-       "name": "Ring",
-       "inner": 0.8,
-       "outer": 1.2,
-       "color": "stone",
-       "y": 0.3
-      },
-      {
-       "type": "examine",
-       "name": "WellExamine",
-       "key": "EX_WELL_KEPT",
-       "loc": "LOC_WELL",
-       "label": "LOC_WELL"
-      }
-     ]
-    },
-    {
-     "type": "group",
-     "name": "WellDip",
-     "at": "farm",
-     "offset": [
-      14,
-      -8
-     ],
-     "flag": "well_kept",
-     "visible_when": false,
-     "children": [
-      {
-       "type": "examine",
-       "name": "DipExamine",
-       "key": "EX_WELL_DIP",
-       "loc": "LOC_WELL",
-       "label": "LOC_WELL"
-      }
-     ]
-    },
-    {
-     "type": "group",
-     "name": "KeepsakeStone",
-     "at": "landmark",
-     "flag": "keepsake_returned",
-     "visible_when": true,
-     "children": [
-      {
-       "type": "instance",
-       "name": "Stone",
-       "scene": "res://assets/models/props/boundary_stone.glb",
-       "at": [
-        3,
-        0
-       ],
-       "yaw_deg": 20
-      },
-      {
-       "type": "examine",
-       "name": "StoneExamine",
-       "key": "EX_KEEPSAKE_STONE",
-       "label": "LOC_LANDMARK",
-       "at": [
-        3,
-        0
-       ]
-      }
-     ]
-    }
-   ]
-  },
   "era_2026": {
    "nodes": [
-    {
-     "type": "register",
-     "name": "RegisterBook",
-     "at": "register"
-    },
-    {
-     "type": "npc",
-     "name": "Local2026",
-     "id": "npc_era_2026",
-     "knot": "greeter",
-     "label": "NPC_2026",
-     "color": [
-      0.6000000000000001,
-      0.35,
-      0.3
-     ],
-     "at": {
-      "ref": "register",
-      "offset": [
-       6,
-       4
-      ]
-     },
-     "height": 1.7,
-     "yaw": 2.6
-    },
     {
      "type": "group",
      "name": "Landmark",
@@ -457,16 +27,6 @@
        "loc": "LOC_LANDMARK",
        "label": "LOC_LANDMARK"
       }
-     ]
-    },
-    {
-     "type": "trade_post",
-     "at": "trade",
-     "key": "POST_2026",
-     "color": [
-      0.7,
-      0.65,
-      0.5
      ]
     },
     {
@@ -500,21 +60,6 @@
      }
     },
     {
-     "type": "farm_plots",
-     "at": {
-      "ref": "farm",
-      "offset": [
-       8,
-       12
-      ]
-     },
-     "count": 2,
-     "seeds": [
-      "seed_cabbage",
-      "seed_potato"
-     ]
-    },
-    {
      "type": "group",
      "name": "Gate",
      "at": "field",
@@ -522,8 +67,6 @@
       18,
       6
      ],
-     "flag": "boundary_marked",
-     "visible_when": true,
      "children": [
       {
        "type": "box",
@@ -577,34 +120,12 @@
     },
     {
      "type": "group",
-     "name": "GateGone",
-     "at": "field",
-     "offset": [
-      18,
-      6
-     ],
-     "flag": "boundary_marked",
-     "visible_when": false,
-     "children": [
-      {
-       "type": "examine",
-       "name": "NoGateExamine",
-       "key": "EX_GATE_GONE",
-       "loc": "LOC_FIELD",
-       "label": "LOC_FIELD"
-      }
-     ]
-    },
-    {
-     "type": "group",
      "name": "WellRing",
      "at": "farm",
      "offset": [
       14,
       -8
      ],
-     "flag": "well_kept",
-     "visible_when": true,
      "children": [
       {
        "type": "torus",
@@ -625,43 +146,8 @@
     },
     {
      "type": "group",
-     "name": "WellDip",
-     "at": "farm",
-     "offset": [
-      14,
-      -8
-     ],
-     "flag": "well_kept",
-     "visible_when": false,
-     "children": [
-      {
-       "type": "examine",
-       "name": "DipExamine",
-       "key": "EX_WELL_DIP",
-       "loc": "LOC_WELL",
-       "label": "LOC_WELL"
-      }
-     ]
-    },
-    {
-     "type": "pickup",
-     "name": "Pickup_keepsake",
-     "item": "keepsake",
-     "examine": "ITEM_KEEPSAKE_DESC",
-     "at": {
-      "ref": "register",
-      "offset": [
-       -4,
-       3
-      ]
-     }
-    },
-    {
-     "type": "group",
      "name": "KeepsakeStone",
      "at": "landmark",
-     "flag": "keepsake_returned",
-     "visible_when": true,
      "children": [
       {
        "type": "instance",
@@ -693,8 +179,6 @@
       -6,
       4
      ],
-     "flag": "bell_hung",
-     "visible_when": true,
      "children": [
       {
        "type": "box",
@@ -753,8 +237,6 @@
       -15,
       0
      ],
-     "flag": "orchard_planted",
-     "visible_when": true,
      "children": [
       {
        "type": "repeat",
@@ -776,47 +258,6 @@
        "type": "examine",
        "name": "OrchardExamine",
        "key": "EX_ORCHARD_KEPT",
-       "loc": "LOC_ORCHARD",
-       "label": "LOC_ORCHARD",
-       "at": [
-        11,
-        2.5
-       ]
-      }
-     ]
-    },
-    {
-     "type": "group",
-     "name": "OrchardScrub",
-     "at": "field",
-     "offset": [
-      -15,
-      0
-     ],
-     "flag": "orchard_planted",
-     "visible_when": false,
-     "children": [
-      {
-       "type": "repeat",
-       "count": 4,
-       "children": [
-        {
-         "type": "tree",
-         "name": "Scrub{i}",
-         "at": [
-          "i * 6 + 2",
-          1.5
-         ],
-         "scale": 1.3,
-         "yaw": "i * 0.9",
-         "scene": "res://assets/vegetation/bush_jello.tscn"
-        }
-       ]
-      },
-      {
-       "type": "examine",
-       "name": "ScrubExamine",
-       "key": "EX_ORCHARD_SCRUB",
        "loc": "LOC_ORCHARD",
        "label": "LOC_ORCHARD",
        "at": [

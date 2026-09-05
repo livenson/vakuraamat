@@ -140,10 +140,9 @@ func reload_path(p: String) -> String:
 				result = "%s: era layer %s re-instanced" % [p, era.id]
 	elif p.begins_with(Sites.path("")) or p.begins_with("res://sites/") or p.begins_with(Sites.USER_ROOT):
 		Sites.reload_active()
-		Narrative.reset_players()
 		if world:
 			world.reload_era_layer(GameState.current_era)
-		result = "%s: pack reloaded (registries, strings, stories; current era layer re-instanced)" % p
+		result = "%s: pack reloaded (registries, strings; current layer re-instanced)" % p
 	else:
 		ResourceLoader.load(p, "", ResourceLoader.CACHE_MODE_REPLACE)
 		result = "%s: cache replaced" % p

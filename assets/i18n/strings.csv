@@ -75,7 +75,7 @@ BUILD_NO_MATERIALS,Materjali ei jätku.,Not enough materials.
 BUILD_COST,Hind: %s,Cost: %s
 UI_DEBUG_MAP,Silumiskaart,Debug map
 UI_DEBUG_MAP_HINT,Klõps kaardil: teleport. M sulgeb.,Click the map to teleport. M closes.
-UI_KEYS,E tegutse   V vakuraamat   B osta siin   N uudised   Tab register   J päevik   I kott   L keel   M kaart   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   V ledger   B buy here   N news   Tab register   J journal   I bag   L language   M map   K codes   F fly   T teleport   H home   F8 report   Esc menu
+UI_KEYS,E tegutse   Tab vakuraamat   B osta siin   N uudised   J päevik   L keel   M kaart   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   Tab vakuraamat   B buy here   N news   J journal   L language   M map   K codes   F fly   T teleport   H home   F8 report   Esc menu
 MENU_SITE,Asukoht,Location
 UI_BUILDING_GROUND,Maa ehitatakse laserandmetest...,Building the ground from the laser data...
 MENU_NEW_LOCATION,Uus asukoht...,New location...

@@ -2,19 +2,29 @@
   "id": "palupera",
   "name_key": "SITE_PALUPERA",
   "subtitle_key": "MENU_SUBTITLE",
-  "description": "Three eras of one square kilometre around Palupera village and manor, Otepaa highlands. The manor, the family and the story are fiction on real ground.",
+  "description": "Palupera village square, Elva parish: 58 cadastral units around the old manor site, bought and rented on the real 2022 land values. The buildings and trees are real; the manor's story is over.",
   "terrain": {
     "tile": "palupera",
-    "center": [637548, 6444029],
+    "center": [
+      637548,
+      6444029
+    ],
     "size": 1024,
     "latitude": 58.1158,
     "longitude": 26.3341,
     "utc_offset": 3.0,
-    "date": [2026, 9, 3]
+    "date": [
+      2026,
+      9,
+      3
+    ]
   },
   "start": {
     "era": "era_2026",
-    "spawn": [508, 513],
+    "spawn": [
+      508,
+      513
+    ],
     "yaw_deg": 180
   },
   "water": "water_2026.json",
@@ -27,24 +37,10 @@
     "LOC_WELL": "well",
     "LOC_NORTH_FIELD": "field"
   },
-  "objectives": [
-    {"when": "register_locked", "key": "OBJ_FIND_REGISTER", "target": "RegisterBook", "lift": 1.2},
-    {"chapter": 1, "key": "OBJ_VISIT_ERAS"},
-    {"chapter": 2, "key": "OBJ_MEET_1938"},
-    {"chapter": 3, "not_flag": "epilogue", "key": "OBJ_SIT", "target": "Leida", "era": "era_2026", "lift": 2.2}
-  ],
-  "register_nudge": {"chapter": 1, "era": "era_1798"},
-  "ending": {
-    "trigger_flag": "epilogue",
-    "counted_flags": ["family_recorded_1798", "north_field_ploughed", "well_kept_open", "cellar_opened"],
-    "bonus_flag": "letter_delivered",
-    "tiers": [
-      {"min_kept": 4, "bonus": true, "key": "ENDING_ORCHARD"},
-      {"min_kept": 2, "key": "ENDING_FURROWS"},
-      {"key": "ENDING_FOREST"}
-    ],
-    "partial_key": "ENDING_BOX_PARTIAL"
-  },
-  "codex": ["CODEX_REAL", "CODEX_INVENTED", "CODEX_WORDS", "CODEX_DATA"],
-  "debug": {"build_node": "Manor_kaseoja_farm"}
+  "codex": [
+    "CODEX_REAL",
+    "CODEX_INVENTED",
+    "CODEX_WORDS",
+    "CODEX_DATA"
+  ]
 }

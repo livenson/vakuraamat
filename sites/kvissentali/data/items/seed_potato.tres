@@ -1,9 +1,0 @@
-[gd_resource type="Resource" format=3]
-
-[ext_resource type="Script" path="res://scripts/items/item_base.gd" id="1"]
-
-[resource]
-script = ExtResource("1")
-id = "seed_potato"
-display_name_key = "ITEM_SEED_POTATO"
-description_key = "ITEM_SEED_POTATO_DESC"

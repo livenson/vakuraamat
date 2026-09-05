@@ -78,12 +78,6 @@ def read_strings(path, rep, label):
     return keys
 
 
-def ink_knots(path):
-    text = open(path, encoding="utf-8").read()
-    knots = set(re.findall(r"^\s*={2,}\s*([A-Za-z_][\w]*)\s*={0,}", text, re.M))
-    return knots, text
-
-
 def validate(site, rep, root=ROOT):
     site_dir = os.path.join(root, "sites", site)
     mpath = os.path.join(site_dir, "site.json")
@@ -125,24 +119,15 @@ def validate(site, rep, root=ROOT):
 
     # --- registries
     eras = load_dir(site_dir, "eras", rep)
-    cps = load_dir(site_dir, "consequence_points", rep)
-    items = load_dir(site_dir, "items", rep)
-    manors = load_dir(site_dir, "manors", rep)
     structures = load_dir(site_dir, "structures", rep)
-    goods_dir = os.path.join(site_dir, "data/trade_goods")
-    crops = load_dir(site_dir, "crops", rep)
-    animals = load_dir(site_dir, "animals", rep)
     if not eras:
         rep.err("no eras in data/eras")
-    flags = {cp.get("flag_name") for cp in cps.values()}
+    elif len(eras) != 1:
+        rep.err(f"data/eras must hold exactly one present-day layer, found {sorted(eras)}")
 
     def era(e, where):
         if e and e not in eras:
             rep.err(f"{where}: unknown era {e!r}")
-
-    def item(i, where):
-        if i and i not in items:
-            rep.err(f"{where}: unknown item {i!r}")
 
     spec = None
     spath = os.path.join(site_dir, "scenes.json")
@@ -153,61 +138,17 @@ def validate(site, rep, root=ROOT):
             rep.err(f"scenes.json: {e}")
     for eid, e in eras.items():
         key(e.get("display_name_key"), f"era {eid}")
-        key(e.get("currency_key"), f"era {eid}")
         sp = e.get("scene_path", "")
         if not (sp.startswith(f"res://sites/{site}/scenes/") or sp.startswith(f"user://sites/{site}/scenes/")):
             rep.warn(f"era {eid}: scene_path {sp!r} is outside the site pack")
         if not os.path.exists(os.path.join(root, sp.replace("res://", "").replace("user://", ""))) and not (spec and eid in spec.get("eras", {})):
             rep.err(f"era {eid}: scene {sp} missing and scenes.json does not define it (make scenes)")
-        ns = e.get("narrative_story", "")
-        if ns and not os.path.exists(os.path.join(root, ns.replace("res://", "").replace("user://", ""))):
-            ink = os.path.join(site_dir, "narrative", f"{eid}.ink")
-            (rep.warn if os.path.exists(ink) else rep.err)(f"era {eid}: {ns} missing ({'make ink' if os.path.exists(ink) else 'no ink source either'})")
-    for cid, cp in cps.items():
-        era(cp.get("trigger_era"), f"consequence {cid}")
-        for e in cp.get("affected_eras", []):
-            era(e, f"consequence {cid}")
-        key(cp.get("trigger_description_key"), f"consequence {cid}")
-        key(cp.get("effect_description_key"), f"consequence {cid}")
-        if not cp.get("flag_name"):
-            rep.err(f"consequence {cid}: no flag_name")
-    for iid, it in items.items():
-        key(it.get("display_name_key"), f"item {iid}")
-        key(it.get("description_key"), f"item {iid}")
-        if it["_script"].endswith("artifact_item.gd"):
-            if it.get("linked_consequence_point_id") not in cps:
-                rep.err(f"artifact {iid}: unknown consequence point {it.get('linked_consequence_point_id')!r}")
-            era(it.get("origin_era"), f"artifact {iid}"); era(it.get("delivery_era"), f"artifact {iid}")
-            if not it.get("valid_delivery_target"):
-                rep.err(f"artifact {iid}: no valid_delivery_target")
-    if os.path.isdir(goods_dir):
-        for f in sorted(os.listdir(goods_dir)):
-            if f.endswith(".tres"):
-                g = read_tres(os.path.join(goods_dir, f))
-                item(g.get("item_id"), f"trade good {f}"); era(g.get("era_id"), f"trade good {f}")
-                if items.get(g.get("item_id"), {}).get("_script", "").endswith("artifact_item.gd"):
-                    rep.err(f"trade good {f}: artifacts cannot be traded")
-    for mid, mn in manors.items():
-        era(mn.get("era_id"), f"manor {mid}"); key(mn.get("display_name_key"), f"manor {mid}")
-        for s in mn.get("structures", []):
-            if s not in structures:
-                rep.err(f"manor {mid}: unknown structure {s!r}")
-        if mn.get("unlock_condition_flag") and mn["unlock_condition_flag"] not in flags:
-            rep.warn(f"manor {mid}: unlock flag {mn['unlock_condition_flag']!r} is not a consequence flag")
     for sid, st in structures.items():
         key(st.get("display_name_key"), f"structure {sid}"); key(st.get("description_key"), f"structure {sid}")
-        for i in st.get("cost_items", {}):
-            item(i, f"structure {sid}")
         if st.get("requires") and st["requires"] not in structures:
             rep.err(f"structure {sid}: requires unknown structure {st['requires']!r}")
-    for cid, c in crops.items():
-        item(c.get("seed_item_id"), f"crop {cid}"); item(c.get("yield_item_id"), f"crop {cid}"); key(c.get("display_name_key"), f"crop {cid}")
-        for e in c.get("eras", []):
-            era(e, f"crop {cid}")
-    for aid, a in animals.items():
-        item(a.get("yield_item_id"), f"animal {aid}"); key(a.get("display_name_key"), f"animal {aid}")
-        for e in a.get("eras", []):
-            era(e, f"animal {aid}")
+    if not os.path.exists(os.path.join(site_dir, "parcels.json")):
+        rep.err("parcels.json missing (make parcels): the ledger has nothing to sell")
 
     # --- manifest rules
     start = m.get("start", {})
@@ -224,20 +165,6 @@ def validate(site, rep, root=ROOT):
         key(loc_key, "site.json locations")
         if lk not in layout:
             rep.err(f"site.json locations: layout key {lk!r} not in layout.json")
-    for o in m.get("objectives", []):
-        key(o.get("key"), "site.json objectives"); era(o.get("era"), "site.json objectives")
-    nd = m.get("register_nudge", {})
-    era(nd.get("era"), "site.json register_nudge")
-    end = m.get("ending", {})
-    for f in end.get("counted_flags", []):
-        if f not in flags:
-            rep.warn(f"site.json ending.counted_flags: {f!r} is not a consequence flag")
-    for tier in end.get("tiers", []):
-        key(tier.get("key"), "site.json ending.tiers"); key(tier.get("key", "") + "_TITLE", "site.json ending.tiers")
-    if end.get("partial_key"):
-        key(end["partial_key"], "site.json ending.partial_key")
-    if end:
-        key("ENDING_KEPT", "site.json ending")
     for k in m.get("codex", []):
         key(k, "site.json codex"); key(k + "_TITLE", "site.json codex")
     if m.get("water") and not os.path.exists(os.path.join(site_dir, m["water"])):
@@ -309,83 +236,34 @@ def validate(site, rep, root=ROOT):
         except ImportError as e:
             rep.err(f"cannot import gen_era_scenes: {e}"); return
         it = gen.Interpreter(site_dir, spec, layout)
-        knots = {}
+        allowed = {"group", "use", "repeat", "instance", "building", "box", "torus", "examine", "tree", "scatter", "traffic", "bicycle",
+                   "roads", "parcels", "footprints", "village"}
         for eid in spec.get("eras", {}):
             era(eid, "scenes.json eras")
-            ink = os.path.join(site_dir, "narrative", f"{eid}.ink")
-            knots[eid] = ink_knots(ink)[0] if os.path.exists(ink) else None
-        target_names = {str(o.get("target")) for o in m.get("objectives", []) if o.get("target")}
-        seen_targets = set()
         for eid, body in spec.get("eras", {}).items():
-            scene = it.build(eid, body.get("nodes", []))
-            names = set(re.findall(r'^\[node name="([^"]+)"', "\n".join(scene.nodes), re.M))
-            seen_targets |= names & target_names
-            if eid == start.get("era") and "RegisterBook" not in names and not any('register_pickup.gd' in n for n in scene.ext):
-                rep.warn(f"scenes.json {eid}: start era has no register pickup, the player can never switch era")
+            it.build(eid, body.get("nodes", []))
 
-            def walk(nodes, env):
+            def walk(nodes):
                 for n in nodes:
                     t = n.get("type")
-                    if t == "npc":
-                        if knots.get(eid) is not None and n.get("knot") and n["knot"] not in knots[eid]:
-                            rep.err(f"scenes.json {eid}: npc {n.get('name')} knot {n['knot']!r} not in narrative/{eid}.ink")
-                        key(n.get("label"), f"scenes.json {eid} npc {n.get('name')}")
-                    elif t == "story_point":
-                        if knots.get(eid) is not None and n.get("knot") not in knots[eid]:
-                            rep.err(f"scenes.json {eid}: story point {n.get('name')} knot {n.get('knot')!r} not in ink")
-                        for k in ("speaker", "text", "loc", "label"):
-                            key(n.get(k, ""), f"scenes.json {eid} story point {n.get('name')}")
-                    elif t == "pickup":
-                        item(n.get("item"), f"scenes.json {eid} pickup {n.get('name')}"); key(n.get("examine", ""), f"scenes.json {eid} pickup {n.get('name')}")
+                    if t not in allowed:
+                        rep.err(f"scenes.json {eid}: node type {t!r} is not part of the present-day game (allowed: {sorted(allowed)})")
                     elif t == "examine":
                         for k in ("key", "loc", "label"):
                             v = n.get(k, "")
                             if "{" not in v:
                                 key(v, f"scenes.json {eid} examine {n.get('name')}")
-                    elif t == "group":
-                        if n.get("flag") and n["flag"] not in flags:
-                            rep.warn(f"scenes.json {eid}: group {n.get('name')} depends on flag {n['flag']!r}, which no consequence point sets")
-                        walk(n.get("children", []), env)
-                    elif t in ("repeat",):
-                        walk(n.get("children", []), env)
+                    elif t in ("group", "repeat"):
+                        if n.get("flag"):
+                            rep.err(f"scenes.json {eid}: group {n.get('name')} still carries a consequence flag")
+                        walk(n.get("children", []))
                     elif t == "use":
-                        walk(spec.get("fragments", {}).get(n.get("fragment"), {}).get("nodes", []), env)
-                    elif t == "farm_plots":
-                        for s in n.get("seeds", []):
-                            item(s, f"scenes.json {eid} farm plots")
-                    elif t == "trade_post":
-                        key(n.get("key"), f"scenes.json {eid} trade post"); key(n.get("key", "") + "_TEXT", f"scenes.json {eid} trade post")
-                    elif t == "manor_site":
-                        if n.get("id") not in manors:
-                            rep.err(f"scenes.json {eid}: manor site {n.get('id')!r} has no ManorDefinition")
-            walk(body.get("nodes", []), {})
+                        walk(spec.get("fragments", {}).get(n.get("fragment"), {}).get("nodes", []))
+            walk(body.get("nodes", []))
         for p in it.problems:
             rep.err(f"scenes.json: {p}")
-        for tname in target_names - seen_targets:
-            rep.err(f"site.json objectives: target node {tname!r} exists in no era scene")
     else:
-        rep.warn("no scenes.json: era scenes must be hand-made")
-
-    # --- ink
-    ndir = os.path.join(site_dir, "narrative")
-    if os.path.isdir(ndir):
-        for f in sorted(os.listdir(ndir)):
-            if f.endswith(".ink"):
-                _, text = ink_knots(os.path.join(ndir, f))
-                for fn in ("flag", "has_item", "give_item", "take_item", "set_flag", "end_chapter", "chapter", "trigger"):
-                    if f"EXTERNAL {fn}(" not in text:
-                        rep.err(f"narrative/{f}: missing 'EXTERNAL {fn}(...)' declaration")
-                if "visiting()" in text and "EXTERNAL visiting()" not in text:
-                    rep.err(f"narrative/{f}: uses visiting() without declaring EXTERNAL visiting()")
-                for iid in re.findall(r'give_item\("([^"]+)"', text):
-                    item(iid, f"narrative/{f}")
-                for cid in re.findall(r'trigger\("([^"]+)"', text):
-                    if cid not in cps:
-                        rep.err(f"narrative/{f}: trigger of unknown consequence point {cid!r}")
-                lines = [l for l in text.splitlines() if l.strip() and not l.strip().startswith(("EXTERNAL", "~", "->", "=", "*", "+", "{", "}", "-", "//", "VAR"))]
-                untagged = [l for l in lines if "# en:" not in l and not l.strip().startswith("#")]
-                if lines and len(untagged) > len(lines) * 0.5:
-                    rep.warn(f"narrative/{f}: {len(untagged)}/{len(lines)} prose lines lack an '# en:' tag")
+        rep.warn("no scenes.json: the layer scene must be hand-made")
 
 
 def main():

@@ -24,7 +24,6 @@ func _ready() -> void:
 	add_child(world)
 	await get_tree().process_frame
 	await get_tree().create_timer(0.5).timeout
-	GameState.register_unlocked = true
 	var layer: Node = world.get_node("EraLayers/era_2026")
 	var traffic: TrafficSystem = layer.find_child("Traffic", true, false)
 	_check(traffic != null, "no Traffic node in era_2026")
