@@ -149,23 +149,23 @@ func _fill_plot() -> void:
 	actions.add_theme_constant_override("separation", 10)
 	body.add_child(actions)
 	if not mine and p.for_sale and p.sellable:
-		_btn(actions, tr("BTN_BUY") + "  " + Ledger.format_money(int(p.price)), func(): _do(Ledger.buy(p.tunnus), "NOTICE_BOUGHT", p.address))
+		_btn(actions, tr("BTN_BUY") + "  " + Ledger.format_money(int(p.price)), func(): _do(await Ledger.buy(p.tunnus), "NOTICE_BOUGHT", p.address))
 	if not mine and int(p.owner_id) != 0:
 		_bid_box = _spin(actions, int(p.price), 1000, 5_000_000)
-		_btn(actions, tr("BTN_BID"), func(): _do(Ledger.place_bid(p.tunnus, int(_bid_box.value)), "", ""))
+		_btn(actions, tr("BTN_BID"), func(): _do(await Ledger.place_bid(p.tunnus, int(_bid_box.value)), "", ""))
 	if mine:
 		_price_box = _spin(actions, int(p.price) if p.for_sale else int(p.land_value), 1000, 5_000_000)
-		_btn(actions, tr("BTN_LIST"), func(): _do(Ledger.list_for_sale(p.tunnus, int(_price_box.value)), "", ""))
+		_btn(actions, tr("BTN_LIST"), func(): _do(await Ledger.list_for_sale(p.tunnus, int(_price_box.value)), "", ""))
 		if p.for_sale:
-			_btn(actions, tr("BTN_UNLIST"), func(): _do(Ledger.list_for_sale(p.tunnus, 0), "", ""))
+			_btn(actions, tr("BTN_UNLIST"), func(): _do(await Ledger.list_for_sale(p.tunnus, 0), "", ""))
 	var arrears_total := 0
 	for t in tenants:
 		arrears_total += int(t.arrears)
 	if arrears_total > 0:
 		if mine:
-			_btn(actions, tr("BTN_PRESS") + "  " + Ledger.format_money(arrears_total), func(): _do(Ledger.press_tenant(p.tunnus), "", ""))
+			_btn(actions, tr("BTN_PRESS") + "  " + Ledger.format_money(arrears_total), func(): _do(await Ledger.press_tenant(p.tunnus), "", ""))
 		else:
-			_btn(actions, tr("BTN_ARREARS") + "  " + Ledger.format_money(arrears_total), func(): _do(Ledger.buy_arrears(p.tunnus), "", ""))
+			_btn(actions, tr("BTN_ARREARS") + "  " + Ledger.format_money(arrears_total), func(): _do(await Ledger.buy_arrears(p.tunnus), "", ""))
 	if mine and Ledger.structures().size() > 0:
 		var brow := HBoxContainer.new()
 		brow.add_theme_constant_override("separation", 10)
@@ -182,7 +182,7 @@ func _fill_plot() -> void:
 		if _build_pick.item_count > 0:
 			_btn(brow, tr("BTN_BUILD"), func():
 				var sid: String = str(_build_pick.get_item_metadata(_build_pick.selected))
-				_do(Ledger.build(p.tunnus, sid), "", ""))
+				_do(await Ledger.build(p.tunnus, sid), "", ""))
 	var bids := Ledger.bids_for(p.tunnus)
 	if bids.size() > 0:
 		body.add_child(_lbl(tr("UI_LEDGER_OFFERS"), 15, GOLD))
@@ -191,9 +191,9 @@ func _fill_plot() -> void:
 			body.add_child(line)
 			line.add_child(_lbl("   %s: %s" % [b.bidder_name, Ledger.format_money(int(b.amount))], 14))
 			if mine:
-				_btn(line, tr("BTN_ACCEPT"), func(): _do(Ledger.accept_bid(int(b.id)), "", ""))
+				_btn(line, tr("BTN_ACCEPT"), func(): _do(await Ledger.accept_bid(int(b.id)), "", ""))
 			elif int(b.bidder_id) == int(Ledger.me().get("id", -1)):
-				_btn(line, tr("BTN_WITHDRAW"), func(): _do(Ledger.withdraw_bid(int(b.id)), "", ""))
+				_btn(line, tr("BTN_WITHDRAW"), func(): _do(await Ledger.withdraw_bid(int(b.id)), "", ""))
 	show_parcel.emit(p.tunnus)
 
 
@@ -214,13 +214,13 @@ func _fill_portfolio() -> void:
 		body.add_child(line)
 		var p := Ledger.parcel(o.tunnus)
 		line.add_child(_lbl("   %s · %s · %s %s · %s" % [tr("UI_LEDGER_" + str(o.kind).to_upper()), p.get("address", o.tunnus), tr("UI_LEDGER_DUE"), _month_name(int(o.due_month)), Ledger.format_money(int(o.amount))], 14))
-		_btn(line, tr("BTN_PAY"), func(): _do(Ledger.pay(int(o.id)), "", ""))
+		_btn(line, tr("BTN_PAY"), func(): _do(await Ledger.pay(int(o.id)), "", ""))
 	var drow := HBoxContainer.new()
 	drow.add_theme_constant_override("separation", 10)
 	body.add_child(drow)
 	drow.add_child(_lbl(tr("UI_LEDGER_DONATE_HINT"), 14))
 	_donate_box = _spin(drow, 1000, 100, 1_000_000)
-	_btn(drow, tr("BTN_DONATE"), func(): _do(Ledger.donate(int(_donate_box.value)), "", ""))
+	_btn(drow, tr("BTN_DONATE"), func(): _do(await Ledger.donate(int(_donate_box.value)), "", ""))
 	for p in owned:
 		var b := Button.new()
 		b.flat = true
@@ -243,7 +243,7 @@ func _fill_offers() -> void:
 			var line := HBoxContainer.new()
 			body.add_child(line)
 			line.add_child(_lbl("   %s · %s: %s" % [p.address, b.bidder_name, Ledger.format_money(int(b.amount))], 14))
-			_btn(line, tr("BTN_ACCEPT"), func(): _do(Ledger.accept_bid(int(b.id)), "", ""))
+			_btn(line, tr("BTN_ACCEPT"), func(): _do(await Ledger.accept_bid(int(b.id)), "", ""))
 	if not any:
 		body.add_child(_lbl("   –", 14))
 	body.add_child(_lbl(tr("UI_LEDGER_OFFERS_OUT"), 15, GOLD))
@@ -254,7 +254,7 @@ func _fill_offers() -> void:
 		var line := HBoxContainer.new()
 		body.add_child(line)
 		line.add_child(_lbl("   %s: %s" % [Ledger.parcel(b.tunnus).get("address", b.tunnus), Ledger.format_money(int(b.amount))], 14))
-		_btn(line, tr("BTN_WITHDRAW"), func(): _do(Ledger.withdraw_bid(int(b.id)), "", ""))
+		_btn(line, tr("BTN_WITHDRAW"), func(): _do(await Ledger.withdraw_bid(int(b.id)), "", ""))
 
 
 func _fill_town() -> void:

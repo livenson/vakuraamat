@@ -1024,7 +1024,7 @@ func _fill_debug_map() -> void:
 	var be := Button.new()
 	be.text = "+ 50 000 €"
 	be.pressed.connect(func():
-		Ledger.debug_grant(50000)
+		await Ledger.debug_grant(50000)
 		_fill_debug_map())
 	row.add_child(be)
 	var bn := Button.new()
@@ -1154,6 +1154,9 @@ func debug_open(which: String) -> void:
 		"inventory": _toggle(inventory, _fill_inventory)
 		"map": _toggle(debug_map, _fill_debug_map)
 		"ledger": _toggle(ledger_panel, ledger_panel.fill)
+		"town":
+			ledger_panel.tabs.current_tab = 4
+			_toggle(ledger_panel, ledger_panel.fill)
 		"news": _toggle(news_panel, news_panel.fill)
 		"menu": _toggle(pause, _fill_pause)
 		"trade", "build":

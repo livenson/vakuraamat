@@ -86,6 +86,10 @@ func _ready() -> void:
 	builder.name = "ParcelBuilder"
 	add_child(builder)
 	builder.setup(self)
+	var figures := PresenceFigures.new()
+	figures.name = "PresenceFigures"
+	add_child(figures)
+	figures.setup(self)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--screenshot="):
 			_screenshot_path = a.trim_prefix("--screenshot=")
@@ -167,6 +171,8 @@ func _exit_tree() -> void:
 
 
 func _process(_delta: float) -> void:
+	if _ready_done:
+		Ledger.move(player.global_position, player.rotation.y)
 	if not _ready_done:
 		return
 	if sky and sky.tod:
