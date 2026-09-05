@@ -734,7 +734,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 380430,
@@ -1076,7 +1079,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 6344831,
@@ -1386,7 +1392,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3440826",
+    "aadr_id": "5747596",
+    "ads_oid": "ME03488302",
+    "koodaadress": "79171595200000000FKNK000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Palupera farm"
+   },
+   "addresses": [
+    "Palupera farm"
+   ],
+   "cadastral": [
+    "58201:002:1360"
+   ]
   },
   {
    "id": 6967038,
@@ -2168,7 +2187,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3440826",
+    "aadr_id": "5747596",
+    "ads_oid": "ME01756597",
+    "koodaadress": "79171595200000000FKNK000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Palupera farm"
+   },
+   "addresses": [
+    "Palupera farm"
+   ],
+   "cadastral": [
+    "58201:002:1360"
+   ]
   },
   {
    "id": 8200048,
@@ -2528,7 +2560,20 @@
    "chimney": false,
    "solar": false,
    "well": true,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3440826",
+    "aadr_id": "5747596",
+    "ads_oid": "ME03732117",
+    "koodaadress": "79171595200000000FKNK000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Palupera farm"
+   },
+   "addresses": [
+    "Palupera farm"
+   ],
+   "cadastral": [
+    "58201:002:1360"
+   ]
   },
   {
    "id": 380433,
@@ -3388,7 +3433,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 383790,
@@ -3684,7 +3732,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 383792,
@@ -3994,7 +4045,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2977975",
+    "aadr_id": "5296283",
+    "ads_oid": "EE02009216",
+    "koodaadress": "7917159520000000023XL000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Vaino"
+   },
+   "addresses": [
+    "Vaino"
+   ],
+   "cadastral": [
+    "17101:001:1997"
+   ]
   },
   {
    "id": 379304,
@@ -4261,7 +4325,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2987001",
+    "aadr_id": "5304051",
+    "ads_oid": "ME01756634",
+    "koodaadress": "79171595200000000E2B4000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Puurkaevu"
+   },
+   "addresses": [
+    "Puurkaevu"
+   ],
+   "cadastral": [
+    "58201:002:2480"
+   ]
   },
   {
    "id": 383376,
@@ -4557,7 +4634,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 6343052,
@@ -5127,7 +5207,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 6344384,
@@ -7023,7 +7106,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 9131790,
@@ -7319,7 +7405,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 383378,
@@ -7942,7 +8031,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": true
+   "monument": true,
+   "ads": {
+    "adr_id": "2984977",
+    "aadr_id": "5302291",
+    "ads_oid": "EE02114653",
+    "koodaadress": "791715952000000006A8T000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Võidumäe"
+   },
+   "addresses": [
+    "Võidumäe"
+   ],
+   "cadastral": [
+    "58201:002:2130"
+   ]
   },
   {
    "id": 383379,
@@ -8210,7 +8312,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984977",
+    "aadr_id": "5302291",
+    "ads_oid": "ME02663287",
+    "koodaadress": "791715952000000006A8T000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Võidumäe"
+   },
+   "addresses": [
+    "Võidumäe"
+   ],
+   "cadastral": [
+    "58201:002:2130"
+   ]
   },
   {
    "id": 383381,
@@ -8520,7 +8635,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984977",
+    "aadr_id": "5302291",
+    "ads_oid": "ME02562611",
+    "koodaadress": "791715952000000006A8T000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Võidumäe"
+   },
+   "addresses": [
+    "Võidumäe"
+   ],
+   "cadastral": [
+    "58201:002:2130"
+   ]
   },
   {
    "id": 6092642,
@@ -8788,7 +8916,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984977",
+    "aadr_id": "5302291",
+    "ads_oid": "ME02362189",
+    "koodaadress": "791715952000000006A8T000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Võidumäe"
+   },
+   "addresses": [
+    "Võidumäe"
+   ],
+   "cadastral": [
+    "58201:002:2130"
+   ]
   },
   {
    "id": 466991,
@@ -9098,7 +9239,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2977644",
+    "aadr_id": "5295942",
+    "ads_oid": "EE01150319",
+    "koodaadress": "7917159520000000056R7000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Kungla"
+   },
+   "addresses": [
+    "Kungla"
+   ],
+   "cadastral": [
+    "58201:002:2400"
+   ]
   },
   {
    "id": 6343874,
@@ -9352,7 +9506,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 466993,
@@ -9662,7 +9819,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2977644",
+    "aadr_id": "5295942",
+    "ads_oid": "ME01150325",
+    "koodaadress": "7917159520000000056R7000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Kungla"
+   },
+   "addresses": [
+    "Kungla"
+   ],
+   "cadastral": [
+    "58201:002:2400"
+   ]
   },
   {
    "id": 382021,
@@ -9930,7 +10100,20 @@
    "chimney": false,
    "solar": false,
    "well": true,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3440826",
+    "aadr_id": "5747596",
+    "ads_oid": "ME03488431",
+    "koodaadress": "79171595200000000FKNK000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Palupera farm"
+   },
+   "addresses": [
+    "Palupera farm"
+   ],
+   "cadastral": [
+    "58201:002:1360"
+   ]
   },
   {
    "id": 379826,
@@ -10942,7 +11125,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 469816,
@@ -11252,7 +11438,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2989952",
+    "aadr_id": "5307171",
+    "ads_oid": "EE01756520",
+    "koodaadress": "79171595200000000BI74000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Pihlapalu"
+   },
+   "addresses": [
+    "Pihlapalu"
+   ],
+   "cadastral": [
+    "58201:002:2600"
+   ]
   },
   {
    "id": 6345378,
@@ -11506,7 +11705,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 379869,
@@ -12222,7 +12424,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 424126,
@@ -12615,7 +12820,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": true
+   "monument": true,
+   "ads": {
+    "adr_id": "3433280",
+    "aadr_id": "5734489",
+    "ads_oid": "EE01646825",
+    "koodaadress": "79171595200000000FIWP000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Väikelaane"
+   },
+   "addresses": [
+    "Väikelaane"
+   ],
+   "cadastral": [
+    "58201:002:2500"
+   ]
   },
   {
    "id": 424127,
@@ -12924,7 +13142,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2985235",
+    "aadr_id": "5307170",
+    "ads_oid": "EE01744840",
+    "koodaadress": "79171595200000000BI73000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Kasepalu"
+   },
+   "addresses": [
+    "Kasepalu"
+   ],
+   "cadastral": [
+    "58201:002:2610"
+   ]
   },
   {
    "id": 379872,
@@ -13234,7 +13465,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2985221",
+    "aadr_id": "5302562",
+    "ads_oid": "ME00946372",
+    "koodaadress": "791715952000000008FBK000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Vabriku"
+   },
+   "addresses": [
+    "Vabriku"
+   ],
+   "cadastral": [
+    "58201:002:0026"
+   ]
   },
   {
    "id": 378721,
@@ -13503,7 +13747,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": true
+   "monument": true,
+   "ads": {
+    "adr_id": "2989950",
+    "aadr_id": "5307168",
+    "ads_oid": "ME03366152",
+    "koodaadress": "79171595200000000BI6V000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Palupera park"
+   },
+   "addresses": [
+    "Palupera park"
+   ],
+   "cadastral": [
+    "58201:002:1512"
+   ]
   },
   {
    "id": 430585,
@@ -13813,7 +14070,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2989952",
+    "aadr_id": "5307171",
+    "ads_oid": "ME03455451",
+    "koodaadress": "79171595200000000BI74000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Pihlapalu"
+   },
+   "addresses": [
+    "Pihlapalu"
+   ],
+   "cadastral": [
+    "58201:002:2600"
+   ]
   },
   {
    "id": 389491,
@@ -14109,7 +14379,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 382540,
@@ -14673,7 +14946,20 @@
    "chimney": true,
    "solar": false,
    "well": true,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2987079",
+    "aadr_id": "5304139",
+    "ads_oid": "EE03473288",
+    "koodaadress": "7917159520000000023XO000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Nõmme"
+   },
+   "addresses": [
+    "Nõmme"
+   ],
+   "cadastral": [
+    "58201:002:1000"
+   ]
   },
   {
    "id": 473922,
@@ -15167,7 +15453,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2985235",
+    "aadr_id": "5307170",
+    "ads_oid": "ME00998620",
+    "koodaadress": "79171595200000000BI73000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Kasepalu"
+   },
+   "addresses": [
+    "Kasepalu"
+   ],
+   "cadastral": [
+    "58201:002:2610"
+   ]
   },
   {
    "id": 389490,
@@ -15477,7 +15776,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3433271",
+    "aadr_id": "5734480",
+    "ads_oid": "EE00936138",
+    "koodaadress": "79171595200000000FIWO000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Tammepalu"
+   },
+   "addresses": [
+    "Tammepalu"
+   ],
+   "cadastral": [
+    "58201:002:0960"
+   ]
   },
   {
    "id": 6343847,
@@ -15731,7 +16043,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 378720,
@@ -16746,7 +17061,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": true
+   "monument": true,
+   "ads": {
+    "adr_id": "2985221",
+    "aadr_id": "5302562",
+    "ads_oid": "ME00946370",
+    "koodaadress": "791715952000000008FBK000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Vabriku"
+   },
+   "addresses": [
+    "Vabriku"
+   ],
+   "cadastral": [
+    "58201:002:0026"
+   ]
   },
   {
    "id": 378723,
@@ -17056,7 +17384,20 @@
    "chimney": true,
    "solar": false,
    "well": true,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2994278",
+    "aadr_id": "5311597",
+    "ads_oid": "EE00956477",
+    "koodaadress": "7917159520000000023XOA7S700000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Nõmme/1"
+   },
+   "addresses": [
+    "Nõmme/1"
+   ],
+   "cadastral": [
+    "58201:002:1000"
+   ]
   },
   {
    "id": 6344835,
@@ -17310,7 +17651,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 378724,
@@ -17620,7 +17964,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3433271",
+    "aadr_id": "5734480",
+    "ads_oid": "ME03488240",
+    "koodaadress": "79171595200000000FIWO000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Tammepalu"
+   },
+   "addresses": [
+    "Tammepalu"
+   ],
+   "cadastral": [
+    "58201:002:0960"
+   ]
   },
   {
    "id": 7822510,
@@ -17874,7 +18231,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 8861089,
@@ -18184,7 +18544,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2987079",
+    "aadr_id": "5304139",
+    "ads_oid": "ME03835352",
+    "koodaadress": "7917159520000000023XO000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Nõmme"
+   },
+   "addresses": [
+    "Nõmme"
+   ],
+   "cadastral": [
+    "58201:002:1000"
+   ]
   },
   {
    "id": 382769,
@@ -18495,7 +18868,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": true
+   "monument": true,
+   "ads": {
+    "adr_id": "2995935",
+    "aadr_id": "5313333",
+    "ads_oid": "ME01743859",
+    "koodaadress": "791715952000000009FYV000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Palupera põhikool"
+   },
+   "addresses": [
+    "Palupera põhikool"
+   ],
+   "cadastral": [
+    "58201:001:0228"
+   ]
   },
   {
    "id": 382766,
@@ -19948,7 +20334,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": true
+   "monument": true,
+   "ads": {
+    "adr_id": "2995935",
+    "aadr_id": "5313333",
+    "ads_oid": "ME01646824",
+    "koodaadress": "791715952000000009FYV000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Palupera põhikool"
+   },
+   "addresses": [
+    "Palupera põhikool"
+   ],
+   "cadastral": [
+    "58201:001:0228"
+   ]
   },
   {
    "id": 6345610,
@@ -20257,7 +20656,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2987079",
+    "aadr_id": "5304139",
+    "ads_oid": "ME00956488",
+    "koodaadress": "7917159520000000023XO000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Nõmme"
+   },
+   "addresses": [
+    "Nõmme"
+   ],
+   "cadastral": [
+    "58201:002:1000"
+   ]
   },
   {
    "id": 6344524,
@@ -20553,7 +20965,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 7822474,
@@ -20863,7 +21278,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2985221",
+    "aadr_id": "5302562",
+    "ads_oid": "ME02060040",
+    "koodaadress": "791715952000000008FBK000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Vabriku"
+   },
+   "addresses": [
+    "Vabriku"
+   ],
+   "cadastral": [
+    "58201:002:0026"
+   ]
   },
   {
    "id": 379635,
@@ -21916,7 +22344,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": true
+   "monument": true,
+   "ads": {
+    "adr_id": "2997382",
+    "aadr_id": "5314879",
+    "ads_oid": "ME01756636",
+    "koodaadress": "791715952000000009FYVA7WE00000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Palupera põhikool/1"
+   },
+   "addresses": [
+    "Palupera põhikool/1"
+   ],
+   "cadastral": [
+    "58201:001:0228"
+   ]
   },
   {
    "id": 381197,
@@ -22346,7 +22787,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 6345089,
@@ -22600,7 +23044,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 6343367,
@@ -22854,7 +23301,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 381198,
@@ -23342,7 +23792,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2979199",
+    "aadr_id": "5302215",
+    "ads_oid": "EE02732553",
+    "koodaadress": "7917159520000000023XX000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Kalda"
+   },
+   "addresses": [
+    "Kalda"
+   ],
+   "cadastral": [
+    "58201:002:0261"
+   ]
   },
   {
    "id": 7876741,
@@ -23651,7 +24114,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2999100",
+    "aadr_id": "5751226",
+    "ads_oid": "ME00948319",
+    "koodaadress": "79171595200000000EHDW000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Lillevälja"
+   },
+   "addresses": [
+    "Lillevälja"
+   ],
+   "cadastral": [
+    "17101:001:2048"
+   ]
   },
   {
    "id": 379828,
@@ -23960,7 +24436,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2976749",
+    "aadr_id": "5295046",
+    "ads_oid": "EE00956857",
+    "koodaadress": "791715952000000006FIK000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Pargi"
+   },
+   "addresses": [
+    "Pargi"
+   ],
+   "cadastral": [
+    "58201:002:0980"
+   ]
   },
   {
    "id": 7876744,
@@ -24269,7 +24758,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2999100",
+    "aadr_id": "5751226",
+    "ads_oid": "ME00948321",
+    "koodaadress": "79171595200000000EHDW000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Lillevälja"
+   },
+   "addresses": [
+    "Lillevälja"
+   ],
+   "cadastral": [
+    "17101:001:2048"
+   ]
   },
   {
    "id": 379397,
@@ -24537,7 +25039,20 @@
    "chimney": true,
    "solar": false,
    "well": true,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2976749",
+    "aadr_id": "5295046",
+    "ads_oid": "ME00956859",
+    "koodaadress": "791715952000000006FIK000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Pargi"
+   },
+   "addresses": [
+    "Pargi"
+   ],
+   "cadastral": [
+    "58201:002:0980"
+   ]
   },
   {
    "id": 464340,
@@ -24846,7 +25361,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2999100",
+    "aadr_id": "5751226",
+    "ads_oid": "ME00948323",
+    "koodaadress": "79171595200000000EHDW000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Lillevälja"
+   },
+   "addresses": [
+    "Lillevälja"
+   ],
+   "cadastral": [
+    "17101:001:2048"
+   ]
   },
   {
    "id": 6344571,
@@ -24903,7 +25431,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 464341,
@@ -25465,7 +25996,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2999100",
+    "aadr_id": "5751226",
+    "ads_oid": "EE00948317",
+    "koodaadress": "79171595200000000EHDW000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Lillevälja"
+   },
+   "addresses": [
+    "Lillevälja"
+   ],
+   "cadastral": [
+    "17101:001:2048"
+   ]
   },
   {
    "id": 464343,
@@ -25761,7 +26305,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 464342,
@@ -26751,7 +27298,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 739808,
@@ -27311,7 +27861,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3433306",
+    "aadr_id": "5734937",
+    "ads_oid": "EE01756639",
+    "koodaadress": "79171595200000000FIX8000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Väike-Pargi"
+   },
+   "addresses": [
+    "Väike-Pargi"
+   ],
+   "cadastral": [
+    "58201:002:2000"
+   ]
   },
   {
    "id": 7390677,
@@ -27621,7 +28184,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984192",
+    "aadr_id": "5301381",
+    "ads_oid": "ME00956851",
+    "koodaadress": "7917159520000000023XE000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Paju"
+   },
+   "addresses": [
+    "Paju"
+   ],
+   "cadastral": [
+    "58201:002:0271"
+   ]
   },
   {
    "id": 380594,
@@ -27939,7 +28515,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3433306",
+    "aadr_id": "5734937",
+    "ads_oid": "ME01054701",
+    "koodaadress": "79171595200000000FIX8000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Väike-Pargi"
+   },
+   "addresses": [
+    "Väike-Pargi"
+   ],
+   "cadastral": [
+    "58201:002:2000"
+   ]
   },
   {
    "id": 380595,
@@ -28249,7 +28838,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984192",
+    "aadr_id": "5301381",
+    "ads_oid": "ME00956845",
+    "koodaadress": "7917159520000000023XE000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Paju"
+   },
+   "addresses": [
+    "Paju"
+   ],
+   "cadastral": [
+    "58201:002:0271"
+   ]
   },
   {
    "id": 380596,
@@ -28559,7 +29161,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984192",
+    "aadr_id": "5301381",
+    "ads_oid": "ME00956838",
+    "koodaadress": "7917159520000000023XE000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Paju"
+   },
+   "addresses": [
+    "Paju"
+   ],
+   "cadastral": [
+    "58201:002:0271"
+   ]
   },
   {
    "id": 6343361,
@@ -28827,7 +29442,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984192",
+    "aadr_id": "5301381",
+    "ads_oid": "ME00956847",
+    "koodaadress": "7917159520000000023XE000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Paju"
+   },
+   "addresses": [
+    "Paju"
+   ],
+   "cadastral": [
+    "58201:002:0271"
+   ]
   },
   {
    "id": 383500,
@@ -29136,7 +29764,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984192",
+    "aadr_id": "5301381",
+    "ads_oid": "EE00956836",
+    "koodaadress": "7917159520000000023XE000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Paju"
+   },
+   "addresses": [
+    "Paju"
+   ],
+   "cadastral": [
+    "58201:002:0271"
+   ]
   },
   {
    "id": 382363,
@@ -29770,7 +30411,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984920",
+    "aadr_id": "5302225",
+    "ads_oid": "EE01872113",
+    "koodaadress": "7917159520000000023XH000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Sireli"
+   },
+   "addresses": [
+    "Sireli"
+   ],
+   "cadastral": [
+    "58201:002:0830"
+   ]
   },
   {
    "id": 382531,
@@ -30670,7 +31324,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2985233",
+    "aadr_id": "5313978",
+    "ads_oid": "EE00957205",
+    "koodaadress": "7917159520000000022OH000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Väike-Sireli"
+   },
+   "addresses": [
+    "Väike-Sireli"
+   ],
+   "cadastral": [
+    "58201:002:0831"
+   ]
   },
   {
    "id": 6342852,
@@ -30980,7 +31647,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984920",
+    "aadr_id": "5302225",
+    "ads_oid": "ME00957284",
+    "koodaadress": "7917159520000000023XH000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Sireli"
+   },
+   "addresses": [
+    "Sireli"
+   ],
+   "cadastral": [
+    "58201:002:0830"
+   ]
   },
   {
    "id": 6345180,
@@ -31354,7 +32034,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 6344450,
@@ -31622,7 +32305,20 @@
    "chimney": true,
    "solar": false,
    "well": true,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984311",
+    "aadr_id": "5301498",
+    "ads_oid": "ME00956965",
+    "koodaadress": "791715952000000005CNV000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Kuuse"
+   },
+   "addresses": [
+    "Kuuse"
+   ],
+   "cadastral": [
+    "58201:002:0004"
+   ]
   },
   {
    "id": 472353,
@@ -31890,7 +32586,20 @@
    "chimney": true,
    "solar": false,
    "well": true,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984311",
+    "aadr_id": "5301498",
+    "ads_oid": "EE00956956",
+    "koodaadress": "791715952000000005CNV000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Kuuse"
+   },
+   "addresses": [
+    "Kuuse"
+   ],
+   "cadastral": [
+    "58201:002:0004"
+   ]
   },
   {
    "id": 425593,
@@ -32158,7 +32867,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984311",
+    "aadr_id": "5301498",
+    "ads_oid": "ME00956958",
+    "koodaadress": "791715952000000005CNV000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Kuuse"
+   },
+   "addresses": [
+    "Kuuse"
+   ],
+   "cadastral": [
+    "58201:002:0004"
+   ]
   },
   {
    "id": 7427029,
@@ -32420,7 +33142,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2984311",
+    "aadr_id": "5301498",
+    "ads_oid": "ME00956960",
+    "koodaadress": "791715952000000005CNV000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Kuuse"
+   },
+   "addresses": [
+    "Kuuse"
+   ],
+   "cadastral": [
+    "58201:002:0004"
+   ]
   },
   {
    "id": 425594,
@@ -32729,7 +33464,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2977095",
+    "aadr_id": "5295382",
+    "ads_oid": "EE00956041",
+    "koodaadress": "7917159520000000058GF000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Lubja"
+   },
+   "addresses": [
+    "Lubja"
+   ],
+   "cadastral": [
+    "58201:002:2560"
+   ]
   },
   {
    "id": 425596,
@@ -33025,7 +33773,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 7822522,
@@ -33279,7 +34030,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 378310,
@@ -33575,7 +34329,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 378311,
@@ -34310,7 +35067,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2976986",
+    "aadr_id": "5295268",
+    "ads_oid": "EE00937991",
+    "koodaadress": "791715952000000006FHL000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Murakamäe"
+   },
+   "addresses": [
+    "Murakamäe"
+   ],
+   "cadastral": [
+    "58201:002:1170"
+   ]
   },
   {
    "id": 6345209,
@@ -34606,7 +35376,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 378312,
@@ -34902,7 +35675,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 430587,
@@ -35212,7 +35988,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "2989414",
+    "aadr_id": "5306569",
+    "ads_oid": "ME01756673",
+    "koodaadress": "791715952000000005IQK000000000000",
+    "full_address": "Tartu maakond, Elva vald, Palupera küla, Alliku"
+   },
+   "addresses": [
+    "Alliku"
+   ],
+   "cadastral": [
+    "58201:002:2490"
+   ]
   }
  ]
 }

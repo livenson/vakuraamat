@@ -195,6 +195,11 @@ kind = "outbuilding"
 floors = 1
 facade = "puit"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "104029262"
+address = "Madruse tn 22"
+purpose = "Elamu, kooli vms abihoone"
+year = 0
+tunnus = "79514:036:0006"
 
 [node name="B727990" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 247.8, 0, 191.1)
@@ -214,6 +219,11 @@ kind = "dwelling"
 floors = 1
 facade = "muu"
 roof_cover = "muu"
+ehr = "104029261"
+address = "Madruse tn 22"
+purpose = "Üksikelamu"
+year = 1969
+tunnus = "79514:036:0006"
 
 [node name="B727240" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 209.1, 0, 208.2)
@@ -233,6 +243,11 @@ kind = "outbuilding"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "katusekivi"
+ehr = "104031111"
+address = "Madruse tn 18"
+purpose = "Muu erihoone"
+year = 1937
+tunnus = "79514:036:0085"
 
 [node name="B8300044" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 189.2, 0, 213.6)
@@ -252,6 +267,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "katusekivi"
+ehr = "121291703"
+address = "Madruse tn 20"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79514:036:0085"
 
 [node name="B707903" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, 0, 229.1)
@@ -271,6 +291,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "eterniit"
+ehr = "104019746"
+address = "Piibu"
+purpose = "Üksikelamu"
+year = 1935
+tunnus = "83101:003:0455"
 
 [node name="B8060221" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 267.9, 0, 233.3)
@@ -289,6 +314,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Madruse tn 22"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B5689539" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 266.5, 0, 265.6)
@@ -308,6 +338,11 @@ kind = "dwelling"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Madruse tn 16"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B707913" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.0, 0, 268.3)
@@ -326,6 +361,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Piibu"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B727241" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 202.6, 0, 269.8)
@@ -344,6 +384,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Madruse tn 16"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B724377" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 194.2, 0, 275.0)
@@ -362,6 +407,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Kvissentali tee 9b"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B9061943" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.6, 0, 275.9)
@@ -380,6 +430,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Piibu"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B9061950" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.1, 0, 285.3)
@@ -398,6 +453,11 @@ kind = "ruin"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = ""
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B707917" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.1, 0, 285.4)
@@ -416,6 +476,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Piibu"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B7217019" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 214.7, 0, 289.9)
@@ -435,6 +500,11 @@ kind = "dwelling"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Madruse tn 16/1"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B6850964" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 315.3, 0, 348.3)
@@ -455,6 +525,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120819295"
+address = "Talmani tn 2"
+purpose = "Üksikelamu"
+year = 2017
+tunnus = "79514:036:0091"
 
 [node name="B716110" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1056.4, 0, 354.1)
@@ -473,6 +548,11 @@ kind = "outbuilding"
 floors = 1
 facade = "muu"
 roof_cover = "eterniit"
+ehr = "104039189"
+address = "Kvissentali tee 1"
+purpose = "Elamu, kooli vms abihoone"
+year = 0
+tunnus = "79514:036:0051"
 
 [node name="B7165597" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 289.4, 0, 356.4)
@@ -492,6 +572,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "katusekivi"
+ehr = "120792299"
+address = "Talmani tn 4"
+purpose = "Üksikelamu"
+year = 2002
+tunnus = "79514:036:0090"
 
 [node name="B5694291" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 855.7, 0, 361.1)
@@ -511,6 +596,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit"
 roof_cover = "plekk"
+ehr = "120537153"
+address = "Lootsi tn 3b"
+purpose = "Üksikelamu"
+year = 2008
+tunnus = "79514:036:0038"
 
 [node name="B5689780" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 814.9, 0, 368.6)
@@ -530,6 +620,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120289299"
+address = "Lootsi tn 3c"
+purpose = "Üksikelamu"
+year = 2008
+tunnus = "79514:036:0036"
 
 [node name="B8673710" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1008.3, 0, 371.9)
@@ -548,6 +643,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Kvissentali tee 1"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B5689559" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 399.9, 0, 373.0)
@@ -567,6 +667,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120299053"
+address = "Madruse tn 9"
+purpose = "Üksikelamu"
+year = 2008
+tunnus = "79514:036:0055"
 
 [node name="B737613" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 348.9, 0, 389.1)
@@ -586,6 +691,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120277073"
+address = "Madruse tn 12"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:036:0080"
 
 [node name="B5689560" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 424.3, 0, 390.3)
@@ -605,6 +715,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120307333"
+address = "Madruse tn 7"
+purpose = "Üksikelamu"
+year = 2008
+tunnus = "79514:036:0056"
 
 [node name="B5694294" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 861.7, 0, 392.9)
@@ -624,6 +739,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit"
 roof_cover = "plekk"
+ehr = "120541287"
+address = "Lootsi tn 3a"
+purpose = "Üksikelamu"
+year = 2009
+tunnus = "79514:036:0039"
 
 [node name="B5689781" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 817.3, 0, 393.5)
@@ -643,6 +763,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit"
 roof_cover = "plekk"
+ehr = "120313434"
+address = "Lootsi tn 5"
+purpose = "Üksikelamu"
+year = 2009
+tunnus = "79514:036:0037"
 
 [node name="B6708911" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 783.3, 0, 399.0)
@@ -662,6 +787,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120657112"
+address = "Lootsi tn 7"
+purpose = "Üksikelamu"
+year = 2013
+tunnus = "79514:036:0035"
 
 [node name="B5689779" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 750.2, 0, 402.8)
@@ -680,6 +810,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = ""
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B5694356" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 716.9, 0, 403.8)
@@ -699,6 +834,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120551632"
+address = "Lootsi tn 11"
+purpose = "Üksikelamu"
+year = 2009
+tunnus = "79514:036:0033"
 
 [node name="B6493295" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 448.3, 0, 407.2)
@@ -718,6 +858,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120562405"
+address = "Madruse tn 5"
+purpose = "Üksikelamu"
+year = 2013
+tunnus = "79514:036:0057"
 
 [node name="B5689653" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 545.4, 0, 407.8)
@@ -737,6 +882,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120312088"
+address = "Lootsi tn 21"
+purpose = "Üksikelamu"
+year = 2008
+tunnus = "79514:036:0028"
 
 [node name="B737614" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 370.2, 0, 407.9)
@@ -756,6 +906,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120270395"
+address = "Madruse tn 10"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:036:0079"
 
 [node name="B6075408" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 649.4, 0, 410.0)
@@ -775,6 +930,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "katusekivi"
+ehr = "120531649"
+address = "Lootsi tn 15"
+purpose = "Üksikelamu"
+year = 2011
+tunnus = "79514:036:0031"
 
 [node name="B5694355" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 677.6, 0, 412.0)
@@ -794,6 +954,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120549013"
+address = "Lootsi tn 13"
+purpose = "Üksikelamu"
+year = 2011
+tunnus = "79514:036:0032"
 
 [node name="B5694296" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 579.2, 0, 413.4)
@@ -813,6 +978,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "plekk"
+ehr = "120317177"
+address = "Lootsi tn 19"
+purpose = "Üksikelamu"
+year = 2009
+tunnus = "79514:036:0029"
 
 [node name="B5694297" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 615.5, 0, 414.7)
@@ -832,6 +1002,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120548197"
+address = "Lootsi tn 17"
+purpose = "Üksikelamu"
+year = 2009
+tunnus = "79514:036:0030"
 
 [node name="B731270" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 393.6, 0, 418.7)
@@ -851,6 +1026,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120231796"
+address = "Madruse tn 8"
+purpose = "Üksikelamu"
+year = 2004
+tunnus = "79514:036:0078"
 
 [node name="B5689782" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 867.5, 0, 422.4)
@@ -870,6 +1050,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120303143"
+address = "Lootsi tn 3"
+purpose = "Üksikelamu"
+year = 2010
+tunnus = "79514:036:0040"
 
 [node name="B5689561" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 470.4, 0, 426.0)
@@ -889,6 +1074,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120301360"
+address = "Madruse tn 3"
+purpose = "Üksikelamu"
+year = 2011
+tunnus = "79514:036:0058"
 
 [node name="B5694353" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 826.2, 0, 435.7)
@@ -908,6 +1098,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120538451"
+address = "Lootsi tn 4"
+purpose = "Üksikelamu"
+year = 2013
+tunnus = "79514:036:0051"
 
 [node name="B5694357" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 415.7, 0, 438.6)
@@ -927,6 +1122,11 @@ kind = "dwelling"
 floors = 2
 facade = "muu"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120538325"
+address = "Madruse tn 6"
+purpose = "Üksikelamu"
+year = 2002
+tunnus = "79514:036:0013"
 
 [node name="B6077850" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 788.5, 0, 444.1)
@@ -946,6 +1146,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "katusekivi"
+ehr = "120535102"
+address = "Lootsi tn 6"
+purpose = "Üksikelamu"
+year = 2009
+tunnus = "79514:036:0050"
 
 [node name="B5694352" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 756.8, 0, 444.6)
@@ -966,6 +1171,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120532917"
+address = "Lootsi tn 8"
+purpose = "Üksikelamu"
+year = 2011
+tunnus = "79514:036:0049"
 
 [node name="B730806" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 304.7, 0, 445.9)
@@ -984,6 +1194,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Madruse tn 14"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B6077851" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 725.3, 0, 449.2)
@@ -1002,6 +1217,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "katusekivi"
+ehr = "120539333"
+address = "Lootsi tn 10"
+purpose = "Üksikelamu"
+year = 2011
+tunnus = "79514:036:0048"
 
 [node name="B5689654" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 552.9, 0, 449.5)
@@ -1021,6 +1241,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120302613"
+address = "Lootsi tn 20"
+purpose = "Üksikelamu"
+year = 2008
+tunnus = "79514:036:0042"
 
 [node name="B5694298" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 872.0, 0, 451.5)
@@ -1040,6 +1265,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120547352"
+address = "Lootsi tn 1"
+purpose = "Üksikelamu"
+year = 2011
+tunnus = "79514:036:0041"
 
 [node name="B5694299" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 691.8, 0, 453.7)
@@ -1059,6 +1289,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120313961"
+address = "Lootsi tn 12"
+purpose = "Üksikelamu"
+year = 2011
+tunnus = "79514:036:0047"
 
 [node name="B726029" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 235.5, 0, 455.0)
@@ -1078,6 +1313,11 @@ kind = "outbuilding"
 floors = 1
 facade = "puit (vooder)"
 roof_cover = "plaatmaterjal (seal hulgas tsementkiudplaat)"
+ehr = "104043629"
+address = "Madruse tn 14"
+purpose = "Elamu, kooli vms abihoone"
+year = 1985
+tunnus = "79514:036:0074"
 
 [node name="B742506" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 438.2, 0, 457.1)
@@ -1097,6 +1337,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120722013"
+address = "Madruse tn 4"
+purpose = "Üksikelamu"
+year = 2015
+tunnus = "79514:036:0012"
 
 [node name="B6493296" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 512.2, 0, 457.7)
@@ -1116,6 +1361,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120653471"
+address = "Lootsi tn 22"
+purpose = "Üksikelamu"
+year = 2013
+tunnus = "79514:036:0084"
 
 [node name="B5689783" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 831.1, 0, 459.5)
@@ -1135,6 +1385,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120304069"
+address = "Lootsi tn 2"
+purpose = "Üksikelamu"
+year = 2011
+tunnus = "79514:036:0052"
 
 [node name="B5694354" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 657.9, 0, 459.7)
@@ -1153,6 +1408,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "katusekivi"
+ehr = "120689848"
+address = "Lootsi tn 14"
+purpose = "Üksikelamu"
+year = 2014
+tunnus = "79514:036:0046"
 
 [node name="B6077852" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 619.6, 0, 461.2)
@@ -1172,6 +1432,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120533654"
+address = "Lootsi tn 16"
+purpose = "Üksikelamu"
+year = 2002
+tunnus = "79514:036:0045"
 
 [node name="B6850945" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 550.5, 0, 485.7)
@@ -1190,6 +1455,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121312593"
+address = "Madruse tn 1"
+purpose = "Üksikelamu"
+year = 2020
+tunnus = "79514:036:0043"
 
 [node name="B8721605" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1024.9, 0, 488.5)
@@ -1208,6 +1478,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121406483"
+address = "Kvissentali põik 2"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0374"
 
 [node name="B5689563" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 417.5, 0, 490.1)
@@ -1227,6 +1502,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "katusekivi"
+ehr = "120295604"
+address = "Lootsi tn 25"
+purpose = "Üksikelamu"
+year = 2008
+tunnus = "79514:036:0011"
 
 [node name="B8535036" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 985.8, 0, 491.9)
@@ -1246,6 +1526,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121364490"
+address = "Ignatsi tn 8"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0370"
 
 [node name="B8337115" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 955.4, 0, 495.5)
@@ -1264,6 +1549,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121347410"
+address = "Ignatsi tn 6"
+purpose = "Üksikelamu"
+year = 2021
+tunnus = "79501:002:0368"
 
 [node name="B8058794" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 922.0, 0, 499.3)
@@ -1283,6 +1573,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121309612"
+address = "Ignatsi tn 4"
+purpose = "Üksikelamu"
+year = 2020
+tunnus = "79501:002:0366"
 
 [node name="B8155658" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 885.9, 0, 503.7)
@@ -1302,6 +1597,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121362432"
+address = "Ignatsi tn 2"
+purpose = "Üksikelamu"
+year = 2022
+tunnus = "79501:002:0364"
 
 [node name="B8558775" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 795.7, 0, 516.5)
@@ -1321,6 +1621,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "191671249"
+address = "Kvissentali tee 8"
+purpose = "Üksikelamu"
+year = 2023
+tunnus = "79501:002:0358"
 
 [node name="B5689564" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 408.0, 0, 517.8)
@@ -1340,6 +1645,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120290243"
+address = "Lootsi tn 27"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:036:0010"
 
 [node name="B8532950" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 770.2, 0, 520.0)
@@ -1358,6 +1668,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121363540"
+address = "Kvissentali tee 10"
+purpose = "Üksikelamu"
+year = 2023
+tunnus = "79501:002:0357"
 
 [node name="B8532870" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 715.4, 0, 524.4)
@@ -1376,6 +1691,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121357743"
+address = "Kvissentali tee 14"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0355"
 
 [node name="B727598" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 240.6, 0, 527.9)
@@ -1395,6 +1715,11 @@ kind = "dwelling"
 floors = 1
 facade = "krohv"
 roof_cover = "eterniit"
+ehr = "104013720"
+address = "Kvissentali tee 33"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 1935
+tunnus = "79514:036:0063"
 
 [node name="B8912877" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 687.3, 0, 530.9)
@@ -1414,6 +1739,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121386725"
+address = "Kvissentali tee 16"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0354"
 
 [node name="B723616" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 262.9, 0, 533.4)
@@ -1432,6 +1762,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Kvissentali tee 33"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B9767933" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 659.4, 0, 537.3)
@@ -1450,6 +1785,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121440709"
+address = "Kvissentali tee 18"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0353"
 
 [node name="B5689615" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 566.7, 0, 540.5)
@@ -1469,6 +1809,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit"
 roof_cover = "plekk"
+ehr = "120303140"
+address = "Pootsmani tn 2"
+purpose = "Üksikelamu"
+year = 2011
+tunnus = "79514:037:0121"
 
 [node name="B9108677" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 976.6, 0, 541.1)
@@ -1487,6 +1832,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = ""
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B8429373" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 961.2, 0, 542.7)
@@ -1506,6 +1856,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121325867"
+address = "Ignatsi tn 5"
+purpose = "Üksikelamu"
+year = 2021
+tunnus = "79501:002:0367"
 
 [node name="B737615" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 523.5, 0, 545.3)
@@ -1525,6 +1880,11 @@ kind = "dwelling"
 floors = 2
 facade = "muu"
 roof_cover = "plekk"
+ehr = "120279364"
+address = "Pootsmani tn 3"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0100"
 
 [node name="B7715669" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 933.0, 0, 545.7)
@@ -1545,6 +1905,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120862180"
+address = "Ignatsi tn 3"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0365"
 
 [node name="B9767686" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 890.1, 0, 547.1)
@@ -1563,6 +1928,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121443990"
+address = "Ignatsi tn 1"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0363"
 
 [node name="B7583910" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 837.6, 0, 548.1)
@@ -1582,6 +1952,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120850113"
+address = "Klaose tn 3"
+purpose = "Üksikelamu"
+year = 2019
+tunnus = "79501:002:0360"
 
 [node name="B737617" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 445.5, 0, 557.0)
@@ -1601,6 +1976,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "katusekivi"
+ehr = "120246680"
+address = "Pootsmani tn 39"
+purpose = "Üksikelamu"
+year = 2005
+tunnus = "79514:037:0035"
 
 [node name="B737616" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 404.9, 0, 561.3)
@@ -1620,6 +2000,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "plekk"
+ehr = "120269642"
+address = "Pootsmani tn 48"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:037:0040"
 
 [node name="B737620" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 572.5, 0, 569.4)
@@ -1639,6 +2024,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "muu"
+ehr = "120281831"
+address = "Pootsmani tn 4"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:037:0122"
 
 [node name="B737619" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 532.0, 0, 569.5)
@@ -1658,6 +2048,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120265701"
+address = "Pootsmani tn 5"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0101"
 
 [node name="B737618" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 343.6, 0, 572.7)
@@ -1677,6 +2072,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120265729"
+address = "Kapteni tn 2"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0063"
 
 [node name="B727301" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 296.0, 0, 573.2)
@@ -1697,6 +2097,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120193498"
+address = "Kapteni tn 3"
+purpose = "Üksikelamu"
+year = 2004
+tunnus = "79514:037:0067"
 
 [node name="B726060" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 406.7, 0, 590.9)
@@ -1716,6 +2121,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit"
 roof_cover = "plekk"
+ehr = "104048069"
+address = "Pootsmani tn 46"
+purpose = "Üksikelamu"
+year = 2003
+tunnus = "79514:037:0039"
 
 [node name="B737621" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 445.0, 0, 591.6)
@@ -1735,6 +2145,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "katusekivi"
+ehr = "120267294"
+address = "Pootsmani tn 37"
+purpose = "Üksikelamu"
+year = 2005
+tunnus = "79514:037:0053"
 
 [node name="B8517335" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 974.2, 0, 592.0)
@@ -1753,6 +2168,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121361574"
+address = "Riistapuu tn 3"
+purpose = "Üksikelamu"
+year = 2022
+tunnus = "79501:002:0372"
 
 [node name="B5689616" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 584.0, 0, 593.6)
@@ -1772,6 +2192,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120286793"
+address = "Pootsmani tn 6"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:037:0123"
 
 [node name="B7494525" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 892.0, 0, 594.2)
@@ -1791,6 +2216,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120824180"
+address = "Riistapuu tn 9"
+purpose = "Üksikelamu"
+year = 2020
+tunnus = "79501:002:0243"
 
 [node name="B7494531" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 947.1, 0, 594.8)
@@ -1810,6 +2240,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120828011"
+address = "Riistapuu tn 5"
+purpose = "Üksikelamu"
+year = 2022
+tunnus = "79501:002:0239"
 
 [node name="B7494527" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 918.5, 0, 595.2)
@@ -1829,6 +2264,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120795546"
+address = "Riistapuu tn 7"
+purpose = "Üksikelamu"
+year = 2018
+tunnus = "79501:002:0241"
 
 [node name="B737622" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 544.1, 0, 598.7)
@@ -1848,6 +2288,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120277773"
+address = "Pootsmani tn 7"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:037:0102"
 
 [node name="B7494523" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 839.3, 0, 598.7)
@@ -1866,6 +2311,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121266820"
+address = "Riistapuu tn 11"
+purpose = "Üksikelamu"
+year = 2019
+tunnus = "79501:002:0245"
 
 [node name="B7583908" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 727.5, 0, 600.4)
@@ -1884,6 +2334,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120821895"
+address = "Riistapuu tn 19"
+purpose = "Üksikelamu"
+year = 2021
+tunnus = "79501:002:0249"
 
 [node name="B8663800" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 754.8, 0, 601.7)
@@ -1903,6 +2358,11 @@ kind = "dwelling"
 floors = 2
 facade = "betoon"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121351027"
+address = "Riistapuu tn 17"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0248"
 
 [node name="B7494519" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 811.3, 0, 603.2)
@@ -1922,6 +2382,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120790378"
+address = "Riistapuu tn 13"
+purpose = "Üksikelamu"
+year = 2019
+tunnus = "79501:002:0246"
 
 [node name="B7583905" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 674.2, 0, 603.6)
@@ -1941,6 +2406,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120809190"
+address = "Riistapuu tn 23"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0251"
 
 [node name="B7494515" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 784.6, 0, 604.3)
@@ -1960,6 +2430,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120825788"
+address = "Riistapuu tn 15"
+purpose = "Üksikelamu"
+year = 2020
+tunnus = "79501:002:0247"
 
 [node name="B728080" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 295.6, 0, 607.9)
@@ -1979,6 +2454,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "104047831"
+address = "Kapteni tn 5"
+purpose = "Üksikelamu"
+year = 2004
+tunnus = "79514:037:0068"
 
 [node name="B737623" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 335.8, 0, 608.2)
@@ -1998,6 +2478,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120263796"
+address = "Kapteni tn 4"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0071"
 
 [node name="B725927" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 447.8, 0, 621.4)
@@ -2017,6 +2502,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120193629"
+address = "Pootsmani tn 35"
+purpose = "Üksikelamu"
+year = 2003
+tunnus = "79514:037:0051"
 
 [node name="B737624" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 587.7, 0, 621.6)
@@ -2036,6 +2526,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "katusekivi"
+ehr = "120271237"
+address = "Pootsmani tn 8"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0124"
 
 [node name="B725929" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 405.9, 0, 622.4)
@@ -2055,6 +2550,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "katusekivi"
+ehr = "104048068"
+address = "Pootsmani tn 44"
+purpose = "Üksikelamu"
+year = 2003
+tunnus = "79514:037:0038"
 
 [node name="B737625" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 546.1, 0, 625.6)
@@ -2075,6 +2575,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120272942"
+address = "Pootsmani tn 9"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:037:0103"
 
 [node name="B9680585" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1023.9, 0, 634.3)
@@ -2094,6 +2599,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121443218"
+address = "Aeru tn 2"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 0
+tunnus = "79501:002:0168"
 
 [node name="B737626" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 336.7, 0, 638.7)
@@ -2113,6 +2623,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120193597"
+address = "Kapteni tn 6"
+purpose = "Üksikelamu"
+year = 2005
+tunnus = "79514:037:0072"
 
 [node name="B8429637" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 766.8, 0, 643.2)
@@ -2131,6 +2646,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Hauskari tn 2"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B7494543" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 951.6, 0, 643.8)
@@ -2151,6 +2671,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120833355"
+address = "Aeru tn 1"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2019
+tunnus = "79501:002:0167"
 
 [node name="B7494537" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 906.3, 0, 646.6)
@@ -2171,6 +2696,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120825271"
+address = "Klaose tn 4"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2018
+tunnus = "79501:002:0195"
 
 [node name="B737628" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 593.9, 0, 647.3)
@@ -2190,6 +2720,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "plekk"
+ehr = "120265700"
+address = "Pootsmani tn 10"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:037:0109"
 
 [node name="B7673723" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 831.8, 0, 650.6)
@@ -2209,6 +2744,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120857491"
+address = "Klaose tn 5"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2019
+tunnus = "79501:002:0196"
 
 [node name="B713512" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 290.1, 0, 650.8)
@@ -2228,6 +2768,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "104047832"
+address = "Kapteni tn 7"
+purpose = "Üksikelamu"
+year = 2004
+tunnus = "79514:037:0069"
 
 [node name="B8058796" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 789.0, 0, 650.8)
@@ -2247,6 +2792,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121307063"
+address = "Hauskari tn 2"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 0
+tunnus = "79501:002:0183"
 
 [node name="B725932" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 411.4, 0, 651.4)
@@ -2266,6 +2816,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "muu"
+ehr = "120193584"
+address = "Pootsmani tn 42"
+purpose = "Üksikelamu"
+year = 2004
+tunnus = "79514:037:0037"
 
 [node name="B737627" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 455.4, 0, 654.4)
@@ -2285,6 +2840,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120230962"
+address = "Pootsmani tn 33"
+purpose = "Üksikelamu"
+year = 2004
+tunnus = "79514:037:0049"
 
 [node name="B737629" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 552.4, 0, 656.0)
@@ -2304,6 +2864,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "katusekivi"
+ehr = "120275941"
+address = "Pootsmani tn 13"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0093"
 
 [node name="B9625598" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 726.8, 0, 656.6)
@@ -2322,6 +2887,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = ""
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B7736324" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 851.3, 0, 662.2)
@@ -2340,6 +2910,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Klaose tn 5"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B9362682" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1026.2, 0, 667.7)
@@ -2358,6 +2933,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = ""
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B8429656" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 768.7, 0, 672.6)
@@ -2376,6 +2956,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Hauskari tn 4"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B737633" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 597.9, 0, 674.1)
@@ -2395,6 +2980,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "plekk"
+ehr = "120265111"
+address = "Pootsmani tn 12"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0110"
 
 [node name="B7494548" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 954.1, 0, 674.1)
@@ -2415,6 +3005,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120862960"
+address = "Aeru tn 3"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2019
+tunnus = "79501:002:0169"
 
 [node name="B7494540" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 908.1, 0, 677.1)
@@ -2435,6 +3030,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120826017"
+address = "Klaose tn 6"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2018
+tunnus = "79501:002:0197"
 
 [node name="B737632" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 328.5, 0, 678.0)
@@ -2454,6 +3054,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120249660"
+address = "Kapteni tn 8"
+purpose = "Üksikelamu"
+year = 2005
+tunnus = "79514:037:0073"
 
 [node name="B737630" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 424.7, 0, 681.1)
@@ -2473,6 +3078,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120246236"
+address = "Pootsmani tn 40"
+purpose = "Üksikelamu"
+year = 2004
+tunnus = "79514:037:0036"
 
 [node name="B7673724" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 833.5, 0, 682.2)
@@ -2492,6 +3102,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120857519"
+address = "Klaose tn 7"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2019
+tunnus = "79501:002:0198"
 
 [node name="B8010487" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 790.8, 0, 683.7)
@@ -2511,6 +3126,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121307141"
+address = "Hauskari tn 4"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 0
+tunnus = "79501:002:0185"
 
 [node name="B737635" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 559.3, 0, 684.0)
@@ -2530,6 +3150,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "plekk"
+ehr = "120282647"
+address = "Pootsmani tn 15"
+purpose = "Üksikelamu"
+year = 2002
+tunnus = "79514:037:0094"
 
 [node name="B737634" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 467.4, 0, 687.4)
@@ -2549,6 +3174,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120231634"
+address = "Pootsmani tn 31"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0047"
 
 [node name="B7736328" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 853.0, 0, 693.3)
@@ -2567,6 +3197,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Klaose tn 7"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B737636" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 606.2, 0, 696.3)
@@ -2586,6 +3221,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120270980"
+address = "Pootsmani tn 14"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0111"
 
 [node name="B7583913" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1031.7, 0, 702.2)
@@ -2606,6 +3246,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120862096"
+address = "Aeru tn 6"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2026
+tunnus = "79501:002:0172"
 
 [node name="B7583925" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 954.4, 0, 705.0)
@@ -2625,6 +3270,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120857928"
+address = "Aeru tn 5"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2020
+tunnus = "79501:002:0171"
 
 [node name="B8868624" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 770.4, 0, 705.5)
@@ -2643,6 +3293,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Hauskari tn 6"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B7583924" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 910.9, 0, 707.7)
@@ -2663,6 +3318,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120861459"
+address = "Klaose tn 8"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2020
+tunnus = "79501:002:0199"
 
 [node name="B737637" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 432.1, 0, 707.9)
@@ -2682,6 +3342,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120265191"
+address = "Pootsmani tn 38"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:037:0054"
 
 [node name="B5689929" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 599.8, 0, 709.3)
@@ -2700,6 +3365,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = ""
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B5689694" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 563.5, 0, 711.1)
@@ -2719,6 +3389,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "katusekivi"
+ehr = "120307748"
+address = "Pootsmani tn 17"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79514:037:0095"
 
 [node name="B7823135" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 835.4, 0, 714.4)
@@ -2738,6 +3413,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121262522"
+address = "Klaose tn 9"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2019
+tunnus = "79501:002:0200"
 
 [node name="B8058798" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 792.7, 0, 716.1)
@@ -2757,6 +3437,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121316325"
+address = "Hauskari tn 6"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 0
+tunnus = "79501:002:0187"
 
 [node name="B737638" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 481.4, 0, 720.8)
@@ -2776,6 +3461,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit"
 roof_cover = "plekk"
+ehr = "120246704"
+address = "Pootsmani tn 29"
+purpose = "Üksikelamu"
+year = 2005
+tunnus = "79514:037:0046"
 
 [node name="B7809575" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 723.7, 0, 722.6)
@@ -2794,6 +3484,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121279676"
+address = "Hauskari tn 3"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0184"
 
 [node name="B8111819" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 854.9, 0, 725.3)
@@ -2812,6 +3507,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Klaose tn 9"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B737639" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 607.3, 0, 726.1)
@@ -2831,6 +3531,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120271011"
+address = "Pootsmani tn 16"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0112"
 
 [node name="B737641" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 320.9, 0, 733.6)
@@ -2850,6 +3555,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120259482"
+address = "Tüürimehe tn 2"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:037:0056"
 
 [node name="B7583914" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1033.6, 0, 734.1)
@@ -2869,6 +3579,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121312286"
+address = "Aeru tn 8"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2022
+tunnus = "79501:002:0174"
 
 [node name="B737642" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 450.8, 0, 737.1)
@@ -2888,6 +3603,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "katusekivi"
+ehr = "104048064"
+address = "Pootsmani tn 36"
+purpose = "Üksikelamu"
+year = 2003
+tunnus = "79514:037:0052"
 
 [node name="B5689928" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 601.6, 0, 737.1)
@@ -2906,6 +3626,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = ""
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B737640" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 566.8, 0, 737.5)
@@ -2926,6 +3651,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120271000"
+address = "Pootsmani tn 19"
+purpose = "Üksikelamu"
+year = 2005
+tunnus = "79514:037:0096"
 
 [node name="B7715693" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 949.6, 0, 738.8)
@@ -2945,6 +3675,11 @@ kind = "dwelling"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = "120872189-2"
+address = "Aeru tn 7/2"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B737643" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 497.8, 0, 743.3)
@@ -2964,6 +3699,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120263034"
+address = "Pootsmani tn 27"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0045"
 
 [node name="B7715695" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 963.7, 0, 744.3)
@@ -2984,6 +3724,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120872189"
+address = "Aeru tn 7/1"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2020
+tunnus = "79501:002:0173"
 
 [node name="B725097" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 354.8, 0, 746.0)
@@ -3002,6 +3747,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "plekk"
+ehr = "104048103"
+address = "Tüürimehe tn 4"
+purpose = "Üksikelamu"
+year = 2004
+tunnus = "79514:037:0057"
 
 [node name="B7823137" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 837.2, 0, 746.3)
@@ -3021,6 +3771,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121262532"
+address = "Klaose tn 11"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2021
+tunnus = "79501:002:0202"
 
 [node name="B8300402" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 794.5, 0, 747.4)
@@ -3039,6 +3794,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121337959"
+address = "Hauskari tn 8"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 0
+tunnus = "79501:002:0189"
 
 [node name="B7583883" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 730.3, 0, 750.5)
@@ -3058,6 +3818,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120867781"
+address = "Hauskari tn 5"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0186"
 
 [node name="B737644" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 383.3, 0, 753.0)
@@ -3077,6 +3842,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "katusekivi"
+ehr = "120233607"
+address = "Tüürimehe tn 6"
+purpose = "Üksikelamu"
+year = 2004
+tunnus = "79514:037:0059"
 
 [node name="B8111818" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 856.3, 0, 757.4)
@@ -3095,6 +3865,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Klaose tn 11"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B737645" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 608.6, 0, 758.2)
@@ -3114,6 +3889,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "plekk"
+ehr = "120273878"
+address = "Pootsmani tn 18"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:037:0113"
 
 [node name="B8871508" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 773.5, 0, 761.6)
@@ -3132,6 +3912,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Hauskari tn 8"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B737647" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 463.5, 0, 765.2)
@@ -3151,6 +3936,11 @@ kind = "dwelling"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120253577"
+address = "Pootsmani tn 34"
+purpose = "Üksikelamu"
+year = 2004
+tunnus = "79514:037:0050"
 
 [node name="B7583915" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1035.2, 0, 766.1)
@@ -3170,6 +3960,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121305784"
+address = "Aeru tn 10"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2022
+tunnus = "79501:002:0176"
 
 [node name="B737646" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 560.9, 0, 766.6)
@@ -3189,6 +3984,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "katusekivi"
+ehr = "120271332"
+address = "Pootsmani tn 21"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:037:0097"
 
 [node name="B7583917" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 959.5, 0, 767.9)
@@ -3208,6 +4008,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120855055"
+address = "Aeru tn 9"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2019
+tunnus = "79501:002:0175"
 
 [node name="B737648" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 517.8, 0, 768.3)
@@ -3227,6 +4032,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "katusekivi"
+ehr = "120275000"
+address = "Pootsmani tn 25"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:037:0099"
 
 [node name="B7583920" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 913.0, 0, 770.4)
@@ -3246,6 +4056,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120874297"
+address = "Klaose tn 12"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2022
+tunnus = "79501:002:0203"
 
 [node name="B8058754" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 795.4, 0, 777.0)
@@ -3265,6 +4080,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121316311"
+address = "Hauskari tn 10"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2022
+tunnus = "79501:002:0191"
 
 [node name="B737649" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 405.0, 0, 777.1)
@@ -3284,6 +4104,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120267647"
+address = "Tüürimehe tn 8"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0060"
 
 [node name="B8631009" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 838.9, 0, 778.2)
@@ -3303,6 +4128,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121379040"
+address = "Klaose tn 13"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 0
+tunnus = "79501:002:0204"
 
 [node name="B8010484" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 733.0, 0, 779.8)
@@ -3322,6 +4152,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121267307"
+address = "Hauskari tn 7"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0188"
 
 [node name="B8193243" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 302.3, 0, 788.4)
@@ -3341,6 +4176,11 @@ kind = "dwelling"
 floors = 2
 facade = "looduslik kivi"
 roof_cover = "plekk"
+ehr = "120861227"
+address = "Tüürimehe tn 1"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79514:037:0078"
 
 [node name="B737651" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 599.4, 0, 789.3)
@@ -3360,6 +4200,11 @@ kind = "dwelling"
 floors = 2
 facade = "looduslik kivi"
 roof_cover = "katusekivi"
+ehr = "120259780"
+address = "Pootsmani tn 20"
+purpose = "Üksikelamu"
+year = 2005
+tunnus = "79514:037:0114"
 
 [node name="B9156393" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 858.2, 0, 789.5)
@@ -3378,6 +4223,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Klaose tn 13"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B737650" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 481.3, 0, 789.9)
@@ -3397,6 +4247,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120259567"
+address = "Pootsmani tn 32"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0048"
 
 [node name="B5689679" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 356.4, 0, 791.8)
@@ -3416,6 +4271,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit"
 roof_cover = "plekk"
+ehr = "120282645"
+address = "Tüürimehe tn 3"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0104"
 
 [node name="B7583916" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1037.1, 0, 800.6)
@@ -3435,6 +4295,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121305719"
+address = "Aeru tn 12"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2022
+tunnus = "79501:002:0178"
 
 [node name="B7583918" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 961.7, 0, 804.8)
@@ -3454,6 +4319,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120855061"
+address = "Aeru tn 11"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2019
+tunnus = "79501:002:0177"
 
 [node name="B7583923" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 915.0, 0, 807.4)
@@ -3473,6 +4343,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120872212"
+address = "Klaose tn 14"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2022
+tunnus = "79501:002:0205"
 
 [node name="B8058747" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 797.2, 0, 809.0)
@@ -3492,6 +4367,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121316237"
+address = "Hauskari tn 12"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 2022
+tunnus = "79501:002:0192"
 
 [node name="B737655" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 577.9, 0, 810.7)
@@ -3511,6 +4391,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120265695"
+address = "Pootsmani tn 22"
+purpose = "Üksikelamu"
+year = 2006
+tunnus = "79514:037:0115"
 
 [node name="B7494549" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 736.3, 0, 811.7)
@@ -3530,6 +4415,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120817181"
+address = "Hauskari tn 9"
+purpose = "Üksikelamu"
+year = 1982
+tunnus = "79501:002:0190"
 
 [node name="B8631010" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 840.9, 0, 811.8)
@@ -3549,6 +4439,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121379075"
+address = "Klaose tn 15"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 0
+tunnus = "79501:002:0206"
 
 [node name="B737656" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 413.9, 0, 812.7)
@@ -3568,6 +4463,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "katusekivi"
+ehr = "120267644"
+address = "Tüürimehe tn 10"
+purpose = "Üksikelamu"
+year = 2008
+tunnus = "79514:037:0061"
 
 [node name="B9156391" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 859.6, 0, 818.5)
@@ -3586,6 +4486,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Klaose tn 15"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B737659" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 548.8, 0, 821.7)
@@ -3605,6 +4510,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "120267989"
+address = "Pootsmani tn 24"
+purpose = "Üksikelamu"
+year = 2007
+tunnus = "79514:037:0108"
 
 [node name="B737658" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 376.0, 0, 822.8)
@@ -3624,6 +4534,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit"
 roof_cover = "plekk"
+ehr = "120264663"
+address = "Tüürimehe tn 5"
+purpose = "Üksikelamu"
+year = 2005
+tunnus = "79514:037:0105"
 
 [node name="B8663866" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 704.0, 0, 827.6)
@@ -3642,6 +4557,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121349220"
+address = "Meruski tn 11"
+purpose = "Üksikelamu"
+year = 2025
+tunnus = "79501:002:0213"
 
 [node name="B711556" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 309.0, 0, 837.5)
@@ -3661,6 +4581,11 @@ kind = "outbuilding"
 floors = 1
 facade = "puit"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "104018155"
+address = "Kapteni tn 12"
+purpose = "Elamu, kooli vms abihoone"
+year = 0
+tunnus = "79514:037:0032"
 
 [node name="B9400822" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 428.1, 0, 843.4)
@@ -3679,6 +4604,11 @@ kind = "outbuilding"
 floors = 1
 facade = "looduslik kivi"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121406062"
+address = "Tüürimehe tn 7"
+purpose = "Elamu, kooli vms abihoone"
+year = 0
+tunnus = "79301:001:0507"
 
 [node name="B9773267" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 659.1, 0, 846.8)
@@ -3697,6 +4627,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121432356"
+address = "Meruski tn 13"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0215"
 
 [node name="B7824894" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1000.9, 0, 850.2)
@@ -3716,6 +4651,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121303080"
+address = "Meruski tn 12"
+purpose = "Ridaelamu"
+year = 2021
+tunnus = "79501:002:0214"
 
 [node name="B8924215" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 320.6, 0, 856.2)
@@ -3735,6 +4675,11 @@ kind = "dwelling"
 floors = 1
 facade = "krohv"
 roof_cover = "plekk"
+ehr = "121405013"
+address = "Kapteni tn 12"
+purpose = "Üksikelamu"
+year = 2025
+tunnus = "79514:037:0032"
 
 [node name="B9108105" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 407.4, 0, 864.7)
@@ -3753,6 +4698,11 @@ kind = "dwelling"
 floors = 2
 facade = "looduslik kivi"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121405974"
+address = "Tüürimehe tn 7"
+purpose = "Üksikelamu"
+year = 2026
+tunnus = "79301:001:0507"
 
 [node name="B7583899" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 614.4, 0, 867.5)
@@ -3771,6 +4721,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120856718"
+address = "Meruski tn 15"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0216"
 
 [node name="B8558783" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 562.7, 0, 877.8)
@@ -3790,6 +4745,11 @@ kind = "outbuilding"
 floors = 1
 facade = "puit (vooder)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121347162"
+address = "Meruski tn 17"
+purpose = "Elamu, kooli vms abihoone"
+year = 0
+tunnus = "79501:002:0217"
 
 [node name="B8414320" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 699.1, 0, 879.8)
@@ -3808,6 +4768,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121343352"
+address = "Meruski tn 20"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0219"
 
 [node name="B8866826" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 337.7, 0, 882.1)
@@ -3827,6 +4792,11 @@ kind = "dwelling"
 floors = 2
 facade = "looduslik kivi"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121375283"
+address = "Kapteni tn 14"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79301:001:0506"
 
 [node name="B8532879" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 572.0, 0, 885.1)
@@ -3846,6 +4816,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121330537"
+address = "Meruski tn 17"
+purpose = "Üksikelamu"
+year = 2026
+tunnus = "79501:002:0217"
 
 [node name="B7583889" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 668.5, 0, 895.7)
@@ -3866,6 +4841,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120850003"
+address = "Meruski tn 22"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0222"
 
 [node name="B713351" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 367.4, 0, 903.3)
@@ -3884,6 +4864,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = "Kapteni tn 16"
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B7546396" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 635.8, 0, 905.7)
@@ -3902,6 +4887,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "120854312"
+address = "Meruski tn 24"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0224"
 
 [node name="B7217009" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 351.3, 0, 907.0)
@@ -3920,6 +4910,11 @@ kind = "outbuilding"
 floors = 0
 facade = ""
 roof_cover = ""
+ehr = ""
+address = ""
+purpose = ""
+year = 0
+tunnus = ""
 
 [node name="B8414328" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 615.7, 0, 918.1)
@@ -3939,6 +4934,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121356272"
+address = "Meruski tn 26"
+purpose = "Üksikelamu"
+year = 2023
+tunnus = "79501:002:0226"
 
 [node name="B724418" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 360.8, 0, 919.9)
@@ -3957,6 +4957,11 @@ kind = "dwelling"
 floors = 1
 facade = "info puudub"
 roof_cover = "info puudub"
+ehr = "104043621"
+address = "Kapteni tn 16"
+purpose = "Üksikelamu"
+year = 1947
+tunnus = "79514:037:0134"
 
 [node name="B8414330" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 469.9, 0, 931.2)
@@ -3975,6 +4980,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121350536"
+address = "Meruski tn 27"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0227"
 
 [node name="B8457172" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 587.3, 0, 934.8)
@@ -3993,6 +5003,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121311554"
+address = "Meruski tn 28"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0228"
 
 [node name="B8532876" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 557.4, 0, 941.2)
@@ -4012,6 +5027,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121311604"
+address = "Meruski tn 30"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0230"
 
 [node name="B713042" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 383.6, 0, 943.7)
@@ -4031,6 +5051,11 @@ kind = "outbuilding"
 floors = 1
 facade = "puit"
 roof_cover = "eterniit"
+ehr = "120540697"
+address = "Kapteni tn 16"
+purpose = "Elamu, kooli vms abihoone"
+year = 1955
+tunnus = "79514:037:0134"
 
 [node name="B9302706" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 434.6, 0, 944.5)
@@ -4050,6 +5075,11 @@ kind = "dwelling"
 floors = 2
 facade = "metall (seal hulgas plekk või profiilplekk)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121413885"
+address = "Meruski tn 29"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0229"
 
 [node name="B724421" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 353.0, 0, 952.7)
@@ -4068,6 +5098,11 @@ kind = "outbuilding"
 floors = 1
 facade = "puit"
 roof_cover = "eterniit"
+ehr = "120540695"
+address = "Kapteni tn 16"
+purpose = "Elamu, kooli vms abihoone"
+year = 1955
+tunnus = "79514:037:0134"
 
 [node name="B8532874" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 532.8, 0, 954.3)
@@ -4086,6 +5121,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121349856"
+address = "Meruski tn 32"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0232"
 
 [node name="B8726835" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 489.7, 0, 973.6)
@@ -4104,6 +5144,11 @@ kind = "dwelling"
 floors = 2
 facade = "fassaadiplaat (seal hulgas tsementkiudplaat)"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121373800"
+address = "Meruski tn 34"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0234"
 
 [node name="B9026477" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 494.9, 0, 1002.5)
@@ -4123,6 +5168,11 @@ kind = "dwelling"
 floors = 2
 facade = "puit (vooder)"
 roof_cover = "muu"
+ehr = "121361302"
+address = "Meruski tn 36"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0236"
 
 [node name="B8429300" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 454.2, 0, 1021.0)
@@ -4141,6 +5191,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "bituumen või  PVC  plaat või rullmaterjal"
+ehr = "121351895"
+address = "Meruski tn 35"
+purpose = "Üksikelamu"
+year = 0
+tunnus = "79501:002:0235"
 
 [node name="Roads" type="Node3D" parent="."]
 script = ExtResource("7")

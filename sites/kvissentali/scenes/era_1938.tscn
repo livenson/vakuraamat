@@ -156,6 +156,11 @@ kind = "outbuilding"
 floors = 2
 facade = "keraamiline tellis"
 roof_cover = "katusekivi"
+ehr = "104031111"
+address = "Madruse tn 18"
+purpose = "Muu erihoone"
+year = 1937
+tunnus = "79514:036:0085"
 
 [node name="B707903" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.5, 0, 229.1)
@@ -175,6 +180,11 @@ kind = "dwelling"
 floors = 2
 facade = "krohv"
 roof_cover = "eterniit"
+ehr = "104019746"
+address = "Piibu"
+purpose = "Üksikelamu"
+year = 1935
+tunnus = "83101:003:0455"
 
 [node name="B727598" type="Node3D" parent="Buildings"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 240.6, 0, 527.9)
@@ -194,6 +204,11 @@ kind = "dwelling"
 floors = 1
 facade = "krohv"
 roof_cover = "eterniit"
+ehr = "104013720"
+address = "Kvissentali tee 33"
+purpose = "Muu kolme või enama korteriga elamu"
+year = 1935
+tunnus = "79514:036:0063"
 
 [node name="Manor_home_farm" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 170.0, 0, 533.0)

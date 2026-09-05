@@ -127,7 +127,16 @@ def summarize_ehr(d):
     floors = int(num(pohi.get("maxKorrusteArv"))) or None
     heat = (tech.get("heat_source") or "").lower()
     energy = (tech.get("energy") or "").lower()
+    kujud = (e.get("ehitiseKujud") or {}).get("ruumikuju") or []
+    kaddr = [a for k in kujud for a in ((k.get("ehitiseKujuAadressid") or {}).get("aadress") or []) if a.get("olek", "K") == "K"]
+    taddr = [a for a in ((e.get("ehitiseAadressid") or {}).get("aadress") or []) if ((a.get("olekviit") or {}).get("olek", "K")) == "K"]
+    first = (kaddr or taddr or [{}])[0]
+    kys = [k for k in ((e.get("ehitiseKatastriyksused") or {}).get("ehitiseKatastriyksus") or []) if k.get("olek", "K") == "K"]
+    ads = {"adr_id": first.get("adrId"), "aadr_id": first.get("aadr_id"), "ads_oid": kujud[0].get("adsOid") if kujud else None,
+           "koodaadress": first.get("koodaadress"), "full_address": first.get("taisaadress")} if first else None
     return {"year": year, "floors": floors, "area": area, "volume": volume,
+            "ads": ads, "addresses": sorted({a.get("lahiaadress") for a in kaddr + taddr if a.get("lahiaadress")}),
+            "cadastral": [k.get("katastritunnus") for k in kys if k.get("katastritunnus")],
             "height_est": round(volume / area, 1) if area and volume else None,
             "name": andmed.get("nimetus"), "purpose": ots.get("kaosIdTxt"), "purpose_code": ots.get("kaosKood"), "status": andmed.get("seisund"),
             "materials": tech,
@@ -307,6 +316,7 @@ def fetch(site, root=ROOT, use_ehr=True, use_lod2=True):
             "kind": kind, "color": COLORS[kind], "wall_color": wall_color, "roof_color": roof_color, "korgus_m": props.get("korgus_m"),
             "materials": mats, "chimney": bool(info.get("chimney", kind == "dwelling")), "solar": bool(info.get("solar")),
             "well": bool(info.get("well")), "monument": bool(info.get("monument")),
+            "ads": info.get("ads"), "addresses": info.get("addresses") or [], "cadastral": info.get("cadastral") or [],
         })
     out.sort(key=lambda b: (b["z"], b["x"]))
     path = os.path.join(site_dir, "buildings.json")
