@@ -34,7 +34,8 @@ adapter interface are in `tools/pipeline/sources.py`; only Estonia is implemente
    `terrain_meta.json` (extent, sheets, height range, sources, attribution).
 2. **Features** (`make features`): `extract_features.py` derives the village massing
    (`buildings_2026.json`, boxes for objects over 2.5 m that are not green) and still water
-   (`water_2026.json`) from the laser data and the orthophoto, and the anchors the layout uses.
+   (`water_2026.json`) from the laser data and the orthophoto, moored boats (`boats_2026.json`:
+   bright hulls beside the river) and the anchors the layout uses.
 3. **Registers** (`make buildings`, `make roads`, `make parcels`, `make tenants`, `make market`,
    `make real-trees`): the WFS and register fetches above, each writing one JSON in the pack.
 4. **Scenes** (`make scenes`): `tools/gen_era_scenes.py` turns `scenes.json` and `layout.json` into

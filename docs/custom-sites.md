@@ -222,8 +222,9 @@ Interaction components after Cogito's patterns (MIT, credited in `THIRD_PARTY.md
   register row, its tenants and its plot's owner (`UiManager.show_sheet`).
 
 Bathrooms (toilet, bathtub, sink and mirror, Kenney models from Poly Pizza) are one room of every
-home; boats (Quaternius, Google and jeremy models from Poly Pizza) moor along the long side of every
-still-water patch over 300 m², a sailboat on big water; the parked bicycle is the Google model.
+home; boats (Quaternius, Google and jeremy models from Poly Pizza) moor where the orthophoto shows them
+(`boats_2026.json` from the feature pass: bright hulls beside the tile's low, treeless water, with
+their heading) and along the long side of every still-water patch over 300 m²; the parked bicycle is the Google model.
 Playgrounds are built from the Poly Pizza swing, slide, seesaw, jungle gym, monkey bars, trampoline
 and play structure (more of them on bigger grounds). A `court` kit lays a tennis court along the
 parcel's long side (two on big plots, a basketball court beyond); the purpose does not say where
