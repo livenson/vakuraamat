@@ -56,6 +56,15 @@ Estonian Land Board Open Data License — **free for commercial and non-commerci
 
 ---
 
+### 1.10 Land valuation 2022 and transaction statistics
+- The cadastral WFS (`kataster:ky_kehtiv`) carries `maks_hind`, the taxation value of every unit from the
+  2022 regular valuation (all 761k units valued from registry data, no site visits), refreshed nightly.
+  This is the economy game's baseline price per parcel. It is a taxation value, not a market price.
+- Maa-amet's transaction statistics environment (https://www.maaruum.ee/kinnisvara/htraru/) has
+  settlement-level medians per property type since 1996, but only as XLSX exports from a query UI;
+  no API. Statistics Estonia (IA028 housing price index, JSON API) and Eesti Pank rates are the
+  machine-readable macro inputs.
+
 ## 2. Target game artifacts
 
 Each raw data type maps to one or more of these final in-engine artifacts:
@@ -146,6 +155,12 @@ Historical maps present a genuinely different problem from modern DTM/orthophoto
 3. This data does **not** need to be imported into Godot directly for most purposes — it's primarily a Blender/level-design reference layer for accurate, real-world-grounded prop placement, not a runtime asset. Optionally, road/building centerlines and footprints could be exported and used to auto-generate rough prop placement in Godot as a starting point for hand-refinement.
 
 ---
+
+### 3.8 Land values → `parcels.json` and `market.json`
+`tools/pipeline/fetch_parcels.py` keeps `maks_hind` as `land_value` (int EUR, null when unset) with
+`land_value_per_m2`, `ehak`, `settlement`, `county`, `ads_oid`, and writes a `summary` block.
+`tools/pipeline/market.py` derives medians and quartiles per intended purpose into `market.json`, and
+can join a hand-exported Maa-amet XLSX (`--xlsx`) as `transactions`. Both files are committed with the pack.
 
 ## 4. Recommended toolchain summary
 

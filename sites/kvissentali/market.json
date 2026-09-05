@@ -1,0 +1,84 @@
+{
+ "attribution": "Maakataster (maa maksustamishind 2022): Maa- ja Ruumiamet",
+ "source": "derived from maks_hind",
+ "fetched": "2026-09-05",
+ "valuation_year": 2022,
+ "county": "Tartu maakond",
+ "settlement": "Tartu linn",
+ "municipality": "Tartu linn",
+ "by_purpose": {
+  "ARIMAA": {
+   "median_eur_m2": 30.13,
+   "p25": 29.23,
+   "p75": 36.75,
+   "n": 3,
+   "total_area": 21998,
+   "total_value": 681887
+  },
+  "ELAMUMAA": {
+   "median_eur_m2": 57.5,
+   "p25": 54.35,
+   "p75": 61.43,
+   "n": 210,
+   "total_area": 513354,
+   "total_value": 20943415
+  },
+  "MAATULUNDUSMAA": {
+   "median_eur_m2": 0.31,
+   "p25": 0.28,
+   "p75": 0.35,
+   "n": 7,
+   "total_area": 1137831,
+   "total_value": 360247
+  },
+  "SIHTOTSTARBETA_MAA": {
+   "median_eur_m2": 4.0,
+   "p25": 4.0,
+   "p75": 4.0,
+   "n": 8,
+   "total_area": 754430,
+   "total_value": 1397272
+  },
+  "TOOTMISMAA": {
+   "median_eur_m2": 68.12,
+   "p25": 66.89,
+   "p75": 69.14,
+   "n": 6,
+   "total_area": 12521,
+   "total_value": 366736
+  },
+  "TRANSPORDIMAA": {
+   "median_eur_m2": 4.0,
+   "p25": 4.0,
+   "p75": 4.0,
+   "n": 39,
+   "total_area": 136377,
+   "total_value": 488136
+  },
+  "UHISKONDLIKE_EHITISTE_MAA": {
+   "median_eur_m2": 17.83,
+   "p25": 16.29,
+   "p75": 24.97,
+   "n": 3,
+   "total_area": 24055,
+   "total_value": 404745
+  },
+  "ULDKASUTATAV_MAA": {
+   "median_eur_m2": 4.0,
+   "p25": 4.0,
+   "p75": 4.0,
+   "n": 13,
+   "total_area": 114114,
+   "total_value": 456456
+  },
+  "all": {
+   "median_eur_m2": 55.35,
+   "p25": 17.09,
+   "p75": 60.7,
+   "n": 289,
+   "total_area": 2714680,
+   "total_value": 25098894
+  }
+ },
+ "transactions": null
+}

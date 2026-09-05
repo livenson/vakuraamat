@@ -6,7 +6,7 @@ SITE ?= palupera
 TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
 CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
-.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate tile-service world-service buildings real-trees dev-watch parcels roads
+.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate tile-service world-service buildings real-trees dev-watch parcels roads market
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, gdal, git-lfs; npm for ink), pull LFS files, first Godot import"
@@ -23,6 +23,7 @@ help:
 	@echo "make features         derive sites/$(SITE)/buildings_*.json and water_*.json from the tile (author edits afterwards)"
 	@echo "make scenes           regenerate sites/$(SITE)/scenes/*.tscn from scenes.json + layout.json"
 	@echo "make validate         check every site pack for broken references (no Godot needed)"
+	@echo "make market           derive sites/$(SITE)/market.json (land value medians per purpose; XLSX=<maa-amet export> joins transaction statistics)"
 
 setup:
 	brew list --cask godot >/dev/null 2>&1 || brew install --cask godot
@@ -50,6 +51,7 @@ tile:
 	@[ -s sites/$(SITE)/buildings.json ] || $(MAKE) buildings
 	@[ -s sites/$(SITE)/parcels.json ] || $(MAKE) parcels
 	@[ -s sites/$(SITE)/roads.json ] || $(MAKE) roads
+	@[ -s sites/$(SITE)/market.json ] || $(MAKE) market
 	$(MAKE) scenes
 	python3 tools/validate_site.py --site $(SITE)
 
@@ -77,6 +79,9 @@ real-trees:
 
 parcels:
 	python3 tools/pipeline/fetch_parcels.py --site $(SITE)
+
+market:
+	python3 tools/pipeline/market.py --site $(SITE) $(if $(XLSX),--xlsx $(XLSX))
 
 roads:
 	python3 tools/pipeline/fetch_roads.py --site $(SITE)

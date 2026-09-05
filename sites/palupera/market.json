@@ -1,0 +1,76 @@
+{
+ "attribution": "Maakataster (maa maksustamishind 2022): Maa- ja Ruumiamet",
+ "source": "derived from maks_hind",
+ "fetched": "2026-09-05",
+ "valuation_year": 2022,
+ "county": "Tartu maakond",
+ "settlement": "Astuvere küla",
+ "municipality": "Elva vald",
+ "by_purpose": {
+  "ELAMUMAA": {
+   "median_eur_m2": 0.66,
+   "p25": 0.61,
+   "p75": 0.99,
+   "n": 13,
+   "total_area": 97317,
+   "total_value": 61357
+  },
+  "JAATMEHOIDLA_MAA": {
+   "median_eur_m2": 0.04,
+   "p25": 0.04,
+   "p75": 0.04,
+   "n": 1,
+   "total_area": 11642,
+   "total_value": 466
+  },
+  "MAATULUNDUSMAA": {
+   "median_eur_m2": 0.43,
+   "p25": 0.32,
+   "p75": 0.54,
+   "n": 29,
+   "total_area": 1991643,
+   "total_value": 755893
+  },
+  "TOOTMISMAA": {
+   "median_eur_m2": 2.11,
+   "p25": 1.69,
+   "p75": 2.12,
+   "n": 4,
+   "total_area": 15770,
+   "total_value": 8550
+  },
+  "TRANSPORDIMAA": {
+   "median_eur_m2": 0.04,
+   "p25": 0.04,
+   "p75": 0.04,
+   "n": 8,
+   "total_area": 249552,
+   "total_value": 9981
+  },
+  "UHISKONDLIKE_EHITISTE_MAA": {
+   "median_eur_m2": 0.3,
+   "p25": 0.3,
+   "p75": 0.3,
+   "n": 1,
+   "total_area": 25946,
+   "total_value": 7784
+  },
+  "ULDKASUTATAV_MAA": {
+   "median_eur_m2": 0.04,
+   "p25": 0.04,
+   "p75": 0.04,
+   "n": 2,
+   "total_area": 25186,
+   "total_value": 1007
+  },
+  "all": {
+   "median_eur_m2": 0.44,
+   "p25": 0.27,
+   "p75": 0.58,
+   "n": 58,
+   "total_area": 2417056,
+   "total_value": 845038
+  }
+ },
+ "transactions": null
+}

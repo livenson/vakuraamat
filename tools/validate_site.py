@@ -243,6 +243,36 @@ def validate(site, rep, root=ROOT):
     if m.get("water") and not os.path.exists(os.path.join(site_dir, m["water"])):
         rep.warn(f"water file {m['water']} missing (make features)")
 
+    # --- economy data: parcels with land values, the market snapshot
+    def load_json(name, required):
+        path = os.path.join(site_dir, name)
+        if not os.path.exists(path):
+            return None
+        try:
+            d = json.load(open(path))
+        except (json.JSONDecodeError, OSError) as e:
+            rep.err(f"{name}: {e}"); return None
+        for k in required:
+            if k not in d:
+                rep.err(f"{name}: missing top-level key {k!r}"); return None
+        return d
+    parcels = load_json("parcels.json", ("parcels",))
+    if parcels:
+        units = parcels["parcels"]
+        for u in units:
+            lv = u.get("land_value")
+            if lv is not None and not isinstance(lv, (int, float)):
+                rep.err(f"parcels.json {u.get('tunnus')}: land_value must be a number or null")
+        if units and not any(u.get("land_value") for u in units):
+            rep.warn("parcels.json has no land_value: re-run make parcels")
+    market = load_json("market.json", ("by_purpose", "source"))
+    if market:
+        if not market["by_purpose"]:
+            rep.warn("market.json: by_purpose is empty")
+        for k, v in market["by_purpose"].items():
+            if not (isinstance(v, dict) and isinstance(v.get("median_eur_m2"), (int, float)) and v["median_eur_m2"] >= 0 and isinstance(v.get("n"), int) and v["n"] >= 1):
+                rep.err(f"market.json by_purpose {k}: needs median_eur_m2 >= 0 and n >= 1")
+
     # --- scenes.json semantics
     if spec:
         try:
