@@ -96,7 +96,7 @@ def export_glb(basemesh, out_path, services_export):
     ExportService, ObjectService = services_export
     root = ExportService.create_character_copy(basemesh, name_suffix="_export")
     export_basemesh = ObjectService.find_object_of_type_amongst_nearest_relatives(root, "Basemesh")
-    ExportService.bake_modifiers_remove_helpers(export_basemesh, bake_masks=True, bake_subdiv=True, remove_helpers=True, also_proxy=True)
+    ExportService.bake_modifiers_remove_helpers(export_basemesh, bake_masks=True, bake_subdiv=False, remove_helpers=True, also_proxy=True)
     for img in bpy.data.images:
         if img.size[0] > TEXTURE_PX or img.size[1] > TEXTURE_PX:
             img.scale(min(img.size[0], TEXTURE_PX), min(img.size[1], TEXTURE_PX))

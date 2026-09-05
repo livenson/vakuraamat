@@ -2,7 +2,7 @@
 // (Beer's law) with refraction of what lies below, foam along the shore, sky reflection.
 // Adapted for Godot 4.7 and still inland water from the "Realistic Water Shader" by UnionBytes
 // (Achim Menzel) and K. S. Ernest Lee, https://github.com/godot-extended-libraries/godot-realistic-water,
-// MIT licence (see THIRD_PARTY.md). Opaque with a screen-texture composite: no alpha sorting, SSR works.
+// MIT licence (see THIRD_PARTY.md). Composites the screen texture below the surface (ALPHA stays 1).
 shader_type spatial;
 render_mode cull_back, depth_draw_always, diffuse_burley, specular_schlick_ggx;
 
@@ -10,14 +10,14 @@ uniform sampler2D DEPTH_TEXTURE : hint_depth_texture, filter_linear_mipmap;
 uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_linear_mipmap;
 
 uniform float wave_speed = 0.35;
-uniform vec4 wave_a = vec4(1.0, 0.4, 0.05, 7.0);    // xy direction, z steepness, w length (m)
-uniform vec4 wave_b = vec4(-0.3, 0.8, 0.04, 4.2);
-uniform vec4 wave_c = vec4(-0.9, -0.6, 0.03, 2.3);
+uniform vec4 wave_a = vec4(1.0, 0.4, 0.02, 7.0);    // xy direction, z steepness, w length (m)
+uniform vec4 wave_b = vec4(-0.3, 0.8, 0.015, 4.2);
+uniform vec4 wave_c = vec4(-0.9, -0.6, 0.01, 2.3);
 
 uniform sampler2D normalmap_a : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
 uniform float normal_scale = 0.09;                   // texture repeats per metre
 uniform vec2 normal_drift = vec2(0.018, 0.012);     // metres per second
-uniform float normal_strength : hint_range(0.0, 1.0) = 0.45;
+uniform float normal_strength : hint_range(0.0, 1.0) = 0.22;
 
 uniform sampler2D foam_sampler : hint_default_black, filter_linear_mipmap, repeat_enable;
 uniform float foam_level = 0.6;                      // metres of water depth under which foam shows
@@ -25,8 +25,8 @@ uniform float refraction = 0.035;
 
 uniform vec4 color_deep : source_color = vec4(0.03, 0.08, 0.08, 1.0);
 uniform vec4 color_shallow : source_color = vec4(0.22, 0.34, 0.27, 1.0);
-uniform float beers_law = 1.7;
-uniform float depth_offset = -0.1;
+uniform float beers_law = 0.45;
+uniform float depth_offset = -0.3;
 
 varying vec3 wave_normal;
 varying vec2 world_xz;
@@ -91,7 +91,7 @@ void fragment() {
 	float depth_blend_pow = clamp(pow(depth_blend, 2.5), 0.0, 1.0);
 	vec3 screen_color = textureLod(SCREEN_TEXTURE, ref_uv, depth_blend_pow * 2.5).rgb;
 	vec3 dye = mix(color_shallow.rgb, color_deep.rgb, depth_blend_pow);
-	vec3 color = mix(screen_color * mix(vec3(1.0), dye, 0.8), dye, depth_blend_pow * 0.9);
+	vec3 color = mix(screen_color * mix(vec3(1.0), dye * 1.8, depth_blend_pow * 0.6), dye, depth_blend_pow * 0.75);   // shallow: clear, tinted; deep: dye
 
 	// --- shore foam where the water is shallow ---------------------------------------------------
 	float foam_depth = 1.0 - min(1.0, max(depth_diff, 0.0) / max(foam_level, 0.01));
@@ -100,6 +100,7 @@ void fragment() {
 	color = mix(color, vec3(0.9, 0.93, 0.9), foam_mix);
 
 	ALBEDO = color;
+	ALPHA = 1.0;      // writing ALPHA puts the surface in the transparent pass, after the screen copy it samples
 	METALLIC = 0.0;
 	ROUGHNESS = 0.02;
 	SPECULAR = 0.5;

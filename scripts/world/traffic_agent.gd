@@ -19,6 +19,7 @@ var lateral := 0.0               # metres to the right of the travel direction
 var allowed: Array = []
 var rng := RandomNumberGenerator.new()
 var _body: Node3D
+var _year := 2026
 var _wheels: Array[Node3D] = []
 var _t := 0.0
 var _speed_now := 0.0
@@ -26,6 +27,7 @@ var _terrain: Terrain3D
 
 
 func setup(g: RoadGraph, k: String, e: Dictionary, start_s: float, fwd: bool, seed_value: int, year: int) -> void:
+	_year = year
 	graph = g
 	kind = k
 	edge = e
@@ -108,8 +110,11 @@ func _place(delta: float) -> void:
 	if d.length_squared() > 0.0:
 		rotation.y = atan2(-d.x, -d.y)
 	if kind == "walker" and _body:
-		_body.position.y = absf(sin(_t * 6.0)) * 0.05 * (_speed_now / maxf(speed, 0.1))
-		_body.rotation.z = sin(_t * 6.0) * 0.03
+		if _body is HumanFigure:
+			_body.set_walking(_speed_now > 0.05, _speed_now / 1.4)
+		else:
+			_body.position.y = absf(sin(_t * 6.0)) * 0.05 * (_speed_now / maxf(speed, 0.1))
+			_body.rotation.z = sin(_t * 6.0) * 0.03
 	for w in _wheels:
 		w.rotate_object_local(Vector3.RIGHT, -_speed_now * delta / 0.32)
 
@@ -127,6 +132,8 @@ func _clothes(fig: Node, col: Color) -> void:
 
 
 func _make_walker() -> Node3D:
+	if HumanFigure.available():
+		return HumanFigure.make(rng, _year)
 	var fig: Node3D = load(FIGURES[rng.randi() % FIGURES.size()]).instantiate()
 	var k := rng.randf_range(0.9, 1.05)
 	fig.scale = Vector3(k, k, k)
@@ -173,7 +180,12 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 	_box(root, Vector3(0.04, 0.5, 0.04), Vector3(0, 0.62, -0.35), paint, 0.4)       # seat tube
 	_box(root, Vector3(0.45, 0.03, 0.03), Vector3(0, 0.95, 0.5), Color(0.2, 0.2, 0.2), 0.5)   # handlebar
 	_box(root, Vector3(0.18, 0.05, 0.25), Vector3(0, 0.92, -0.35), Color(0.15, 0.1, 0.08))   # saddle
-	if with_rider:
+	if with_rider and HumanFigure.available():
+		var rider := HumanFigure.make(r, 2026)
+		rider.pose = "sit"
+		rider.position = Vector3(0, 0.55, -0.15)
+		root.add_child(rider)
+	elif with_rider:
 		var fig: Node3D = load(FIGURES[0]).instantiate()
 		fig.position = Vector3(0, 0.5, -0.3)
 		fig.scale = Vector3(0.95, 0.95, 0.95)
