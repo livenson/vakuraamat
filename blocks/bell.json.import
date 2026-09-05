@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://dba2ij12hhw2b"
+valid=false
+
+[deps]
+
+source_file="res://blocks/bell.json"
+
+[params]
+
+compress=true

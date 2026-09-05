@@ -209,6 +209,19 @@ func layout() -> Dictionary:
 	return parsed if typeof(parsed) == TYPE_DICTIONARY else {}
 
 
+## Display name of any pack (active or not) in the current locale, read from its strings.csv.
+func display_name(id: String) -> String:
+	_ensure()
+	var key := name_key(id)
+	if id == active and tr(key) != key:
+		return tr(key)
+	var loc := TranslationServer.get_locale().substr(0, 2)
+	for t in csv_translations(str(_root_of.get(id, ROOT)) + id + "/strings.csv"):
+		if t.locale == loc and t.get_message(key) != "":
+			return t.get_message(key)
+	return key if key != "" else id
+
+
 ## Translation key of a site's display name (falls back to the id).
 func name_key(id: String) -> String:
 	_ensure()

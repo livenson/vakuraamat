@@ -121,6 +121,19 @@
     },
     {
      "type": "pickup",
+     "name": "Pickup_bell_clapper",
+     "item": "bell_clapper",
+     "examine": "ITEM_BELL_CLAPPER_DESC",
+     "at": {
+      "ref": "landmark",
+      "offset": [
+       6,
+       -5
+      ]
+     }
+    },
+    {
+     "type": "pickup",
      "name": "Pickup_graft_bundle",
      "item": "graft_bundle",
      "examine": "ITEM_GRAFT_BUNDLE_DESC",
@@ -205,67 +218,6 @@
     {
      "type": "hunting",
      "max_animals": 6
-    },
-    {
-     "type": "group",
-     "name": "WellRing",
-     "at": "farm",
-     "offset": [
-      14,
-      -8
-     ],
-     "flag": "well_kept",
-     "visible_when": true,
-     "children": [
-      {
-       "type": "torus",
-       "name": "Ring",
-       "inner": 0.8,
-       "outer": 1.2,
-       "color": "stone",
-       "y": 0.3
-      },
-      {
-       "type": "examine",
-       "name": "WellExamine",
-       "key": "EX_WELL_KEPT",
-       "loc": "LOC_WELL",
-       "label": "LOC_WELL"
-      }
-     ]
-    },
-    {
-     "type": "group",
-     "name": "WellDip",
-     "at": "farm",
-     "offset": [
-      14,
-      -8
-     ],
-     "flag": "well_kept",
-     "visible_when": false,
-     "children": [
-      {
-       "type": "examine",
-       "name": "DipExamine",
-       "key": "EX_WELL_DIP",
-       "loc": "LOC_WELL",
-       "label": "LOC_WELL"
-      }
-     ]
-    },
-    {
-     "type": "pickup",
-     "name": "Pickup_harvest_letter",
-     "item": "harvest_letter",
-     "examine": "ITEM_HARVEST_LETTER_DESC",
-     "at": {
-      "ref": "farm",
-      "offset": [
-       5,
-       -9
-      ]
-     }
     },
     {
      "type": "pickup",
@@ -358,6 +310,67 @@
        "key": "EX_GATE_GONE",
        "loc": "LOC_FIELD",
        "label": "LOC_FIELD"
+      }
+     ]
+    },
+    {
+     "type": "pickup",
+     "name": "Pickup_harvest_letter",
+     "item": "harvest_letter",
+     "examine": "ITEM_HARVEST_LETTER_DESC",
+     "at": {
+      "ref": "farm",
+      "offset": [
+       5,
+       -9
+      ]
+     }
+    },
+    {
+     "type": "group",
+     "name": "WellRing",
+     "at": "farm",
+     "offset": [
+      14,
+      -8
+     ],
+     "flag": "well_kept",
+     "visible_when": true,
+     "children": [
+      {
+       "type": "torus",
+       "name": "Ring",
+       "inner": 0.8,
+       "outer": 1.2,
+       "color": "stone",
+       "y": 0.3
+      },
+      {
+       "type": "examine",
+       "name": "WellExamine",
+       "key": "EX_WELL_KEPT",
+       "loc": "LOC_WELL",
+       "label": "LOC_WELL"
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "name": "WellDip",
+     "at": "farm",
+     "offset": [
+      14,
+      -8
+     ],
+     "flag": "well_kept",
+     "visible_when": false,
+     "children": [
+      {
+       "type": "examine",
+       "name": "DipExamine",
+       "key": "EX_WELL_DIP",
+       "loc": "LOC_WELL",
+       "label": "LOC_WELL"
       }
      ]
     },
@@ -465,135 +478,6 @@
     },
     {
      "type": "group",
-     "name": "WellRing",
-     "at": "farm",
-     "offset": [
-      14,
-      -8
-     ],
-     "flag": "well_kept",
-     "visible_when": true,
-     "children": [
-      {
-       "type": "torus",
-       "name": "Ring",
-       "inner": 0.8,
-       "outer": 1.2,
-       "color": "stone",
-       "y": 0.3
-      },
-      {
-       "type": "examine",
-       "name": "WellExamine",
-       "key": "EX_WELL_KEPT",
-       "loc": "LOC_WELL",
-       "label": "LOC_WELL"
-      }
-     ]
-    },
-    {
-     "type": "group",
-     "name": "WellDip",
-     "at": "farm",
-     "offset": [
-      14,
-      -8
-     ],
-     "flag": "well_kept",
-     "visible_when": false,
-     "children": [
-      {
-       "type": "examine",
-       "name": "DipExamine",
-       "key": "EX_WELL_DIP",
-       "loc": "LOC_WELL",
-       "label": "LOC_WELL"
-      }
-     ]
-    },
-    {
-     "type": "group",
-     "name": "Orchard",
-     "at": "field",
-     "offset": [
-      -15,
-      0
-     ],
-     "flag": "orchard_planted",
-     "visible_when": true,
-     "children": [
-      {
-       "type": "repeat",
-       "count": 6,
-       "children": [
-        {
-         "type": "tree",
-         "name": "Apple{i}",
-         "at": [
-          "i * 4.5",
-          0
-         ],
-         "scale": "0.5 + 0.1 * (i % 3)",
-         "yaw": "i * 1.1"
-        }
-       ]
-      },
-      {
-       "type": "examine",
-       "name": "OrchardExamine",
-       "key": "EX_ORCHARD_KEPT",
-       "loc": "LOC_ORCHARD",
-       "label": "LOC_ORCHARD",
-       "at": [
-        11,
-        2.5
-       ]
-      }
-     ]
-    },
-    {
-     "type": "group",
-     "name": "OrchardScrub",
-     "at": "field",
-     "offset": [
-      -15,
-      0
-     ],
-     "flag": "orchard_planted",
-     "visible_when": false,
-     "children": [
-      {
-       "type": "repeat",
-       "count": 4,
-       "children": [
-        {
-         "type": "tree",
-         "name": "Scrub{i}",
-         "at": [
-          "i * 6 + 2",
-          1.5
-         ],
-         "scale": 1.3,
-         "yaw": "i * 0.9",
-         "scene": "res://assets/vegetation/bush_jello.tscn"
-        }
-       ]
-      },
-      {
-       "type": "examine",
-       "name": "ScrubExamine",
-       "key": "EX_ORCHARD_SCRUB",
-       "loc": "LOC_ORCHARD",
-       "label": "LOC_ORCHARD",
-       "at": [
-        11,
-        2.5
-       ]
-      }
-     ]
-    },
-    {
-     "type": "group",
      "name": "Gate",
      "at": "field",
      "offset": [
@@ -674,6 +558,54 @@
      ]
     },
     {
+     "type": "group",
+     "name": "WellRing",
+     "at": "farm",
+     "offset": [
+      14,
+      -8
+     ],
+     "flag": "well_kept",
+     "visible_when": true,
+     "children": [
+      {
+       "type": "torus",
+       "name": "Ring",
+       "inner": 0.8,
+       "outer": 1.2,
+       "color": "stone",
+       "y": 0.3
+      },
+      {
+       "type": "examine",
+       "name": "WellExamine",
+       "key": "EX_WELL_KEPT",
+       "loc": "LOC_WELL",
+       "label": "LOC_WELL"
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "name": "WellDip",
+     "at": "farm",
+     "offset": [
+      14,
+      -8
+     ],
+     "flag": "well_kept",
+     "visible_when": false,
+     "children": [
+      {
+       "type": "examine",
+       "name": "DipExamine",
+       "key": "EX_WELL_DIP",
+       "loc": "LOC_WELL",
+       "label": "LOC_WELL"
+      }
+     ]
+    },
+    {
      "type": "pickup",
      "name": "Pickup_keepsake",
      "item": "keepsake",
@@ -711,6 +643,147 @@
        "at": [
         3,
         0
+       ]
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "name": "BellPost",
+     "at": "trade",
+     "offset": [
+      -6,
+      4
+     ],
+     "flag": "bell_hung",
+     "visible_when": true,
+     "children": [
+      {
+       "type": "box",
+       "name": "Post",
+       "size": [
+        0.2,
+        3.2,
+        0.2
+       ],
+       "y": 1.6,
+       "color": "darkwood"
+      },
+      {
+       "type": "box",
+       "name": "Arm",
+       "size": [
+        1.2,
+        0.15,
+        0.15
+       ],
+       "y": 3.1,
+       "color": "darkwood",
+       "at": [
+        0.5,
+        0
+       ]
+      },
+      {
+       "type": "box",
+       "name": "Bell",
+       "size": [
+        0.35,
+        0.4,
+        0.35
+       ],
+       "y": 2.7,
+       "color": "stone",
+       "at": [
+        1.0,
+        0
+       ]
+      },
+      {
+       "type": "examine",
+       "name": "BellExamine",
+       "key": "EX_BELL_KEPT",
+       "label": "LOC_LANDMARK"
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "name": "Orchard",
+     "at": "field",
+     "offset": [
+      -15,
+      0
+     ],
+     "flag": "orchard_planted",
+     "visible_when": true,
+     "children": [
+      {
+       "type": "repeat",
+       "count": 6,
+       "children": [
+        {
+         "type": "tree",
+         "name": "Apple{i}",
+         "at": [
+          "i * 4.5",
+          0
+         ],
+         "scale": "0.5 + 0.1 * (i % 3)",
+         "yaw": "i * 1.1"
+        }
+       ]
+      },
+      {
+       "type": "examine",
+       "name": "OrchardExamine",
+       "key": "EX_ORCHARD_KEPT",
+       "loc": "LOC_ORCHARD",
+       "label": "LOC_ORCHARD",
+       "at": [
+        11,
+        2.5
+       ]
+      }
+     ]
+    },
+    {
+     "type": "group",
+     "name": "OrchardScrub",
+     "at": "field",
+     "offset": [
+      -15,
+      0
+     ],
+     "flag": "orchard_planted",
+     "visible_when": false,
+     "children": [
+      {
+       "type": "repeat",
+       "count": 4,
+       "children": [
+        {
+         "type": "tree",
+         "name": "Scrub{i}",
+         "at": [
+          "i * 6 + 2",
+          1.5
+         ],
+         "scale": 1.3,
+         "yaw": "i * 0.9",
+         "scene": "res://assets/vegetation/bush_jello.tscn"
+        }
+       ]
+      },
+      {
+       "type": "examine",
+       "name": "ScrubExamine",
+       "key": "EX_ORCHARD_SCRUB",
+       "loc": "LOC_ORCHARD",
+       "label": "LOC_ORCHARD",
+       "at": [
+        11,
+        2.5
        ]
       }
      ]

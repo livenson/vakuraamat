@@ -90,3 +90,23 @@ MENU_NO_RESULTS,Midagi ei leitud.,Nothing found.
 MENU_WORLD_READY,Maailm on valmis.,The world is ready.
 MENU_LOCATION_NAME,Nimi,Name
 MENU_GENERATING,Maailma luuakse: %s,Creating the world: %s
+MENU_LOCATIONS,Asukohad...,Locations...
+MENU_AVAILABLE,Olemas,Available
+MENU_ON_SERVICE,Valmis teenuses,Ready on the service
+MENU_SUGGESTED,Soovitatud kohad,Suggested places
+MENU_SEARCH_PLACES,Otsi kohta,Search for a place
+MENU_PLAY,Mängi,Play
+MENU_INSTALL_PLAY,Paigalda ja mängi,Install and play
+MENU_CREATE,Loo,Create
+MENU_SHIPPED,kaasas,shipped
+MENU_INSTALLED,paigaldatud,installed
+MENU_FRIENDS,Sõbrad,Friends
+MENU_SHARE_WORLD,Jaga seda maailma,Share this world
+MENU_VISIT,Külasta sõbra maailma (kood),Visit a friend's world (code)
+MENU_VISIT_GO,Mine,Go
+MENU_WORLD_CODE,Maailma kood: %s,World code: %s
+MENU_VISITING,"Külas: %s (%s)","Visiting: %s (%s)"
+MENU_WORLDS_DOWN,"Maailmateenus ei vasta (%s). Käivita: make world-service","The world service is not answering (%s). Start it with: make world-service"
+MENU_NO_SUCH_WORLD,Sellist maailma ei ole.,No such world.
+NOTICE_FRIEND_DELIVERY,"Sõber %s tegi sinu maailmas midagi: %s","A friend, %s, did something in your world: %s"
+MENU_CURRENT,praegune,current

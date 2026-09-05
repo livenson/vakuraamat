@@ -90,6 +90,30 @@ grafts, deed, letter (the bonus that gates the best ending). `tools/godot/story_
 composed pack through from prologue to epilogue using only the pack's data. See `blocks/README.md`
 for the schema; add a block by adding a file.
 
+## The Locations panel
+
+*Locations...* in the main menu (and in the pause menu, which saves first) lists the packs you have
+(shipped and installed, with Play / Continue), the packs already generated on the tile service
+(Install and play), suggested Estonian places to generate with one click
+(`assets/data/suggested_places.json`), a place search (address, place name, coordinates, or your IP
+location), and the friends section.
+
+## Friends: shared worlds and deliveries
+
+`make world-service` runs `tools/world_service.py` (loopback port 8766, JSON files under
+`data_raw/worlds/`). *Share this world* publishes the active pack as a descriptor: where it is, how
+its story was composed (seed, blocks), which consequence flags you have committed; you get a
+six-letter code (also copied to the clipboard). A friend enters the code under *Visit*: their game
+regenerates the same pack through their tile service (`visit_<code>`), starts it with your committed
+flags, and posts every consequence they trigger there as a *delivery*. When you next load your
+world, the deliveries are pulled and applied as consequences, with a ledger line and a notice naming
+the friend. Your committed flags are republished at every chapter end.
+
+Co-op blocks (`"coop": true`, e.g. `blocks/bell.json`) can only be completed by a visitor: the ink
+option checks `visiting()`. They are listed in the ledger but not counted for the ending, so a solo
+player is never blocked. The URLs of both services live in `user://settings.cfg` (`[service] url`,
+`[service] worlds_url`); your player name for deliveries is `[player] name`.
+
 ## Iterating
 
 | Change | Then run |

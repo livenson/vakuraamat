@@ -29,7 +29,7 @@ func service_url() -> String:
 
 
 ## One HTTP round trip. Returns {code, body(String), ok}. code 0 = no connection.
-func _http(url: String, method: int = HTTPClient.METHOD_GET, body: String = "", download_to: String = "") -> Dictionary:
+func http(url: String, method: int = HTTPClient.METHOD_GET, body: String = "", download_to: String = "") -> Dictionary:
 	var r := HTTPRequest.new()
 	r.timeout = 60.0
 	if download_to != "":
@@ -49,8 +49,17 @@ func _http(url: String, method: int = HTTPClient.METHOD_GET, body: String = "", 
 	return {"code": code, "body": text, "ok": res[0] == HTTPRequest.RESULT_SUCCESS and code >= 200 and code < 300}
 
 
+## Packs already generated and cached on the service: [{id, name, x, y, size, eras, seed, blocks}].
+func list_service_packs() -> Array:
+	var r := await http(service_url() + "/packs")
+	if not r.ok:
+		return []
+	var d = JSON.parse_string(r.body)
+	return d if typeof(d) == TYPE_ARRAY else []
+
+
 func service_alive() -> bool:
-	var r := await _http(service_url() + "/health")
+	var r := await http(service_url() + "/health")
 	return r.ok
 
 
@@ -67,7 +76,7 @@ func geocode(q: String) -> Array:
 		if a > 50.0 and a < 70.0:
 			var p := wgs84_to_lest97(a, b)
 			return [{"name": "%.4f N %.4f E" % [a, b], "x": p.x, "y": p.y}]
-	var r := await _http(GEOCODER + q.uri_encode())
+	var r := await http(GEOCODER + q.uri_encode())
 	if not r.ok:
 		return []
 	var parsed = JSON.parse_string(r.body)
@@ -81,7 +90,7 @@ func geocode(q: String) -> Array:
 
 ## Coarse position from the IP address: {ok, x, y, name}. City-level at best.
 func locate_by_ip() -> Dictionary:
-	var r := await _http(IP_API)
+	var r := await http(IP_API)
 	if not r.ok:
 		return {"ok": false}
 	var d = JSON.parse_string(r.body)
@@ -136,8 +145,8 @@ static func slug(name: String) -> String:
 
 ## Ask the service for a pack at (x, y), wait for it, install it, make it the active site.
 ## Returns {ok, id, error}.
-func create_world(name: String, x: float, y: float, size: int = 1024, eras: String = "1798,1938,2026") -> Dictionary:
-	var id := slug(name)
+func create_world(name: String, x: float, y: float, size: int = 1024, eras: String = "1798,1938,2026", id_override: String = "", seed_value: int = -1, blocks: Array = []) -> Dictionary:
+	var id := id_override if id_override != "" else slug(name)
 	var base := service_url()
 	var error := ""
 	if not await service_alive():
@@ -145,8 +154,13 @@ func create_world(name: String, x: float, y: float, size: int = 1024, eras: Stri
 	elif not in_estonia(x, y):
 		error = tr("MENU_OUTSIDE_ESTONIA")
 	if error == "":
-		var body := JSON.stringify({"id": id, "name": name, "x": x, "y": y, "size": size, "eras": eras})
-		var r := await _http(base + "/tile", HTTPClient.METHOD_POST, body)
+		var req := {"id": id, "name": name, "x": x, "y": y, "size": size, "eras": eras}
+		if seed_value >= 0:
+			req["seed"] = seed_value
+		if not blocks.is_empty():
+			req["blocks"] = blocks
+		var body := JSON.stringify(req)
+		var r := await http(base + "/tile", HTTPClient.METHOD_POST, body)
 		if not r.ok:
 			error = r.body if r.body != "" else "HTTP %d" % r.code
 	if error == "":
@@ -154,7 +168,7 @@ func create_world(name: String, x: float, y: float, size: int = 1024, eras: Stri
 	if error == "":
 		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cache"))
 		var zip_path := "user://cache/%s.zip" % id
-		var dl := await _http(base + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path)
+		var dl := await http(base + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path)
 		if not dl.ok:
 			error = "download: HTTP %d" % dl.code
 		elif not install_zip(zip_path, id):
@@ -168,7 +182,7 @@ func create_world(name: String, x: float, y: float, size: int = 1024, eras: Stri
 ## Poll the job until it is done; "" on success, else the error text.
 func _wait_for_job(base: String, id: String) -> String:
 	while true:
-		var st := await _http(base + "/status?id=" + id)
+		var st := await http(base + "/status?id=" + id)
 		if not st.ok:
 			return "status: HTTP %d" % st.code
 		var d = JSON.parse_string(st.body)

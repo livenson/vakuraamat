@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://dls35kvwwmbip"
+valid=false
+
+[deps]
+
+source_file="res://assets/data/suggested_places.json"
+
+[params]
+
+compress=true

@@ -13,6 +13,7 @@
 #       end_chapter()
 #       chapter()           -> int
 #       trigger(cp_id)      -> bool   fire a consequence point that is a choice, not a delivery
+#       visiting()          -> bool   the player is a guest in a friend's world (co-op blocks)
 #   Tags: '# me' marks a line spoken by the player; '# speaker: KEY' overrides the speaker.
 extends Node
 
@@ -29,6 +30,7 @@ var _pending_states: Dictionary = {}   # era_id -> json state loaded from a save
 var _factory = preload("res://addons/inkgd/ink_player_factory.gd")
 var _externals := Externals.new()
 var default_speaker := ""         # translation key of who is talking unless a line says otherwise
+var force_visiting := false       # tests: pretend to be a visitor in a friend's world
 
 
 ## Functions callable from ink via EXTERNAL declarations.
@@ -50,6 +52,8 @@ class Externals:
 		return GameState.chapter
 	func trigger(cp_id) -> bool:
 		return GameState.trigger_consequence(str(cp_id))
+	func visiting() -> bool:
+		return Friends.visiting_code != "" or Narrative.force_visiting
 
 
 func _ready() -> void:
@@ -86,8 +90,8 @@ func _player_for(era_id: String) -> Node:
 
 
 func _bind_externals(player: Node) -> void:
-	for fn in ["flag", "has_item", "give_item", "take_item", "set_flag", "end_chapter", "chapter", "trigger"]:
-		player.bind_external_function(fn, _externals, fn, fn in ["flag", "has_item", "chapter"])
+	for fn in ["flag", "has_item", "give_item", "take_item", "set_flag", "end_chapter", "chapter", "trigger", "visiting"]:
+		player.bind_external_function(fn, _externals, fn, fn in ["flag", "has_item", "chapter", "visiting"])
 
 
 ## Start a conversation at a knot in the current era's story.

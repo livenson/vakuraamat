@@ -2,7 +2,7 @@
   "id": "kvissentali",
   "name_key": "SITE_KVISSENTALI",
   "subtitle_key": "SITE_KVISSENTALI_SUBTITLE",
-  "description": "Kvissentali: generated site pack (blocks well, letter, grafts, deed, keepsake, seed 34750).",
+  "description": "Kvissentali: generated site pack (blocks deed, letter, well, keepsake, bell, grafts, seed 34750).",
   "terrain": {
     "tile": "kvissentali",
     "center": [
@@ -42,9 +42,9 @@
   "locations": {
     "LOC_LANDMARK": "landmark",
     "LOC_FARMSTEAD": "farm",
+    "LOC_FIELD": "field",
     "LOC_WELL": "farm",
-    "LOC_ORCHARD": "field",
-    "LOC_FIELD": "field"
+    "LOC_ORCHARD": "field"
   },
   "objectives": [
     {
@@ -80,10 +80,10 @@
   "ending": {
     "trigger_flag": "epilogue",
     "counted_flags": [
-      "well_kept",
-      "orchard_planted",
       "boundary_marked",
-      "keepsake_returned"
+      "well_kept",
+      "keepsake_returned",
+      "orchard_planted"
     ],
     "tiers": [
       {
@@ -112,16 +112,20 @@
   "story": {
     "seed": 34750,
     "blocks": [
-      "well",
-      "letter",
-      "grafts",
       "deed",
-      "keepsake"
+      "letter",
+      "well",
+      "keepsake",
+      "bell",
+      "grafts"
     ],
     "npcs": {
       "era_1798": "Peep",
       "era_1938": "Elmar",
       "era_2026": "Kadri"
-    }
+    },
+    "coop_flags": [
+      "bell_hung"
+    ]
   }
 }

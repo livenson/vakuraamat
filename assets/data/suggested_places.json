@@ -1,0 +1,114 @@
+[
+ {
+  "name": "Alatskivi mõis",
+  "note_en": "Alatskivi castle by Lake Peipsi",
+  "note_et": "Alatskivi loss Peipsi ääres",
+  "x": 681863,
+  "y": 6500230,
+  "address": "Tartu maakond, Peipsiääre vald, Alatskivi alevik, Lossi tn 6"
+ },
+ {
+  "name": "Elva",
+  "note_en": "Elva, a railway town in the pines",
+  "note_et": "Elva, raudteelinn mändide all",
+  "x": 642048,
+  "y": 6456199,
+  "address": "Tartu maakond, Elva vald"
+ },
+ {
+  "name": "Haapsalu linnus",
+  "note_en": "Haapsalu, the bishop's castle",
+  "note_et": "Haapsalu piiskopilinnus",
+  "x": 480467,
+  "y": 6531438,
+  "address": "Lääne maakond, Haapsalu linn, Kabrametsa küla, Linnuste"
+ },
+ {
+  "name": "Karula",
+  "note_en": "Karula, the hill country (Lüllemäe)",
+  "note_et": "Karula kuppelmaastik (Lüllemäe)",
+  "x": 641268,
+  "y": 6403488,
+  "address": "Valga maakond, Valga vald, Lüllemäe küla"
+ },
+ {
+  "name": "Kolga mõis",
+  "note_en": "Kolga manor, Harju",
+  "note_et": "Kolga mõis, Harjumaa",
+  "x": 591280,
+  "y": 6596017,
+  "address": "Harju maakond, Kuusalu vald, Kolga alevik, Kolga mõis"
+ },
+ {
+  "name": "Kuressaare linnus",
+  "note_en": "Kuressaare castle, Saaremaa",
+  "note_et": "Kuressaare linnus, Saaremaa",
+  "x": 410578,
+  "y": 6457165,
+  "address": "Saare maakond, Saaremaa vald, Kuressaare linn, Linnuse tee"
+ },
+ {
+  "name": "Mooste mõis",
+  "note_en": "Mooste manor, Põlva",
+  "note_et": "Mooste mõis, Põlvamaa",
+  "x": 687928,
+  "y": 6451254,
+  "address": "Põlva maakond, Põlva vald, Mooste alevik, Mõisahoovi tee"
+ },
+ {
+  "name": "Otepää",
+  "note_en": "Otepää, the highlands",
+  "note_et": "Otepää, kõrgustik",
+  "x": 647311,
+  "y": 6437896,
+  "address": "Valga maakond, Otepää vald"
+ },
+ {
+  "name": "Palmse mõis",
+  "note_en": "Palmse manor, Lahemaa",
+  "note_et": "Palmse mõis, Lahemaa",
+  "x": 610747,
+  "y": 6598853,
+  "address": "Lääne-Viru maakond, Haljala vald, Palmse küla, Palmse mõisakompleks"
+ },
+ {
+  "name": "Rõuge",
+  "note_en": "Rõuge, the deep valleys",
+  "note_et": "Rõuge, sügavad orud",
+  "x": 674253,
+  "y": 6402333,
+  "address": "Võru maakond, Rõuge vald"
+ },
+ {
+  "name": "Sagadi mõis",
+  "note_en": "Sagadi manor, Lahemaa",
+  "note_et": "Sagadi mõis, Lahemaa",
+  "x": 617728,
+  "y": 6601021,
+  "address": "Lääne-Viru maakond, Haljala vald, Sagadi küla, 17193 Sagadi mõisa tee"
+ },
+ {
+  "name": "Toomemägi",
+  "note_en": "Tartu, Toome hill",
+  "note_et": "Tartu, Toomemägi",
+  "x": 658789,
+  "y": 6474299,
+  "address": "Tartu maakond, Tartu linn, Tartu linn, Lossi tn 25"
+ },
+ {
+  "name": "Vihula mõis",
+  "note_en": "Vihula manor, Lahemaa",
+  "note_et": "Vihula mõis, Lahemaa",
+  "x": 623452,
+  "y": 6603039,
+  "address": "Lääne-Viru maakond, Haljala vald, Vihula küla, Vihula mõis"
+ },
+ {
+  "name": "Viljandi lossimäed",
+  "note_en": "Viljandi, the castle hills",
+  "note_et": "Viljandi lossimäed",
+  "x": 593579,
+  "y": 6469861,
+  "address": "Viljandi maakond, Viljandi linn, Ranna pst"
+ }
+]

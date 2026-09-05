@@ -6,6 +6,7 @@ EXTERNAL set_flag(name)
 EXTERNAL end_chapter()
 EXTERNAL chapter()
 EXTERNAL trigger(cp_id)
+EXTERNAL visiting()
 -> END
 
 == greeter ==
@@ -19,13 +20,6 @@ EXTERNAL trigger(cp_id)
 -> menu
 
 = menu
-+ { not flag("well_kept") } [Miks kaev täis aetakse? %% Why fill the well?]
-    Sest käsk on nii. Mõisa kaev teenib, öeldakse. Keda teenib. # en: Because the order says so. The manor's well will serve, they say. Serve whom.
-    Kui keegi aitaks kivid paika tõsta, ei saaks seda enam täita. # en: If somebody helped set the stones, it could not be filled any more.
-    -> menu
-+ { not has_item("graft_bundle") and not flag("orchard_planted") } [Mis kimp see seal on? %% What is that bundle over there?]
-    Pookoksad. Mõisa aednik jättis. Meil ei ole aega ega maad. Võta, kui tahad. # en: Grafting stock. The manor's gardener left them. We have neither time nor ground. Take them if you like.
-    -> menu
 + { has_item("deed_page") and not flag("boundary_marked") } [Näita lehekülge. %% Show the page.]
     ~ give_item("deed_page", "npc_era_1798")
     Ta loeb. Loeb veel kord. # en: They read it. Read it again.
@@ -33,6 +27,10 @@ EXTERNAL trigger(cp_id)
     -> check_chapter
 + { not has_item("deed_page") and not flag("boundary_marked") } [Kes siin raamatut peab? %% Who keeps the book here?]
     Mina. Talud, kohustused, piirid. Kui midagi ei ole kirjas, ei ole seda olemas. # en: I do. Farms, obligations, bounds. What is not written does not exist.
+    -> menu
++ { not flag("well_kept") } [Miks kaev täis aetakse? %% Why fill the well?]
+    Sest käsk on nii. Mõisa kaev teenib, öeldakse. Keda teenib. # en: Because the order says so. The manor's well will serve, they say. Serve whom.
+    Kui keegi aitaks kivid paika tõsta, ei saaks seda enam täita. # en: If somebody helped set the stones, it could not be filled any more.
     -> menu
 + { has_item("keepsake") and not flag("keepsake_returned") } [Anna mälestusese. %% Hand over the keepsake.]
     ~ give_item("keepsake", "npc_era_1798")
@@ -42,6 +40,12 @@ EXTERNAL trigger(cp_id)
 + { not has_item("keepsake") and not flag("keepsake_returned") } [Kas siit on midagi kadunud? %% Has anything gone missing here?]
     Vasktükk, nimega. Isa oma. Kadus ühel sügisel ja ei tulnud tagasi. # en: A piece of copper, with a name. Father's. It vanished one autumn and never came back.
     -> menu
++ { not has_item("bell_clapper") and not flag("bell_hung") } [Mis raud see seal maas on? %% What iron is that on the ground?]
+    Kellakeel. Kell läks mõisaga. Keel jäi. Meie omad ei tohi seda viia, nii on vana sõna. # en: A bell clapper. The bell went with the manor. The clapper stayed. Our own may not carry it, so the old word goes.
+    -> menu
++ { not has_item("graft_bundle") and not flag("orchard_planted") } [Mis kimp see seal on? %% What is that bundle over there?]
+    Pookoksad. Mõisa aednik jättis. Meil ei ole aega ega maad. Võta, kui tahad. # en: Grafting stock. The manor's gardener left them. We have neither time nor ground. Take them if you like.
+    -> menu
 + [Mis koht see on? %% What is this place?]
     Kvissentali. Kõik, mis siin on, seisab millegi vanema peal. # en: Kvissentali. Everything here stands on something older.
     -> menu
@@ -50,7 +54,7 @@ EXTERNAL trigger(cp_id)
     -> END
 
 = check_chapter
-{ chapter() == 2 and (flag("well_kept") + flag("orchard_planted") + flag("boundary_marked") + flag("keepsake_returned")) >= 2:
+{ chapter() == 2 and (flag("boundary_marked") + flag("well_kept") + flag("keepsake_returned") + flag("orchard_planted")) >= 2:
     ~ end_chapter()
 }
 -> menu

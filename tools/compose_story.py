@@ -47,7 +47,7 @@ GENERIC_MENU = [
     "    Mine. Ma olen siin. # en: Go. I'm here.",
     "    -> END",
 ]
-EXTERNALS = ["flag(name)", "has_item(id)", "give_item(id, target)", "take_item(id)", "set_flag(name)", "end_chapter()", "chapter()", "trigger(cp_id)"]
+EXTERNALS = ["flag(name)", "has_item(id)", "give_item(id, target)", "take_item(id)", "set_flag(name)", "end_chapter()", "chapter()", "trigger(cp_id)", "visiting()"]
 
 
 def q(s):
@@ -138,7 +138,7 @@ def compose(site, name, years, seed=0, block_ids=None, blocks_dir=BLOCKS_DIR):
     nodes = {e: [] for e in eras}
     menu = {e: [] for e in eras}
     knots = {e: [] for e in eras}
-    flags, bonus_flag = [], ""
+    flags, bonus_flag, coop_flags = [], "", []
     trigger_count = {e: 0 for e in eras}
     locations = {}
     for b in usable:
@@ -191,6 +191,8 @@ def compose(site, name, years, seed=0, block_ids=None, blocks_dir=BLOCKS_DIR):
                 locations[k] = anchor if isinstance(anchor, str) else "landmark"
         if b.get("bonus"):
             bonus_flag = b["flag"]
+        elif b.get("coop"):
+            coop_flags.append(b["flag"])   # needs a visiting friend; shown in the ledger, not counted for the ending
         else:
             flags.append(b["flag"])
         trigger_count[trig] += 1
@@ -249,7 +251,8 @@ def compose(site, name, years, seed=0, block_ids=None, blocks_dir=BLOCKS_DIR):
         ["ENDING_KEPT", "Alles %d / %d", "Kept %d of %d"],
     ]
     return {"eras": eras, "years": years, "npcs": npcs, "items": items, "cps": cps, "nodes": nodes, "ink": ink, "strings": strings,
-            "objectives": objectives, "ending": ending, "locations": locations, "blocks": [b["id"] for b in usable], "seed": seed}
+            "objectives": objectives, "ending": ending, "locations": locations, "blocks": [b["id"] for b in usable], "seed": seed,
+            "coop_flags": coop_flags}
 
 
 if __name__ == "__main__":

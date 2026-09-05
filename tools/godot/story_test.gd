@@ -79,7 +79,8 @@ func _npc_by_id(era: String, npc_id: String) -> Node:
 
 
 ## Try the dialogue options until the flag flips (delivery blocks add a give option to the target NPC).
-func _deliver(era: String, npc_id: String, flag: String) -> void:
+## Options naming the item are tried first, so two deliveries to one NPC do not get mixed up.
+func _deliver(era: String, npc_id: String, flag: String, item_name: String = "") -> void:
 	var npc := _npc_by_id(era, npc_id)
 	_check(npc != null, "delivery NPC %s missing in %s" % [npc_id, era])
 	await _talk(npc)
@@ -89,10 +90,16 @@ func _deliver(era: String, npc_id: String, flag: String) -> void:
 			break
 		var pick := -1
 		for o in choices:
-			if not tried.has(o.text):
+			if item_name != "" and item_name in o.text.to_lower() and not tried.has(o.text):
 				pick = o.index
 				tried[o.text] = true
 				break
+		if pick < 0:
+			for o in choices:
+				if not tried.has(o.text):
+					pick = o.index
+					tried[o.text] = true
+					break
 		if pick < 0:
 			break
 		choices.clear()
@@ -140,9 +147,22 @@ func _run() -> void:
 		for it in GameState.items.values():
 			if it is ArtifactItem and it.linked_consequence_point_id == cp.id:
 				artifact = it
-		if artifact:
+		var coop: bool = cp.flag_name in Sites.get_value("story", {}).get("coop_flags", [])
+		if TimelineState.has_flag(cp.flag_name):
+			print("[story] %s already set while talking to a shared NPC" % cp.id)
+			continue
+		var item_name := tr(artifact.display_name_key).to_lower() if artifact else ""
+		if artifact and coop:
 			_check(Inventory.has(artifact.id), "artifact %s for %s was never picked up" % [artifact.id, cp.id])
-			await _deliver(cp.trigger_era, artifact.valid_delivery_target, cp.flag_name)
+			Narrative.force_visiting = false
+			await _deliver(cp.trigger_era, artifact.valid_delivery_target, cp.flag_name, item_name)
+			_check(not TimelineState.has_flag(cp.flag_name), "co-op consequence %s could be done without a visitor" % cp.id)
+			Narrative.force_visiting = true
+			await _deliver(cp.trigger_era, artifact.valid_delivery_target, cp.flag_name, item_name)
+			Narrative.force_visiting = false
+		elif artifact:
+			_check(Inventory.has(artifact.id), "artifact %s for %s was never picked up" % [artifact.id, cp.id])
+			await _deliver(cp.trigger_era, artifact.valid_delivery_target, cp.flag_name, item_name)
 		else:
 			var sp := _layer(cp.trigger_era).find_children("*", "StoryPoint", true, false)
 			_check(not sp.is_empty(), "choice consequence %s has no story point in %s" % [cp.id, cp.trigger_era])

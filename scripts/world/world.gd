@@ -55,6 +55,7 @@ func _ready() -> void:
 	var tw := create_tween()
 	tw.tween_property(fade, "color:a", 0.0, FADE_TIME)
 	_ready_done = true
+	Friends.pull_deliveries()
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--screenshot="):
 			_screenshot_path = a.trim_prefix("--screenshot=")

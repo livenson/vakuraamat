@@ -15,6 +15,8 @@ var visited_eras: Dictionary = {}         # era_id -> true
 var register_unlocked: bool = false
 var world: Node = null                    # the World scene, if running
 var pending_load := false                 # main menu asked for "Continue"
+var menu_open_locations := false          # pause menu asked the main menu to open the Locations panel
+var preset_flags: Dictionary = {}         # committed flags a visited world starts with (Friends.visit)
 
 
 ## Fresh game state (new game from the menu).
@@ -25,6 +27,8 @@ func reset() -> void:
 	register_unlocked = false
 	pending_load = false
 	TimelineState.flags = {}
+	for f in preset_flags:
+		TimelineState.flags[f] = true
 	TimelineState.commit()
 	Inventory.artifacts = []
 	Inventory.local = {}
@@ -149,6 +153,7 @@ func to_dict() -> Dictionary:
 	var d := {
 		"current_era": current_era, "chapter": chapter, "visited_eras": visited_eras.duplicate(),
 		"register_unlocked": register_unlocked,
+		"visiting": Friends.visiting_code, "visiting_owner": Friends.visiting_owner,
 	}
 	if world and world.has_method("to_dict"):
 		d["world"] = world.to_dict()
@@ -159,6 +164,8 @@ func from_dict(d: Dictionary) -> void:
 	chapter = int(d.get("chapter", 0))
 	visited_eras = d.get("visited_eras", {}).duplicate()
 	register_unlocked = bool(d.get("register_unlocked", false))
+	Friends.visiting_code = str(d.get("visiting", ""))
+	Friends.visiting_owner = str(d.get("visiting_owner", ""))
 	var era_id: String = d.get("current_era", "")
 	if world and world.has_method("from_dict"):
 		world.from_dict(d.get("world", {}))
