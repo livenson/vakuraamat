@@ -92,7 +92,9 @@ its design documents in the repo root describe that version.
   bake; the interior stamps grass away on first entry as the safety net.
 - Streamed tiles sit at a 1024 m offset: nodes must read pack files through
   `Sites.path_in(Sites.pack_of(self), ...)` and sample the terrain with `to_global(...)`; `Parcels.at`
-  already resolves the tile. Never assume tile-local equals world coordinates.
+  already resolves the tile. Never assume tile-local equals world coordinates. Tenant lookups go
+  through `Tenants.of(Sites.pack_of(node), tunnus)`, never `Ledger.tenants_of` on a node that may sit
+  on a neighbour tile; `TileStreamer.tile_ready` / `tile_unloaded` are the hooks for per-tile content.
 - Hot reload keeps instance state: a member variable added to a script is null on the live instance
   until restart, so guard new dictionaries and arrays (`if _cache == null: _cache = {}`), or `restart`.
 - `tools/dev.py` targets the newest game instance; while `make test` runs, its headless games are

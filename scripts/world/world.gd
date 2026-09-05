@@ -402,20 +402,29 @@ func from_dict(d: Dictionary) -> void:
 		sky.tod.current_time = float(d.time_of_day)
 
 
-## Step into the first real building whose address contains `needle` (debug: --enter=, dev channel).
+## Step into the first real building of the origin layer or any loaded tile whose address contains
+## `needle` (debug: --enter=, dev channel). "<address>@<degrees>" turns the player after stepping in.
 func enter_building(needle: String) -> bool:
 	var interiors: Interiors = get_node_or_null("Interiors")
-	var layer: Node = $EraLayers.get_node_or_null(GameState.current_era)
-	if interiors == null or layer == null:
+	if interiors == null:
 		return false
-	var turn := 0.0   # "<address>@<degrees>" turns the player after stepping in (screenshots)
+	var turn := 0.0
 	if "@" in needle:
 		turn = deg_to_rad(float(needle.get_slice("@", 1)))
 		needle = needle.get_slice("@", 0)
-	for b in layer.find_children("*", "FootprintBuilding", true, false):
-		if needle.to_lower() in str(b.address).to_lower() and b.get_node_or_null("Door"):
-			interiors.enter(b, player)
-			if turn != 0.0:
-				player.rotation.y += turn
-			return true
+	var scopes: Array = [$EraLayers.get_node_or_null(GameState.current_era)]
+	if streamer:
+		for loc in streamer.tiles:
+			var root: Node = streamer.tiles[loc].get("root")
+			if root:
+				scopes.append(root.get_node_or_null("Era"))
+	for layer in scopes:
+		if layer == null:
+			continue
+		for b in layer.find_children("*", "FootprintBuilding", true, false):
+			if needle.to_lower() in str(b.address).to_lower() and b.get_node_or_null("Door"):
+				interiors.enter(b, player)
+				if turn != 0.0:
+					player.rotation.y += turn
+				return true
 	return false

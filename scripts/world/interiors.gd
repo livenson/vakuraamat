@@ -31,6 +31,9 @@ func setup(w: Node3D) -> void:
 	world = w
 	instance = self
 	EventBus.era_changed.connect(func(_e): call_deferred("attach_doors"))
+	if w.streamer:
+		w.streamer.tile_ready.connect(func(_loc: Vector2i, root: Node3D): call_deferred("attach_doors", root))
+		w.streamer.tile_unloaded.connect(_on_tile_unloaded)
 	call_deferred("attach_doors")
 
 
@@ -39,10 +42,11 @@ func _exit_tree() -> void:
 		instance = null
 
 
-## One door per real building of the origin tile (outbuildings and huts excluded).
-func attach_doors() -> void:
-	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era) if world else null
-	if layer == null:
+## One door per real building of the origin layer, or of a streamed tile's root when given
+## (outbuildings and huts excluded).
+func attach_doors(scope: Node = null) -> void:
+	var layer: Node = scope if scope else (world.get_node("EraLayers").get_node_or_null(GameState.current_era) if world else null)
+	if layer == null or not is_instance_valid(layer):
 		return
 	var n := 0
 	for b in layer.find_children("*", "FootprintBuilding", true, false):
@@ -62,8 +66,25 @@ func attach_doors() -> void:
 		print("[interiors] %d doors" % n)
 
 
+## A tile leaves: forget its doors and interiors; step out if the player was inside one of them.
+func _on_tile_unloaded(loc: Vector2i) -> void:
+	var root: Node = world.streamer.tiles.get(loc, {}).get("root") if world and world.streamer else null
+	if root == null:
+		return
+	if inside and is_instance_valid(inside) and root.is_ancestor_of(inside):
+		exit()
+	_doors = _doors.filter(func(d): return is_instance_valid(d) and not root.is_ancestor_of(d))
+	for id in _interiors.keys():
+		var n = _interiors[id]
+		if not is_instance_valid(n) or root.is_ancestor_of(n):
+			_interiors.erase(id)
+
+
 func _process(_delta: float) -> void:
 	if inside == null or world == null:
+		return
+	if not is_instance_valid(inside):
+		inside = null
 		return
 	var player: Node3D = world.get_node_or_null("Player")
 	if player == null:
@@ -103,6 +124,8 @@ func exit(player: Node3D = null) -> void:
 		return
 	var b := inside
 	inside = null
+	if not is_instance_valid(b):
+		return
 	var root: Node3D = _interiors.get(b.get_instance_id())
 	if root:
 		root.visible = false
@@ -174,7 +197,7 @@ func _build(b: FootprintBuilding) -> Node3D:
 			door_u = d
 			door_edge = i
 	_clear_plants(b)
-	var tenants := Ledger.tenants_of(b.tunnus) if b.tunnus != "" else []
+	var tenants: Array = Tenants.of(Sites.pack_of(b), b.tunnus)
 	var use := _use_of(b, tenants)
 	var door_pt := Vector2(door_pos.x, door_pos.z)
 	var rng := RandomNumberGenerator.new()

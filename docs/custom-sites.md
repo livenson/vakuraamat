@@ -180,8 +180,11 @@ its role: shop counters and shelves where a company is registered, desks for off
 and sofa in dwellings, benches and cabinets in workshops. Pieces are Kenney Furniture Kit models
 (CC0, `assets/vendor/kenney_furniture_kit`). While inside, the exterior mesh and its collider hide so
 the openings look out at the real street; E at the door or simply walking out through it restores
-the exterior. `--enter="<address part>"` starts a screenshot run inside a building; the door's hover
-text shows the register's use, year and storeys.
+the exterior. `--enter="<address part>"` (or `<address part>@<degrees>` to turn after stepping in) starts a
+screenshot run inside a building; the door's hover text shows the register's use, year and storeys.
+Doors, tenant name plates and interiors also attach to streamed neighbour tiles (their tenants come
+from that pack's `tenants.json` through `Tenants.of`); parcel outlines stay on the origin tile, whose
+ledger is the one town.
 
 ## Cadastral units, roads and what stands on a plot
 

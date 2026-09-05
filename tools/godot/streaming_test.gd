@@ -66,12 +66,31 @@ func _ready() -> void:
 	_check(absf(b.global_position.y - world.terrain.data.get_height(b.global_position)) < 6.0, "streamed building not on the ground (y %.1f, ground %.1f)" % [b.global_position.y, world.terrain.data.get_height(b.global_position)])
 	var at := st.pack_at(Vector3(1500, 0, 512))
 	_check(at.get("id", "") == _nid and at.get("offset", Vector3.ZERO).x == 1024.0, "pack_at lookup wrong: %s" % at)
+	# doors, interiors and name plates follow the tile
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var doors := era.find_children("Door", "BuildingDoor", true, false)
+	_check(doors.size() > 5, "only %d doors on the streamed tile" % doors.size())
+	var bd: BuildingDoor = doors[0]
+	var bb: FootprintBuilding = bd.building
+	_check(bd.label() != "", "streamed door has no label")
+	Interiors.instance.enter(bb, world.player)
+	await get_tree().process_frame
+	var bl := bb.to_local(world.player.global_position)
+	_check(Interiors.instance.inside == bb and Geometry2D.is_point_in_polygon(Vector2(bl.x, bl.z), bb.polygon), "player not inside the streamed building: %s" % bl)
+	_check(not bb._mesh_node.visible and bb._body_node.collision_layer == 0, "streamed exterior still shown")
+	Interiors.instance.exit(world.player)
+	_check(Interiors.instance.inside == null and bb._mesh_node.visible, "streamed exterior not restored")
 	# 3. the player may cross now
 	world.player.set_pose(Vector3(1100, 200, 512), 0.0, 0.0)
 	world._snap(world.player, 1.0)
 	await get_tree().create_timer(0.3).timeout
 	_check(world.player.global_position.x > 1024.0, "player pushed back although the tile is loaded")
 	_check(not Parcels.at(world.player.global_position).is_empty() or true, "parcel lookup crashed")
+	# 4. unloading the tile prunes its doors
+	st._unload(Vector2i(1, 0))
+	await get_tree().process_frame
+	_check(Interiors.instance._doors.all(func(d): return is_instance_valid(d)), "doors of an unloaded tile not pruned")
 	print("[stream] PASSED")
 	_cleanup()
 	get_tree().quit(0)
