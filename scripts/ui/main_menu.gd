@@ -1,22 +1,26 @@
-# Main menu: continue / new game, the Locations panel (packs you have, packs ready on the tile
-# service, suggested places to generate, a place search, friends' worlds), language, fullscreen.
+# Main menu: the first page of the book. A rubric rule down the margin, the running head (the place,
+# the saved book's month and cash), the menu as ruled entries with their detail in the right column,
+# and the plate: the pack's square kilometre with its cadastral units drawn over the orthophoto.
+# The Locations page (packs you have, packs on the tile service, suggested places, a search, the town)
+# is the second page.
 extends Control
 
 const SUGGESTED := "res://assets/data/suggested_places.json"
+const MARGIN := 72.0
 
-@onready var box: VBoxContainer = $Box
-
+var box: VBoxContainer          # the left column (menu) or the page body (locations)
+var _page: Control
 var _picked: Dictionary = {}
 var _status: Label
 var _results: VBoxContainer
 var _name_edit: LineEdit
 var _query: LineEdit
-var _code_edit: LineEdit
 var _service_box: VBoxContainer
 
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	theme = BookTheme.theme()
 	if "--locations" in OS.get_cmdline_user_args():
 		GameState.menu_open_locations = true
 	if GameState.menu_open_locations:
@@ -26,58 +30,118 @@ func _ready() -> void:
 		_build()
 
 
-func _clear() -> void:
-	for c in box.get_children():
-		box.remove_child(c)
-		c.queue_free()
+## A fresh page: paper, grain, the rubric margin rule; returns the body area right of the margin.
+func _new_page() -> MarginContainer:
+	if _page:
+		_page.queue_free()
+	_page = Control.new()
+	_page.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(_page)
+	var paper := ColorRect.new()
+	paper.color = BookTheme.PAGE
+	paper.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_page.add_child(paper)
+	var grain := TextureRect.new()
+	grain.texture = BookTheme.grain()
+	grain.stretch_mode = TextureRect.STRETCH_TILE
+	grain.modulate = Color(0.3, 0.25, 0.15, 0.07)
+	grain.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	grain.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_page.add_child(grain)
+	var rubric := ColorRect.new()
+	rubric.color = Color(BookTheme.RUBRIC, 0.8)
+	rubric.set_anchors_and_offsets_preset(Control.PRESET_LEFT_WIDE)
+	rubric.offset_left = MARGIN
+	rubric.offset_right = MARGIN + 1.5
+	_page.add_child(rubric)
+	var credit := BookTheme.label(tr("MENU_CREDIT"), "DetailLabel")
+	credit.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, 24)
+	credit.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	credit.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	_page.add_child(credit)
+	var body := MarginContainer.new()
+	body.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	body.add_theme_constant_override("margin_left", int(MARGIN) + 28)
+	body.add_theme_constant_override("margin_right", 48)
+	body.add_theme_constant_override("margin_top", 44)
+	body.add_theme_constant_override("margin_bottom", 56)
+	_page.add_child(body)
+	return body
 
 
 func _build() -> void:
-	_clear()
-	var title := Label.new()
-	title.text = "Vakuraamat"
-	title.add_theme_font_size_override("font_size", 56)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(title)
-	var sub := Label.new()
-	sub.text = tr(str(Sites.get_value("subtitle_key", "MENU_SUBTITLE")))
-	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(sub)
-	var where := Label.new()
-	where.text = "%s: %s" % [tr("MENU_SITE"), Sites.display_name(Sites.active)]
-	where.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	where.add_theme_font_size_override("font_size", 14)
-	box.add_child(where)
-	box.add_child(Control.new())
-	if SaveManager.has_save():
-		_button("UI_CONTINUE_GAME", func():
-			var saved := SaveManager.saved_site()
-			if saved != "" and saved != Sites.active:
-				Sites.select(saved)
+	var body := _new_page()
+	var columns := HBoxContainer.new()
+	columns.add_theme_constant_override("separation", 56)
+	body.add_child(columns)
+	box = VBoxContainer.new()
+	box.custom_minimum_size = Vector2(520, 0)
+	box.size_flags_horizontal = Control.SIZE_FILL
+	box.add_theme_constant_override("separation", 0)
+	columns.add_child(box)
+	BookTheme.label("Vakuraamat", "TitleLabel", box)
+	BookTheme.label(tr(str(Sites.get_value("subtitle_key", "MENU_SUBTITLE"))), "ProseLabel", box)
+	var summary := SaveManager.summary()
+	var saved_here: bool = not summary.is_empty() and summary.site == Sites.active
+	var head := BookTheme.label(Sites.display_name(Sites.active), "DetailLabel", box)
+	head.add_theme_font_size_override("font_size", 15)
+	if saved_here:
+		head.text += "   " + _book_line(summary)
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(0, 28)
+	box.add_child(gap)
+	if not summary.is_empty():
+		_entry("UI_CONTINUE_GAME", (Sites.display_name(summary.site) + ", " if not saved_here else "") + _book_line(summary), func():
+			if summary.site != "" and summary.site != Sites.active and Sites.available.has(summary.site):
+				Sites.select(summary.site)
 			GameState.pending_load = true
 			get_tree().change_scene_to_file("res://scenes/world/world.tscn"))
-	_button("UI_NEW_GAME", func(): _start_new_game())
-	_button("MENU_LOCATIONS", _build_locations_panel)
-	_button("MENU_LANGUAGE", func():
+	_entry("UI_NEW_GAME", Sites.display_name(Sites.active), func(): _start_new_game())
+	_entry("MENU_LOCATIONS", tr("MENU_PACKS_COUNT") % Sites.available.size(), _build_locations_panel)
+	_entry("MENU_LANGUAGE", "English" if TranslationServer.get_locale().begins_with("et") else "Eesti", func():
 		TranslationServer.set_locale("en" if TranslationServer.get_locale().begins_with("et") else "et")
 		_build())
-	var fs := Button.new()
-	fs.toggle_mode = true
-	fs.add_theme_font_size_override("font_size", 24)
-	fs.custom_minimum_size = Vector2(320, 44)
+	var fs := _entry("MENU_FULLSCREEN", "", func(): WindowMode.set_fullscreen(not WindowMode.is_fullscreen()))
 	var relabel := func(on: bool):
-		fs.set_pressed_no_signal(on)
-		fs.text = "%s: %s  (%s)" % [tr("MENU_FULLSCREEN"), tr("MENU_ON") if on else tr("MENU_OFF"), WindowMode.shortcut_text()]
+		if is_instance_valid(fs):
+			fs.get_child(0).text = "%s   %s" % [tr("MENU_ON") if on else tr("MENU_OFF"), WindowMode.shortcut_text()]
 	relabel.call(WindowMode.is_fullscreen())
-	fs.toggled.connect(func(on: bool): WindowMode.set_fullscreen(on))
-	WindowMode.changed.connect(relabel)
-	box.add_child(fs)
-	_button("UI_QUIT", func(): get_tree().quit())
-	var credit := Label.new()
-	credit.text = tr("MENU_CREDIT")
-	credit.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	credit.add_theme_font_size_override("font_size", 13)
-	box.add_child(credit)
+	WindowMode.changed.connect(relabel, CONNECT_REFERENCE_COUNTED)
+	fs.tree_exiting.connect(func(): WindowMode.changed.disconnect(relabel))
+	_entry("UI_QUIT", "", func(): get_tree().quit())
+	var plate := MapPlate.new()
+	plate.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	plate.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	columns.add_child(plate)
+	plate.setup(Sites.active, summary.get("owned", []) if saved_here else [])
+
+
+## "October 2026, 250 000 €" for a saved book (the town's name when the book is online).
+func _book_line(summary: Dictionary) -> String:
+	var when := Ledger.date_for(int(summary.get("month", 0)), str(summary.get("site", "")))
+	if str(summary.get("backend", "local")) == "town":
+		return "%s, %s" % [when, tr("UI_ONLINE_BADGE")]
+	var cash := int(summary.get("cash", -1))
+	return when if cash < 0 else "%s, %s" % [when, BookTheme.money(cash)]
+
+
+## A ruled ledger entry: the action on the left, its detail in the right column.
+func _entry(key: String, detail: String, cb: Callable) -> Button:
+	var b := Button.new()
+	b.theme_type_variation = "RowButton"
+	b.text = tr(key)
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.custom_minimum_size = Vector2(0, 50)
+	b.pressed.connect(cb)
+	var d := BookTheme.label(detail, "DetailLabel")
+	d.add_theme_font_size_override("font_size", 15)
+	d.set_anchors_and_offsets_preset(Control.PRESET_CENTER_RIGHT, Control.PRESET_MODE_MINSIZE, 12)
+	d.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	d.grow_vertical = Control.GROW_DIRECTION_BOTH
+	d.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.add_child(d)
+	box.add_child(b)
+	return b
 
 
 func _start_new_game(site_id: String = "") -> void:
@@ -90,23 +154,21 @@ func _start_new_game(site_id: String = "") -> void:
 func _button(key: String, cb: Callable) -> void:
 	var b := Button.new()
 	b.text = tr(key)
-	b.add_theme_font_size_override("font_size", 24)
-	b.custom_minimum_size = Vector2(320, 44)
 	b.pressed.connect(cb)
 	box.add_child(b)
 
 
 # ---------------------------------------------------------------- Locations
 func _build_locations_panel() -> void:
-	_clear()
+	var body := _new_page()
 	_picked = {}
-	var title := Label.new()
-	title.text = tr("MENU_LOCATIONS").trim_suffix("...")
+	box = VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	body.add_child(box)
+	var title := BookTheme.label(tr("MENU_LOCATIONS").trim_suffix("..."), "TitleLabel", box)
 	title.add_theme_font_size_override("font_size", 40)
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	box.add_child(title)
 	var scroll := ScrollContainer.new()
-	scroll.custom_minimum_size = Vector2(760, 560)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	box.add_child(scroll)
 	var list := VBoxContainer.new()
@@ -155,11 +217,8 @@ func _build_locations_panel() -> void:
 
 	# --- search
 	_section(list, "MENU_SEARCH_PLACES")
-	var hint := Label.new()
-	hint.text = tr("MENU_LOCATION_HINT")
+	var hint := BookTheme.label(tr("MENU_LOCATION_HINT"), "DetailLabel", list)
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	hint.add_theme_font_size_override("font_size", 13)
-	list.add_child(hint)
 	var srow := HBoxContainer.new()
 	list.add_child(srow)
 	_query = LineEdit.new()
@@ -192,10 +251,7 @@ func _build_locations_panel() -> void:
 	list.add_child(trow)
 	var town_db := Ledger.db_name_for(Sites.active)
 	var town_url := str(Ledger.setting("town", "url", Ledger.DEFAULT_TOWN_URL))
-	var tl := Label.new()
-	tl.text = tr("MENU_TOWN_ADDRESS") % [town_url, town_db]
-	tl.add_theme_font_size_override("font_size", 14)
-	trow.add_child(tl)
+	BookTheme.label(tr("MENU_TOWN_ADDRESS") % [town_url, town_db], "", trow)
 	_small(trow, "MENU_COPY", func():
 		DisplayServer.clipboard_set("%s %s" % [town_url, town_db])
 		_status.text = tr("MENU_COPIED"))
@@ -224,12 +280,13 @@ func _build_locations_panel() -> void:
 		cfg.save(Sites.SETTINGS))
 	urow.add_child(offline)
 
-	_status = Label.new()
-	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_status = BookTheme.label("", "DetailLabel", box)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_status.custom_minimum_size = Vector2(700, 0)
-	box.add_child(_status)
-	_button("MENU_BACK", _build)
+	var back := Button.new()
+	back.text = tr("MENU_BACK")
+	back.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	back.pressed.connect(_build)
+	box.add_child(back)
 
 
 func _fmt_center(c: Array) -> String:
@@ -237,11 +294,11 @@ func _fmt_center(c: Array) -> String:
 
 
 func _section(list: VBoxContainer, key: String) -> void:
-	var l := Label.new()
-	l.text = tr(key)
-	l.add_theme_font_size_override("font_size", 20)
-	l.add_theme_color_override("font_color", Color(0.85, 0.68, 0.25))
-	list.add_child(l)
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(0, 10)
+	list.add_child(gap)
+	BookTheme.label(tr(key), "HeadLabel", list)
+	BookTheme.rule(list)
 
 
 func _row(list: VBoxContainer, name: String, detail: String) -> HBoxContainer:
@@ -250,23 +307,18 @@ func _row(list: VBoxContainer, name: String, detail: String) -> HBoxContainer:
 	var v := VBoxContainer.new()
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(v)
-	var n := Label.new()
-	n.text = name
-	n.add_theme_font_size_override("font_size", 18)
-	v.add_child(n)
-	var d := Label.new()
-	d.text = detail
-	d.add_theme_font_size_override("font_size", 12)
-	d.modulate = Color(0.8, 0.8, 0.8)
-	v.add_child(d)
+	var n := BookTheme.label(name, "", v)
+	n.add_theme_font_size_override("font_size", 17)
+	BookTheme.label(detail, "DetailLabel", v)
 	return row
 
 
 func _row_button(row: HBoxContainer, key: String, cb: Callable) -> void:
 	var b := Button.new()
 	b.text = tr(key)
-	b.add_theme_font_size_override("font_size", 15)
 	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	if key in ["MENU_PLAY", "UI_CONTINUE_GAME", "MENU_INSTALL_PLAY"]:
+		b.theme_type_variation = "PrimaryButton"
 	b.pressed.connect(cb)
 	row.add_child(b)
 
@@ -274,7 +326,6 @@ func _row_button(row: HBoxContainer, key: String, cb: Callable) -> void:
 func _small(parent: Node, key: String, cb: Callable) -> void:
 	var b := Button.new()
 	b.text = tr(key)
-	b.add_theme_font_size_override("font_size", 15)
 	b.pressed.connect(cb)
 	parent.add_child(b)
 
@@ -286,11 +337,8 @@ func _fill_service_packs() -> void:
 	for c in _service_box.get_children():
 		c.queue_free()
 	if not alive:
-		var l := Label.new()
-		l.text = tr("MENU_SERVICE_DOWN") % Locator.service_url()
-		l.add_theme_font_size_override("font_size", 13)
+		var l := BookTheme.label(tr("MENU_SERVICE_DOWN") % Locator.service_url(), "DetailLabel", _service_box)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		_service_box.add_child(l)
 		return
 	var packs: Array = await Locator.list_service_packs()
 	if not is_instance_valid(_service_box):
@@ -316,8 +364,8 @@ func _show_results(results: Array) -> void:
 		return
 	for r in results.slice(0, 6):
 		var b := Button.new()
+		b.theme_type_variation = "TextButton"
 		b.text = "%s   (%d, %d)" % [r.name, r.x, r.y]
-		b.add_theme_font_size_override("font_size", 14)
 		b.pressed.connect(func():
 			_picked = r
 			_name_edit.text = str(r.name).split(",")[-1].strip_edges() if "," in str(r.name) else str(r.name)

@@ -268,3 +268,4 @@ UI_PROMPT_LEAVE,Välju,Leave
 UI_BUILDING,Hoone,Building
 UI_FLOORS,%d korrust,%d floors
 NOTICE_ENTERED,Sees: %s,Inside: %s
+MENU_PACKS_COUNT,%d kohta,%d places
