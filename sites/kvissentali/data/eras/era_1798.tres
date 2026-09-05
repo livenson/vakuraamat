@@ -1,0 +1,19 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/era/era_definition.gd" id="1"]
+[ext_resource type="Texture2D" path="res://assets/terrain/kvissentali/era_1798_verst.png" id="2"]
+
+[resource]
+script = ExtResource("1")
+id = "era_1798"
+display_name_key = "ERA_1798_NAME"
+year_label = "1798"
+scene_path = "res://sites/kvissentali/scenes/era_1798.tscn"
+texture_strength = 0.45
+ground_tint = Color(0.93, 0.88, 0.72, 1)
+default_time_of_day = 13.5
+order = 0
+narrative_story = "res://sites/kvissentali/narrative/era_1798.ink.json"
+currency_key = "CUR_1798"
+starting_money = 12
+terrain_texture = ExtResource("2")

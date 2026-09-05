@@ -17,8 +17,15 @@ Step 2 (tools/godot/import_terrain.gd) turns these into Terrain3D region files.
 Only needs python3 (stdlib), curl-free (urllib), and the GDAL command line tools
 (`brew install gdal`). QGIS is not required.
 
-Example (Palmse manor, sheet 64913):
+Examples:
+    python3 tools/pipeline/fetch_tile.py --site kvissentali            # centre, size, tile and era maps from sites/<site>/site.json
     python3 tools/pipeline/fetch_tile.py --name palmse --center 613372 6598710
+    python3 tools/pipeline/fetch_tile.py --site palupera --only-era-maps   # just the historical ground maps (WMS)
+
+Era ground maps come from the Maa-amet historical WMS (kaart.maaamet.ee/wms/ajalooline, EPSG:3301):
+    --era-map kk1940:era_1938_cadastral.png      schematic cadastral map 1930-1944
+    --era-map yheverstakaart:era_1798_verst.png  one-verst map 1894-1922
+Sheets: an AOI that crosses 1:10 000 sheet borders is mosaicked with gdalbuildvrt.
 
 Sheet numbers can be looked up from a point automatically (downloads the
 1:10 000 map sheet grid once into data_raw/).
@@ -40,6 +47,7 @@ GEOPORTAL_BASE = "https://geoportaal.maaamet.ee/"
 GRID_ZIP = "https://geoportaal.maaamet.ee/docs/pohikaart/epk10T_SHP.zip"
 GRID2T_ZIP = "https://geoportaal.maaamet.ee/docs/pohikaart/epk2T_SHP.zip"
 WMS = "https://kaart.maaamet.ee/wms/fotokaart"
+WMS_HISTORICAL = "https://kaart.maaamet.ee/wms/ajalooline"
 WMS_MAX_PX = 4096
 ATTRIBUTION = "Map data: Maa- ja Ruumiamet (Estonian Land and Spatial Development Board), {year}"
 
@@ -159,6 +167,24 @@ def fetch_canopy(a, raw_dir, out_dir, xmin, ymin, xmax, ymax):
             "format": "float32 little-endian, row-major, row 0 = north; metres above ground; 0 = nothing"}
 
 
+def fetch_era_maps(era_maps, out_dir, xmin, ymin, xmax, ymax, px):
+    """Historical ground maps for the same extent from the Maa-amet historical WMS: {file: layer}."""
+    done = {}
+    for fname, layer in era_maps.items():
+        q = {"SERVICE": "WMS", "VERSION": "1.3.0", "REQUEST": "GetMap", "LAYERS": layer, "STYLES": "", "CRS": "EPSG:3301",
+             "BBOX": f"{ymin},{xmin},{ymax},{xmax}", "WIDTH": px, "HEIGHT": px, "FORMAT": "image/png"}
+        path = os.path.join(out_dir, fname)
+        if os.path.exists(path):
+            os.remove(path)
+        download(WMS_HISTORICAL + "?" + urllib.parse.urlencode(q), path)
+        with open(path, "rb") as f:
+            if f.read(4) != b"\x89PNG":
+                sys.exit(f"historical WMS did not return a PNG for layer {layer} - see {path}")
+        done[fname] = {"layer": layer, "source": WMS_HISTORICAL}
+        log(f"era map {layer} -> {fname}")
+    return done
+
+
 def gdal_stats(path):
     info = run(["gdalinfo", "-stats", path], quiet=True)
     zmin = float(re.search(r"STATISTICS_MINIMUM=([-\d.]+)", info).group(1))
@@ -169,9 +195,13 @@ def gdal_stats(path):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--name", required=True, help="tile name, becomes assets/terrain/<name>/")
-    ap.add_argument("--center", nargs=2, type=float, metavar=("X", "Y"), required=True,
-                    help="AOI centre in EPSG:3301 (easting northing)")
+    ap.add_argument("--site", help="read tile name, centre, size and era maps from sites/<site>/site.json")
+    ap.add_argument("--name", help="tile name, becomes assets/terrain/<name>/")
+    ap.add_argument("--center", nargs=2, type=float, metavar=("X", "Y"), help="AOI centre in EPSG:3301 (easting northing)")
+    ap.add_argument("--era-map", action="append", default=[], metavar="LAYER:FILE",
+                    help="historical WMS layer to save as assets/terrain/<name>/FILE (repeatable)")
+    ap.add_argument("--only-era-maps", action="store_true", help="fetch just the era maps (no DTM/orthophoto/canopy)")
+    ap.add_argument("--map-px", type=int, default=2048, help="era map size in pixels (default 2048)")
     ap.add_argument("--size", type=int, default=1024, help="AOI edge length in metres (default 1024 = one Terrain3D region)")
     ap.add_argument("--sheet", help="1:10000 map sheet number; looked up from --center if omitted")
     ap.add_argument("--texture-px", type=int, default=WMS_MAX_PX, help="orthophoto size in pixels (max 4096 per WMS request)")
@@ -180,6 +210,22 @@ def main():
     ap.add_argument("--project", default=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
                     help="project root (default: repo root)")
     a = ap.parse_args()
+    era_maps = {}
+    for em in a.era_map:
+        layer, _, fname = em.partition(":")
+        era_maps[fname or f"era_{layer}.png"] = layer
+    if a.site:
+        mpath = os.path.join(a.project, "sites", a.site, "site.json")
+        if not os.path.exists(mpath):
+            sys.exit(f"no such site: {mpath}")
+        t = json.load(open(mpath)).get("terrain", {})
+        a.name = a.name or t.get("tile", a.site)
+        a.center = a.center or t.get("center")
+        a.size = t.get("size", a.size)
+        for era_id, spec in t.get("era_maps", {}).items():
+            era_maps.setdefault(spec.get("file", f"{era_id}.png"), spec["layer"])
+    if not a.name or not a.center:
+        sys.exit("--name and --center are required unless --site is given")
 
     raw_dir = os.path.join(a.project, "data_raw")
     out_dir = os.path.join(a.project, "assets", "terrain", a.name)
@@ -193,17 +239,36 @@ def main():
     xmax, ymax = xmin + a.size, ymin + a.size
     log(f"AOI EPSG:3301 x {xmin}..{xmax}  y {ymin}..{ymax}  ({a.size} m)")
 
-    sheet = a.sheet or sheet_for_point(a.center[0], a.center[1], raw_dir)
-    a.sheet = sheet
-    log(f"map sheet {sheet}")
-    # NOTE: an AOI straddling two sheets would need a VRT mosaic; kept to one sheet for now.
-    if not (xmin >= 0 and xmax - xmin <= 5000):
-        sys.exit("AOI larger than one 5x5 km sheet is not supported yet")
+    meta_path = os.path.join(out_dir, "terrain_meta.json")
+    if a.only_era_maps:
+        fetched = fetch_era_maps(era_maps, out_dir, xmin, ymin, xmax, ymax, a.map_px)
+        if os.path.exists(meta_path):
+            meta = json.load(open(meta_path))
+            meta.setdefault("era_maps", {}).update(fetched)
+            json.dump(meta, open(meta_path, "w"), indent=2)
+        return
+    if a.size > 2048:
+        log("warning: Terrain3D regions are at most 2048 m; larger tiles need several regions")
+
+    # Every 1:10 000 sheet the AOI touches (one per corner); mosaicked when there is more than one.
+    sheets = a.sheet.split(",") if a.sheet else sorted({sheet_for_point(x, y, raw_dir) for x, y in
+                                                        [(xmin + 1, ymin + 1), (xmax - 1, ymin + 1), (xmin + 1, ymax - 1), (xmax - 1, ymax - 1)]})
+    a.sheet = sheets[0]
+    log(f"map sheet(s) {','.join(sheets)}")
 
     # --- DTM ---------------------------------------------------------------
-    dtm_url = dtm_download_url(sheet)
-    dtm_name = urllib.parse.parse_qs(urllib.parse.urlparse(dtm_url).query)["f"][0]
-    dtm_path = download(dtm_url, os.path.join(raw_dir, dtm_name))
+    dtm_urls, dtm_paths = [], []
+    for sh in sheets:
+        url = dtm_download_url(sh)
+        fname = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)["f"][0]
+        dtm_urls.append(url)
+        dtm_paths.append(download(url, os.path.join(raw_dir, fname)))
+    dtm_url = dtm_urls[0]
+    dtm_name = ",".join(os.path.basename(p) for p in dtm_paths)
+    dtm_path = dtm_paths[0]
+    if len(dtm_paths) > 1:
+        dtm_path = os.path.join(raw_dir, f"{a.name}_dtm_src.vrt")
+        run(["gdalbuildvrt", "-q", dtm_path] + dtm_paths)
 
     clipped = os.path.join(raw_dir, f"{a.name}_dtm_{a.size}m.tif")
     run(["gdal_translate", "-q", "-projwin", xmin, ymax, xmax, ymin, dtm_path, clipped])
@@ -243,12 +308,15 @@ def main():
     # --- Canopy / object heights --------------------------------------------
     canopy = fetch_canopy(a, raw_dir, out_dir, xmin, ymin, xmax, ymax) if not a.no_canopy else None
 
+    # --- Historical ground maps for the eras ----------------------------------
+    fetched_maps = fetch_era_maps(era_maps, out_dir, xmin, ymin, xmax, ymax, a.map_px)
+
     # --- Metadata ----------------------------------------------------------
     today = dt.date.today().isoformat()
     meta = {
         "name": a.name,
         "crs": "EPSG:3301",
-        "sheet": sheet,
+        "sheet": sheets[0],
         "xmin": xmin, "ymin": ymin, "xmax": xmax, "ymax": ymax,
         "size_m": a.size,
         "size_px": a.size,
@@ -260,16 +328,17 @@ def main():
         "texture": "ortho.jpg",
         "texture_px": px,
         "canopy": canopy,
+        "era_maps": fetched_maps,
         "world_mapping": "Godot x = easting - xmin; Godot z = ymax - northing (north is -Z); y = height * z_scale",
-        "source": {"dtm": dtm_url, "dtm_file": dtm_name, "ortho_wms": WMS, "ortho_layer": "EESTIFOTO"},
+        "source": {"dtm": dtm_url, "dtm_files": dtm_name, "dtm_sheets": sheets, "ortho_wms": WMS, "ortho_layer": "EESTIFOTO", "historical_wms": WMS_HISTORICAL},
         "fetched": today,
         "attribution": ATTRIBUTION.format(year=today[:4]),
         "license": "Maa-amet open data licence (free use with attribution)",
     }
-    with open(os.path.join(out_dir, "terrain_meta.json"), "w") as f:
+    with open(meta_path, "w") as f:
         json.dump(meta, f, indent=2)
     log(f"wrote {out_dir}/{{heightmap.r32, ortho.jpg, terrain_meta.json}}")
-    log("next: godot --headless --path . -s res://tools/godot/import_terrain.gd -- --tile=" + a.name)
+    log("next: godot --headless --path . -s res://tools/godot/import_terrain.gd -- --tile=" + a.name + (" --site=" + a.site if a.site else ""))
 
 
 if __name__ == "__main__":

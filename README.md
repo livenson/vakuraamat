@@ -22,6 +22,10 @@ in the repo right now.
 All ground, buildings' positions, tree heights and the ponds come from Maa- ja Ruumiamet open data
 of the real Palupera village square; the manor, the family and the story are fiction.
 
+Place and story are a **site pack** (`sites/<id>/`): Palupera is the original, Kvissentali (Tartu)
+a scaffold, and any 1 km² of Estonia can be added with two make targets. See
+[docs/custom-sites.md](docs/custom-sites.md) and the section below.
+
 ## Status: all five phases playable
 
 - **Phase 1, the slice:** three eras of the Palupera square, the register as the era
@@ -51,12 +55,32 @@ for t in boot_test playthrough_test farming_test hunting_test economy_test; do
   godot --headless --path . res://tools/godot/$t.tscn; done
 ```
 
-Site layout lives in `data/site_layout.json` (positions found from the cadastral parcel
-and the nDSM building footprint); `tools/gen_era_scenes.py` regenerates the era scenes.
+Site layout lives in `sites/palupera/layout.json` (positions found from the cadastral parcel
+and the nDSM building footprint); `sites/palupera/scenes.json` says what stands where in each
+era and `make scenes` regenerates the era scenes from both.
 
-Narrative: `assets/narrative/era_*.ink` (Estonian lines with `# en:` tags, choices as
-`[et %% en]`), compiled with `cd tools/ink && npm install && npm run compile`. Strings:
-`assets/i18n/strings.csv`. Press L in game to switch language.
+Narrative: `sites/<id>/narrative/era_*.ink` (Estonian lines with `# en:` tags, choices as
+`[et %% en]`), compiled with `make ink`. Strings: core UI keys in `assets/i18n/strings.csv`,
+place and story keys in `sites/<id>/strings.csv`. Press L in game to switch language.
+
+## Custom locations and stories
+
+```sh
+make site SITE=kvissentali NAME="Kvissentali" CENTER="657600 6477150"   # scaffold a pack (EPSG:3301 centre)
+make tile SITE=kvissentali      # Maa-amet DTM, nDSM, orthophoto, 1938 cadastral and one-verst maps,
+                                # Terrain3D import, vegetation, buildings + water, scenes, validation
+godot --path . -- --site=kvissentali
+```
+
+A pack holds everything place-specific: `site.json` (terrain tile and centre, sun position, era
+ground maps, spawn, journal locations, objectives, ending rules), `layout.json`, `scenes.json`,
+`data/` (eras, consequence points, items, manors, structures, trade goods, crops, animals),
+`narrative/`, `strings.csv` and the derived `buildings_2026.json` / `water_2026.json`. The scaffold
+is a complete, playable skeleton: a register, one NPC per era, one artifact whose return leaves a
+stone in every later era, trading, farming, hunting and building copied from Palupera with the eras
+remapped. The main menu offers a **Location** button when more than one pack exists; saves remember
+their pack. `make validate` checks every pack for broken references without Godot; the site test in
+`make test` boots every pack. Details: [docs/custom-sites.md](docs/custom-sites.md).
 
 ## Phase 0 technical spike (kept for reference)
 
@@ -66,21 +90,21 @@ orthophoto draped on it at full resolution, a Sky3D day/night cycle with the sun
 Palmse's real latitude/longitude, one Blender-authored prop, a first-person walker and an
 FPS/coordinate HUD.
 No game systems yet, by design. The site follows `vakuraamat-first-iteration-design.md`;
-the earlier Palmse comparison tile was removed from the repo (regenerate with `make tile TILE=palmse CENTER="613372 6598710"`).
+the earlier Palmse comparison tile was removed from the repo (regenerate with `make site SITE=palmse CENTER="613372 6598710"` and `make tile SITE=palmse`).
 
 ## Project init (fresh clone)
 
 ```sh
 git clone <repo> vakuraamat && cd vakuraamat
 make setup      # Homebrew tools, git-lfs pull, npm for the ink compiler, first Godot import
-make tile       # downloads Maa-amet data for Palupera and builds the terrain (~10 min, network)
+make tile       # downloads Maa-amet data for Palupera and builds the terrain (~10 min, network); SITE=<id> for another pack
 make test       # headless test suite
 godot --path .  # play
 ```
 
 Generated data is deliberately not in git: the Terrain3D region file (22 MB, rewritten on every
 re-scatter), prepared tree meshes and impostor atlases. `make tile` rebuilds the terrain from the
-committed inputs (`heightmap.r32`, `canopy.r32`, `ortho.jpg`, `data/site_layout.json`); `make trees`
+committed inputs (`heightmap.r32`, `canopy.r32`, `ortho.jpg`, era maps, `sites/<id>/layout.json`); `make trees`
 rebuilds the trees (needs Blender and a window for the impostor bake). Large stable binaries
 (models, textures, addon binaries, era map images) are tracked with git LFS, see `.gitattributes`.
 Coding-agent conventions live in `AGENTS.md`.
@@ -89,12 +113,15 @@ Coding-agent conventions live in `AGENTS.md`.
 
 | Target | Produces | Inputs |
 |---|---|---|
-| `make tile` | `assets/terrain/<tile>/{heightmap.r32, canopy.r32, ortho.jpg, terrain_meta.json, data/, terrain_assets.tres}` | Maa-amet geoportal (DTM, nDSM), WMS orthophoto, `data/site_layout.json` (pads, exclusions) |
+| `make tile SITE=<id>` | `assets/terrain/<tile>/{heightmap.r32, canopy.r32, ortho.jpg, era_*.png, terrain_meta.json, data/, terrain_assets.tres}`, then `make features` and `make scenes` | `sites/<id>/site.json` (centre, size, era map layers), Maa-amet geoportal (DTM, nDSM), WMS orthophoto and historical maps, `sites/<id>/layout.json` (pads, exclusions) |
 | `make scatter` | vegetation instances in the region file | control map, `canopy.r32`, layout exclusions |
 | `make trees` | `assets/models/trees/*.glb`, `*_mesh.res`, `*_impostor.png`, `*_lod.tscn` | Blender Sapling presets, `assets/textures/foliage/*` |
 | `make props` | oak, boundary stone, buildings, figures, prepared vegetation scenes | Blender scripts in `tools/blender`, `assets/textures/buildings/*` |
-| `python3 tools/gen_era_scenes.py` | `scenes/eras/era_*.tscn` | `data/site_layout.json`, `data/buildings_2026.json` |
-| `make ink` | `assets/narrative/*.ink.json` | `assets/narrative/*.ink` |
+| `make site SITE=<id> NAME=... CENTER=...` | `sites/<id>/` scaffold (manifest, layout, scenes.json, data, ink, strings) | `tools/new_site.py`, the template pack's gameplay content |
+| `make features SITE=<id>` | `sites/<id>/buildings_2026.json`, `water_2026.json` | `canopy.r32`, `heightmap.r32`, `ortho.jpg` (`tools/pipeline/extract_features.py`) |
+| `make scenes SITE=<id>` | `sites/<id>/scenes/era_*.tscn` | `sites/<id>/scenes.json`, `layout.json`, `buildings_2026.json` |
+| `make validate` | report | every `sites/*/` (`tools/validate_site.py`, no Godot) |
+| `make ink` | `sites/*/narrative/*.ink.json` | `sites/*/narrative/*.ink` |
 
 Other one-off analyses (building footprints, ponds, parcel lookups) are documented inline in
 `data/*.json` comments and the commit history; the WFS/WMS endpoints are in `THIRD_PARTY.md`.
@@ -137,18 +164,18 @@ To play on an Android TV over the home network, see [docs/tv-streaming.md](docs/
 ## Terrain pipeline (repeatable, two commands)
 
 ```sh
-# 1. Maa-amet -> heightmap.r32 + ortho.jpg + terrain_meta.json  (needs network)
-python3 tools/pipeline/fetch_tile.py --name palupera --center 637548 6444029 --size 1024
+# 1. Maa-amet -> heightmap.r32 + canopy.r32 + ortho.jpg + era maps + terrain_meta.json  (needs network)
+python3 tools/pipeline/fetch_tile.py --site palupera        # or --name <tile> --center <E> <N> --era-map kk1940:era_1938_cadastral.png
 
 # 2. -> Terrain3D region data + assets/material resources     (headless Godot)
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . \
-    -s res://tools/godot/import_terrain.gd -- --tile=palupera
+    -s res://tools/godot/import_terrain.gd -- --site=palupera
 ```
 
 What step 1 does:
 
-1. Finds the 1:10 000 map sheet for the centre point (downloads Maa-amet's `epk10T` sheet
-   grid once into `data_raw/`).
+1. Finds the 1:10 000 map sheets under the four corners (downloads Maa-amet's `epk10T` sheet
+   grid once into `data_raw/`); several sheets are mosaicked with `gdalbuildvrt`.
 2. POSTs the geoportal download form (`andmetyyp=dem_1m_geotiff`, `kaardiruut=<sheet>`)
    and downloads the 1 m DTM GeoTIFF for that sheet (~74 MB, cached in `data_raw/`).
 3. Clips a `--size` m square with `gdal_translate -projwin`, fills any NoData (water) with
@@ -157,7 +184,9 @@ What step 1 does:
    names.
 4. Fetches the orthophoto for the same bbox from the `fotokaart` WMS (layer `EESTIFOTO`,
    EPSG:3301, JPEG, max 4096 px per request; 1024 m at 4096 px = 25 cm/px).
-5. Writes `terrain_meta.json` with extent, sheet, height range, source URLs, fetch date and
+5. Fetches the nDSM canopy/object heights (1:2000 sheets) and the historical ground maps named in
+   the site manifest from the `ajalooline` WMS (same bbox, PNG).
+6. Writes `terrain_meta.json` with extent, sheets, height range, source URLs, fetch date and
    the attribution string.
 
 What step 2 does: loads the raw heightmap as `Image.FORMAT_RF`, resamples the orthophoto
@@ -196,13 +225,12 @@ square has 22 m of relief at 1:1; the Palmse tile had 6 m.
 
 ### Limits of the current pipeline
 
-- One tile = one Terrain3D region = one map sheet. An AOI crossing sheet boundaries or
-  larger than 5 km needs a VRT mosaic (not implemented).
+- One tile = one Terrain3D region (at most 2048 m). Sheet boundaries are mosaicked.
 - The override shader drops Terrain3D's projection/detiling/paintable-rotation features
   (inherited from the lightweight example). Fine for a drape; revisit if painted textures
   are needed later.
-- Only the current orthophoto and DTM. Historical layers, CHM/nDSM and cadastral data are
-  Phase 1+ and covered in the data-pipeline doc.
+- Historical layers come from the WMS as pictures at 2048 px (about 50 cm/px); vector cadastral
+  data is only used offline for positions.
 
 ## Layout
 
@@ -210,12 +238,15 @@ square has 22 m of relief at 1:1; the Palmse tile had 6 m.
 addons/terrain_3d/           Terrain3D 1.0.2 (vendored)
 addons/sky_3d/               Sky3D 2.1.0 (vendored)
 assets/terrain/ortho_drape.gdshader  Terrain3D override shader with world-aligned orthophoto
-assets/terrain/palupera/     heightmap.r32, ortho.jpg, terrain_meta.json, data/, terrain_assets.tres
+assets/terrain/<tile>/       heightmap.r32, canopy.r32, ortho.jpg, era_*.png, terrain_meta.json, data/, terrain_assets.tres
+sites/<id>/                  site pack: site.json, layout.json, scenes.json, data/, narrative/, scenes/, strings.csv
+scripts/autoload/sites.gd    the active pack; tools/new_site.py, tools/validate_site.py, tools/gen_era_scenes.py
 assets/models/props/         boundary_stone.glb (generated by tools/blender/)
 scenes/spike/                Phase 0 scene + script
 scenes/player/               first-person walker
 scripts/player|ui|terrain/   controller, HUD, georef helper
-tools/pipeline/fetch_tile.py Maa-amet download + GDAL clip/convert
+tools/pipeline/fetch_tile.py Maa-amet download + GDAL clip/convert (+ historical WMS maps)
+tools/pipeline/extract_features.py  buildings and still water from the laser data
 tools/godot/import_terrain.gd  headless Terrain3D import
 tools/blender/make_boundary_stone.py  headless Blender prop generator
 tools/verify_spike.sh        acceptance run (screenshot + FPS)

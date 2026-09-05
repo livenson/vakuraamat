@@ -1,0 +1,17 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/hunting/animal_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "black_grouse"
+display_name_key = "ANIMAL_BLACK_GROUSE"
+body_color = Color(0.12, 0.12, 0.16, 1)
+body_size = Vector3(0.15, 0.25, 0.4)
+spawn_classes = Array[int]([2])
+yield_item_id = "grouse"
+flee_distance = 10.0
+speed = 6.0
+hunt_range = 5.0
+group_size = 3
+eras = Array[String](["era_1798"])

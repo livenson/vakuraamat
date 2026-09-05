@@ -1,0 +1,49 @@
+{
+  "name": "kvissentali",
+  "crs": "EPSG:3301",
+  "sheet": "54754",
+  "xmin": 657088,
+  "ymin": 6476638,
+  "xmax": 658112,
+  "ymax": 6477662,
+  "size_m": 1024,
+  "size_px": 1024,
+  "resolution_m": 1.0,
+  "heightmap": "heightmap.r32",
+  "heightmap_format": "float32 little-endian, row-major, row 0 = north edge (ymax), metres EH2000",
+  "z_min": 31.389,
+  "z_max": 42.372,
+  "z_scale": 1.0,
+  "texture": "ortho.jpg",
+  "texture_px": 4096,
+  "canopy": {
+    "file": "canopy.r32",
+    "source": "ndsm_rel_1m (1:2000 sheets 476657_ndsm_1m.tif,476658_ndsm_1m.tif,477657_ndsm_1m.tif,477658_ndsm_1m.tif)",
+    "max_height": 30.02,
+    "format": "float32 little-endian, row-major, row 0 = north; metres above ground; 0 = nothing"
+  },
+  "era_maps": {
+    "era_1798_verst.png": {
+      "layer": "yheverstakaart",
+      "source": "https://kaart.maaamet.ee/wms/ajalooline"
+    },
+    "era_1938_cadastral.png": {
+      "layer": "kk1940",
+      "source": "https://kaart.maaamet.ee/wms/ajalooline"
+    }
+  },
+  "world_mapping": "Godot x = easting - xmin; Godot z = ymax - northing (north is -Z); y = height * z_scale",
+  "source": {
+    "dtm": "https://geoportaal.maaamet.ee/index.php?lang_id=1&plugin_act=otsing&kaardiruut=54754&andmetyyp=dem_1m_geotiff&dl=1&f=54754_dtm_1m.tif&no_cache=6a9bc912591dc&page_id=614",
+    "dtm_files": "54754_dtm_1m.tif",
+    "dtm_sheets": [
+      "54754"
+    ],
+    "ortho_wms": "https://kaart.maaamet.ee/wms/fotokaart",
+    "ortho_layer": "EESTIFOTO",
+    "historical_wms": "https://kaart.maaamet.ee/wms/ajalooline"
+  },
+  "fetched": "2026-09-05",
+  "attribution": "Map data: Maa- ja Ruumiamet (Estonian Land and Spatial Development Board), 2026",
+  "license": "Maa-amet open data licence (free use with attribution)"
+}

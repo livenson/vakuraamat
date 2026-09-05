@@ -55,14 +55,17 @@ func scan() -> void:
 
 
 ## Switch the active site (main menu). Registries listen to site_changed and reload.
-func select(id: String) -> void:
+## remember=false (tests) leaves user://settings.cfg alone.
+func select(id: String, remember: bool = true) -> void:
+	_ensure()
 	if id == active or not available.has(id):
 		return
 	_activate(id)
-	var cfg := ConfigFile.new()
-	cfg.load(SETTINGS)
-	cfg.set_value("site", "id", id)
-	cfg.save(SETTINGS)
+	if remember:
+		var cfg := ConfigFile.new()
+		cfg.load(SETTINGS)
+		cfg.set_value("site", "id", id)
+		cfg.save(SETTINGS)
 	site_changed.emit(id)
 
 

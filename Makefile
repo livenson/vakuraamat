@@ -6,7 +6,7 @@ SITE ?= palupera
 TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
 CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
-.PHONY: help setup import tile scatter trees props ink test lint export clean-generated
+.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, gdal, git-lfs; npm for ink), pull LFS files, first Godot import"
@@ -18,6 +18,11 @@ help:
 	@echo "make test             run the headless test suite"
 	@echo "make lint             gdlint, ruff, shellcheck (same as the GitHub workflow; needs uv and shellcheck)"
 	@echo "make export           export the macOS build to build/Vakuraamat.zip"
+	@echo "make site SITE=x NAME=\"X\" CENTER=\"E N\"  scaffold a new location/story pack under sites/x (EPSG:3301 centre)"
+	@echo "make era-maps         fetch the historical ground maps (WMS) named in sites/$(SITE)/site.json and relink the eras"
+	@echo "make features         derive sites/$(SITE)/buildings_*.json and water_*.json from the tile (author edits afterwards)"
+	@echo "make scenes           regenerate sites/$(SITE)/scenes/*.tscn from scenes.json + layout.json"
+	@echo "make validate         check every site pack for broken references (no Godot needed)"
 
 setup:
 	brew list --cask godot >/dev/null 2>&1 || brew install --cask godot
@@ -35,10 +40,36 @@ import:
 	$(GODOT) --headless --path . --import >/dev/null 2>&1 || true
 
 tile:
-	python3 tools/pipeline/fetch_tile.py --name $(TILE) --center $(CENTER) --size 1024
+	python3 tools/pipeline/fetch_tile.py --site $(SITE)
+	python3 tools/new_site.py --id $(SITE) --relink-era-maps
 	$(MAKE) import
 	$(GODOT) --headless --path . -s res://tools/godot/import_terrain.gd -- --site=$(SITE) --tile=$(TILE)
 	$(MAKE) scatter
+	@[ -s sites/$(SITE)/buildings_2026.json ] && [ "$$(cat sites/$(SITE)/buildings_2026.json)" != "[]" ] || $(MAKE) features
+	$(MAKE) scenes
+	python3 tools/validate_site.py --site $(SITE)
+
+site:
+	@test -n "$(CENTER)" || (echo 'usage: make site SITE=id NAME="Display name" CENTER="easting northing" [ERAS=1798,1938,2026]'; exit 1)
+	python3 tools/new_site.py --id $(SITE) --name "$(or $(NAME),$(SITE))" --center $(CENTER) --eras $(or $(ERAS),1798,1938,2026)
+	$(MAKE) ink
+	$(MAKE) scenes
+	$(MAKE) import
+	python3 tools/validate_site.py --site $(SITE)
+
+era-maps:
+	python3 tools/pipeline/fetch_tile.py --site $(SITE) --only-era-maps
+	python3 tools/new_site.py --id $(SITE) --relink-era-maps
+	$(MAKE) import
+
+features:
+	python3 tools/pipeline/extract_features.py --site $(SITE)
+
+scenes:
+	python3 tools/gen_era_scenes.py --site $(SITE)
+
+validate:
+	python3 tools/validate_site.py --all
 
 scatter:
 	$(GODOT) --headless --path . -s res://tools/godot/scatter_vegetation.gd -- --site=$(SITE) --tile=$(TILE)
@@ -64,7 +95,8 @@ ink:
 	cd tools/ink && npm run compile
 
 test:
-	@for t in boot_test playthrough_test farming_test hunting_test economy_test; do \
+	@python3 tools/validate_site.py --all | grep -E "OK|FAILED"
+	@for t in boot_test site_test playthrough_test farming_test hunting_test economy_test; do \
 	  printf "%-18s " $$t; $(GODOT) --headless --path . res://tools/godot/$$t.tscn 2>&1 | grep -E "PASSED|FAILED" | head -1; done
 
 lint:

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/farming/crop_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "potato"
+display_name_key = "CROP_POTATO"
+seed_item_id = "seed_potato"
+yield_item_id = "potatoes"
+yield_quantity = 5
+growth_time_hours = 7.0
+stalk_color = Color(0.25, 0.5, 0.2, 1)
+ripe_color = Color(0.3, 0.45, 0.2, 1)
+stalk_height = 0.5
+eras = Array[String](["era_1938", "era_2026"])

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/trading/trade_good.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+item_id = "potatoes"
+era_id = "era_2026"
+buy_price = 0
+sell_price = 120

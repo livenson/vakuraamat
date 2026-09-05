@@ -1,0 +1,15 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://o1aqjnd0glb2"
+path="res://.godot/imported/era_1938.ink.json-98ce1ea1a92b63fa35d3f44bdc3ea3a0.res"
+
+[deps]
+
+source_file="res://sites/kvissentali/narrative/era_1938.ink.json"
+dest_files=["res://.godot/imported/era_1938.ink.json-98ce1ea1a92b63fa35d3f44bdc3ea3a0.res"]
+
+[params]
+
+compress=true
