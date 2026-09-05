@@ -265,6 +265,27 @@ def validate(site, rep, root=ROOT):
                 rep.err(f"parcels.json {u.get('tunnus')}: land_value must be a number or null")
         if units and not any(u.get("land_value") for u in units):
             rep.warn("parcels.json has no land_value: re-run make parcels")
+    buildings = load_json("buildings.json", ("buildings",))
+    tunnus_set = {u.get("tunnus") for u in parcels["parcels"]} if parcels else set()
+    building_ids = {b.get("id") for b in buildings["buildings"]} if buildings else set()
+    tenants = load_json("tenants.json", ("attribution", "source", "fetched", "tenants"))
+    if tenants:
+        for t in tenants["tenants"]:
+            who = f"tenants.json {t.get('registry_code')}"
+            if not (str(t.get("registry_code") or "").isdigit() and t.get("name")):
+                rep.err(f"{who}: needs a numeric registry_code and a name")
+            if t.get("match") not in ("exact", "street", "none"):
+                rep.err(f"{who}: match must be exact, street or none")
+            if t.get("tunnus") is not None and t["tunnus"] not in tunnus_set:
+                rep.err(f"{who}: tunnus {t['tunnus']!r} not in parcels.json")
+            if t.get("building_id") is not None and t["building_id"] not in building_ids:
+                rep.err(f"{who}: building_id {t['building_id']!r} not in buildings.json")
+            if t.get("match") == "exact" and t.get("tunnus") is None and t.get("building_id") is None:
+                rep.err(f"{who}: exact match without a parcel or building")
+            if str(t.get("legal_form") or "").startswith("Füüsilisest isikust"):
+                rep.err(f"{who}: sole proprietor (a private person) in tenants.json")
+        if tenants["tenants"] and not any(t.get("match") == "exact" for t in tenants["tenants"]):
+            rep.warn("tenants.json: no tenant matched a parcel or building")
     market = load_json("market.json", ("by_purpose", "source"))
     if market:
         if not market["by_purpose"]:

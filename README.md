@@ -93,6 +93,10 @@ window rows per floor, doors and chimneys. K shows the cadastral number, buildin
 median euros per m² by intended purpose. These are taxation values, labelled as such; a hand-exported
 Maa-amet transaction table can be joined with `make market XLSX=<file>`.
 
+**Tenants:** the companies registered on the tile's addresses come from the e-Business Register's
+open data and are matched to parcels and buildings (`tenants.json`, `make tenants`), by the address
+id the Building Register shares with the company register where possible, else by street and number.
+
 **Real buildings and trees:** every building in a tile comes from the topographic database (footprint),
 the Building Register (year built, floors, purpose, facade and roof materials, heating, water, solar)
 and Maa-amet's LOD2 3D models (roof shapes); a building appears only in the eras after its first year
