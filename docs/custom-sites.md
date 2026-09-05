@@ -326,7 +326,9 @@ waves, drifting ripple normals, depth-based colour by Beer's law with refraction
 below, foam along the shore), a basin carved into the terrain at load time (only where the laser
 DTM was flat at the water level, so land inside a patch's bounding box stays), and a school of fish
 circling below the surface (a MultiMesh, animated within 70 m of the player). Streamed tiles get
-their ponds too. Vegetation is never scattered on water patches (`TerrainBuilder.water_exclusions`).
+their ponds too. Vegetation is never scattered on water patches (`TerrainBuilder.water_exclusions`) nor under
+building footprints (`TerrainBuilder.footprint_mask`: the register polygons grown 0.7 m, or the laser massing
+rectangles), so nothing grows through an interior floor.
 
 Ground and facade textures are CC0 sets from Poly Haven, fetched and packed by
 `tools/pipeline/fetch_polyhaven.py` (record in `assets/textures/POLYHAVEN.json`): five terrain
@@ -346,7 +348,7 @@ clothes. Preview them with `godot --path . res://tools/godot/figure_preview.tscn
 
 | Change | Then run |
 |---|---|
-| positions in `layout.json` | `make scenes`; pads and exclusions also need `make tile` (or `make scatter`) |
+| positions in `layout.json` | `make scenes`; pads, exclusions and `buildings.json` also need `make tile` (or `make scatter`) |
 | `scenes.json` | `make scenes` |
 | `.ink` | `make ink` |
 | `strings.csv`, any `.tres` | `make import` (Godot re-imports the CSV into `.translation` files) |

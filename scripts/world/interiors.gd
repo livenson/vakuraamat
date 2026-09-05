@@ -10,6 +10,7 @@ const KIT := "res://assets/vendor/kenney_furniture_kit/glb/"
 const WALL := 0.25          # inner wall inset from the footprint
 const SLAB := 0.12
 const MAX_FLOORS := 4
+const PLANT_IDS := [5, 6, 7, 8, 9]   # TerrainBuilder.RULES bushes, grass, clover; trees (0..4) are measured and never touched
 
 static var instance: Interiors
 
@@ -167,6 +168,7 @@ func _build(b: FootprintBuilding) -> Node3D:
 			door_u = d
 			door_edge = i
 	var ramp_edge := (door_edge + poly.size() / 2) % poly.size()
+	_clear_plants(b)
 	var tenants := Ledger.tenants_of(b.tunnus) if b.tunnus != "" else []
 	var use := _use_of(b, tenants)
 	for k in n_floors:
@@ -261,7 +263,7 @@ func _slab(root: Node3D, poly: PackedVector2Array, y: float, mat: Material, up: 
 
 ## One inner wall between two floor heights: solid below the sill and above the lintel, piers between
 ## window openings, and the door gap on the ground floor. Faces inward, double-sided.
-func _wall(root: Node3D, a: Vector2, c: Vector2, y0: float, y1: float, mat: Material, kind: String, storey: int, door_u: float, door_w: float) -> void:
+func _wall(root: Node3D, a: Vector2, c: Vector2, y0: float, y1: float, mat: Material, kind: String, _storey: int, door_u: float, door_w: float) -> void:
 	var length := a.distance_to(c)
 	if length < 0.3:
 		return
@@ -418,7 +420,7 @@ const SETS := {
 
 ## Pieces along the walls, skipping the door and ramp walls; a piece per ~4 m of wall.
 func _furnish(root: Node3D, poly: PackedVector2Array, y0: float, use: String, storey: int, door_edge: int, ramp_edge: int, b: FootprintBuilding) -> void:
-	var set: Array = SETS.get(use if storey == 0 else ("home" if use == "home" else "office"), SETS.office)
+	var pieces: Array = SETS.get(use if storey == 0 else ("home" if use == "home" else "office"), SETS.office)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash("%d_%d" % [b.building_id, storey])
 	var idx := 0
@@ -436,9 +438,9 @@ func _furnish(root: Node3D, poly: PackedVector2Array, y0: float, use: String, st
 			inward = -inward
 		var slots := maxi(1, int(length / 4.0))
 		for s in slots:
-			if idx >= set.size():
+			if idx >= pieces.size():
 				return
-			var piece: Array = set[idx]
+			var piece: Array = pieces[idx]
 			idx += 1
 			var size: Vector3 = piece[1]
 			var u := length * (s + 0.5) / slots
@@ -474,22 +476,47 @@ func _piece(model: String, size: Vector3, color: Color) -> Node3D:
 
 
 ## Lamp positions: the centroid for small rooms, a 9 m grid of points inside the polygon for halls.
-static func _lamp_spots(poly: PackedVector2Array) -> Array:
+## Baked grass and bushes under the footprint of an older tile, stamped away on the first visit
+## (session only; the region file is untouched). Tiles baked with TerrainBuilder.footprint_mask have none.
+func _clear_plants(b: FootprintBuilding) -> void:
+	var terrain: Terrain3D = world.terrain if world else null
+	if terrain == null or terrain.instancer == null or not terrain.instancer.has_method("remove_instances"):
+		return
+	for spot in _grid_spots(_grow(b.polygon, 0.7), 2.5):
+		var at: Vector3 = b.to_global(Vector3(spot.x, 0.0, spot.y))
+		var h: float = terrain.data.get_height(at)
+		if not is_nan(h):
+			at.y = h
+		for id in PLANT_IDS:
+			terrain.instancer.remove_instances(at, {"asset_id": id, "size": 6.0, "strength": 1.0, "slope": Vector2(0.0, 90.0),
+				"modifier_alt": false, "modifier_ctrl": false, "modifier_shift": false, "height_offset": 0.0, "random_height": 0.0,
+				"fixed_scale": 1.0, "random_scale": 0.0, "fixed_spin": 0.0, "random_spin": 0.0, "fixed_tilt": 0.0, "random_tilt": 0.0,
+				"align_to_normal": false, "vertex_color": Color.WHITE, "random_hue": 0.0, "random_darken": 0.0})
+
+
+## Points of a `step` grid inside the polygon, starting half a step in from its bounding box.
+static func _grid_spots(poly: PackedVector2Array, step: float) -> Array:
 	var spots := []
-	if _area(poly) < 90.0:
-		spots.append(_centroid(poly))
+	if poly.size() < 3:
 		return spots
 	var rect := Rect2(poly[0], Vector2.ZERO)
 	for p in poly:
 		rect = rect.expand(p)
-	var x := rect.position.x + 4.5
+	var x := rect.position.x + step / 2.0
 	while x < rect.end.x:
-		var z := rect.position.y + 4.5
+		var z := rect.position.y + step / 2.0
 		while z < rect.end.y:
 			if Geometry2D.is_point_in_polygon(Vector2(x, z), poly):
 				spots.append(Vector2(x, z))
-			z += 9.0
-		x += 9.0
+			z += step
+		x += step
+	return spots
+
+
+static func _lamp_spots(poly: PackedVector2Array) -> Array:
+	if _area(poly) < 90.0:
+		return [_centroid(poly)]
+	var spots := _grid_spots(poly, 9.0)
 	if spots.is_empty():
 		spots.append(_centroid(poly))
 	return spots
