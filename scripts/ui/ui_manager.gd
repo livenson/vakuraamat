@@ -7,7 +7,7 @@ const GOLD := Color(0.85, 0.68, 0.25)
 const PAPER := Color(0.93, 0.88, 0.76)
 const INK := Color(0.16, 0.12, 0.08)
 const MAP_ORDER := ["era_1798", "era_1938", "era_2026"]
-var LOCATIONS := {}   # LOC_* -> tile metres, from data/site_layout.json (journal map markers)
+var _locations := {}   # LOC_* -> tile metres, from data/site_layout.json (journal map markers)
 
 var world: Node3D
 var player: CharacterBody3D
@@ -53,7 +53,7 @@ func _ready() -> void:
 	var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/site_layout.json"))
 	for pair in [["LOC_OAK", "oak"], ["LOC_MANOR", "manor"], ["LOC_ORCHARD", "orchard"], ["LOC_FARMSTEAD", "farm"], ["LOC_WELL", "well"], ["LOC_NORTH_FIELD", "field"]]:
 		var v: Array = layout[pair[1]]
-		LOCATIONS[pair[0]] = Vector2(v[0], v[1])
+		_locations[pair[0]] = Vector2(v[0], v[1])
 	world = get_parent()
 	player = world.get_node("Player")
 	interactor = player.get_node("Camera3D/Interactor")
@@ -76,8 +76,12 @@ func _ready() -> void:
 	EventBus.era_changed.connect(func(_e): _refresh_era_label())
 	EventBus.chapter_committed.connect(_on_chapter_committed)
 	EventBus.register_opened.connect(func(): show_notice(tr("UI_REGISTER_TITLE")))
-	EventBus.flag_changed.connect(func(f, v): if f == "epilogue" and v: call_deferred("_show_ending"))
-	EventBus.item_added.connect(func(_i, _e): if _open_panel == inventory: _fill_inventory())
+	EventBus.flag_changed.connect(func(f, v):
+		if f == "epilogue" and v:
+			call_deferred("_show_ending"))
+	EventBus.item_added.connect(func(_i, _e):
+		if _open_panel == inventory:
+			_fill_inventory())
 	Narrative.line.connect(_on_line)
 	Narrative.choices.connect(_on_choices)
 	Narrative.ended.connect(_on_dialogue_ended)
@@ -919,10 +923,10 @@ func _draw_markers(c: Control) -> void:
 	var size := c.size
 	var side := minf(size.x, size.y)
 	var origin := (size - Vector2(side, side)) * 0.5
-	for id in LOCATIONS:
+	for id in _locations:
 		if not Journal.visited.has(id):
 			continue
-		var p: Vector2 = origin + LOCATIONS[id] / 1024.0 * side
+		var p: Vector2 = origin + _locations[id] / 1024.0 * side
 		c.draw_circle(p, 6, GOLD)
 		c.draw_circle(p, 6, INK, false, 1.5)
 		c.draw_string(ThemeDB.fallback_font, p + Vector2(9, 5), tr(id), HORIZONTAL_ALIGNMENT_LEFT, -1, 14, INK)

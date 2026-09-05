@@ -3,7 +3,7 @@
 # Tapered trunk, four bent limbs, a canopy of overlapping lumpy spheres with vertex
 # colours, flared roots. ~2.5k faces. Base at the origin, ~14 m tall at scale 1.
 import bpy, bmesh, sys, math, random
-from mathutils import Vector, Matrix
+from mathutils import Vector
 
 out_path = sys.argv[sys.argv.index("--") + 1] if "--" in sys.argv else "oak.glb"
 random.seed(7)

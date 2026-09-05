@@ -14,7 +14,9 @@ func _ready() -> void:
 	prompt_key = "BUILD_PROMPT"
 	label_key = manor.display_name_key if manor else ""
 	EventBus.flag_changed.connect(func(_f, _v): _refresh())
-	Manors.structure_built.connect(func(mid, _sid): if mid == manor_id: _refresh())
+	Manors.structure_built.connect(func(mid, _sid):
+		if mid == manor_id:
+			_refresh())
 	_refresh()
 
 

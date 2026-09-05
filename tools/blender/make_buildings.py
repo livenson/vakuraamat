@@ -2,8 +2,7 @@
 #   Blender -b -P tools/blender/make_buildings.py -- assets/models/buildings
 # Produces manor.glb, ruin.glb, rehielamu.glb (1798 barn-dwelling), farmhouse_1938.glb.
 # Materials are plain principled colours so Godot needs no textures.
-import bpy, bmesh, sys, math, random, os
-from mathutils import Vector
+import bpy, bmesh, sys, random, os
 
 out_dir = sys.argv[sys.argv.index("--") + 1] if "--" in sys.argv else "buildings"
 os.makedirs(out_dir, exist_ok=True)

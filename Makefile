@@ -4,7 +4,7 @@ BLENDER ?= /Applications/Blender.app/Contents/MacOS/Blender
 TILE ?= palupera
 CENTER ?= 637548 6444029
 
-.PHONY: help setup import tile scatter trees props ink test export clean-generated
+.PHONY: help setup import tile scatter trees props ink test lint export clean-generated
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, gdal, git-lfs; npm for ink), pull LFS files, first Godot import"
@@ -14,6 +14,7 @@ help:
 	@echo "make props            regenerate Blender props (oak, boundary stone, buildings, figures)"
 	@echo "make ink              compile assets/narrative/*.ink"
 	@echo "make test             run the headless test suite"
+	@echo "make lint             gdlint, ruff, shellcheck (same as the GitHub workflow; needs uv and shellcheck)"
 	@echo "make export           export the macOS build to build/Vakuraamat.zip"
 
 setup:
@@ -63,6 +64,11 @@ ink:
 test:
 	@for t in boot_test playthrough_test farming_test hunting_test economy_test; do \
 	  printf "%-18s " $$t; $(GODOT) --headless --path . res://tools/godot/$$t.tscn 2>&1 | grep -E "PASSED|FAILED" | head -1; done
+
+lint:
+	git ls-files '*.gd' | grep -v '^addons/' | xargs uvx --python 3.12 --from gdtoolkit==4.5.0 gdlint
+	uvx ruff@0.16.6 check tools
+	git ls-files '*.sh' | xargs shellcheck
 
 export:
 	mkdir -p build && $(GODOT) --headless --path . --export-release "macOS" build/Vakuraamat.zip

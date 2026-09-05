@@ -21,7 +21,8 @@ The design and plan documents in the repo root are authoritative: `vakuraamat-im
   with `make tile` / `make trees`. Large stable binaries are in git LFS (`.gitattributes`).
 
 ## Commands
-- `make setup` once; `make test` before every commit; `make export` for a macOS build.
+- `make setup` once; `make test` and `make lint` before every commit (the lint workflow runs on
+  GitHub too: gdlint with `.gdlintrc`, ruff with `ruff.toml`, shellcheck); `make export` for a macOS build.
 - Godot headless scripts: `godot --headless --path . -s res://tools/godot/<tool>.gd` for SceneTree
   tools; scenes that need autoloads run as `godot --headless --path . res://tools/godot/<test>.tscn`.
 - zsh does not word-split unquoted variables: when looping over argument strings use `${=args}`.
