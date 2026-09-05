@@ -74,6 +74,9 @@ its design documents in the repo root describe that version.
 - Poly Pizza downloads cannot be scripted (403 on the file host); the user saves the glb by hand into
   `assets/vendor/polypizza/<name>.glb`, then add a THIRD_PARTY.md row (Kenney and Quaternius there are
   CC0, "Poly by Google" is CC BY 3.0). Scale every vendored model from its bounds (`Interiors._bounds`).
+- "Resource file not found: res://" and "Error loading resource: ''" right after a pack switch, with no
+  GDScript backtrace: Terrain3D reading a downloaded tile's still-empty data directory on its first
+  visit. Harmless; the region is built and saved right after.
 - Prop checks without a world: `tools/godot/figure_preview.tscn` (the eight figures), `bike_preview.tscn`
   (bicycles with riders, side-on, a red block marking the riding direction).
 - Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`
