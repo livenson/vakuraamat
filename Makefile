@@ -6,15 +6,14 @@ SITE ?= palupera
 TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
 CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
-.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate tile-service world-service buildings real-trees dev-watch parcels roads market tenants module server town news news-local
+.PHONY: help setup import tile scatter trees props test lint export clean-generated site era-maps features scenes validate tile-service buildings real-trees dev-watch parcels roads market tenants module server town news news-local
 
 help:
-	@echo "make setup            install tools (Homebrew: godot, blender, gdal, git-lfs; npm for ink), pull LFS files, first Godot import"
+	@echo "make setup            install tools (Homebrew: godot, blender, gdal, git-lfs), pull LFS files, first Godot import"
 	@echo "make tile             fetch Maa-amet data for SITE (tile/centre from sites/$(SITE)/site.json), import into Terrain3D, scatter vegetation (regenerates assets/terrain/$(TILE)/data)"
 	@echo "make scatter          re-scatter vegetation only"
 	@echo "make trees            regenerate tree models, prepared meshes and impostor atlases (needs a window for the bake)"
 	@echo "make props            regenerate Blender props (oak, boundary stone, buildings, figures)"
-	@echo "make ink              compile sites/*/narrative/*.ink"
 	@echo "make test             run the headless test suite"
 	@echo "make lint             gdlint, ruff, shellcheck (same as the GitHub workflow; needs uv and shellcheck)"
 	@echo "make export           export the macOS build to build/Vakuraamat.zip"
@@ -37,9 +36,7 @@ setup:
 	brew list gdal >/dev/null 2>&1 || brew install gdal
 	brew list git-lfs >/dev/null 2>&1 || brew install git-lfs
 	git lfs install && git lfs pull
-	cd tools/ink && npm install
 	xattr -dr com.apple.quarantine addons/terrain_3d 2>/dev/null || true
-	$(MAKE) ink
 	$(MAKE) import
 	@test -f assets/terrain/$(TILE)/data/terrain3d_00_00.res || echo ">> terrain region data is not in git: run 'make tile' (network, ~10 min)"
 
@@ -65,7 +62,6 @@ tile:
 site:
 	@test -n "$(CENTER)" || (echo 'usage: make site SITE=id NAME="Display name" CENTER="easting northing" [ERAS=1798,1938,2026]'; exit 1)
 	python3 tools/new_site.py --id $(SITE) --name "$(or $(NAME),$(SITE))" --center $(CENTER) --eras $(or $(ERAS),1798,1938,2026)
-	$(MAKE) ink
 	$(MAKE) scenes
 	$(MAKE) import
 	python3 tools/validate_site.py --site $(SITE)
@@ -146,8 +142,6 @@ props:
 	$(GODOT) --headless --path . -s res://tools/godot/prepare_vegetation.gd
 	$(MAKE) import
 
-ink:
-	cd tools/ink && npm run compile
 
 test:
 	@python3 tools/validate_site.py --all | grep -E "OK|FAILED"
@@ -171,8 +165,6 @@ play:
 tile-service:
 	python3 tools/tile_service.py --port 8765
 
-world-service:
-	python3 tools/world_service.py --port 8766
 
 dev-watch:
 	python3 tools/dev.py watch

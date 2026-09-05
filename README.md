@@ -68,10 +68,9 @@ coordinates (or *Use my location*), pick a result, *Create the world*. The servi
 data, places the story skeleton on detected anchors and returns a pack; the game installs it under
 `user://` and builds the terrain on first visit.
 
-**Generated stories:** packs made by `make site` or the tile service get their story from quest
-blocks (`blocks/*.json`, composed by `tools/compose_story.py`): one NPC per era, artifacts to carry
-between eras, a choice, visible traces in the later years and three endings, all placed on anchors
-found in the data. `make test` plays such a pack through end to end (`story_test`).
+**Generated packs:** packs made by `make site` or the tile service are complete town packs: a landmark, the
+real footprints, roads, parcels with land values, tenants, the market snapshot, traffic and a bicycle.
+`make test` boots every pack (`site_test`) and plays the offline ledger on Kvissentali (`ledger_test`).
 
 **Streets, plots and facades:** ETAK roads become asphalt streets with kerbs, footpaths and gravel
 roads; every cadastral unit gets what its registered purpose implies (`assets/data/parcel_rules.json`:
@@ -163,7 +162,6 @@ Coding-agent conventions live in `AGENTS.md`.
 | `make features SITE=<id>` | `sites/<id>/buildings_2026.json`, `water_2026.json` | `canopy.r32`, `heightmap.r32`, `ortho.jpg` (`tools/pipeline/extract_features.py`) |
 | `make scenes SITE=<id>` | `sites/<id>/scenes/era_*.tscn` | `sites/<id>/scenes.json`, `layout.json`, `buildings_2026.json` |
 | `make validate` | report | every `sites/*/` (`tools/validate_site.py`, no Godot) |
-| `make ink` | `sites/*/narrative/*.ink.json` | `sites/*/narrative/*.ink` |
 
 Other one-off analyses (building footprints, ponds, parcel lookups) are documented inline in
 `data/*.json` comments and the commit history; the WFS/WMS endpoints are in `THIRD_PARTY.md`.

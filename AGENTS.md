@@ -66,7 +66,7 @@ its design documents in the repo root describe that version.
   (or `--fullscreen`).
 - Strings: `assets/i18n/strings.csv` (keys, et, en). Add keys, never hard-code text.
 - A node added from a `SceneTree._init()` script enters the tree one frame later: `await process_frame`
-  before touching Terrain3D or inkgd objects. `assert()` does not stop headless tests; use the
+  before touching Terrain3D objects. `assert()` does not stop headless tests; use the
   `_check()` helper pattern and the watchdog timer.
 - GDScript: annotate types when the right side is a Variant (`var x: String = dict.key`), or the
   headless parser fails with "Cannot infer the type".

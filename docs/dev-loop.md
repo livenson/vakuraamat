@@ -42,7 +42,7 @@ Every report becomes an event in the session; Claude reads the JSON and the scre
     the result says "error N (restart needed)");
   - era `.tscn`: the cache entry is replaced and the current era layer is instanced again with the
     player where they stand (`make scenes` first when `scenes.json` changed);
-  - anything under `sites/<id>/` (`.tres`, `strings.csv`, `.ink.json`, `site.json`): the pack is
+  - anything under `sites/<id>/` (`.tres`, `strings.csv`, `site.json`, `parcels.json`): the pack is
     re-read, registries and strings reload, the layer re-instanced;
   - shaders, textures, other resources: replaced in the cache.
 - **Restart at this spot**: `python3 tools/dev.py restart` makes the game write a report of where it
