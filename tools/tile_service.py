@@ -11,7 +11,7 @@ The game (scripts/autoload/locator.gd) talks to it:
     GET  /packs                      -> [{"id","name","x","y","size","eras","seed","blocks"}]  packs ready in the cache
     GET  /download?id=<id>           -> zip with site/<pack files> and tile/<engine files>
 A job runs the same tools as `make site` + `make tile`, in a workspace outside the repo, with the
-download cache shared (data_raw/). Needs python3, numpy, GDAL and node (for the ink compiler).
+download cache shared (data_raw/). Needs python3, numpy and GDAL.
 Nothing here is exposed beyond the loopback interface unless you bind it so.
 """
 import argparse, json, os, re, shutil, subprocess, sys, threading, traceback, urllib.parse, urllib.request, zipfile
@@ -101,8 +101,6 @@ def run_job(job):
         stage("scenes", 0.75)
         if not gen_era_scenes.generate(sid, root=ws):
             raise RuntimeError("scene generation reported problems")
-        stage("dialogue", 0.8)
-        subprocess.run(["node", os.path.join(ROOT, "tools/ink/compile.js"), sid, os.path.join(ws, "sites")], check=True)
         stage("validation", 0.85)
         subprocess.run([sys.executable, os.path.join(ROOT, "tools/validate_site.py"), "--site", sid, "--root", ws], check=True)
         stage("packing", 0.9)
