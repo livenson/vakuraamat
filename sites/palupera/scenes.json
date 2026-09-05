@@ -1,0 +1,142 @@
+{
+  "colors": {
+    "darkwood": [0.30, 0.22, 0.14],
+    "stone": [0.55, 0.53, 0.50],
+    "grey": [0.45, 0.45, 0.42],
+    "iron": [0.30, 0.30, 0.32]
+  },
+  "fragments": {
+    "oak": {
+      "params": ["scale", "year"],
+      "nodes": [
+        {"type": "group", "name": "Oak", "at": "oak", "children": [
+          {"type": "instance", "name": "OakTree", "scene": "res://assets/models/props/oak.glb", "scale": "scale", "yaw_deg": 40},
+          {"type": "examine", "name": "OakExamine", "key": "EX_OAK_{year}", "loc": "LOC_OAK", "label": "LOC_OAK", "at": [1.5, 1.5]}
+        ]}
+      ]
+    }
+  },
+  "eras": {
+    "era_2026": {"nodes": [
+      {"type": "use", "fragment": "oak", "with": {"scale": 1.0, "year": 2026}},
+      {"type": "group", "name": "Ruin", "at": "manor", "children": [
+        {"type": "building", "name": "RuinModel", "model": "res://assets/models/buildings/ruin.glb", "yaw_deg": 180},
+        {"type": "examine", "name": "RuinExamine", "key": "EX_MANOR_2026", "loc": "LOC_MANOR", "label": "LOC_MANOR", "at": [0, "-manor_size[1] / 2 - 3"]},
+        {"type": "register", "name": "RegisterBook", "at": [0, "-manor_size[1] / 2 + 5"]}
+      ]},
+      {"type": "group", "name": "OrchardKept", "at": "orchard", "flag": "cellar_opened", "visible_when": true, "children": [
+        {"type": "repeat", "count": 6, "children": [
+          {"type": "tree", "name": "Apple{i}", "at": ["i * 4.5", 0], "scale": "0.55 + 0.1 * (i % 3)", "yaw": "i * 1.1"}
+        ]},
+        {"type": "examine", "name": "OrchardExamine", "key": "EX_ORCHARD_2026", "loc": "LOC_ORCHARD", "label": "LOC_ORCHARD", "at": [11, 2.5]}
+      ]},
+      {"type": "group", "name": "OrchardScrub", "at": "orchard", "flag": "cellar_opened", "visible_when": false, "children": [
+        {"type": "repeat", "count": 4, "children": [
+          {"type": "tree", "name": "Scrub{i}", "at": ["i * 6 + 2", 1.5], "scale": 1.3, "yaw": "i * 0.9", "scene": "res://assets/vegetation/bush_jello.tscn"}
+        ]},
+        {"type": "examine", "name": "ScrubExamine", "key": "EX_ORCHARD_SCRUB_2026", "loc": "LOC_ORCHARD", "label": "LOC_ORCHARD", "at": [11, 2.5]}
+      ]},
+      {"type": "group", "name": "Farm", "at": "farm", "children": [
+        {"type": "box", "name": "Foundation", "size": [14, 0.35, 8], "y": 0.17, "color": "grey"},
+        {"type": "examine", "name": "FarmExamine", "key": "EX_FARM_2026", "loc": "LOC_FARMSTEAD", "label": "LOC_FARMSTEAD", "at": [0, 5.5]}
+      ]},
+      {"type": "group", "name": "WellRing", "at": "well", "flag": "well_kept_open", "visible_when": true, "children": [
+        {"type": "torus", "name": "Ring", "inner": 0.8, "outer": 1.2, "color": "stone", "y": 0.3},
+        {"type": "examine", "name": "WellExamine", "key": "EX_WELL_2026", "loc": "LOC_WELL", "label": "LOC_WELL"}
+      ]},
+      {"type": "group", "name": "WellDip", "at": "well", "flag": "well_kept_open", "visible_when": false, "children": [
+        {"type": "examine", "name": "DipExamine", "key": "EX_WELL_DIP_2026", "loc": "LOC_WELL", "label": "LOC_WELL"}
+      ]},
+      {"type": "group", "name": "StoneKept", "at": "stone", "flag": "family_recorded_1798", "visible_when": true, "children": [
+        {"type": "instance", "name": "BoundaryStone", "scene": "res://assets/models/props/boundary_stone.glb", "yaw_deg": 20},
+        {"type": "examine", "name": "StoneExamine", "key": "EX_STONE_2026", "label": "LOC_NORTH_FIELD"}
+      ]},
+      {"type": "group", "name": "FieldMeadow", "at": "field", "flag": "north_field_ploughed", "visible_when": true, "children": [
+        {"type": "examine", "name": "MeadowExamine", "key": "EX_FIELD_MEADOW_2026", "loc": "LOC_NORTH_FIELD", "label": "LOC_NORTH_FIELD"}
+      ]},
+      {"type": "group", "name": "FieldForest", "at": "field", "flag": "north_field_ploughed", "visible_when": false, "children": [
+        {"type": "scatter", "prefix": "Young", "count": 36, "radius": 45, "scale": [0.35, 0.65], "seed": 1798},
+        {"type": "examine", "name": "ForestExamine", "key": "EX_FIELD_FOREST_2026", "loc": "LOC_NORTH_FIELD", "label": "LOC_NORTH_FIELD"}
+      ]},
+      {"type": "npc", "name": "Leida", "id": "npc_leida", "knot": "leida", "label": "NPC_LEIDA", "color": [0.45, 0.5, 0.62], "at": "leida", "height": 1.55, "yaw": 2.4, "pose": "holding"},
+      {"type": "pickup", "name": "RustedTool", "item": "rusted_tool", "examine": "EX_RUSTED_TOOL", "at": {"ref": "oak", "offset": [3, 2]}},
+      {"type": "farm_plots", "at": {"ref": "farm", "offset": [2, 14]}, "count": 2, "seeds": ["seed_potato", "seed_cabbage"]},
+      {"type": "village", "source": "buildings_2026.json"},
+      {"type": "trade_post", "at": ["manor[0] - manor_size[0] / 2 - 12", "manor[1] - 10"], "key": "POST_2026", "color": [0.85, 0.85, 0.8]}
+    ]},
+    "era_1938": {"nodes": [
+      {"type": "use", "fragment": "oak", "with": {"scale": 0.75, "year": 1938}},
+      {"type": "group", "name": "School", "at": "manor", "children": [
+        {"type": "building", "name": "SchoolModel", "model": "res://assets/models/buildings/manor.glb", "yaw_deg": 180, "footprint": ["manor_size[0] + 0.6", 8, "manor_size[1] + 0.6"]},
+        {"type": "examine", "name": "SchoolExamine", "key": "EX_MANOR_1938", "loc": "LOC_MANOR", "label": "LOC_MANOR", "at": [0, "-manor_size[1] / 2 - 3"]}
+      ]},
+      {"type": "group", "name": "Farm", "at": "farm", "children": [
+        {"type": "building", "name": "FarmModel", "model": "res://assets/models/buildings/farmhouse_1938.glb", "footprint": [16.2, 3.5, 8.2]},
+        {"type": "examine", "name": "FarmExamine", "key": "EX_FARM_1938", "loc": "LOC_FARMSTEAD", "label": "LOC_FARMSTEAD", "at": [0, 5.5]}
+      ]},
+      {"type": "group", "name": "WellKept", "at": "well", "flag": "well_kept_open", "visible_when": true, "children": [
+        {"type": "torus", "name": "Ring", "inner": 0.8, "outer": 1.2, "color": "stone", "y": 0.35},
+        {"type": "box", "name": "PostA", "size": [0.15, 2.2, 0.15], "y": 1.1, "color": "darkwood", "at": [-1.1, 0]},
+        {"type": "box", "name": "PostB", "size": [0.15, 2.2, 0.15], "y": 1.1, "color": "darkwood", "at": [1.1, 0]},
+        {"type": "box", "name": "Beam", "size": [2.4, 0.15, 0.15], "y": 2.2, "color": "darkwood"},
+        {"type": "examine", "name": "WellExamine", "key": "EX_WELL_1938", "loc": "LOC_WELL", "label": "LOC_WELL"}
+      ]},
+      {"type": "group", "name": "WellGone", "at": "well", "flag": "well_kept_open", "visible_when": false, "children": [
+        {"type": "examine", "name": "DipExamine", "key": "EX_WELL_DIP_1938", "loc": "LOC_WELL", "label": "LOC_WELL"}
+      ]},
+      {"type": "group", "name": "OrchardPlanted", "at": "orchard", "flag": "cellar_opened", "visible_when": true, "children": [
+        {"type": "repeat", "count": 6, "children": [
+          {"type": "tree", "name": "Sapling{i}", "at": ["i * 4.5", 0], "scale": 0.22, "yaw": "i * 1.1"},
+          {"type": "box", "name": "Stake{i}", "size": [0.06, 1.4, 0.06], "y": 0.7, "color": "darkwood", "at": ["i * 4.5 + 0.4", 0]}
+        ]},
+        {"type": "examine", "name": "OrchardExamine", "key": "EX_ORCHARD_SAPLINGS_1938", "loc": "LOC_ORCHARD", "label": "LOC_ORCHARD", "at": [11, 2.5]}
+      ]},
+      {"type": "group", "name": "OrchardBare", "at": "orchard", "flag": "cellar_opened", "visible_when": false, "children": [
+        {"type": "examine", "name": "BareExamine", "key": "EX_ORCHARD_BARE_1938", "loc": "LOC_ORCHARD", "label": "LOC_ORCHARD", "at": [11, 2.5]}
+      ]},
+      {"type": "group", "name": "Field", "at": "field", "children": [
+        {"type": "box", "name": "PloughBeam", "size": [2.2, 0.12, 0.12], "y": 0.5, "color": "darkwood", "rot": 0.3},
+        {"type": "box", "name": "PloughShare", "size": [0.5, 0.35, 0.08], "y": 0.18, "color": "iron", "at": [0.9, 0.1], "rot": 0.3},
+        {"type": "examine", "name": "FieldExamine", "key": "EX_FIELD_1938", "loc": "LOC_NORTH_FIELD", "label": "LOC_NORTH_FIELD"}
+      ]},
+      {"type": "group", "name": "Chapter2", "at": [0, 0], "min_chapter": 2, "children": [
+        {"type": "npc", "name": "Aino", "id": "npc_aino", "knot": "aino", "label": "NPC_AINO", "color": [0.7, 0.35, 0.3], "at": {"ref": "farm", "offset": [3, 6]}, "height": 1.62, "yaw": 3.0},
+        {"type": "npc", "name": "Juhan", "id": "npc_juhan", "knot": "juhan", "label": "NPC_JUHAN", "color": [0.33, 0.36, 0.5], "at": {"ref": "field", "offset": [3, 2]}, "height": 1.8, "yaw": -1.2, "pose": "holding"},
+        {"type": "npc", "name": "Villem", "id": "npc_villem", "knot": "villem", "label": "NPC_VILLEM", "color": [0.28, 0.28, 0.3], "at": ["manor[0] - 9", "manor[1] - manor_size[1] / 2 - 6"], "height": 1.75, "yaw": 0.8, "pose": "arms_folded"},
+        {"type": "pickup", "name": "RegisterPage", "item": "register_page", "examine": "ITEM_REGISTER_PAGE_DESC", "at": ["manor[0] + 9", "manor[1] - manor_size[1] / 2 - 3"]},
+        {"type": "pickup", "name": "AinoLetter", "item": "aino_letter", "examine": "ITEM_AINO_LETTER_DESC", "at": {"ref": "farm", "offset": [-5, 5]}}
+      ]},
+      {"type": "pickup", "name": "ChurnLid", "item": "milk_churn_lid", "examine": "ITEM_MILK_CHURN_LID_DESC", "at": [520, 600]},
+      {"type": "trade_post", "at": {"ref": "farm", "offset": [22, -4]}, "key": "POST_1938", "color": [0.7, 0.65, 0.5]},
+      {"type": "manor_site", "id": "kaseoja_farm", "at": {"ref": "farm", "offset": [10, -8]}},
+      {"type": "manor_site", "id": "manor_park", "at": {"ref": "manor", "offset": [30, 10]}},
+      {"type": "farm_plots", "at": {"ref": "farm", "offset": [-6, 14]}, "count": 3, "seeds": ["seed_rye", "seed_oats", "seed_potato"]},
+      {"type": "hunting", "max_animals": 6}
+    ]},
+    "era_1798": {"nodes": [
+      {"type": "use", "fragment": "oak", "with": {"scale": 0.45, "year": 1798}},
+      {"type": "group", "name": "Manor", "at": "manor", "children": [
+        {"type": "building", "name": "ManorModel", "model": "res://assets/models/buildings/manor.glb", "yaw_deg": 180, "footprint": ["manor_size[0] + 0.6", 8, "manor_size[1] + 0.6"]},
+        {"type": "examine", "name": "ManorExamine", "key": "EX_MANOR_1798", "loc": "LOC_MANOR", "label": "LOC_MANOR", "at": [0, "-manor_size[1] / 2 - 3"]},
+        {"type": "pickup", "name": "ManorKey", "item": "manor_key", "examine": "ITEM_MANOR_KEY_DESC", "at": [4, "-manor_size[1] / 2 - 2.5"]},
+        {"type": "npc", "name": "Hans", "id": "npc_hans", "knot": "hans", "label": "NPC_HANS", "color": [0.2, 0.2, 0.26], "at": [-6, "-manor_size[1] / 2 - 5"], "height": 1.72, "yaw": 0.5, "pose": "arms_folded"}
+      ]},
+      {"type": "group", "name": "Farm", "at": "farm", "children": [
+        {"type": "building", "name": "FarmModel", "model": "res://assets/models/buildings/rehielamu.glb", "footprint": [16.2, 3.0, 8.2]},
+        {"type": "examine", "name": "FarmExamine", "key": "EX_FARM_1798", "loc": "LOC_FARMSTEAD", "label": "LOC_FARMSTEAD", "at": [0, 5.5]},
+        {"type": "pickup", "name": "Ploughshare", "item": "ploughshare", "examine": "ITEM_PLOUGHSHARE_DESC", "at": [6, 5.5]},
+        {"type": "pickup", "name": "Hymnbook", "item": "hymnbook", "examine": "ITEM_HYMNBOOK_DESC", "at": [-4, 5.2]},
+        {"type": "npc", "name": "Mart", "id": "npc_mart", "knot": "mart", "label": "NPC_MART", "color": [0.4, 0.3, 0.2], "at": [3, -7], "height": 1.68, "yaw": 2.8, "pose": "holding"}
+      ]},
+      {"type": "group", "name": "WellSite", "at": "well", "children": [
+        {"type": "torus", "name": "HalfRing", "inner": 0.8, "outer": 1.2, "color": "stone", "y": 0.15},
+        {"type": "story_point", "name": "WellStory", "knot": "well", "speaker": "NPC_MART", "text": "EX_WELL_1798", "loc": "LOC_WELL", "label": "LOC_WELL", "radius": 1.8}
+      ]},
+      {"type": "group", "name": "Strips", "at": "field", "children": [
+        {"type": "examine", "name": "FieldExamine", "key": "EX_FIELD_1798", "loc": "LOC_NORTH_FIELD", "label": "LOC_NORTH_FIELD"}
+      ]},
+      {"type": "hunting", "max_animals": 10},
+      {"type": "trade_post", "at": ["manor[0] + manor_size[0] / 2 + 8", "manor[1] - 6"], "key": "POST_1798", "color": [0.45, 0.35, 0.22]}
+    ]}
+  }
+}

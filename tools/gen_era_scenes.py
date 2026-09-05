@@ -1,29 +1,57 @@
 #!/usr/bin/env python3
-"""Generates scenes/eras/era_*.tscn from data/site_layout.json.
+"""Generates sites/<site>/scenes/<era>.tscn from sites/<site>/scenes.json and layout.json.
 
-The era scenes are plain Godot text scenes and can be edited in the editor afterwards;
-re-running this script overwrites them, so keep authored changes here or in the layout.
+    python3 tools/gen_era_scenes.py [--site palupera] [--check]
+
+The era scenes are plain Godot text scenes and can be inspected in the editor; re-running
+this script overwrites them, so keep authored changes in scenes.json or layout.json.
 Positions are tile metres (x east, z south); children sit at y = 0 and EraController
 drops them onto the terrain at activation.
-"""
-import json, math, os, random
 
-random.seed(1798)
+scenes.json
+-----------
+{
+  "colors":    {"darkwood": [0.30, 0.22, 0.14], ...},          named RGB triples
+  "fragments": {"oak": {"params": ["scale", "year"], "nodes": [...]}},  reusable blocks
+  "eras":      {"era_2026": {"nodes": [...]}, ...}             one entry per EraDefinition id
+}
+Every node is an object with a "type" (see PRIMITIVES below) and a "name". Numbers may be
+expression strings evaluated with the layout keys as variables ("manor[0] - manor_size[0]/2",
+"i * 4.5"), text may interpolate parameters ("EX_OAK_{year}"). "at" is a layout key
+("manor"), a pair [x, z] or an object {"ref": "manor", "offset": [dx, dz]}; inside a group it
+is relative to the group. Rotations "yaw" are radians (yaw_deg for degrees).
+
+PRIMITIVES
+  group        name at [flag visible_when min_chapter lift children]   Conditional Node3D
+  instance     name scene [scale yaw yaw_deg]                            any PackedScene
+  building     name model [yaw yaw_deg footprint=[w,h,d] scale skirt]    glb + collider, tags the group's footprint
+  box          name size y color [at rot]        torus  name inner outer color [y]
+  examine      name key [loc label at]           story_point  name knot speaker text [loc label radius]
+  npc          name id knot label color at [height yaw pose]
+  pickup       name item examine at              register  name [at]     (the vakuraamat itself)
+  tree         name at scale [yaw scene]         repeat    count var children   (var is i by default)
+  scatter      prefix count radius scale=[min,max] [seed scene]           random trees in a disc
+  farm_plots   at count seeds                    trade_post  at key color
+  manor_site   id at                             hunting     [max_animals]
+  village      source                            massing boxes from a buildings json (x z w d h color)
+  use          fragment with={param: value}
+"""
+import argparse, json, math, os, random, sys
+
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-L = json.load(open(os.path.join(ROOT, "data/site_layout.json")))
-OAK, MANOR, ORCH, FARM, WELL, FIELD, STONE = (tuple(L[k]) for k in ["oak", "manor", "orchard", "farm", "well", "field", "stone"])
-MW, MD = L.get("manor_size", [22, 11])   # manor footprint: width (x) and depth (z) in metres
-LEIDA = tuple(L["leida"])
-PALE = (0.85, 0.78, 0.55); DARKWOOD = (0.30, 0.22, 0.14); STONE_C = (0.55, 0.53, 0.5); RED = (0.55, 0.25, 0.2); GREY = (0.45, 0.45, 0.42)
+DARKWOOD = (0.30, 0.22, 0.14)
+SKIRT = (0.42, 0.38, 0.32)
 
 
 def color(c):
-    return "Color(%.3f, %.3f, %.3f, 1)" % c
+    return "Color(%.3f, %.3f, %.3f, 1)" % tuple(c)
 
 
 class Scene:
+    """Text-scene writer: external/sub resources and a flat node list with parent paths."""
+
     def __init__(self, era):
-        self.era = era; self.ext = []; self.sub = []; self.nodes = []; self.ext_ids = {}
+        self.era = era; self.ext = []; self.sub = []; self.nodes = []; self.ext_ids = {}; self._sub_n = 0
 
     def ext_res(self, typ, path):
         if path in self.ext_ids:
@@ -32,14 +60,23 @@ class Scene:
         self.ext.append(f'[ext_resource type="{typ}" path="{path}" id="{i}"]'); self.ext_ids[path] = i
         return i
 
+    def sub_res(self, typ, body, prefix):
+        self._sub_n += 1
+        sid = f"{prefix}{self._sub_n}"
+        self.sub.append(f'[sub_resource type="{typ}" id="{sid}"]\n{body}')
+        return f'SubResource("{sid}")'
+
     def mat(self, c, rough=0.9):
-        i = len(self.sub) + 1
-        self.sub.append(f'[sub_resource type="StandardMaterial3D" id="M{i}"]\nalbedo_color = {color(c)}\nroughness = {rough}')
-        return f'SubResource("M{i}")'
+        return self.sub_res("StandardMaterial3D", f"albedo_color = {color(c)}\nroughness = {rough}", "M")
 
     def node(self, name, typ, parent, props="", instance=None):
         head = f'[node name="{name}" ' + (f'type="{typ}" ' if typ else '') + f'parent="{parent}"' + (f' instance=ExtResource("{instance}")' if instance else '') + ']'
         self.nodes.append(head + ("\n" + props if props else ""))
+
+    @staticmethod
+    def xf(x, z, yaw=0.0, scale=1.0, y=0.0):
+        cy = math.cos(yaw) * scale; sy = math.sin(yaw) * scale
+        return f'transform = Transform3D({cy:.4f}, 0, {sy:.4f}, 0, {scale}, 0, {-sy:.4f}, 0, {cy:.4f}, {x}, {y}, {z})'
 
     def group(self, name, parent, x, z, flag=None, visible_when=True, min_chapter=0, lift=0.0):
         sc = self.ext_res("Script", "res://scripts/interaction/conditional.gd")
@@ -53,8 +90,8 @@ class Scene:
         self.node(name, "Node3D", parent, props)
 
     def box(self, name, parent, size, y_center, c, x=0, z=0, rot=0):
-        m = self.mat(c); cy = math.cos(rot); sy = math.sin(rot)
-        self.node(name, "CSGBox3D", parent, f'transform = Transform3D({cy:.4f}, 0, {sy:.4f}, 0, 1, 0, {-sy:.4f}, 0, {cy:.4f}, {x}, {y_center}, {z})\nsize = Vector3({size[0]}, {size[1]}, {size[2]})\nmaterial = {m}')
+        m = self.mat(c)
+        self.node(name, "CSGBox3D", parent, f'{self.xf(x, z, rot, 1.0, y_center)}\nsize = Vector3({size[0]}, {size[1]}, {size[2]})\nmaterial = {m}')
 
     def torus(self, name, parent, inner, outer, c, y=0.0):
         m = self.mat(c)
@@ -68,42 +105,108 @@ class Scene:
         self.node(name, None, parent, p, instance=i)
 
     def npc(self, name, parent, npc_id, knot, label, c, x, z, height=1.7, yaw=0.0, pose="stand"):
-        i = self.ext_res("PackedScene", "res://scenes/npc/npc.tscn"); cy = math.cos(yaw); sy = math.sin(yaw)
-        self.node(name, None, parent, f'transform = Transform3D({cy:.4f}, 0, {sy:.4f}, 0, 1, 0, {-sy:.4f}, 0, {cy:.4f}, {x}, 0, {z})\nnpc_id = "{npc_id}"\nknot = "{knot}"\nlabel_key = "{label}"\nbody_color = {color(c)}\nheight = {height}\npose = "{pose}"', instance=i)
+        i = self.ext_res("PackedScene", "res://scenes/npc/npc.tscn")
+        self.node(name, None, parent, f'{self.xf(x, z, yaw)}\nnpc_id = "{npc_id}"\nknot = "{knot}"\nlabel_key = "{label}"\nbody_color = {color(c)}\nheight = {height}\npose = "{pose}"', instance=i)
 
     def pickup(self, name, parent, item, examine, x, z):
         i = self.ext_res("PackedScene", "res://scenes/props/pickup.tscn")
         self.node(name, None, parent, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {x}, 0, {z})\nitem_id = "{item}"\nera_id = "{self.era}"\nexamine_key = "{examine}"', instance=i)
 
     def tree(self, name, parent, x, z, scale, yaw=0.0, scene="res://assets/vegetation/tree_juniper.tscn"):
-        i = self.ext_res("PackedScene", scene); cy = math.cos(yaw) * scale; sy = math.sin(yaw) * scale
-        self.node(name, None, parent, f'transform = Transform3D({cy:.4f}, 0, {sy:.4f}, 0, {scale}, 0, {-sy:.4f}, 0, {cy:.4f}, {x}, 0, {z})', instance=i)
+        i = self.ext_res("PackedScene", scene)
+        self.node(name, None, parent, self.xf(x, z, yaw, scale), instance=i)
+
+    def instance(self, name, parent, path, props=""):
+        i = self.ext_res("PackedScene", path)
+        self.node(name, None, parent, props, instance=i)
+
+    def collider(self, parent, shape_ref, y, layer=2):
+        self.node("Body3D", "StaticBody3D", parent, f"collision_layer = {layer}\ncollision_mask = 0")
+        self.node("Shape", "CollisionShape3D", f"{parent}/Body3D", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, {y}, 0)\nshape = {shape_ref}')
 
     def building(self, name, parent, path, yaw=0.0, footprint=None, scale=1.0, skirt=True):
         """A glb building at the parent's origin; optional box collider (w, h, d) so the player can't walk through.
         The parent group gets metadata/footprint so EraController snaps it to the LOWEST corner, and a
         foundation skirt fills the gap on the uphill side."""
-        cy = math.cos(yaw) * scale; sy = math.sin(yaw) * scale
-        self.instance(name, parent, path, f'transform = Transform3D({cy:.4f}, 0, {sy:.4f}, 0, {scale}, 0, {-sy:.4f}, 0, {cy:.4f}, 0, 0, 0)')
+        self.instance(name, parent, path, self.xf(0, 0, yaw, scale))
         if footprint:
             w, h, d = footprint
-            self._footprint(parent, w, d)
+            self.footprint(parent, w, d)
             if skirt:
-                self.box(f"{name}Skirt", parent, (w - 0.2, 3.0, d - 0.2), -1.5, (0.42, 0.38, 0.32))
-            self.sub.append(f'[sub_resource type="BoxShape3D" id="BS_{self.era}_{name}"]\nsize = Vector3({w}, {h}, {d})')
+                self.box(f"{name}Skirt", parent, (w - 0.2, 3.0, d - 0.2), -1.5, SKIRT)
+            shape = self.sub_res("BoxShape3D", f"size = Vector3({w}, {h}, {d})", f"BS_{self.era}_")
             self.node(f"{name}Body", "StaticBody3D", parent, "collision_layer = 1\ncollision_mask = 0")
-            self.node("Shape", "CollisionShape3D", f"{parent}/{name}Body", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, {h / 2}, 0)\nshape = SubResource("BS_{self.era}_{name}")')
+            self.node("Shape", "CollisionShape3D", f"{parent}/{name}Body", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, {h / 2}, 0)\nshape = {shape}')
 
-    def _footprint(self, parent, w, d):
+    def footprint(self, parent, w, d):
         """Tag the group node so EraController samples the whole footprint when snapping."""
         for i, n in enumerate(self.nodes):
             if n.startswith(f'[node name="{parent.split("/")[-1]}" ') and 'metadata/footprint' not in n:
                 self.nodes[i] = n + f'\nmetadata/footprint = Vector2({w}, {d})'
                 return
 
-    def instance(self, name, parent, path, props=""):
-        i = self.ext_res("PackedScene", path)
-        self.node(name, None, parent, props, instance=i)
+    def register(self, name, parent, x, z):
+        rp = self.ext_res("Script", "res://scripts/interaction/register_pickup.gd")
+        self.node(name, "Node3D", parent, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {x}, 0, {z})\nscript = ExtResource("{rp}")')
+        path = f"{parent}/{name}" if parent != "." else name
+        self.node("BookMesh", "CSGBox3D", path, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)\nsize = Vector3(0.45, 0.12, 0.32)\nmaterial = {self.mat((0.45, 0.25, 0.1), 0.6)}')
+        self.node("Plinth", "CSGBox3D", path, f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)\nsize = Vector3(0.9, 0.9, 0.7)\nmaterial = {self.mat((0.7, 0.68, 0.62))}')
+        self.collider(path, self.sub_res("SphereShape3D", "radius = 1.2", "S"), 0.6)
+
+    def story_point(self, name, parent, knot, speaker, text, loc, label, radius=1.8):
+        sp = self.ext_res("Script", "res://scripts/interaction/story_point.gd")
+        self.node(name, "Node3D", parent, f'script = ExtResource("{sp}")\nknot = "{knot}"\nspeaker_key = "{speaker}"\ntext_key = "{text}"\nlocation_id = "{loc}"\nlabel_key = "{label}"')
+        path = f"{parent}/{name}" if parent != "." else name
+        self.collider(path, self.sub_res("SphereShape3D", f"radius = {radius}", "S"), 1.0)
+
+    def farm_plots(self, origin, n, seeds):
+        """Farming: plots in a row plus a seed bin, all era-local."""
+        self.group("Farming", ".", *origin)
+        for i in range(n):
+            self.instance(f"Plot{i}", "Farming", "res://scenes/farming/farm_plot.tscn",
+                          f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {i * 5.5}, 0, 0)\nplot_id = "plot{i}"\nera_id = "{self.era}"')
+        sb = self.ext_res("Script", "res://scripts/farming/seed_bin.gd")
+        shape = self.sub_res("BoxShape3D", "size = Vector3(1.4, 1.2, 1.0)", f"SB_{self.era}_")
+        self.node("SeedBin", "Node3D", "Farming", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, 0)\nscript = ExtResource("{sb}")\nera_id = "{self.era}"\nseed_item_ids = Array[String]([{", ".join(chr(34) + x + chr(34) for x in seeds)}])')
+        self.box("Bin", "Farming/SeedBin", (1.2, 0.9, 0.8), 0.45, DARKWOOD)
+        self.collider("Farming/SeedBin", shape, 0.6)
+
+    def trade_post(self, pos, key, box_color):
+        """Trading: one post per era, era-local goods and money."""
+        sc = self.ext_res("Script", "res://scripts/trading/trade_post.gd")
+        shape = self.sub_res("BoxShape3D", "size = Vector3(2.6, 2.4, 2.2)", f"TP_{self.era}_")
+        self.node("TradePost", "Node3D", ".", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {pos[0]}, 0, {pos[1]})\nscript = ExtResource("{sc}")\nera_id = "{self.era}"\npost_name_key = "{key}"\nintro_key = "{key}_TEXT"')
+        self.footprint("TradePost", 3.0, 2.4)
+        self.box("Base", "TradePost", (3.0, 2.0, 2.4), -1.0, SKIRT)
+        self.box("Stall", "TradePost", (2.4, 1.1, 1.2), 0.55, box_color)
+        self.box("Awning", "TradePost", (2.8, 0.12, 2.0), 2.2, (0.5, 0.45, 0.3), 0, -0.3)
+        self.box("PostA", "TradePost", (0.1, 2.2, 0.1), 1.1, DARKWOOD, -1.3, -1.2)
+        self.box("PostB", "TradePost", (0.1, 2.2, 0.1), 1.1, DARKWOOD, 1.3, -1.2)
+        self.collider("TradePost", shape, 1.1)
+
+    def manor_site(self, manor_id, pos):
+        """Base building: a marker post the player builds from."""
+        sc = self.ext_res("Script", "res://scripts/base_building/manor_controller.gd")
+        shape = self.sub_res("BoxShape3D", "size = Vector3(1.6, 2.4, 1.6)", f"MS_{manor_id}_")
+        name = f"Manor_{manor_id}"
+        self.node(name, "Node3D", ".", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {pos[0]}, 0, {pos[1]})\nscript = ExtResource("{sc}")\nmanor_id = "{manor_id}"')
+        self.box("Post", name, (0.25, 2.0, 0.25), 1.0, DARKWOOD)
+        self.box("Sign", name, (1.2, 0.5, 0.08), 1.7, (0.85, 0.8, 0.6))
+        self.collider(name, shape, 1.2)
+
+    def hunting(self, max_animals=8):
+        """Hunting: a spawner that keeps animals around the player on their land cover."""
+        sc = self.ext_res("Script", "res://scripts/hunting/hunting_spawner.gd")
+        self.node("HuntingSpawner", "Node3D", ".", f'script = ExtResource("{sc}")\nera_id = "{self.era}"\nmax_animals = {max_animals}')
+
+    def village(self, buildings):
+        """Real building footprints (from the nDSM) as simple massing boxes."""
+        self.group("Village", ".", 0, 0)
+        for i, b in enumerate(buildings):
+            self.group(f"B{i}", "Village", b["x"], b["z"])
+            self.footprint(f"Village/B{i}", b["w"], b["d"])
+            self.box("Mass", f"Village/B{i}", (b["w"], b["h"] + 3.0, b["d"]), b["h"] / 2 - 1.5, tuple(min(1.0, k * 0.9) for k in b["color"]))
+            self.box("Roof", f"Village/B{i}", (b["w"] + 0.6, 0.25, b["d"] + 0.6), b["h"] + 0.12, tuple(k * 0.6 for k in b["color"]))
 
     def write(self, path):
         sc = self.ext_res("Script", "res://scripts/era/era_controller.gd")
@@ -112,190 +215,162 @@ class Scene:
         open(path, "w").write(out)
 
 
-def common(s, era):
-    s.group("Oak", ".", *OAK)
-    sc = {"era_1798": 0.45, "era_1938": 0.75, "era_2026": 1.0}[era]
-    s.instance("OakTree", "Oak", "res://assets/models/props/oak.glb", f'transform = Transform3D({sc * 0.76:.3f}, 0, {sc * 0.64:.3f}, 0, {sc}, 0, {-sc * 0.64:.3f}, 0, {sc * 0.76:.3f}, 0, 0, 0)')
-    s.examine("OakExamine", "Oak", f"EX_OAK_{era[-4:]}", "LOC_OAK", "LOC_OAK", 1.5, 1.5)
+class Interpreter:
+    """Turns the scenes.json node lists into Scene calls."""
+
+    def __init__(self, site_dir, spec, layout):
+        self.site_dir = site_dir; self.spec = spec; self.layout = layout
+        self.colors = {k: tuple(v) for k, v in spec.get("colors", {}).items()}
+        self.fragments = spec.get("fragments", {})
+        self.base_env = {k: (list(v) if isinstance(v, list) else v) for k, v in layout.items() if k not in ("exclusions", "pads")}
+        self.base_env.update({n: getattr(math, n) for n in ("pi", "tau", "cos", "sin", "sqrt", "radians")})
+        self.problems = []
+
+    # --- values --------------------------------------------------------------
+    def num(self, v, env, default=None):
+        if v is None:
+            return default
+        if isinstance(v, str):
+            try:
+                return eval(v, {"__builtins__": {}}, env)
+            except Exception as e:
+                self.problems.append(f"bad expression {v!r}: {e}"); return default if default is not None else 0.0
+        return v
+
+    def nums(self, seq, env):
+        return [self.num(v, env) for v in seq]
+
+    def txt(self, v, env):
+        if isinstance(v, str) and "{" in v:
+            try:
+                return v.format_map(env)
+            except KeyError as e:
+                self.problems.append(f"unknown parameter {e} in {v!r}"); return v
+        return v
+
+    def col(self, v, env):
+        if isinstance(v, str):
+            if v in self.colors:
+                return self.colors[v]
+            self.problems.append(f"unknown color {v!r}"); return (1.0, 0.0, 1.0)
+        return tuple(self.nums(v, env))
+
+    def pos(self, at, env, default=(0.0, 0.0)):
+        """Layout key, [x, z] or {"ref": key, "offset": [dx, dz]} -> (x, z)."""
+        if at is None:
+            return default
+        if isinstance(at, str):
+            if at not in self.layout:
+                self.problems.append(f"unknown layout key {at!r}"); return default
+            return tuple(self.layout[at][:2])
+        if isinstance(at, dict):
+            x, z = self.pos(at.get("ref"), env)
+            dx, dz = self.nums(at.get("offset", [0, 0]), env)
+            return (x + dx, z + dz)
+        return tuple(self.nums(at, env))
+
+    def yaw(self, n, env):
+        if "yaw_deg" in n:
+            return math.radians(self.num(n["yaw_deg"], env))
+        return self.num(n.get("yaw", 0.0), env)
+
+    # --- nodes ---------------------------------------------------------------
+    def build(self, era, nodes):
+        s = Scene(era)
+        self.emit(s, ".", nodes, dict(self.base_env, era=era))
+        return s
+
+    def emit(self, s, parent, nodes, env):
+        for n in nodes:
+            t = n.get("type")
+            name = self.txt(n.get("name", ""), env)
+            child_path = name if parent == "." else f"{parent}/{name}"
+            if t == "group":
+                x, z = self.pos(n.get("at"), env)
+                s.group(name, parent, x, z, n.get("flag"), n.get("visible_when", True), int(n.get("min_chapter", 0)), self.num(n.get("lift", 0.0), env))
+                self.emit(s, child_path, n.get("children", []), env)
+            elif t == "use":
+                frag = self.fragments.get(n.get("fragment"))
+                if frag is None:
+                    self.problems.append(f"unknown fragment {n.get('fragment')!r}"); continue
+                sub = dict(env); sub.update(n.get("with", {}))   # parameters: numbers, or text for {name} interpolation
+                self.emit(s, parent, frag.get("nodes", []), sub)
+            elif t == "repeat":
+                var = n.get("var", "i")
+                for i in range(int(self.num(n.get("count", 0), env))):
+                    sub = dict(env); sub[var] = i
+                    self.emit(s, parent, n.get("children", []), sub)
+            elif t == "instance":
+                x, z = self.pos(n.get("at"), env)
+                s.instance(name, parent, n["scene"], Scene.xf(x, z, self.yaw(n, env), self.num(n.get("scale", 1.0), env)))
+            elif t == "building":
+                fp = n.get("footprint")
+                s.building(name, parent, n["model"], self.yaw(n, env), tuple(self.nums(fp, env)) if fp else None, self.num(n.get("scale", 1.0), env), n.get("skirt", True))
+            elif t == "box":
+                x, z = self.pos(n.get("at"), env)
+                s.box(name, parent, self.nums(n["size"], env), self.num(n.get("y", 0.0), env), self.col(n["color"], env), x, z, self.num(n.get("rot", 0.0), env))
+            elif t == "torus":
+                s.torus(name, parent, self.num(n["inner"], env), self.num(n["outer"], env), self.col(n["color"], env), self.num(n.get("y", 0.0), env))
+            elif t == "examine":
+                x, z = self.pos(n.get("at"), env)
+                s.examine(name, parent, self.txt(n["key"], env), self.txt(n.get("loc", ""), env), self.txt(n.get("label", ""), env), x, z)
+            elif t == "story_point":
+                s.story_point(name, parent, n["knot"], n.get("speaker", ""), self.txt(n.get("text", ""), env), n.get("loc", ""), n.get("label", ""), self.num(n.get("radius", 1.8), env))
+            elif t == "npc":
+                x, z = self.pos(n.get("at"), env)
+                s.npc(name, parent, n["id"], n["knot"], n["label"], self.col(n.get("color", [0.5, 0.4, 0.3]), env), x, z, self.num(n.get("height", 1.7), env), self.yaw(n, env), n.get("pose", "stand"))
+            elif t == "pickup":
+                x, z = self.pos(n.get("at"), env)
+                s.pickup(name, parent, n["item"], n.get("examine", ""), x, z)
+            elif t == "register":
+                x, z = self.pos(n.get("at"), env)
+                s.register(name or "RegisterBook", parent, x, z)
+            elif t == "tree":
+                x, z = self.pos(n.get("at"), env)
+                s.tree(name, parent, x, z, self.num(n.get("scale", 1.0), env), self.yaw(n, env), n.get("scene", "res://assets/vegetation/tree_juniper.tscn"))
+            elif t == "scatter":
+                rng = random.Random(int(n.get("seed", 1798)))
+                r_max = self.num(n.get("radius", 40.0), env); smin, smax = self.nums(n.get("scale", [0.4, 0.7]), env)
+                for i in range(int(self.num(n.get("count", 10), env))):
+                    a = rng.random() * math.tau; r = rng.random() ** 0.5 * r_max
+                    s.tree(f"{n.get('prefix', 'Tree')}{i}", parent, round(math.cos(a) * r, 1), round(math.sin(a) * r, 1), round(rng.uniform(smin, smax), 2), rng.random() * 6.28, n.get("scene", "res://assets/vegetation/tree_juniper.tscn"))
+            elif t == "farm_plots":
+                s.farm_plots(self.pos(n.get("at"), env), int(self.num(n.get("count", 2), env)), n.get("seeds", []))
+            elif t == "trade_post":
+                s.trade_post(self.pos(n.get("at"), env), n["key"], self.col(n.get("color", [0.7, 0.65, 0.5]), env))
+            elif t == "manor_site":
+                s.manor_site(n["id"], self.pos(n.get("at"), env))
+            elif t == "hunting":
+                s.hunting(int(self.num(n.get("max_animals", 8), env)))
+            elif t == "village":
+                src = os.path.join(self.site_dir, n.get("source", "buildings_2026.json"))
+                if os.path.exists(src):
+                    s.village(json.load(open(src)))
+                else:
+                    self.problems.append(f"village source missing: {src}")
+            else:
+                self.problems.append(f"unknown node type {t!r} ({name})")
 
 
-def build_2026():
-    s = Scene("era_2026"); common(s, "era_2026")
-    s.group("Ruin", ".", *MANOR)
-    s.building("RuinModel", "Ruin", "res://assets/models/buildings/ruin.glb", yaw=math.pi)
-    s.examine("RuinExamine", "Ruin", "EX_MANOR_2026", "LOC_MANOR", "LOC_MANOR", 0, -MD / 2 - 3)
-    rp = s.ext_res("Script", "res://scripts/interaction/register_pickup.gd")
-    s.node("RegisterBook", "Node3D", "Ruin", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, {-MD / 2 + 5})\nscript = ExtResource("{rp}")')
-    s.node("BookMesh", "CSGBox3D", "Ruin/RegisterBook", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)\nsize = Vector3(0.45, 0.12, 0.32)\nmaterial = {s.mat((0.45, 0.25, 0.1), 0.6)}')
-    s.node("Plinth", "CSGBox3D", "Ruin/RegisterBook", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)\nsize = Vector3(0.9, 0.9, 0.7)\nmaterial = {s.mat((0.7, 0.68, 0.62))}')
-    s.node("Body3D", "StaticBody3D", "Ruin/RegisterBook", "collision_layer = 2\ncollision_mask = 0")
-    s.sub.append('[sub_resource type="SphereShape3D" id="S1"]\nradius = 1.2')
-    s.node("Shape", "CollisionShape3D", "Ruin/RegisterBook/Body3D", 'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)\nshape = SubResource("S1")')
-    s.group("OrchardKept", ".", *ORCH, flag="cellar_opened", visible_when=True)
-    for i in range(6):
-        s.tree(f"Apple{i}", "OrchardKept", i * 4.5, 0, 0.55 + 0.1 * (i % 3), i * 1.1)
-    s.examine("OrchardExamine", "OrchardKept", "EX_ORCHARD_2026", "LOC_ORCHARD", "LOC_ORCHARD", 11, 2.5)
-    s.group("OrchardScrub", ".", *ORCH, flag="cellar_opened", visible_when=False)
-    for i in range(4):
-        s.tree(f"Scrub{i}", "OrchardScrub", i * 6 + 2, 1.5, 1.3, i * 0.9, scene="res://assets/vegetation/bush_jello.tscn")
-    s.examine("ScrubExamine", "OrchardScrub", "EX_ORCHARD_SCRUB_2026", "LOC_ORCHARD", "LOC_ORCHARD", 11, 2.5)
-    s.group("Farm", ".", *FARM)
-    s.box("Foundation", "Farm", (14, 0.35, 8), 0.17, GREY)
-    s.examine("FarmExamine", "Farm", "EX_FARM_2026", "LOC_FARMSTEAD", "LOC_FARMSTEAD", 0, 5.5)
-    s.group("WellRing", ".", *WELL, flag="well_kept_open", visible_when=True)
-    s.torus("Ring", "WellRing", 0.8, 1.2, STONE_C, 0.3)
-    s.examine("WellExamine", "WellRing", "EX_WELL_2026", "LOC_WELL", "LOC_WELL", 0, 0)
-    s.group("WellDip", ".", *WELL, flag="well_kept_open", visible_when=False)
-    s.examine("DipExamine", "WellDip", "EX_WELL_DIP_2026", "LOC_WELL", "LOC_WELL", 0, 0)
-    s.group("StoneKept", ".", *STONE, flag="family_recorded_1798", visible_when=True)
-    s.instance("BoundaryStone", "StoneKept", "res://assets/models/props/boundary_stone.glb", 'transform = Transform3D(0.9397, 0, 0.342, 0, 1, 0, -0.342, 0, 0.9397, 0, 0, 0)')
-    s.examine("StoneExamine", "StoneKept", "EX_STONE_2026", "", "LOC_NORTH_FIELD", 0, 0)
-    s.group("FieldMeadow", ".", *FIELD, flag="north_field_ploughed", visible_when=True)
-    s.examine("MeadowExamine", "FieldMeadow", "EX_FIELD_MEADOW_2026", "LOC_NORTH_FIELD", "LOC_NORTH_FIELD", 0, 0)
-    s.group("FieldForest", ".", *FIELD, flag="north_field_ploughed", visible_when=False)
-    for i in range(36):
-        a = random.random() * math.tau; r = random.random() ** 0.5 * 45
-        s.tree(f"Young{i}", "FieldForest", round(math.cos(a) * r, 1), round(math.sin(a) * r, 1), round(0.35 + random.random() * 0.3, 2), random.random() * 6.28)
-    s.examine("ForestExamine", "FieldForest", "EX_FIELD_FOREST_2026", "LOC_NORTH_FIELD", "LOC_NORTH_FIELD", 0, 0)
-    s.npc("Leida", ".", "npc_leida", "leida", "NPC_LEIDA", (0.45, 0.5, 0.62), LEIDA[0], LEIDA[1], 1.55, 2.4, pose="holding")
-    s.pickup("RustedTool", ".", "rusted_tool", "EX_RUSTED_TOOL", OAK[0] + 3, OAK[1] + 2)
-    farm_plots(s, "era_2026", (FARM[0] + 2, FARM[1] + 14), 2, ["seed_potato", "seed_cabbage"])
-    # the real village: building footprints from the nDSM as simple massing (data/buildings_2026.json)
-    s.group("Village", ".", 0, 0)
-    bl = json.load(open(os.path.join(ROOT, "data/buildings_2026.json")))
-    for i, b in enumerate(bl):
-        s.group(f"B{i}", "Village", b["x"], b["z"])
-        s._footprint(f"Village/B{i}", b["w"], b["d"])
-        s.box("Mass", f"Village/B{i}", (b["w"], b["h"] + 3.0, b["d"]), b["h"] / 2 - 1.5, tuple(min(1.0, k * 0.9) for k in b["color"]))
-        s.box("Roof", f"Village/B{i}", (b["w"] + 0.6, 0.25, b["d"] + 0.6), b["h"] + 0.12, tuple(k * 0.6 for k in b["color"]))
-    trade_post(s, "era_2026", (MANOR[0] - MW / 2 - 12, MANOR[1] - 10), "POST_2026", (0.85, 0.85, 0.8))
-    return s
-
-
-def build_1938():
-    s = Scene("era_1938"); common(s, "era_1938")
-    s.group("School", ".", *MANOR)
-    s.building("SchoolModel", "School", "res://assets/models/buildings/manor.glb", yaw=math.pi, footprint=(MW + 0.6, 8, MD + 0.6))
-    s.examine("SchoolExamine", "School", "EX_MANOR_1938", "LOC_MANOR", "LOC_MANOR", 0, -MD / 2 - 3)
-    s.group("Farm", ".", *FARM)
-    s.building("FarmModel", "Farm", "res://assets/models/buildings/farmhouse_1938.glb", footprint=(16.2, 3.5, 8.2))
-    s.examine("FarmExamine", "Farm", "EX_FARM_1938", "LOC_FARMSTEAD", "LOC_FARMSTEAD", 0, 5.5)
-    s.group("WellKept", ".", *WELL, flag="well_kept_open", visible_when=True)
-    s.torus("Ring", "WellKept", 0.8, 1.2, STONE_C, 0.35)
-    s.box("PostA", "WellKept", (0.15, 2.2, 0.15), 1.1, DARKWOOD, -1.1, 0)
-    s.box("PostB", "WellKept", (0.15, 2.2, 0.15), 1.1, DARKWOOD, 1.1, 0)
-    s.box("Beam", "WellKept", (2.4, 0.15, 0.15), 2.2, DARKWOOD, 0, 0)
-    s.examine("WellExamine", "WellKept", "EX_WELL_1938", "LOC_WELL", "LOC_WELL", 0, 0)
-    s.group("WellGone", ".", *WELL, flag="well_kept_open", visible_when=False)
-    s.examine("DipExamine", "WellGone", "EX_WELL_DIP_1938", "LOC_WELL", "LOC_WELL", 0, 0)
-    s.group("OrchardPlanted", ".", *ORCH, flag="cellar_opened", visible_when=True)
-    for i in range(6):
-        s.tree(f"Sapling{i}", "OrchardPlanted", i * 4.5, 0, 0.22, i * 1.1)
-        s.box(f"Stake{i}", "OrchardPlanted", (0.06, 1.4, 0.06), 0.7, DARKWOOD, i * 4.5 + 0.4, 0)
-    s.examine("OrchardExamine", "OrchardPlanted", "EX_ORCHARD_SAPLINGS_1938", "LOC_ORCHARD", "LOC_ORCHARD", 11, 2.5)
-    s.group("OrchardBare", ".", *ORCH, flag="cellar_opened", visible_when=False)
-    s.examine("BareExamine", "OrchardBare", "EX_ORCHARD_BARE_1938", "LOC_ORCHARD", "LOC_ORCHARD", 11, 2.5)
-    s.group("Field", ".", *FIELD)
-    s.box("PloughBeam", "Field", (2.2, 0.12, 0.12), 0.5, DARKWOOD, 0, 0, 0.3)
-    s.box("PloughShare", "Field", (0.5, 0.35, 0.08), 0.18, (0.3, 0.3, 0.32), 0.9, 0.1, 0.3)
-    s.examine("FieldExamine", "Field", "EX_FIELD_1938", "LOC_NORTH_FIELD", "LOC_NORTH_FIELD", 0, 0)
-    s.group("Chapter2", ".", 0, 0, min_chapter=2)
-    s.npc("Aino", "Chapter2", "npc_aino", "aino", "NPC_AINO", (0.7, 0.35, 0.3), FARM[0] + 3, FARM[1] + 6, 1.62, 3.0)
-    s.npc("Juhan", "Chapter2", "npc_juhan", "juhan", "NPC_JUHAN", (0.33, 0.36, 0.5), FIELD[0] + 3, FIELD[1] + 2, 1.8, -1.2, pose="holding")
-    s.npc("Villem", "Chapter2", "npc_villem", "villem", "NPC_VILLEM", (0.28, 0.28, 0.3), MANOR[0] - 9, MANOR[1] - MD / 2 - 6, 1.75, 0.8, pose="arms_folded")
-    s.pickup("RegisterPage", "Chapter2", "register_page", "ITEM_REGISTER_PAGE_DESC", MANOR[0] + 9, MANOR[1] - MD / 2 - 3)
-    s.pickup("AinoLetter", "Chapter2", "aino_letter", "ITEM_AINO_LETTER_DESC", FARM[0] - 5, FARM[1] + 5)
-    s.pickup("ChurnLid", ".", "milk_churn_lid", "ITEM_MILK_CHURN_LID_DESC", 520, 600)
-    extras_1938(s)
-    return s
-
-
-def build_1798():
-    s = Scene("era_1798"); common(s, "era_1798")
-    s.group("Manor", ".", *MANOR)
-    s.building("ManorModel", "Manor", "res://assets/models/buildings/manor.glb", yaw=math.pi, footprint=(MW + 0.6, 8, MD + 0.6))
-    s.examine("ManorExamine", "Manor", "EX_MANOR_1798", "LOC_MANOR", "LOC_MANOR", 0, -MD / 2 - 3)
-    s.pickup("ManorKey", "Manor", "manor_key", "ITEM_MANOR_KEY_DESC", 4, -MD / 2 - 2.5)
-    s.npc("Hans", "Manor", "npc_hans", "hans", "NPC_HANS", (0.2, 0.2, 0.26), -6, -MD / 2 - 5, 1.72, 0.5, pose="arms_folded")
-    s.group("Farm", ".", *FARM)
-    s.building("FarmModel", "Farm", "res://assets/models/buildings/rehielamu.glb", footprint=(16.2, 3.0, 8.2))
-    s.examine("FarmExamine", "Farm", "EX_FARM_1798", "LOC_FARMSTEAD", "LOC_FARMSTEAD", 0, 5.5)
-    s.pickup("Ploughshare", "Farm", "ploughshare", "ITEM_PLOUGHSHARE_DESC", 6, 5.5)
-    s.pickup("Hymnbook", "Farm", "hymnbook", "ITEM_HYMNBOOK_DESC", -4, 5.2)
-    s.npc("Mart", "Farm", "npc_mart", "mart", "NPC_MART", (0.4, 0.3, 0.2), 3, -7, 1.68, 2.8, pose="holding")
-    s.group("WellSite", ".", *WELL)
-    s.torus("HalfRing", "WellSite", 0.8, 1.2, STONE_C, 0.15)
-    sp = s.ext_res("Script", "res://scripts/interaction/story_point.gd")
-    s.sub.append('[sub_resource type="SphereShape3D" id="S2"]\nradius = 1.8')
-    s.node("WellStory", "Node3D", "WellSite", f'script = ExtResource("{sp}")\nknot = "well"\nspeaker_key = "NPC_MART"\ntext_key = "EX_WELL_1798"\nlocation_id = "LOC_WELL"\nlabel_key = "LOC_WELL"')
-    s.node("Body3D", "StaticBody3D", "WellSite/WellStory", "collision_layer = 2\ncollision_mask = 0")
-    s.node("Shape", "CollisionShape3D", "WellSite/WellStory/Body3D", 'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)\nshape = SubResource("S2")')
-    s.group("Strips", ".", *FIELD)
-    s.examine("FieldExamine", "Strips", "EX_FIELD_1798", "LOC_NORTH_FIELD", "LOC_NORTH_FIELD", 0, 0)
-    extras_1798(s)
-    return s
-
-
-# Hooks for later phases (farming, hunting, trading) to add era-local content.
-def farm_plots(s, era, origin, n, seeds):
-    """Farming (Phase 2): plots in a row plus a seed bin, all era-local."""
-    s.group("Farming", ".", *origin)
-    for i in range(n):
-        s.instance(f"Plot{i}", "Farming", "res://scenes/farming/farm_plot.tscn",
-                   f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {i * 5.5}, 0, 0)\nplot_id = "plot{i}"\nera_id = "{era}"')
-    sb = s.ext_res("Script", "res://scripts/farming/seed_bin.gd")
-    s.sub.append(f'[sub_resource type="BoxShape3D" id="SB_{era}"]\nsize = Vector3(1.4, 1.2, 1.0)')
-    s.node("SeedBin", "Node3D", "Farming", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, 0)\nscript = ExtResource("{sb}")\nera_id = "{era}"\nseed_item_ids = Array[String]([{", ".join(chr(34) + x + chr(34) for x in seeds)}])')
-    s.box("Bin", "Farming/SeedBin", (1.2, 0.9, 0.8), 0.45, DARKWOOD)
-    s.node("Body3D", "StaticBody3D", "Farming/SeedBin", "collision_layer = 2\ncollision_mask = 0")
-    s.node("Shape", "CollisionShape3D", "Farming/SeedBin/Body3D", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)\nshape = SubResource("SB_{era}")')
-
-
-def trade_post(s, era, pos, key, box_color):
-    """Trading (Phase 4): one post per era, era-local goods and money."""
-    sc = s.ext_res("Script", "res://scripts/trading/trade_post.gd")
-    s.sub.append(f'[sub_resource type="BoxShape3D" id="TP_{era}"]\nsize = Vector3(2.6, 2.4, 2.2)')
-    s.node("TradePost", "Node3D", ".", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {pos[0]}, 0, {pos[1]})\nscript = ExtResource("{sc}")\nera_id = "{era}"\npost_name_key = "{key}"\nintro_key = "{key}_TEXT"')
-    s._footprint("TradePost", 3.0, 2.4)
-    s.box("Base", "TradePost", (3.0, 2.0, 2.4), -1.0, (0.42, 0.38, 0.32))
-    s.box("Stall", "TradePost", (2.4, 1.1, 1.2), 0.55, box_color)
-    s.box("Awning", "TradePost", (2.8, 0.12, 2.0), 2.2, (0.5, 0.45, 0.3), 0, -0.3)
-    s.box("PostA", "TradePost", (0.1, 2.2, 0.1), 1.1, DARKWOOD, -1.3, -1.2)
-    s.box("PostB", "TradePost", (0.1, 2.2, 0.1), 1.1, DARKWOOD, 1.3, -1.2)
-    s.node("Body3D", "StaticBody3D", "TradePost", "collision_layer = 2\ncollision_mask = 0")
-    s.node("Shape", "CollisionShape3D", "TradePost/Body3D", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)\nshape = SubResource("TP_{era}")')
-
-
-def manor_site(s, manor_id, pos):
-    """Base building (Phase 5): a marker post the player builds from."""
-    sc = s.ext_res("Script", "res://scripts/base_building/manor_controller.gd")
-    s.sub.append(f'[sub_resource type="BoxShape3D" id="MS_{manor_id}"]\nsize = Vector3(1.6, 2.4, 1.6)')
-    s.node(f"Manor_{manor_id}", "Node3D", ".", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, {pos[0]}, 0, {pos[1]})\nscript = ExtResource("{sc}")\nmanor_id = "{manor_id}"')
-    s.box("Post", f"Manor_{manor_id}", (0.25, 2.0, 0.25), 1.0, DARKWOOD)
-    s.box("Sign", f"Manor_{manor_id}", (1.2, 0.5, 0.08), 1.7, (0.85, 0.8, 0.6))
-    s.node("Body3D", "StaticBody3D", f"Manor_{manor_id}", "collision_layer = 2\ncollision_mask = 0")
-    s.node("Shape", "CollisionShape3D", f"Manor_{manor_id}/Body3D", f'transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)\nshape = SubResource("MS_{manor_id}")')
-
-
-def extras_1938(s):
-    trade_post(s, "era_1938", (FARM[0] + 22, FARM[1] - 4), "POST_1938", (0.7, 0.65, 0.5))
-    manor_site(s, "kaseoja_farm", (FARM[0] + 10, FARM[1] - 8))
-    manor_site(s, "manor_park", (MANOR[0] + 30, MANOR[1] + 10))
-    farm_plots(s, "era_1938", (FARM[0] - 6, FARM[1] + 14), 3, ["seed_rye", "seed_oats", "seed_potato"])
-    hunting(s, "era_1938", 6)
-
-
-def hunting(s, era, max_animals=8):
-    """Hunting (Phase 3): a spawner that keeps animals around the player on their land cover."""
-    sc = s.ext_res("Script", "res://scripts/hunting/hunting_spawner.gd")
-    s.node("HuntingSpawner", "Node3D", ".", f'script = ExtResource("{sc}")\nera_id = "{era}"\nmax_animals = {max_animals}')
-
-
-def extras_1798(s):
-    hunting(s, "era_1798", 10)
-    trade_post(s, "era_1798", (MANOR[0] + MW / 2 + 8, MANOR[1] - 6), "POST_1798", (0.45, 0.35, 0.22))
+def generate(site, check=False):
+    site_dir = os.path.join(ROOT, "sites", site)
+    spec = json.load(open(os.path.join(site_dir, "scenes.json")))
+    layout = json.load(open(os.path.join(site_dir, "layout.json")))
+    it = Interpreter(site_dir, spec, layout)
+    out_dir = os.path.join(site_dir, "scenes")
+    os.makedirs(out_dir, exist_ok=True)
+    for era, body in spec.get("eras", {}).items():
+        s = it.build(era, body.get("nodes", []))
+        if not check:
+            s.write(os.path.join(out_dir, f"{era}.tscn")); print("wrote", site, era, f"({len(s.nodes)} nodes)")
+    for p in it.problems:
+        print("problem:", p)
+    return not it.problems
 
 
 if __name__ == "__main__":
-    for b in (build_2026, build_1938, build_1798):
-        s = b(); s.write(os.path.join(ROOT, f"scenes/eras/{s.era}.tscn")); print("wrote", s.era)
+    ap = argparse.ArgumentParser(description="Generate era scenes from a site's scenes.json")
+    ap.add_argument("--site", default="palupera")
+    ap.add_argument("--check", action="store_true", help="only report problems, write nothing")
+    a = ap.parse_args()
+    sys.exit(0 if generate(a.site, a.check) else 1)
