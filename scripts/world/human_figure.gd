@@ -47,6 +47,7 @@ func setup(variant: String, rng: RandomNumberGenerator, year: int) -> void:
 	if scene == null:
 		return
 	var model: Node3D = scene.instantiate()
+	model.rotation.y = PI   # the export faces +Z; agents and NPCs face -Z
 	add_child(model)
 	skeleton = model.find_child("*", true, false) as Skeleton3D if model is Skeleton3D else null
 	for n in model.find_children("*", "Skeleton3D", true, false):

@@ -33,10 +33,12 @@ func _snap_children() -> void:
 	var terrain: Terrain3D = GameState.world.terrain if GameState.world else null
 	if terrain == null:
 		return
-	_snap_list(get_children(), terrain)
-	# one level deeper for container groups (the village massing, the real footprints)
+	# container groups (the village massing, the real footprints, the parcel kits) stay at y 0 and
+	# their children snap one by one; kits that place their pieces on the ground carry no_snap
+	var containers := ["Village", "Buildings", "Parcels"]
+	_snap_list(get_children().filter(func(c): return not (c.name in containers)), terrain)
 	for c in get_children():
-		if c is Node3D and c.get_child_count() > 0 and c.name in ["Village", "Buildings", "Parcels"]:
+		if c is Node3D and c.get_child_count() > 0 and c.name in containers:
 			_snap_list(c.get_children(), terrain)
 
 

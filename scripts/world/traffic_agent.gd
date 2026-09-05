@@ -180,10 +180,13 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 	_box(root, Vector3(0.04, 0.5, 0.04), Vector3(0, 0.62, -0.35), paint, 0.4)       # seat tube
 	_box(root, Vector3(0.45, 0.03, 0.03), Vector3(0, 0.95, 0.5), Color(0.2, 0.2, 0.2), 0.5)   # handlebar
 	_box(root, Vector3(0.18, 0.05, 0.25), Vector3(0, 0.92, -0.35), Color(0.15, 0.1, 0.08))   # saddle
+	root.rotation.y = PI   # built with the handlebar at +Z; agents and the mounted player face -Z
 	if with_rider and HumanFigure.available():
 		var rider := HumanFigure.make(r, 2026)
 		rider.pose = "sit"
-		rider.position = Vector3(0, 0.55, -0.15)
+		rider.position = Vector3(0, 0.1, -0.42)   # hips over the saddle once the legs fold forward
+		rider.rotation.y = PI                    # the frame's front is +Z, the figure faces -Z
+		rider.rotation.x = -0.15                 # leaning onto the handlebar
 		root.add_child(rider)
 	elif with_rider:
 		var fig: Node3D = load(FIGURES[0]).instantiate()

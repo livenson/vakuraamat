@@ -183,6 +183,32 @@ static func water_exclusions(water_path: String) -> Array:
 	return out
 
 
+## A texel mask of the pack's road corridors (roads.json polylines, half the ETAK width plus half a
+## metre): nothing is scattered on carriageways, verges stay. Null when the pack has no roads.
+static func road_mask(roads_path: String, size: int) -> Image:
+	if roads_path == "" or not FileAccess.file_exists(roads_path):
+		return null
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(roads_path))
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return null
+	var img := Image.create_empty(size, size, false, Image.FORMAT_L8)
+	var on := Color(1, 1, 1)
+	for r in parsed.get("roads", []):
+		var pts: Array = r.get("points", [])
+		var half: float = maxf(float(r.get("width", 4.0)), 2.0) * 0.5 + 0.5
+		for i in range(pts.size() - 1):
+			var a := Vector2(float(pts[i][0]), float(pts[i][1]))
+			var b := Vector2(float(pts[i + 1][0]), float(pts[i + 1][1]))
+			var lo := Vector2(minf(a.x, b.x), minf(a.y, b.y)) - Vector2(half, half)
+			var hi := Vector2(maxf(a.x, b.x), maxf(a.y, b.y)) + Vector2(half, half)
+			for y in range(maxi(int(lo.y), 0), mini(int(hi.y) + 1, size)):
+				for x in range(maxi(int(lo.x), 0), mini(int(hi.x) + 1, size)):
+					var p := Vector2(x + 0.5, y + 0.5)
+					if p.distance_to(Geometry2D.get_closest_point_to_segment(p, a, b)) <= half:
+						img.set_pixel(x, y, on)
+	return img
+
+
 ## Level the ground under authored buildings ("pads": x, z, w, d in tile metres): the footprint
 ## takes the mean height, blended out over a 5 m margin. Shared by all eras.
 static func level_building_pads(img: Image, pads: Array) -> void:
@@ -263,7 +289,7 @@ func classify(img: Image, canopy: Image = null) -> Image:
 ## Trees from trees.json ([x, z, height, crown, conifer]) as instances of the rule whose species fits:
 ## conifers become pines (tall) or spruces, deciduous trees birches; junipers for small conifers.
 ## Returns true when the tile had measured trees.
-func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Array, rng: RandomNumberGenerator, batches: Array, colors: Array, origin: Vector3 = Vector3.ZERO) -> bool:
+func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Array, rng: RandomNumberGenerator, batches: Array, colors: Array, origin: Vector3 = Vector3.ZERO, mask: Image = null) -> bool:
 	var path := tile_dir + "/trees.json"
 	if not FileAccess.file_exists(path):
 		return false
@@ -277,6 +303,10 @@ func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Arr
 	for t in parsed.trees:
 		var pos := Vector3(float(t[0]), 0.0, float(t[1])) + origin
 		if excluded(pos.x - origin.x, pos.z - origin.z, exclusions):
+			continue
+		var lx := int(pos.x - origin.x)
+		var lz := int(pos.z - origin.z)
+		if mask and lx >= 0 and lz >= 0 and lx < mask.get_width() and lz < mask.get_height() and mask.get_pixel(lx, lz).r > 0.5:
 			continue
 		var h := float(t[2])
 		var conifer := int(t[4]) == 1
@@ -307,7 +337,7 @@ func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Arr
 ## the loaded assets, so the tool captures it before the node enters the tree).
 ## `loc` other than (0,0): a streamed neighbour region; the mesh assets are already set up by the
 ## origin, only that region is populated and its file cached.
-func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value: int = 1798, keep_textures: Array = [], loc: Vector2i = Vector2i.ZERO) -> Array:
+func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value: int = 1798, keep_textures: Array = [], loc: Vector2i = Vector2i.ZERO, mask: Image = null) -> Array:
 	var assets: Terrain3DAssets = terrain.assets
 	var texture_list: Array = keep_textures if not keep_textures.is_empty() else assets.texture_list.duplicate()
 	var origin := Vector3(loc.x * terrain.region_size, 0.0, loc.y * terrain.region_size)
@@ -345,11 +375,11 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 		colors.append(PackedColorArray())
 	# Measured single trees (Maa-amet Geo3D, tools/pipeline/fetch_trees.py) replace the statistical
 	# tree rules where the dataset covers the tile; bushes and grass stay statistical.
-	var measured := _place_measured_trees(terrain, tile_dir, exclusions, rng, batches, colors, origin)
+	var measured := _place_measured_trees(terrain, tile_dir, exclusions, rng, batches, colors, origin, mask)
 	for y in size:
 		for x in size:
 			var id := Terrain3DUtil.get_base(Terrain3DUtil.as_uint(ctrl.get_pixel(x, y).r))
-			if excluded(x, y, exclusions):
+			if excluded(x, y, exclusions) or (mask and mask.get_pixel(x, y).r > 0.5):
 				continue
 			var h: float = canopy.get_pixel(x, y).r if canopy else -1.0
 			for i in RULES.size():

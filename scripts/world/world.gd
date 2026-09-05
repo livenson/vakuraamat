@@ -251,7 +251,8 @@ func _build_terrain(tile_dir: String) -> void:
 	var layout := Sites.layout()
 	var ok: bool = await builder.import(terrain, tile_dir, layout)
 	if ok:
-		await builder.scatter(terrain, tile_dir, layout.get("exclusions", []) + TerrainBuilder.water_exclusions(Sites.path(str(Sites.get_value("water", "")))))
+		var mask := TerrainBuilder.road_mask(Sites.path("roads.json"), terrain.region_size)
+		await builder.scatter(terrain, tile_dir, layout.get("exclusions", []) + TerrainBuilder.water_exclusions(Sites.path(str(Sites.get_value("water", "")))), 1798, [], Vector2i.ZERO, mask)
 	# let Terrain3D rebuild its clipmap and collision around the camera before anyone is placed on it
 	terrain.set_camera(player.camera)
 	terrain.data.update_maps()
