@@ -60,6 +60,11 @@ them in the air, a pitch in degrees tilts the view), e.g. a border check from th
 `godot --path . res://scenes/world/world.tscn -- --site=kvissentali --fly --spawn=940,500,-90,110,-28 --screenshot=/tmp/a.png`.
 `--no-stream` keeps neighbouring tiles from loading during measurements.
 
+## M: debug map
+
+The map shows the 1024 m tile the player stands in (the site's own drape, or a streamed
+neighbour's orthophoto), redraws live while open, and a click teleports within that tile.
+
 ## K: codes overlay
 
 K toggles an overlay with the cadastral unit under you (number, purpose, area, owner, X-GIS link),

@@ -157,7 +157,10 @@ and the tile service.
 override it with `sites/<id>/parcel_rules.json`): the first rule matching the unit's purpose, size,
 ownership and the era year names a kit, built by `scripts/world/parcel_kit.gd`: `playground` (swing
 frame, slide, sandpit, bench) on small municipal public land, `park` (benches) on larger public land,
-`hedge` around residential plots, `fence` around industrial ones, or nothing. The `parcels` and
+`hedge` around residential plots, `fence` around industrial ones, `solar` (rows of tilted panel
+tables where the orthophoto shows regular 3-20 m rows on a large industrial unit, rule
+`needs_rows`; row spacing and direction come from a 2D FFT of the photo inside the unit), or
+nothing. The `parcels` and
 `roads` nodes in `scenes.json` place them (generated packs: newest era; Palupera: 2026). Roads are
 ribbons on the terrain (`scripts/world/road_network.gd`): asphalt with kerbs for streets, light paving
 for footpaths, gravel for other roads and trails.
@@ -176,7 +179,9 @@ paths, streets and roads, cyclists, cars (right-hand lanes, pre-1950 black saloo
 hatchbacks) and horse carts. The mix follows the era year (only walkers and carts before 1900, bikes
 and a few cars before 1950) and the clock (peaks at 7–9 and 16–19, few at night). Agents spawn
 35–220 m from the player, despawn beyond 320 m, keep a minimum gap to the one ahead and turn around
-at dead ends. The `bicycle` node (`{"type": "bicycle", "name": "Bicycle", "x": .., "z": ..}`) parks
+at dead ends. Cars are Kenney Car Kit models (CC0, `assets/vendor/kenney_car_kit`): sedans,
+hatchbacks, SUVs, vans, delivery vans, taxis and trucks after 1950, a near-black sedan before.
+The `bicycle` node (`{"type": "bicycle", "name": "Bicycle", "x": .., "z": ..}`) parks
 a rideable bike: E mounts it, E again dismounts, riding is about twice walking speed with momentum.
 Both need `roads.json`; `tools/new_site.py` adds them to the newest era of a generated pack.
 
