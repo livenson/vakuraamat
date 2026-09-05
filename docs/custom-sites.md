@@ -149,6 +149,9 @@ page's plate (`scripts/ui/map_plate.gd`) draws the pack's cadastral units over i
 fills the saved book's plots. *Create the world* and *Install and play* freeze the Locations page under
 a progress sheet (the service's stage, a bar, the elapsed time; `Locator.progress(text, fraction)`)
 until the pack is installed or the job fails with its error and a Close button.
+The debug map (M) lays its text out without overlaps: street names along their longest stretch (from
+`roads.json`), house numbers at the buildings (from `buildings.json` addresses), then the points'
+labels nearest the player; every point keeps its dot, and the dot under the mouse shows its name.
 `tools/godot/menu_shot.tscn` screenshots the menu (`--locations` for the second page, `--creating`
 or `--failed` for the sheet).
 

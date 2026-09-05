@@ -25,6 +25,7 @@ var inside: FootprintBuilding = null
 var _interiors: Dictionary = {}     # building instance id -> Node3D
 var _doors: Array = []
 var _kit_cache: Dictionary = {}
+var _kit_size: Dictionary = {}   # model -> AABB of the kit model as exported
 
 
 func setup(w: Node3D) -> void:
@@ -111,6 +112,11 @@ func enter(b: FootprintBuilding, player: Node3D) -> void:
 	root.visible = true
 	_set_colliders(root, true)
 	inside = b
+	var pieces := 0
+	for c in root.find_children("*", "Node3D", true, false):
+		if c.has_meta("piece"):
+			pieces += 1
+	print("[interiors] inside %s: %d rooms, %d pieces" % [_door_label(b), root.find_children("Partition_*", "MeshInstance3D", false, false).size() + 1, pieces])
 	var f: Dictionary = b.door_frame()
 	var n: Vector3 = f.n
 	var spot: Vector3 = b.to_global(f.pos - n.normalized() * 1.4 + Vector3.UP * (float(root.get_meta("floor0")) + 0.2))
@@ -681,22 +687,22 @@ func _ramp(root: Node3D, poly: PackedVector2Array, edge: int, y0: float, fh: flo
 # ---------------------------------------------------------------- furniture
 
 const SETS := {
-	"living": [["loungeSofa", Vector3(2.0, 0.8, 0.9), Color(0.3, 0.4, 0.55)], ["tableCoffee", Vector3(1.0, 0.45, 0.6), Color(0.6, 0.45, 0.3)],
-		["televisionModern", Vector3(1.2, 0.8, 0.3), Color(0.15, 0.15, 0.15)], ["cabinetTelevision", Vector3(1.2, 1.1, 0.5), Color(0.5, 0.5, 0.5)],
+	"living": [["loungeSofa", Vector3(2.0, 0.8, 0.9), Color(0.3, 0.4, 0.55)], ["tableCoffee", Vector3(1.0, 0.45, 0.6), Color(0.6, 0.45, 0.3), "front"],
+		["cabinetTelevision", Vector3(1.4, 0.5, 0.45), Color(0.5, 0.5, 0.5), "facing"], ["televisionModern", Vector3(1.1, 0.7, 0.2), Color(0.15, 0.15, 0.15), "stack"],
 		["bookcaseClosed", Vector3(1.0, 2.0, 0.4), Color(0.45, 0.32, 0.22)], ["plantSmall1", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)], ["lampRoundFloor", Vector3(0.4, 1.6, 0.4), Color(0.9, 0.85, 0.7)]],
 	"kitchen": [["kitchenCabinet", Vector3(1.0, 0.9, 0.6), Color(0.85, 0.85, 0.8)], ["kitchenStove", Vector3(0.9, 0.9, 0.6), Color(0.7, 0.7, 0.72)],
 		["kitchenFridge", Vector3(0.9, 1.9, 0.7), Color(0.85, 0.85, 0.88)], ["kitchenCabinet", Vector3(1.0, 0.9, 0.6), Color(0.85, 0.85, 0.8)],
-		["table", Vector3(1.4, 0.75, 0.9), Color(0.6, 0.45, 0.3)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)]],
+		["table", Vector3(1.4, 0.75, 0.9), Color(0.6, 0.45, 0.3)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24), "front"]],
 	"bedroom": [["bedDouble", Vector3(1.8, 0.6, 2.0), Color(0.75, 0.3, 0.3)], ["cabinetBed", Vector3(1.0, 1.8, 0.6), Color(0.4, 0.4, 0.42)],
 		["bookcaseOpen", Vector3(1.0, 2.0, 0.4), Color(0.6, 0.6, 0.58)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)],
 		["plantSmall2", Vector3(0.4, 0.9, 0.4), Color(0.3, 0.55, 0.3)], ["lampRoundFloor", Vector3(0.4, 1.6, 0.4), Color(0.9, 0.85, 0.7)]],
 	"hall": [["bookcaseClosed", Vector3(1.0, 2.0, 0.4), Color(0.45, 0.32, 0.22)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)],
 		["plantSmall3", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)], ["lampRoundFloor", Vector3(0.4, 1.6, 0.4), Color(0.9, 0.85, 0.7)]],
-	"reception": [["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22)],
+	"reception": [["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22), "front"],
 		["loungeSofa", Vector3(2.0, 0.8, 0.9), Color(0.3, 0.4, 0.55)], ["tableCoffee", Vector3(1.0, 0.45, 0.6), Color(0.6, 0.45, 0.3)],
 		["bookcaseClosed", Vector3(1.0, 2.0, 0.4), Color(0.45, 0.32, 0.22)], ["plantSmall3", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)]],
-	"office": [["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22)],
-		["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22)],
+	"office": [["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22), "front"],
+		["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22), "front"],
 		["bookcaseOpen", Vector3(1.0, 2.0, 0.4), Color(0.6, 0.6, 0.58)], ["cabinetTelevision", Vector3(1.2, 1.1, 0.5), Color(0.5, 0.5, 0.5)], ["plantSmall2", Vector3(0.4, 0.9, 0.4), Color(0.3, 0.55, 0.3)]],
 	"salesroom": [["kitchenBar", Vector3(1.8, 1.0, 0.7), Color(0.55, 0.4, 0.3)], ["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)],
 		["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)], ["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)],
@@ -710,13 +716,16 @@ const SETS := {
 }
 
 
-## Pieces of `role` along the walls of one room: a piece per ~4 m of wall. Edges in `skip_edges` and edges
-## carrying a doorway or the exterior door get none, and nothing stands within CLEAR of an `avoid` point.
+## Furnish a room by its role: pieces line the walls in the set's order, packed along each usable
+## wall in turn (a wall carrying a doorway or the exterior door gets none, and nothing stands within
+## CLEAR of an `avoid` point). A piece flagged "front" stands in front of the previous wall piece
+## (a coffee table before the sofa, a chair at a desk), "facing" goes to the wall opposite it (the
+## television cabinet across from the sofa) and "stack" sits on top of it (the television).
 func _furnish(root: Node3D, poly: PackedVector2Array, y0: float, role: String, seed_key: String, skip_edges: Array, avoid: Array) -> void:
 	var pieces: Array = SETS.get(role, SETS.office)
 	var rng := RandomNumberGenerator.new()
 	rng.seed = hash(seed_key)
-	var idx := 0
+	var walls: Array = []   # {a, dir, inward, length, used}: usable walls, the packing cursor per wall
 	for i in poly.size():
 		if i in skip_edges:
 			continue
@@ -735,28 +744,69 @@ func _furnish(root: Node3D, poly: PackedVector2Array, y0: float, role: String, s
 		var inward := Vector2(-dir.y, dir.x)
 		if not Geometry2D.is_point_in_polygon(a + dir * 0.5 + inward * 0.5, poly):
 			inward = -inward
-		var slots := maxi(1, int(length / 4.0))
-		for s in slots:
-			if idx >= pieces.size():
-				return
-			var piece: Array = pieces[idx]
-			idx += 1
-			var size: Vector3 = piece[1]
-			var u := length * (s + 0.5) / slots
-			var at := a + dir * u + inward * (size.z / 2.0 + 0.3)
-			if not Geometry2D.is_point_in_polygon(at, poly):
-				continue
-			var blocked := false
-			for p in avoid:
-				if at.distance_to(p) < CLEAR:
-					blocked = true
-			if blocked:
-				continue
-			var node := _piece(str(piece[0]), size, piece[2])
-			node.position = Vector3(at.x, y0, at.y)
-			node.rotation.y = -atan2(dir.y, dir.x) + PI   # back to the wall
-			node.set_meta("piece", true)
-			root.add_child(node)
+		walls.append({"a": a, "dir": dir, "inward": inward, "length": length, "used": 0.4})
+	if walls.is_empty():
+		return
+	var wi := rng.randi() % walls.size()   # the first wall furnished varies per room
+	var anchor: Dictionary = {}            # the last wall piece: {at, inward, dir, size, y}
+	for piece in pieces:
+		var size: Vector3 = piece[1]
+		var flag: String = str(piece[3]) if piece.size() > 3 else ""
+		var spot: Dictionary = {}
+		if flag == "stack" and not anchor.is_empty():
+			spot = {"at": anchor.at, "dir": anchor.dir, "y": anchor.y + anchor.size.y}
+		elif flag == "front" and not anchor.is_empty():
+			spot = {"at": anchor.at + anchor.inward * (anchor.size.z + size.z) * 0.5 + anchor.inward * 0.35, "dir": anchor.dir, "y": y0}
+		elif flag == "facing" and not anchor.is_empty():
+			var best := -1
+			var best_d := INF
+			for k in walls.size():
+				var w: Dictionary = walls[k]
+				if w.inward.dot(anchor.inward) > -0.5:
+					continue
+				var d: float = absf((anchor.at - w.a).dot(w.inward))
+				if d < best_d:
+					best_d = d
+					best = k
+			if best >= 0:
+				spot = _pack(walls[best], size, y0, (anchor.at - walls[best].a).dot(walls[best].dir))
+		if spot.is_empty() and flag != "stack":
+			for _try in walls.size():
+				spot = _pack(walls[wi], size, y0)
+				if not spot.is_empty():
+					break
+				wi = (wi + 1) % walls.size()
+		if spot.is_empty():
+			continue
+		var at: Vector2 = spot.at
+		if not Geometry2D.is_point_in_polygon(at, poly):
+			continue
+		var blocked := false
+		for p in avoid:
+			if at.distance_to(p) < CLEAR:
+				blocked = true
+		if blocked:
+			continue
+		var node := _piece(str(piece[0]), size, piece[2])
+		node.position = Vector3(at.x, spot.y, at.y)
+		var dir: Vector2 = spot.dir
+		node.rotation.y = -atan2(dir.y, dir.x) + PI   # back to the wall
+		node.set_meta("piece", true)
+		root.add_child(node)
+		if flag == "" or flag == "facing":
+			anchor = {"at": at, "inward": spot.get("inward", anchor.get("inward", Vector2.ZERO)), "dir": dir, "size": size, "y": spot.y}
+
+
+## The next free stretch of a wall for a piece `size` wide (from the wall's cursor, or from `along`
+## metres down the wall when given); {} when the wall is full. Advances the cursor.
+func _pack(w: Dictionary, size: Vector3, y0: float, along: float = -1.0) -> Dictionary:
+	var u: float = w.used + size.x * 0.5
+	if along >= 0.0:
+		u = maxf(u, along)
+	if u + size.x * 0.5 + 0.3 > w.length:
+		return {}
+	w.used = u + size.x * 0.5 + 0.4
+	return {"at": w.a + w.dir * u + w.inward * (size.z * 0.5 + 0.3), "dir": w.dir, "inward": w.inward, "y": y0}
 
 
 ## A Kenney Furniture Kit model when vendored (`assets/vendor/kenney_furniture_kit/glb/<name>.glb`), else a box.
@@ -767,6 +817,16 @@ func _piece(model: String, size: Vector3, color: Color) -> Node3D:
 	var scene: PackedScene = _kit_cache[model]
 	if scene:
 		var n: Node3D = scene.instantiate()
+		if not _kit_size.has(model):
+			_kit_size[model] = _bounds(n)
+		var bounds: AABB = _kit_size[model]
+		if bounds.size.y > 0.01:
+			var k := size.y / bounds.size.y   # the kit is modelled at about half life size
+			var wrap := Node3D.new()
+			n.scale = Vector3(k, k, k)
+			n.position.y = -bounds.position.y * k
+			wrap.add_child(n)
+			return wrap
 		return n
 	var mi := MeshInstance3D.new()
 	var box := BoxMesh.new()
@@ -779,6 +839,22 @@ func _piece(model: String, size: Vector3, color: Color) -> Node3D:
 	var wrap := Node3D.new()
 	wrap.add_child(mi)
 	return wrap
+
+
+## The bounds of a model's meshes in its own frame (no tree needed).
+static func _bounds(n: Node3D) -> AABB:
+	var out := AABB()
+	var first := true
+	for mi in n.find_children("*", "MeshInstance3D", true, false):
+		var xf := Transform3D.IDENTITY
+		var p: Node = mi
+		while p != n and p is Node3D:
+			xf = p.transform * xf
+			p = p.get_parent()
+		var b: AABB = xf * mi.get_aabb()
+		out = b if first else out.merge(b)
+		first = false
+	return out
 
 
 ## Lamp positions: the centroid for small rooms, a 9 m grid of points inside the polygon for halls.
