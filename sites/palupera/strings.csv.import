@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://be7ctl8rgy1w5"
+
+[deps]
+
+files=["res://sites/palupera/strings.et.translation", "res://sites/palupera/strings.en.translation"]
+
+source_file="res://sites/palupera/strings.csv"
+dest_files=["res://sites/palupera/strings.et.translation", "res://sites/palupera/strings.en.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

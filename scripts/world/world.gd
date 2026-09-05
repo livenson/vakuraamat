@@ -1,8 +1,8 @@
 # The one world scene: shared terrain + sky, the player, and one EraLayer per era.
 # Era switching keeps the player where they stand and swaps texture, props and NPCs.
+# Which ground, spawn, sky and water: the active site pack (Sites.manifest).
 extends Node3D
 
-const TILE := "palupera"
 const FADE_TIME := 1.2
 
 @onready var terrain: Terrain3D = $Terrain3D
@@ -18,12 +18,18 @@ var _fx := ["sdfgi", "ssao", "ssil", "fog", "glow", "grade"]   # --fx=a,b,c limi
 var _screenshot_frame := 240
 var _frames := 0
 var _era_nodes: Dictionary = {}     # era_id -> EraController
-var _spawn := Vector3(508, 0, 513)  # north of the ruin, 2026 prologue start (data/site_layout.json spawn_2026)
+var _spawn := Vector3(512, 0, 512)  # from the site manifest "start.spawn" (tile metres)
 
 
 func _ready() -> void:
 	GameState.world = self
-	georef = TerrainGeoref.load_tile(TILE)
+	var tile := Sites.tile()
+	if terrain.data == null or terrain.data.region_locations.is_empty():
+		push_error("no terrain data for tile %s - run make tile SITE=%s" % [tile, Sites.active])
+	georef = TerrainGeoref.load_tile(tile)
+	var start: Dictionary = Sites.get_value("start", {})
+	var sp: Array = start.get("spawn", [512, 512])
+	_spawn = Vector3(float(sp[0]), 0.0, float(sp[1]))
 	terrain.set_camera(player.camera)
 	_configure_sky()
 	_apply_orthophoto()
@@ -37,9 +43,11 @@ func _ready() -> void:
 		# New game (or the scene run directly): fresh state, prologue in 2026.
 		GameState.reset()
 		player.global_position = _spawn
-		player.rotation.y = PI   # face south, toward the ruin
+		player.rotation.y = deg_to_rad(float(start.get("yaw_deg", 180.0)))
 		_snap(player, 1.0)
-		await GameState.switch_era("era_2026")
+		var order := GameState.eras_in_order()
+		var first_era: String = str(start.get("era", order[-1].id if not order.is_empty() else ""))
+		await GameState.switch_era(first_era)
 	var tw := create_tween()
 	tw.tween_property(fade, "color:a", 0.0, FADE_TIME)
 	for a in OS.get_cmdline_user_args():
@@ -127,14 +135,27 @@ func _apply_orthophoto() -> void:
 	mat.set_shader_param("ortho_extent", georef.tile_size_m())
 
 
+## The terrain tile named by the site. Assigned before Terrain3D enters the tree (the World
+## node enters first), so the region data and ground assets load exactly as if baked in the scene.
+func _enter_tree() -> void:
+	var tile := Sites.tile()
+	var t3d: Terrain3D = get_node("Terrain3D")
+	var assets_path := "res://assets/terrain/%s/terrain_assets.tres" % tile
+	if ResourceLoader.exists(assets_path):
+		t3d.assets = load(assets_path)
+	t3d.data_directory = "res://assets/terrain/%s/data" % tile
+
+
 func _configure_sky() -> void:
 	var tod := sky.tod
-	tod.latitude = deg_to_rad(58.1158)
-	tod.longitude = deg_to_rad(26.3341)
-	tod.utc = 3.0
-	tod.year = 2026
-	tod.month = 9
-	tod.day = 3
+	var t: Dictionary = Sites.terrain()
+	tod.latitude = deg_to_rad(float(t.get("latitude", 58.1158)))
+	tod.longitude = deg_to_rad(float(t.get("longitude", 26.3341)))
+	tod.utc = float(t.get("utc_offset", 3.0))
+	var date: Array = t.get("date", [2026, 9, 3])
+	tod.year = int(date[0])
+	tod.month = int(date[1])
+	tod.day = int(date[2])
 	tod.minutes_per_day = 150.0   # a full day in 2.5 real hours; the slice is ~80 min
 	tod.game_time_enabled = true
 	_configure_environment()
@@ -199,11 +220,12 @@ func _push_out_of_buildings(layer: Node) -> void:
 			return
 
 
-## Still water from data/water_2026.json (flat patches in the laser DTM): the same ponds in every era.
+## Still water from the site's water file (flat patches in the laser DTM): the same ponds in every era.
 func _place_water() -> void:
-	if not FileAccess.file_exists("res://data/water_2026.json"):
+	var rel := str(Sites.get_value("water", ""))
+	if rel == "" or not FileAccess.file_exists(Sites.path(rel)):
 		return
-	var ponds: Array = JSON.parse_string(FileAccess.get_file_as_string("res://data/water_2026.json"))
+	var ponds: Array = JSON.parse_string(FileAccess.get_file_as_string(Sites.path(rel)))
 	var mat := ShaderMaterial.new()
 	mat.shader = load("res://assets/shaders/water.gdshader")
 	mat.set_shader_parameter("normal_map", load("res://assets/textures/water_normal.png"))

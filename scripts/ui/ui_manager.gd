@@ -6,8 +6,7 @@ extends CanvasLayer
 const GOLD := Color(0.85, 0.68, 0.25)
 const PAPER := Color(0.93, 0.88, 0.76)
 const INK := Color(0.16, 0.12, 0.08)
-const MAP_ORDER := ["era_1798", "era_1938", "era_2026"]
-var _locations := {}   # LOC_* -> tile metres, from data/site_layout.json (journal map markers)
+var _locations := {}   # LOC_* -> tile metres, from the site's layout.json via manifest "locations"
 
 var world: Node3D
 var player: CharacterBody3D
@@ -50,10 +49,12 @@ var _open_panel: Control = null
 
 
 func _ready() -> void:
-	var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/site_layout.json"))
-	for pair in [["LOC_OAK", "oak"], ["LOC_MANOR", "manor"], ["LOC_ORCHARD", "orchard"], ["LOC_FARMSTEAD", "farm"], ["LOC_WELL", "well"], ["LOC_NORTH_FIELD", "field"]]:
-		var v: Array = layout[pair[1]]
-		_locations[pair[0]] = Vector2(v[0], v[1])
+	var layout: Dictionary = Sites.layout()
+	var locs: Dictionary = Sites.get_value("locations", {})
+	for loc_key in locs:
+		var v: Array = layout.get(str(locs[loc_key]), [])
+		if v.size() >= 2:
+			_locations[loc_key] = Vector2(float(v[0]), float(v[1]))
 	world = get_parent()
 	player = world.get_node("Player")
 	interactor = player.get_node("Camera3D/Interactor")
@@ -77,7 +78,7 @@ func _ready() -> void:
 	EventBus.chapter_committed.connect(_on_chapter_committed)
 	EventBus.register_opened.connect(func(): show_notice(tr("UI_REGISTER_TITLE")))
 	EventBus.flag_changed.connect(func(f, v):
-		if f == "epilogue" and v:
+		if f == _ending_flag() and v:
 			call_deferred("_show_ending"))
 	EventBus.item_added.connect(func(_i, _e):
 		if _open_panel == inventory:
@@ -103,18 +104,41 @@ func _heading_deg() -> float:
 	return fmod(rad_to_deg(atan2(fwd.x, -fwd.z)) + 360.0, 360.0)
 
 
+## The first matching rule of the site manifest's "objectives": {when: register_locked} |
+## {chapter, flag, not_flag} conditions, "key" for the HUD text, optional "target" node name
+## (with "era" and "lift") for the marker.
+func _current_objective() -> Dictionary:
+	for o in Sites.get_value("objectives", []):
+		if o.get("when", "") == "register_locked":
+			if not GameState.register_unlocked:
+				return o
+			continue
+		if not GameState.register_unlocked:
+			continue
+		if o.has("chapter") and GameState.chapter != int(o.chapter):
+			continue
+		if o.has("flag") and not TimelineState.has_flag(str(o.flag)):
+			continue
+		if o.has("not_flag") and TimelineState.has_flag(str(o.not_flag)):
+			continue
+		return o
+	return {}
+
+
 ## World position of the current objective, or null.
 func _objective_target() -> Variant:
 	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
 	if layer == null:
 		return null
-	if not GameState.register_unlocked:
-		var n: Node = layer.find_child("RegisterBook", true, false)
-		return n.global_position + Vector3(0, 1.2, 0) if n else null
-	if GameState.chapter == 3 and GameState.current_era == "era_2026" and not TimelineState.has_flag("epilogue"):
-		var l: Node = layer.find_child("Leida", true, false)
-		return l.global_position + Vector3(0, 2.2, 0) if l else null
-	return null
+	var o := _current_objective()
+	if not o.has("target") or (o.has("era") and GameState.current_era != str(o.era)):
+		return null
+	var n: Node = layer.find_child(str(o.target), true, false)
+	return n.global_position + Vector3(0, float(o.get("lift", 1.5)), 0) if n else null
+
+
+func _ending_flag() -> String:
+	return str(Sites.get_value("ending", {}).get("trigger_flag", "epilogue"))
 
 
 func _draw_marker() -> void:
@@ -293,15 +317,8 @@ func _build_panel(title_key: String) -> PanelContainer:
 
 # ---------------------------------------------------------------- HUD
 func _objective() -> String:
-	if not GameState.register_unlocked:
-		return tr("OBJ_FIND_REGISTER")
-	if GameState.chapter == 1:
-		return tr("OBJ_VISIT_ERAS")
-	if GameState.chapter == 2:
-		return tr("OBJ_MEET_1938")
-	if GameState.chapter == 3 and not TimelineState.has_flag("epilogue"):
-		return tr("OBJ_SIT")
-	return ""
+	var o := _current_objective()
+	return tr(str(o.key)) if o.has("key") else ""
 
 
 func _refresh_era_label() -> void:
@@ -490,7 +507,8 @@ func _fill_register() -> void:
 		for e in Journal.entries:
 			if era.id in e.era_to and not TimelineState.has_flag("seen_%s_%s" % [e.flag, era.id]):
 				mark = "   ✦"
-		var nudge := "   ←" if (GameState.chapter == 1 and era.id == "era_1798" and not GameState.visited_eras.has(era.id)) else ""
+		var nd: Dictionary = Sites.get_value("register_nudge", {})
+		var nudge := "   ←" if (not nd.is_empty() and GameState.chapter == int(nd.get("chapter", 1)) and era.id == str(nd.get("era", "")) and not GameState.visited_eras.has(era.id)) else ""
 		b.text = "%s   %s%s%s" % [era.year_label, tr(era.display_name_key), mark, nudge]
 		b.add_theme_font_size_override("font_size", 24)
 		b.disabled = era.id == GameState.current_era
@@ -592,8 +610,9 @@ func _fill_journal() -> void:
 	stack.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	maps.add_child(stack)
 	map_rects.clear()
-	for id in MAP_ORDER:
-		var era := GameState.era(id)
+	var order := GameState.eras_in_order()
+	for era in order:
+		var id: String = era.id
 		var r := TextureRect.new()
 		r.texture = era.terrain_texture
 		r.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
@@ -609,18 +628,18 @@ func _fill_journal() -> void:
 	var row := HBoxContainer.new()
 	maps.add_child(row)
 	var l1 := Label.new()
-	l1.text = "1798"
+	l1.text = order[0].year_label if not order.is_empty() else ""
 	row.add_child(l1)
 	map_slider = HSlider.new()
 	map_slider.min_value = 0
-	map_slider.max_value = 2
+	map_slider.max_value = maxi(order.size() - 1, 1)
 	map_slider.step = 0.01
-	map_slider.value = 2
+	map_slider.value = map_slider.max_value
 	map_slider.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	map_slider.value_changed.connect(func(_v): _update_map_blend())
 	row.add_child(map_slider)
 	var l3 := Label.new()
-	l3.text = "2026"
+	l3.text = order[-1].year_label if not order.is_empty() else ""
 	row.add_child(l3)
 	_update_map_blend()
 	# codex: what is attested history and what is invented (design doc 6)
@@ -631,7 +650,7 @@ func _fill_journal() -> void:
 	cb.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cb.add_theme_constant_override("separation", 8)
 	codex.add_child(cb)
-	for k in ["CODEX_REAL", "CODEX_INVENTED", "CODEX_WORDS", "CODEX_DATA"]:
+	for k in Sites.get_value("codex", []):
 		var h := Label.new()
 		h.text = tr(k + "_TITLE")
 		h.add_theme_color_override("font_color", GOLD)
@@ -827,7 +846,8 @@ func _fill_debug_map() -> void:
 	stack.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	body.add_child(stack)
 	var bg := TextureRect.new()
-	bg.texture = GameState.era("era_2026").terrain_texture
+	var newest := GameState.eras_in_order()
+	bg.texture = newest[-1].terrain_texture if not newest.is_empty() else null
 	bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -905,17 +925,29 @@ func debug_open(which: String) -> void:
 		"trade", "build":
 			var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
 			if layer:
-				var n: Node = layer.find_child("TradePost" if which == "trade" else "Manor_kaseoja_farm", true, false)
+				var n: Node = layer.find_child("TradePost", true, false) if which == "trade" else _debug_build_node(layer)
 				if n:
 					n.interact(player)
 
 
+## The manor the debug "build" hook opens: the manifest's debug.build_node, else the first one.
+func _debug_build_node(layer: Node) -> Node:
+	var bn: String = str(Sites.get_value("debug", {}).get("build_node", ""))
+	var n: Node = layer.find_child(bn, true, false) if bn != "" else null
+	if n == null:
+		var all := layer.find_children("*", "ManorController", true, false)
+		n = all[0] if not all.is_empty() else null
+	return n
+
+
 func _update_map_blend() -> void:
-	# slider 0..2 across 1798 -> 1938 -> 2026; the upper layers fade in over the lower ones
+	# slider 0..N-1 across the eras in order; each upper layer fades in over the ones below
 	var v: float = map_slider.value
-	map_rects["era_1798"].modulate.a = 1.0
-	map_rects["era_1938"].modulate.a = clampf(v, 0.0, 1.0)
-	map_rects["era_2026"].modulate.a = clampf(v - 1.0, 0.0, 1.0)
+	var order := GameState.eras_in_order()
+	for i in order.size():
+		var r: TextureRect = map_rects.get(order[i].id)
+		if r:
+			r.modulate.a = 1.0 if i == 0 else clampf(v - (i - 1), 0.0, 1.0)
 	map_markers.queue_redraw()
 
 
@@ -1006,29 +1038,34 @@ func _end_dialogue() -> void:
 
 
 # ---------------------------------------------------------------- ending
+## Ending tier from the site manifest "ending": count the "counted_flags" that are set, note the
+## optional "bonus_flag", pick the first tier whose min_kept (and bonus, if required) is met.
 func _show_ending() -> void:
+	var rules: Dictionary = Sites.get_value("ending", {})
+	var counted: Array = rules.get("counted_flags", [])
 	var kept := 0
-	for f in ["family_recorded_1798", "north_field_ploughed", "well_kept_open", "cellar_opened"]:
-		if TimelineState.has_flag(f):
+	for f in counted:
+		if TimelineState.has_flag(str(f)):
 			kept += 1
-	var letter := TimelineState.has_flag("letter_delivered")
-	var key := "ENDING_FOREST"
-	if kept == 4 and letter:
-		key = "ENDING_ORCHARD"
-	elif kept >= 2:
-		key = "ENDING_FURROWS"
+	var bonus_flag := str(rules.get("bonus_flag", ""))
+	var bonus := bonus_flag != "" and TimelineState.has_flag(bonus_flag)
+	var key := ""
+	for tier in rules.get("tiers", []):
+		if kept >= int(tier.get("min_kept", 0)) and (bonus or not bool(tier.get("bonus", false))):
+			key = str(tier.get("key", ""))
+			break
 	var body := _clear_body(ending)
-	body.get_node("Title").text = tr(key + "_TITLE")
+	body.get_node("Title").text = tr(key + "_TITLE") if key != "" else ""
 	var t := Label.new()
-	t.text = tr(key)
-	if letter and kept < 4:
-		t.text += "\n\n" + tr("ENDING_BOX_PARTIAL")
+	t.text = tr(key) if key != "" else ""
+	if bonus and kept < counted.size() and rules.has("partial_key"):
+		t.text += "\n\n" + tr(str(rules.partial_key))
 	t.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	t.custom_minimum_size = Vector2(700, 0)
 	t.add_theme_font_size_override("font_size", 19)
 	body.add_child(t)
 	var kept_l := Label.new()
-	kept_l.text = tr("ENDING_KEPT") % [kept, 4]
+	kept_l.text = tr("ENDING_KEPT") % [kept, counted.size()]
 	body.add_child(kept_l)
 	var again := Button.new()
 	again.text = tr("UI_PLAY_AGAIN")

@@ -13,3 +13,5 @@ extends Resource
 @export var default_time_of_day: float = 10.0   # hours, applied on FIRST entry only
 @export var order: int = 0
 @export var narrative_story: String       # compiled ink json for this era
+@export var currency_key: String = ""     # translation key of the era's money unit (trading)
+@export var starting_money: int = 0       # wallet at new game (trading)

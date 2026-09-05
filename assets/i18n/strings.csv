@@ -1,7 +1,4 @@
 keys,et,en
-ERA_1798_NAME,Mõis,The manor
-ERA_1938_NAME,Esimesed omanikud,The first owners
-ERA_2026_NAME,Praegu,The present
 UI_REGISTER_TITLE,Vakuraamat,The register
 UI_REGISTER_HINT,Vali lehekülg,Choose a page
 UI_JOURNAL,Päevik,Journal
@@ -31,98 +28,18 @@ NOTICE_LEFT_BEHIND,"%s jäi sinna, kus sa seisid. Ainult see, mis raamatusse kuu
 NOTICE_ARTIFACT_TAKEN,%s. See kuulub raamatusse; see tuleb sinuga läbi aastate.,%s. It belongs to the book; it comes with you through the years.
 NOTICE_SAVED,Salvestatud.,Saved.
 NOTICE_ERA,%s,%s
-CP1_FAMILY_RECORDED_TRIGGER,Andsid kubjas Hansule 1798. aastal registrilehe ja ta kirjutas Kaseoja pere talu nime all sisse.,You gave Hans the steward the register page in 1798 and he recorded the Kaseoja family under the farm's name.
-CP1_FAMILY_RECORDED_EFFECT,Andsid Hansule registrilehe 1798. aastal. 1938. aastal leiab maamõõtja Birkenbachi ja Kaseoja samalt lehelt; 2026. aastal seisab põllu serval kivi pere nimega.,You gave Hans the register page in 1798. In 1938 the surveyor finds Birkenbach and Kaseoja on the same page; in 2026 a stone with the family's name stands at the field edge.
-CP2_NORTH_FIELD_TRIGGER,Andsid Juhanile 1938. aastal vanaisa sahatera.,You gave Juhan the old ploughshare in 1938.
-CP2_NORTH_FIELD_EFFECT,"Andsid Juhanile sahatera 1938. aastal. 2026. aastal on põhjapõld niit, mitte mets.","You gave Juhan the ploughshare in 1938. In 2026, the north field is meadow, not forest."
-CP3_WELL_KEPT_TRIGGER,"Aitasid Mardil 1798. aastal kaevu toestada, kubjase käsu vastu.","You helped Mart shore up the well in 1798, against the steward's order."
-CP3_WELL_KEPT_EFFECT,Aitasid Mardil kaevu toestada 1798. aastal. 1938. aastal on talul oma magus vesi; 2026. aastal on kaev alles kivirõngana.,You helped Mart shore up the well in 1798. In 1938 the farm has its own sweet water; in 2026 the well survives as a stone ring.
-CP4_CELLAR_OPENED_TRIGGER,Andsid Ainole 1938. aastal mõisa võtme ja kelder avati.,You gave Aino the manor key in 1938 and the cellar was opened.
-CP4_CELLAR_OPENED_EFFECT,Andsid Ainole mõisa võtme 1938. aastal. Samal kevadel istutati vana paruni õunapuud; 2026. aastal kannab vana aed veel vilja.,You gave Aino the manor key in 1938. That spring the old baron's apple stock was planted; in 2026 the old orchard still bears.
-CP5_LETTER_DELIVERED_TRIGGER,Andsid Leidale 2026. aastal tema ema kirja.,You gave Leida her mother's letter in 2026.
-CP5_LETTER_DELIVERED_EFFECT,"Andsid Leidale Aino kirja. Ta teab nüüd, kuhu pere kast on maetud.",You gave Leida Aino's letter. She knows now where the family's box is buried.
-ITEM_REGISTER_PAGE,Registrileht,Register page
-ITEM_REGISTER_PAGE_DESC,"Lahtine leht vakuraamatust, 1938. aasta käekirjas. Ülal seisab: Kaseoja Mart.",A loose page from the register in a 1938 hand. At the top: Kaseoja Mart.
-ITEM_PLOUGHSHARE,Sahatera,Ploughshare
-ITEM_PLOUGHSHARE_DESC,"Vana raud. Raske, tömp, ei murdu.","Old iron. Heavy, blunt, does not break."
-ITEM_MANOR_KEY,Mõisa võti,Manor key
-ITEM_MANOR_KEY_DESC,"Pikk sepistatud võti. Keldriuks, ütleb kubjas.","A long forged key. The cellar door, says the steward."
-ITEM_AINO_LETTER,Aino kiri,Aino's letter
-ITEM_AINO_LETTER_DESC,"„Sellele, kes leiab. Esimesest lõikusest.“","""To whoever finds this. From the first harvest."""
-ITEM_RUSTED_TOOL,Roostes tööriist,Rusted tool
-ITEM_RUSTED_TOOL_DESC,Kellegi sirp. Terast on vähe alles.,Someone's sickle. Not much steel left.
-ITEM_MILK_CHURN_LID,Piimanõu kaas,Milk-churn lid
-ITEM_MILK_CHURN_LID_DESC,Piimaühingu number on peale löödud.,The dairy cooperative's number is stamped on it.
-ITEM_HYMNBOOK,Lauluraamat,Hymnbook
-ITEM_HYMNBOOK_DESC,"Vana kirjaviis. Nimi esilehel: Kaseoja Mart, kirjutatud kellegi teise käega.","Old orthography. A name on the flyleaf: Kaseoja Mart, in someone else's hand."
-NPC_LEIDA,Leida Kaseoja,Leida Kaseoja
-NPC_AINO,Aino Kaseoja,Aino Kaseoja
-NPC_JUHAN,Juhan Kaseoja,Juhan Kaseoja
-NPC_VILLEM,"Villem Tamberg, maamõõtja","Villem Tamberg, surveyor"
-NPC_MART,Kaseoja Mart,Kaseoja Mart
-NPC_HANS,"Hans, kubjas","Hans, the steward"
-LOC_OAK,Tamm,The oak
-LOC_MANOR,Mõis,The manor
-LOC_ORCHARD,Õunaaed,The orchard
-LOC_FARMSTEAD,Kaseoja talu,Kaseoja farm
-LOC_WELL,Kaev,The well
-LOC_NORTH_FIELD,Põhjapõld,The north field
-EX_OAK_1798,"Noor tamm, kahe mehe kõrgune. Keegi on ta ümber kivid ladunud, et loomad ei näriks.","A young oak, twice a man's height. Someone has stacked stones round it so the animals won't chew it."
-EX_OAK_1938,Tamm. Tüvesse on lõigatud kaks tähte ja süda; keegi on need hiljem ära hõõruda püüdnud.,The oak. Two letters and a heart cut into the bark; someone later tried to rub them out.
-EX_OAK_2026,Tamm. Kakssada aastat ja veel püsti. Juured on maapinnast väljas nagu põlved.,The oak. Two hundred years and still standing. Roots out of the ground like knees.
-EX_WELL_1798,"Pooleli kaev. Keegi on selle kallal kõvasti tööd teinud ja keegi teine tahab, et see täis aetaks.",A half-dug well. Someone has worked hard on it and someone else wants it filled.
-EX_WELL_1938,Kaev uue vändaga. Vesi on külm ja magus.,The well with a new winch. The water is cold and sweet.
-EX_WELL_DIP_1938,"Lohk maas, kus miski kunagi oli. Vett tuuakse mõisast.",A dip in the ground where something once was. Water is carried from the manor.
-EX_WELL_2026,Kivirõngas nõgeste sees. Alla vaadates on seal ikka veel vesi.,A stone ring in the nettles. Look down and there is still water in it.
-EX_WELL_DIP_2026,Lohk. Mitte midagi muud.,A dip. Nothing else.
-EX_STONE_2026,"Piirikivi. KASEOJA. Keegi on tähed raiunud hoolega, teisel katsel õigesti.","A boundary stone. KASEOJA. Someone cut the letters with care, right on the second try."
-EX_FIELD_MEADOW_2026,"Niit. Vanade vagude jäljed lähevad põhja poole, sirged nagu joonlaud.","Meadow. Old furrow lines run north, straight as a ruler."
-EX_FIELD_FOREST_2026,"Noor mets seal, kus oli põld. Kased on kõik ühevanused.",Young forest where the field was. The birches are all the same age.
-EX_FIELD_1938,"Pooleldi küntud põld. Ader seisab vao otsas, tera pooleks.","A half-ploughed field. The plough stands at the end of a furrow, its share cracked in two."
-EX_ORCHARD_2026,Vana õunaaed. Mõni puu kannab veel.,An old orchard. A few trees still bear.
-EX_ORCHARD_SCRUB_2026,Võsa mõisavaremete kõrval. Miski pole kunagi siia istutatud.,Scrub beside the manor ruin. Nothing was ever planted here.
-EX_ORCHARD_SAPLINGS_1938,"Värsked istikud reas, toed kõrval. Aino on iga ühe juurde pulga pistnud.","Fresh saplings in a row, stakes beside them. Aino has pushed a stick in next to every one."
-EX_ORCHARD_BARE_1938,Rohune nõlv mõisa all. Kelder on kinni.,A grassy slope below the manor. The cellar is sealed.
-EX_MANOR_1798,"Mõis. Aknad põlevad, uks on kinni. Sinna ei minda.","The manor. Windows lit, door shut. One does not go in."
-EX_MANOR_1938,Koolimaja. Kellegi lapsed karjuvad sees. Tahvlil on ikka veel eilne.,The schoolhouse. Somebody's children shouting inside. Yesterday still on the blackboard.
-EX_MANOR_2026,"Varemed. Katust pole, seinad on. Nurgas on keegi lõket teinud, ammu.","Ruins. No roof, walls yes. Someone made a fire in a corner, long ago."
-EX_FARM_1798,"Rehielamu. Suitsu tuleb ukse ülemisest servast, mitte korstnast, sest korstnat pole.","A barn-dwelling. Smoke comes from the top edge of the door, not the chimney, because there is no chimney."
-EX_FARM_1938,"Sama maja, uus katus, korsten. Pool juurdeehitust seisab, teine pool on kavatsus.","The same house, a new roof, a chimney. Half the extension is standing; the other half is an intention."
-EX_FARM_2026,Vundament nõgeste all. Uksekivi on alles.,A foundation under nettles. The doorstep is still there.
-EX_RUSTED_TOOL,Roostes sirp tamme juure vahel. Keegi jättis selle siia ja ei tulnud tagasi.,A rusted sickle between the oak's roots. Someone left it here and did not come back.
-EX_REGISTER_2026,"Raamat. Nahk, paks, kuiv. Kolm sissekannet selle talu kohta. Kolmas on tänavune.","A book. Leather, thick, dry. Three entries for this farm. The third is this year's."
 UI_CHAPTER,%s. peatükk,Chapter %s
 UI_EPILOGUE,Epiloog,Epilogue
 UI_REGISTER_LOCKED,Sul pole veel raamatut.,You don't have the book yet.
 UI_LEDGER_EMPTY,Veel pole midagi muutunud.,Nothing has changed yet.
 UI_PLAY_AGAIN,Mängi uuesti,Play again
-MENU_SUBTITLE,"Ühe Lõuna-Eesti mõisa maaraamat, kolm aastat, sama maa.","One South Estonian manor's land register, three years, the same ground."
 MENU_LANGUAGE,Keel / Language,Keel / Language
 MENU_FULLSCREEN,Täisekraan,Fullscreen
 MENU_ON,sees,on
 MENU_OFF,väljas,off
 MENU_CREDIT,Kaardiandmed: Maa- ja Ruumiamet 2026,Map data: Maa- ja Ruumiamet 2026
-ENDING_FOREST_TITLE,Mets,Forest
-ENDING_FURROWS_TITLE,Vaod,Furrows
-ENDING_ORCHARD_TITLE,Õunaaed,Orchard
-ENDING_FOREST,"Maa on suurema osa vaikselt tagasi võtnud. Leida istub sinuga tamme juurtel ja räägib lood niikuinii: kaev, ader, õunapuud. Asjad, mida ta mäletab, mitte asjad, mida sina näed. Vakuraamatu viimasel lehel on üks rida tema käega.","The land has quietly taken most of it back. Leida sits with you on the oak's roots and tells the stories anyway: the well, the plough, the apple trees. Things she remembers, not things you can see. The register's last page carries one line in her hand."
-ENDING_FURROWS,"Jälgi on alles: põld, kaev, kivi, mõni õunapuu. Leida viib sind iga ühe juurde, mida ta mäletab, kiirustamata, kepiga näidates. Vakuraamatu viimane leht loetleb, mis jäi.","Traces remain: a field, a well, a stone, a few apple trees. Leida walks you to each one she remembers, unhurried, pointing with her stick. The register's last page lists what was kept."
-ENDING_ORCHARD,"Leida viib sind kõige vanema õunapuu alla. Kastis on pere paberid, kolm põlve, ja pressitud õunaõis 1938. aastast. Vakuraamatu viimane leht täitub ise, sinu käekirjas. Aed õitseb.","Leida leads you to the oldest apple tree. Inside the box: the family's papers, three generations, and a pressed apple blossom from 1938. The register's last page fills itself in, in your own handwriting. The orchard is in bloom."
-ENDING_BOX_PARTIAL,"Kast leitakse, kirja ja õiega, aga ilma paberiteta. Leida kehitab õlgu: „Noh. See oligi see, mis loeb.“","The box is found, with the letter and the blossom but no papers. Leida shrugs: ""Well. That's the part that mattered."""
-ENDING_KEPT,Alles jäi %d / %d.,Kept: %d of %d.
-ITEM_REGISTER,Vakuraamat,The register
-NOTICE_REGISTER_FOUND,Vakuraamat. Kolm sissekannet selle talu kohta. Ava see (Tab) ja vali lehekülg.,The register. Three entries for this farm. Open it (Tab) and choose a page.
-EX_FIELD_1798,Ribapõllud. Iga riba on teise pere oma ja ükski pole nende endi.,Strip fields. Every strip belongs to a different family and none of them to themselves.
 UI_PROMPT_USE,Tegutse,Act
 UI_CODEX,Mis on tõsi,What's real
-CODEX_REAL_TITLE,Tõestisündinud,Attested
-CODEX_REAL,"Maa: Palupera küla ja mõisa ümbrus, Maa- ja Ruumiameti kõrgusandmete ja ortofoto järgi, meetri täpsusega. Vakuraamat (Wackenbuch) oli mõisa register taludest ja kohustustest; 1798. aastal peeti seda saksa keeles. Liivimaa talupojad said perekonnanimed 1823–1826. 1919. aasta maaseadus võõrandas mõisad ja jagas maa asundustaludeks; Palupera mõisa peahoones tegutseb 1933. aastast kool. Nimede eestistamine oli 1935. aastast tasuta ja umbes 195 000 inimest vahetas nime.","The ground: the surroundings of Palupera village and manor, from the Land Board's elevation data and orthophoto, to the metre. The vakuraamat (Wackenbuch) was a manor's register of farms and obligations; in 1798 it was kept in German. Livonian peasants received surnames in 1823–1826. The 1919 Land Act expropriated the manors and divided the land into settler farms; a school has run in Palupera manor house since 1933. Estonianising surnames was free from 1935 and about 195,000 people changed theirs."
-CODEX_INVENTED_TITLE,Välja mõeldud,Invented
-CODEX_INVENTED,"Tõrvamäe mõis, parun von Tolkenau, Kaseoja pere ja kõik inimesed selles loos. Ühtki päris peret ega mõisat ei kujutata.","Tõrvamäe manor, the baron von Tolkenau, the Kaseoja family and every person in this story. No real family or manor is depicted."
-CODEX_WORDS_TITLE,Sõnad,Words
-CODEX_WORDS,"vakuraamat – mõisa register. adramaa – maaüksus, mida haris üks ader. kubjas – mõisa ülevaataja. maarahvas – nii nimetasid eestlased end enne 19. sajandi keskpaika; sõna „eestlane“ polnud 1798. aastal käibel. asundustalu – 1919. aasta maareformiga loodud talu. Kaseoja – kase oja; Birkenbach on sama nimi saksa keeles.","vakuraamat – a manor's register. adramaa – a unit of land, as much as one plough worked. kubjas – the manor's overseer. maarahvas – 'the country people', what Estonians called themselves before the mid-19th century; the word for 'Estonian' was not in use in 1798. asundustalu – a farm created by the 1919 land reform. Kaseoja – 'birch brook'; Birkenbach is the same name in German."
-CODEX_DATA_TITLE,Andmed,Data
-CODEX_DATA,"Kaardiandmed: Maa- ja Ruumiamet 2026 (kõrgusmudel, ortofoto, taimkatte kõrgusmudel, katastrikaart 1930–1944, üheverstane kaart 1894–1922). 1798. aasta pind on Mellini atlase asemel esialgu verstakaart.","Map data: Maa- ja Ruumiamet 2026 (elevation model, orthophoto, canopy height model, cadastral map 1930–1944, one-verst map 1894–1922). The 1798 ground uses the verst map as a stand-in for Mellin's atlas for now."
 FARM_PLOT,Peenar,Plot
 FARM_PLANT,Külva,Sow
 FARM_HARVEST,Lõika,Harvest
@@ -135,42 +52,10 @@ FARM_PLANTED,Külvatud: %s.,Sown: %s.
 FARM_HARVESTED,Lõigatud: %d × %s.,Harvested: %d × %s.
 FARM_SEED_BIN,Seemnesalv,Seed bin
 FARM_SEED_BIN_TEXT,Seemnekotid. Võta üks korraga; keegi ei loe.,Seed sacks. Take one at a time; nobody's counting.
-CROP_RYE,Rukis,Rye
-CROP_OATS,Kaer,Oats
-CROP_POTATO,Kartul,Potato
-CROP_CABBAGE,Kapsas,Cabbage
-ITEM_SEED_RYE,Rukkiseeme,Rye seed
-ITEM_SEED_RYE_DESC,Kotike. Eelmise aasta oma.,A small sack. Last year's.
-ITEM_SEED_OATS,Kaeraseeme,Oat seed
-ITEM_SEED_OATS_DESC,"Hobustele ja inimestele, selles järjekorras.","For horses and people, in that order."
-ITEM_SEED_POTATO,Seemnekartul,Seed potato
-ITEM_SEED_POTATO_DESC,Idud juba väljas.,Already sprouting.
-ITEM_SEED_CABBAGE,Kapsaseeme,Cabbage seed
-ITEM_SEED_CABBAGE_DESC,"Paberkotis, poe oma.","In a paper packet, from the shop."
-ITEM_RYE,Rukis,Rye
-ITEM_RYE_DESC,Vihk. Leib on selle sees kuskil.,A sheaf. Bread is in there somewhere.
-ITEM_OATS,Kaer,Oats
-ITEM_OATS_DESC,Vihk kaeru.,A sheaf of oats.
-ITEM_POTATOES,Kartulid,Potatoes
-ITEM_POTATOES_DESC,"Korv kartuleid, muld küljes.","A basket of potatoes, soil still on them."
-ITEM_CABBAGE,Kapsas,Cabbage
-ITEM_CABBAGE_DESC,Kaks pead. Rasked.,Two heads. Heavy.
 HUNT_PROMPT,Küti,Hunt
 HUNT_HINT,"%s. Õnnestumine umbes %d%%. Ligemale, aeglaselt.","%s. About %d%% chance. Closer, slowly."
 HUNT_SUCCESS,Saak: %s.,Taken: %s.
 HUNT_MISS,%s pääses.,The %s got away.
-ANIMAL_HARE,Jänes,Hare
-ANIMAL_ROE_DEER,Metskits,Roe deer
-ANIMAL_BLACK_GROUSE,Tedr,Black grouse
-ITEM_HARE_MEAT,Jänes,Hare
-ITEM_HARE_MEAT_DESC,Üks jänes. Kubjas ei tohi teada.,One hare. The steward must not know.
-ITEM_VENISON,Kitseliha,Venison
-ITEM_VENISON_DESC,"Metskitse liha, riidesse mässitud.","Roe deer meat, wrapped in cloth."
-ITEM_GROUSE,Tedr,Black grouse
-ITEM_GROUSE_DESC,"Must lind, raske kui kivi.","A black bird, heavy as a stone."
-CUR_1798,kopikat,kopecks
-CUR_1938,senti,cents
-CUR_2026,senti,cents
 TRADE_PROMPT,Kauple,Trade
 UI_TRADE,Kauplemine,Trading
 UI_BUY,Osta,Buy
@@ -178,26 +63,6 @@ UI_SELL,Müü,Sell
 UI_BALANCE,Rahakott: %s,Purse: %s
 TRADE_NO_MONEY,Raha ei jätku.,Not enough money.
 TRADE_NOTHING_TO_SELL,"Sul pole midagi, mida siin ostetakse.",You have nothing they buy here.
-POST_1798,Mõisa ait,The manor granary
-POST_1798_TEXT,"Aidamees. Ostab vilja ja kõike, mida metsast tuuakse, ja ei küsi. Müüb seemet ja soola.","The granary keeper. Buys grain and whatever comes out of the forest, and doesn't ask. Sells seed and salt."
-POST_1938,Piimaühingu pood,The dairy cooperative shop
-POST_1938_TEXT,"Ühingu pood piimapuki juures. Naelad, petrool, seeme. Ostab kõike, mis kasvab.","The cooperative shop by the milk stand. Nails, kerosene, seed. Buys anything that grows."
-POST_2026,Külapood,The village shop
-POST_2026_TEXT,"Pood on lahti kolm tundi päevas. Kohv on kallis, kartul on odav.","The shop is open three hours a day. Coffee is dear, potatoes are cheap."
-ITEM_TALLOW_CANDLE,Rasvaküünal,Tallow candle
-ITEM_TALLOW_CANDLE_DESC,Vinab. Põleb.,Smokes. Burns.
-ITEM_SALT,Sool,Salt
-ITEM_SALT_DESC,Kotike soola. Kallim kui kõik muu.,A bag of salt. Dearer than anything else.
-ITEM_NAILS,Naelad,Nails
-ITEM_NAILS_DESC,Paberisse keeratud. Juhan loeb need üle.,Wrapped in paper. Juhan will count them.
-ITEM_TIMBER,Palgid,Timber
-ITEM_TIMBER_DESC,"Kuus palki, kooritud.","Six logs, debarked."
-ITEM_KEROSENE,Petrool,Kerosene
-ITEM_KEROSENE_DESC,Lambi jaoks.,For the lamp.
-ITEM_COFFEE,Kohv,Coffee
-ITEM_COFFEE_DESC,Pool kilo. Poemüüja imestas.,Half a kilo. The shopkeeper was surprised.
-MANOR_KASEOJA,Kaseoja talu,Kaseoja farm
-MANOR_PARK,Mõisa park,The manor park
 BUILD_PROMPT,Ehita,Build
 UI_BUILD,Ehitamine,Building
 BUILD_LEVEL,%s: %d / %d ehitatud.,%s: %d of %d built.
@@ -208,20 +73,7 @@ BUILD_REQUIRES,Vajab enne: %s.,Needs first: %s.
 BUILD_NO_MONEY,Raha ei jätku.,Not enough money.
 BUILD_NO_MATERIALS,Materjali ei jätku.,Not enough materials.
 BUILD_COST,Hind: %s,Cost: %s
-STRUCT_STOREHOUSE,Ait,Storehouse
-STRUCT_STOREHOUSE_DESC,Vilja jaoks. Kõik algab aidast.,For the grain. Everything starts with a storehouse.
-STRUCT_SAUNA,Saun,Sauna
-STRUCT_SAUNA_DESC,Laupäeviti. Aino nõuab.,Saturdays. Aino insists.
-STRUCT_BARN,Laut,Barn
-STRUCT_BARN_DESC,"Kahele lehmale ja hobusele, kui hobune tuleb.","For two cows and a horse, if the horse comes."
-STRUCT_DAIRY_STAND,Piimapukk,Milk stand
-STRUCT_DAIRY_STAND_DESC,Pargi väravas. Ühingu auto peatub siin.,At the park gate. The cooperative's lorry stops here.
-STRUCT_SWING,Külakiik,Village swing
-STRUCT_SWING_DESC,Jaanipäevaks.,For midsummer.
-OBJ_FIND_REGISTER,Leia vakuraamat varemetest (lõuna pool) ja võta see: E.,Find the register in the ruin (to the south) and take it: E.
-OBJ_VISIT_ERAS,Ava vakuraamat (Tab) ja käi kõigil kolmel lehel. Esimene leht on märgitud.,Open the register (Tab) and visit all three pages. The first page is marked.
-OBJ_MEET_1938,"1938: leia Aino talu juurest, Juhan põhjapõllult, maamõõtja mõisa eest.","1938: find Aino at the farm, Juhan on the north field, the surveyor outside the manor."
-OBJ_SIT,"Kui oled valmis, mine 2026. aastasse ja istu Leidaga tamme all.","When you are ready, go to 2026 and sit with Leida under the oak."
 UI_DEBUG_MAP,Silumiskaart,Debug map
 UI_DEBUG_MAP_HINT,Klõps kaardil: teleport. M sulgeb.,Click the map to teleport. M closes.
 UI_KEYS,E tegutse   Tab vakuraamat   J päevik   I kott   L keel   M silumiskaart   Esc menüü,E interact   Tab register   J journal   I bag   L language   M debug map   Esc menu
+MENU_SITE,Asukoht,Location

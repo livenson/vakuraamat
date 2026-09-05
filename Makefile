@@ -1,18 +1,20 @@
 # Vakuraamat build helpers. Run from the repo root on macOS.
 GODOT ?= /Applications/Godot.app/Contents/MacOS/Godot
 BLENDER ?= /Applications/Blender.app/Contents/MacOS/Blender
-TILE ?= palupera
-CENTER ?= 637548 6444029
+# The active site pack (sites/<SITE>/site.json) names its terrain tile and the tile centre (EPSG:3301).
+SITE ?= palupera
+TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
+CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
 .PHONY: help setup import tile scatter trees props ink test lint export clean-generated
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, gdal, git-lfs; npm for ink), pull LFS files, first Godot import"
-	@echo "make tile             fetch Maa-amet data for TILE/CENTER, import into Terrain3D, scatter vegetation (regenerates assets/terrain/$(TILE)/data)"
+	@echo "make tile             fetch Maa-amet data for SITE (tile/centre from sites/$(SITE)/site.json), import into Terrain3D, scatter vegetation (regenerates assets/terrain/$(TILE)/data)"
 	@echo "make scatter          re-scatter vegetation only"
 	@echo "make trees            regenerate tree models, prepared meshes and impostor atlases (needs a window for the bake)"
 	@echo "make props            regenerate Blender props (oak, boundary stone, buildings, figures)"
-	@echo "make ink              compile assets/narrative/*.ink"
+	@echo "make ink              compile sites/*/narrative/*.ink"
 	@echo "make test             run the headless test suite"
 	@echo "make lint             gdlint, ruff, shellcheck (same as the GitHub workflow; needs uv and shellcheck)"
 	@echo "make export           export the macOS build to build/Vakuraamat.zip"
@@ -35,11 +37,11 @@ import:
 tile:
 	python3 tools/pipeline/fetch_tile.py --name $(TILE) --center $(CENTER) --size 1024
 	$(MAKE) import
-	$(GODOT) --headless --path . -s res://tools/godot/import_terrain.gd -- --tile=$(TILE)
+	$(GODOT) --headless --path . -s res://tools/godot/import_terrain.gd -- --site=$(SITE) --tile=$(TILE)
 	$(MAKE) scatter
 
 scatter:
-	$(GODOT) --headless --path . -s res://tools/godot/scatter_vegetation.gd -- --tile=$(TILE)
+	$(GODOT) --headless --path . -s res://tools/godot/scatter_vegetation.gd -- --site=$(SITE) --tile=$(TILE)
 	$(MAKE) import
 
 trees:

@@ -3,8 +3,6 @@
 # references the timeline, consequence or artifact systems.
 extends Node
 
-const CROP_DIR := "res://data/crops/"
-
 var crops: Dictionary = {}          # id -> CropDefinition
 var plots: Dictionary = {}          # plot_key -> {crop, planted_at}
 var game_hours: float = 0.0         # accumulated from the world clock
@@ -12,13 +10,13 @@ var _last_time := -1.0
 
 
 func _ready() -> void:
-	var d := DirAccess.open(CROP_DIR)
-	if d:
-		for f in d.get_files():
-			f = f.trim_suffix(".remap")
-			if f.ends_with(".tres"):
-				var c: CropDefinition = load(CROP_DIR + f)
-				crops[c.id] = c
+	Sites.site_changed.connect(func(_id): reload())
+	reload()
+
+
+func reload() -> void:
+	crops.clear()
+	Sites.load_dir(Sites.data_dir("crops"), crops)
 
 
 ## Called by the world every frame with Sky3D's current_time (0..24) to keep a running clock.

@@ -3,20 +3,24 @@
 # per-era dictionary, and a post only ever touches Inventory's bucket for its own era.
 extends Node
 
-const DIR := "res://data/trade_goods/"
-const CURRENCY := {"era_1798": "CUR_1798", "era_1938": "CUR_1938", "era_2026": "CUR_2026"}
-
 var goods: Array[TradeGood] = []
 var money: Dictionary = {}          # era_id -> int
 
 
 func _ready() -> void:
-	var d := DirAccess.open(DIR)
+	Sites.site_changed.connect(func(_id): reload())
+	reload()
+
+
+func reload() -> void:
+	goods.clear()
+	var dir := Sites.data_dir("trade_goods")
+	var d := DirAccess.open(dir)
 	if d:
 		for f in d.get_files():
 			f = f.trim_suffix(".remap")
 			if f.ends_with(".tres"):
-				goods.append(load(DIR + f))
+				goods.append(load(dir + f))
 
 
 func goods_for(era_id: String) -> Array:
@@ -28,11 +32,13 @@ func balance(era_id: String) -> int:
 
 
 func currency_key(era_id: String) -> String:
-	return CURRENCY.get(era_id, "CUR_1938")
+	var e: EraDefinition = GameState.era(era_id)
+	return e.currency_key if e else ""
 
 
 func format_money(amount: int, era_id: String) -> String:
-	return "%d %s" % [amount, tr(currency_key(era_id))]
+	var key := currency_key(era_id)
+	return "%d %s" % [amount, tr(key)] if key != "" else str(amount)
 
 
 func add_money(era_id: String, amount: int) -> void:

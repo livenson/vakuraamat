@@ -2,20 +2,18 @@
 # scripts/hunting references the timeline, consequence or artifact systems.
 extends Node
 
-const DIR := "res://data/animals/"
-
 var animals: Dictionary = {}       # id -> AnimalDefinition
 var taken: Dictionary = {}         # era_id -> count (flavour + save)
 
 
 func _ready() -> void:
-	var d := DirAccess.open(DIR)
-	if d:
-		for f in d.get_files():
-			f = f.trim_suffix(".remap")
-			if f.ends_with(".tres"):
-				var a: AnimalDefinition = load(DIR + f)
-				animals[a.id] = a
+	Sites.site_changed.connect(func(_id): reload())
+	reload()
+
+
+func reload() -> void:
+	animals.clear()
+	Sites.load_dir(Sites.data_dir("animals"), animals)
 
 
 func for_era(era_id: String) -> Array:

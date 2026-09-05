@@ -17,17 +17,30 @@ func _build() -> void:
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(title)
 	var sub := Label.new()
-	sub.text = tr("MENU_SUBTITLE")
+	sub.text = tr(str(Sites.get_value("subtitle_key", "MENU_SUBTITLE")))
 	sub.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	box.add_child(sub)
 	box.add_child(Control.new())
 	if SaveManager.has_save():
 		_button("UI_CONTINUE_GAME", func():
+			var saved := SaveManager.saved_site()
+			if saved != "" and saved != Sites.active:
+				Sites.select(saved)
 			GameState.pending_load = true
 			get_tree().change_scene_to_file("res://scenes/world/world.tscn"))
 	_button("UI_NEW_GAME", func():
 		GameState.reset()
 		get_tree().change_scene_to_file("res://scenes/world/world.tscn"))
+	if Sites.available.size() > 1:
+		var sb := Button.new()
+		sb.text = "%s: %s" % [tr("MENU_SITE"), tr(Sites.name_key(Sites.active))]
+		sb.add_theme_font_size_override("font_size", 24)
+		sb.custom_minimum_size = Vector2(320, 44)
+		sb.pressed.connect(func():
+			var i := Sites.available.find(Sites.active)
+			Sites.select(Sites.available[(i + 1) % Sites.available.size()])
+			_build())
+		box.add_child(sb)
 	_button("MENU_LANGUAGE", func():
 		TranslationServer.set_locale("en" if TranslationServer.get_locale().begins_with("et") else "et")
 		_build())

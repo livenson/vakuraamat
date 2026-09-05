@@ -1,7 +1,7 @@
 # Scatters vegetation over a terrain tile with the Terrain3D instancer, driven by the
 # land-cover class stored in the control map by import_terrain.gd. Instances are saved
 # into the region files; mesh assets into terrain_assets.tres. Re-runnable.
-#   godot --headless --path . -s res://tools/godot/scatter_vegetation.gd -- --tile=palupera
+#   godot --headless --path . -s res://tools/godot/scatter_vegetation.gd -- --site=palupera [--tile=<tile>]
 extends SceneTree
 
 # Control-map ids: 0 meadow, 1 field, 2 canopy/forest, 3 gravel, 4 bare soil.
@@ -25,10 +25,18 @@ const RULES := [
 
 
 func _init() -> void:
-	var tile := "palupera"
+	var site := "palupera"
+	var tile := ""
 	for a in OS.get_cmdline_user_args():
-		if a.begins_with("--tile="):
+		if a.begins_with("--site="):
+			site = a.trim_prefix("--site=")
+		elif a.begins_with("--tile="):
 			tile = a.trim_prefix("--tile=")
+	var layout_path := "res://sites/%s/layout.json" % site
+	if tile == "":
+		var mtext := FileAccess.get_file_as_string("res://sites/%s/site.json" % site)
+		var manifest = JSON.parse_string(mtext) if not mtext.is_empty() else null
+		tile = str(manifest.get("terrain", {}).get("tile", site)) if typeof(manifest) == TYPE_DICTIONARY else site
 	var dir := "res://assets/terrain/%s" % tile
 	var terrain := Terrain3D.new()
 	terrain.data_directory = dir + "/data"
@@ -63,10 +71,10 @@ func _init() -> void:
 		assets.set_mesh_asset(i, ma)
 		terrain.instancer.clear_by_mesh(i)
 
-	# Keep authored spots (buildings, the oak, the well...) clear: circles from data/site_layout.json.
+	# Keep authored spots (buildings, the oak, the well...) clear: circles from the site layout.
 	var exclusions: Array = []
-	if FileAccess.file_exists("res://data/site_layout.json"):
-		var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/site_layout.json"))
+	if FileAccess.file_exists(layout_path):
+		var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(layout_path))
 		exclusions = layout.get("exclusions", [])
 	var ctrl: Image = terrain.data.control_maps[0]
 	var size := ctrl.get_width()

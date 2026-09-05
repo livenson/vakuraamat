@@ -6,11 +6,13 @@
 #   assets/terrain/<tile>/terrain_assets.tres         (one neutral white ground texture)
 #
 # Run headless from the project root:
-#   godot --headless --path . -s res://tools/godot/import_terrain.gd -- --tile=palmse
+#   godot --headless --path . -s res://tools/godot/import_terrain.gd -- --site=palupera [--tile=<tile>]
 #
 # World mapping (see terrain_meta.json): the tile's north-west corner sits at
 # Godot (0, y, 0); +X is east, +Z is south, so north is -Z.
 extends SceneTree
+
+var _layout_path := ""   # sites/<site>/layout.json: building pads to level
 
 const NEUTRAL_ROUGHNESS_ALPHA := 0.5  # Terrain3D colour map alpha: 0.5 = no roughness change
 
@@ -26,7 +28,10 @@ const MATERIALS := [
 
 func _init() -> void:
 	var args := _user_args()
-	var tile: String = args.get("tile", "palmse")
+	var site: String = args.get("site", "palupera")
+	var site_meta: Dictionary = _site_manifest(site)
+	var tile: String = args.get("tile", site_meta.get("terrain", {}).get("tile", site))
+	_layout_path = "res://sites/%s/layout.json" % site
 	var dir := "res://assets/terrain/%s" % tile
 	var meta_text := FileAccess.get_file_as_string(dir + "/terrain_meta.json")
 	if meta_text.is_empty():
@@ -135,12 +140,12 @@ func _init() -> void:
 
 ## Very simple colour classification of the (already vertex-resolution) orthophoto into
 ## material ids, encoded into a Terrain3D control map (base = overlay = id, blend 0).
-## Level the ground under authored buildings (data/site_layout.json "pads": x, z, w, d in tile metres):
+## Level the ground under authored buildings (the site layout's "pads": x, z, w, d in tile metres):
 ## the footprint takes the mean height, blended out over a 5 m margin. Shared by all eras.
 func _level_building_pads(img: Image) -> void:
-	if not FileAccess.file_exists("res://data/site_layout.json"):
+	if not FileAccess.file_exists(_layout_path):
 		return
-	var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/site_layout.json"))
+	var layout: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(_layout_path))
 	var pads: Array = layout.get("pads", [])
 	var size := img.get_width()
 	for pad in pads:
@@ -212,6 +217,12 @@ func _classify_orthophoto(img: Image, canopy: Image = null) -> Image:
 			ctrl.set_pixel(x, y, Color(Terrain3DUtil.as_float(bits), 0, 0, 1))
 	print("[import_terrain] control map: meadow %d  field %d  canopy %d  gravel %d  soil %d texels" % counts)
 	return ctrl
+
+
+func _site_manifest(site: String) -> Dictionary:
+	var text := FileAccess.get_file_as_string("res://sites/%s/site.json" % site)
+	var parsed = JSON.parse_string(text) if not text.is_empty() else null
+	return parsed if typeof(parsed) == TYPE_DICTIONARY else {}
 
 
 func _user_args() -> Dictionary:
