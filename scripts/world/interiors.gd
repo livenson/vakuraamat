@@ -11,6 +11,12 @@ const WALL := 0.25          # inner wall inset from the footprint
 const SLAB := 0.12
 const MAX_FLOORS := 4
 const PLANT_IDS := [5, 6, 7, 8, 9]   # TerrainBuilder.RULES bushes, grass, clover; trees (0..4) are measured and never touched
+const ROOM_AREA := {"home": 28.0, "office": 45.0, "shop": 120.0, "workshop": 120.0}   # split rooms while larger than this
+const MIN_ROOM := 9.0
+const MAX_DEPTH := 3
+const DOOR_W := 0.95
+const DOOR_END := 0.6        # a doorway keeps this far from a wall's ends
+const CLEAR := 1.2           # furniture keeps this far from doorways and the ramp
 
 static var instance: Interiors
 
@@ -167,37 +173,283 @@ func _build(b: FootprintBuilding) -> Node3D:
 		if door_edge < 0 or d < door_u:
 			door_u = d
 			door_edge = i
-	var ramp_edge := (door_edge + poly.size() / 2) % poly.size()
 	_clear_plants(b)
 	var tenants := Ledger.tenants_of(b.tunnus) if b.tunnus != "" else []
 	var use := _use_of(b, tenants)
+	var door_pt := Vector2(door_pos.x, door_pos.z)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash("rooms_%d" % b.building_id)   # the same plan on every storey: rooms stack
+	var walls: Array = []
+	var rooms: Array = _partition(poly, use, rng, walls, door_pt)
+	var doorways: Array = _place_doorways(walls, rng)
+	_attach_doorways(rooms, doorways)
+	_assign_roles(rooms, use, door_pt, false)
+	var ramp_room: Dictionary = rooms[0]
+	for r in rooms:
+		if _area(r.poly) > _area(ramp_room.poly):
+			ramp_room = r
+	var ramp_edge := _ramp_edge(ramp_room.poly, door_pt, ramp_room.doorways)
+	var landing := _ramp_landing(ramp_room.poly, ramp_edge, fh)
+	var upper: Array = []
+	for r in rooms:
+		upper.append({"poly": r.poly, "role": "", "doorways": r.doorways})
+	_assign_roles(upper, use, landing.get_center(), true)
+	root.set_meta("splits", _split_count(walls))
+	root.set_meta("doorways", doorways)
+	root.set_meta("rooms", rooms.size())
 	for k in n_floors:
 		var y0 := floor0 + k * fh
 		var y1 := y0 + fh
 		var top := k == n_floors - 1
-		_slab(root, poly, y0, floor_mat, true, [] if k == 0 else [_ramp_landing(poly, ramp_edge, fh)])
-		_slab(root, poly, y1 - SLAB, ceil_mat, false, [] if top or n_floors == 1 else [_ramp_landing(poly, ramp_edge, fh)])
+		_slab(root, poly, y0, floor_mat, true, [] if k == 0 else [landing])
+		_slab(root, poly, y1 - SLAB, ceil_mat, false, [] if top or n_floors == 1 else [landing])
 		for i in poly.size():
 			var a := poly[i]
 			var c := poly[(i + 1) % poly.size()]
 			var gap := -1.0
 			if k == 0 and i == door_edge:
-				gap = _project_u(Vector2(door_pos.x, door_pos.z), a, c)
-			_wall(root, a, c, y0, y1, wall_mat, b.kind, k, gap, float(f.width) + 0.3)
+				gap = _project_u(door_pt, a, c)
+			_wall(root, a, c, y0, y1, wall_mat, b.kind, gap, float(f.width) + 0.3)
+		_partition_walls(root, walls, y0, y1, wall_mat, b.kind)
 		if not top:
-			_ramp(root, poly, ramp_edge, y0, fh, wall_mat)
-		for spot in _lamp_spots(poly):
-			var light := OmniLight3D.new()
-			light.position = Vector3(spot.x, y0 + minf(2.2, fh - 0.6), spot.y)
-			light.light_color = Color(1.0, 0.9, 0.75)
-			light.light_energy = 4.0
-			light.light_specular = 0.2
-			light.omni_range = 12.0
-			light.omni_attenuation = 1.0
-			light.shadow_enabled = false
-			root.add_child(light)
-		_furnish(root, poly, y0, use, k, door_edge, ramp_edge, b)
+			_ramp(root, ramp_room.poly, ramp_edge, y0, fh, wall_mat)
+		var storey_rooms: Array = rooms if k == 0 else upper
+		for idx in storey_rooms.size():
+			var room: Dictionary = storey_rooms[idx]
+			for spot in _lamp_spots(room.poly):
+				var light := OmniLight3D.new()
+				light.position = Vector3(spot.x, y0 + minf(2.2, fh - 0.6), spot.y)
+				light.light_color = Color(1.0, 0.9, 0.75)
+				light.light_energy = 4.0
+				light.light_specular = 0.2
+				light.omni_range = 12.0
+				light.omni_attenuation = 1.0
+				light.shadow_enabled = false
+				root.add_child(light)
+			var avoid: Array = room.doorways.duplicate()
+			var skip: Array = []
+			if k == 0:
+				avoid.append(door_pt)
+			if room.poly == ramp_room.poly:
+				var rr := _ramp_rect(ramp_room.poly, ramp_edge, fh)
+				if not top:
+					skip.append(ramp_edge)
+					avoid.append(rr[0])
+				if k > 0 or not top:
+					avoid.append(landing.get_center())
+			_furnish(root, room.poly, y0, str(room.role), "%d_%d_%d" % [b.building_id, k, idx], skip, avoid)
 	return root
+
+
+# ---------------------------------------------------------------- rooms
+
+## Rooms of a storey: a deterministic BSP of the inset polygon. Fills `walls` with the partition segments
+## ({a, c, door_u: -1, split}); shops and workshops only split off a back room.
+func _partition(poly: PackedVector2Array, use: String, rng: RandomNumberGenerator, walls: Array, door_pt: Vector2, depth: int = 0) -> Array:
+	var limit: float = ROOM_AREA.get(use, 45.0)
+	var once_only := use in ["shop", "workshop"]
+	var leaf := [{"poly": poly, "role": "", "doorways": []}]
+	if depth >= MAX_DEPTH or _area(poly) <= limit or (once_only and depth >= 1):
+		return leaf
+	var rect := Rect2(poly[0], Vector2.ZERO)
+	for p in poly:
+		rect = rect.expand(p)
+	# cut across the longer axis, else the shorter; the cut keeps 1.5 m from the exterior door's coordinate
+	var vertical := rect.size.x >= rect.size.y
+	var cut := -1.0
+	for attempt in 2:
+		var span: float = rect.size.x if vertical else rect.size.y
+		var lo_edge: float = rect.position.x if vertical else rect.position.y
+		var door_c: float = door_pt.x if vertical else door_pt.y
+		var options: Array = [rng.randf_range(0.42, 0.58), rng.randf_range(0.42, 0.58)] if not once_only else [0.25, 0.75]
+		var best_d := -1.0
+		for t in options:
+			var c: float = lo_edge + span * t
+			var d := absf(c - door_c)
+			if d > best_d:
+				best_d = d
+				cut = c
+		if best_d >= 1.5:
+			break
+		cut = -1.0
+		vertical = not vertical
+	if cut < 0.0:
+		return leaf
+	var pad := 5.0
+	var half: PackedVector2Array
+	if vertical:
+		half = PackedVector2Array([Vector2(rect.position.x - pad, rect.position.y - pad), Vector2(cut, rect.position.y - pad), Vector2(cut, rect.end.y + pad), Vector2(rect.position.x - pad, rect.end.y + pad)])
+	else:
+		half = PackedVector2Array([Vector2(rect.position.x - pad, rect.position.y - pad), Vector2(rect.end.x + pad, rect.position.y - pad), Vector2(rect.end.x + pad, cut), Vector2(rect.position.x - pad, cut)])
+	var lo := _largest(Geometry2D.intersect_polygons(poly, half))
+	var hi := _largest(Geometry2D.clip_polygons(poly, half))
+	if lo.size() < 3 or hi.size() < 3 or _area(lo) < MIN_ROOM or _area(hi) < MIN_ROOM:
+		return leaf
+	var split_id := _split_count(walls)
+	var found := false
+	for i in lo.size():
+		var a := lo[i]
+		var c := lo[(i + 1) % lo.size()]
+		var on_line: bool = absf((a.x if vertical else a.y) - cut) < 0.02 and absf((c.x if vertical else c.y) - cut) < 0.02
+		if not on_line or a.distance_to(c) < 0.5:
+			continue
+		var mid := (a + c) / 2.0 + (Vector2(0.05, 0) if vertical else Vector2(0, 0.05))
+		if not Geometry2D.is_point_in_polygon(mid, hi):
+			continue   # borders a discarded fragment: stays open, an alcove
+		walls.append({"a": a, "c": c, "door_u": -1.0, "split": split_id})
+		found = true
+	if not found:
+		return leaf
+	return _partition(lo, use, rng, walls, door_pt, depth + 1) + _partition(hi, use, rng, walls, door_pt, depth + 1)
+
+
+static func _split_count(walls: Array) -> int:
+	var n := -1
+	for w in walls:
+		n = maxi(n, int(w.split))
+	return n + 1
+
+
+static func _largest(pieces: Array) -> PackedVector2Array:
+	var best := PackedVector2Array()
+	for p in pieces:
+		if p.size() >= 3 and _area(p) > _area(best):
+			best = p
+	return best
+
+
+## One doorway per split, placed after every split is known: on the split's longest segment, in the middle
+## of its largest stretch free of other wall ends. A split too short for a door is dropped (stays open).
+func _place_doorways(walls: Array, rng: RandomNumberGenerator) -> Array:
+	var doorways: Array = []
+	for split_id in _split_count(walls):
+		var seg: Dictionary = {}
+		for w in walls:
+			if int(w.split) == split_id and (seg.is_empty() or w.a.distance_to(w.c) > seg.a.distance_to(seg.c)):
+				seg = w
+		if seg.is_empty():
+			continue
+		var a: Vector2 = seg.a
+		var c: Vector2 = seg.c
+		var length := a.distance_to(c)
+		var dir := (c - a) / length
+		var cuts := [0.0, length]
+		for w in walls:
+			if w == seg:
+				continue
+			for pt in [w.a, w.c]:
+				if _dist_to_segment(pt, a, c) < 0.05:
+					var u: float = (pt - a).dot(dir)
+					if u > 0.0 and u < length:
+						cuts.append(u)
+		cuts.sort()
+		var u0 := 0.0
+		var u1 := 0.0
+		for i in range(cuts.size() - 1):
+			if cuts[i + 1] - cuts[i] > u1 - u0:
+				u0 = cuts[i]
+				u1 = cuts[i + 1]
+		if u1 - u0 < DOOR_W + 2.0 * DOOR_END:
+			for w in walls.duplicate():
+				if int(w.split) == split_id:
+					walls.erase(w)
+			continue
+		var door_u := clampf((u0 + u1) / 2.0 + rng.randf_range(-0.6, 0.6), u0 + DOOR_END + DOOR_W / 2.0, u1 - DOOR_END - DOOR_W / 2.0)
+		seg.door_u = door_u
+		doorways.append(a + dir * door_u)
+	return doorways
+
+
+## Every doorway lies on an edge of exactly two rooms; record it on both.
+static func _attach_doorways(rooms: Array, doorways: Array) -> void:
+	for room in rooms:
+		var poly: PackedVector2Array = room.poly
+		for d in doorways:
+			for i in poly.size():
+				if _dist_to_segment(d, poly[i], poly[(i + 1) % poly.size()]) < 0.05:
+					room.doorways.append(d)
+					break
+
+
+const ROLES := {
+	"home": ["living", "kitchen", "bedroom", "bedroom", "bedroom"], "office": ["reception", "office", "office", "office", "office"],
+	"shop": ["salesroom", "back", "back", "back", "back"], "workshop": ["workshop", "store", "store", "store", "store"],
+}
+const UPPER_ROLES := {"home": ["hall", "bedroom", "bedroom", "bedroom", "bedroom"], "office": ["office", "office", "office", "office", "office"],
+	"shop": ["office", "office", "office", "office", "office"], "workshop": ["office", "office", "office", "office", "office"]}
+
+
+## Roles by use: the room touching `entry` (the exterior door downstairs, the ramp landing upstairs) comes first,
+## the rest by size.
+func _assign_roles(rooms: Array, use: String, entry: Vector2, upper: bool) -> void:
+	var order: Array = rooms.duplicate()
+	var best: Dictionary = order[0]
+	var best_d := INF
+	for r in order:
+		var poly: PackedVector2Array = r.poly
+		for i in poly.size():
+			var d := _dist_to_segment(entry, poly[i], poly[(i + 1) % poly.size()])
+			if d < best_d:
+				best_d = d
+				best = r
+	order.erase(best)
+	order.sort_custom(func(x, y): return _area(x.poly) > _area(y.poly))
+	order.push_front(best)
+	var names: Array = (UPPER_ROLES if upper else ROLES).get(use, ROLES.office)
+	for i in order.size():
+		order[i].role = names[mini(i, names.size() - 1)]
+
+
+## The ramp hugs the longest edge of its room that is away from the door and the doorways.
+func _ramp_edge(poly: PackedVector2Array, door_pt: Vector2, doorways: Array) -> int:
+	var best := 0
+	var best_len := -1.0
+	var fallback := 0
+	var fallback_len := -1.0
+	for i in poly.size():
+		var a := poly[i]
+		var c := poly[(i + 1) % poly.size()]
+		var length := a.distance_to(c)
+		if length > fallback_len:
+			fallback_len = length
+			fallback = i
+		var clear := _dist_to_segment(door_pt, a, c) > 1.5
+		for d in doorways:
+			if _dist_to_segment(d, a, c) <= 1.5:
+				clear = false
+		if clear and length > best_len:
+			best_len = length
+			best = i
+	return best if best_len >= 3.0 else fallback
+
+
+## Partition walls of one storey with their doorways and a lintel over each opening.
+func _partition_walls(root: Node3D, walls: Array, y0: float, y1: float, mat: Material, kind: String) -> void:
+	for w in walls:
+		var mi := _wall(root, w.a, w.c, y0, y1, mat, kind, float(w.door_u), DOOR_W, false)
+		if mi:
+			mi.name = "Partition_%d" % int(w.split)
+		if float(w.door_u) >= 0.0:
+			_lintel(root, w.a, w.c, float(w.door_u), y0 + (2.1 if kind == "dwelling" else 2.4))
+
+
+## A thin box over a doorway so the opening reads as a door, not a missing wall.
+func _lintel(root: Node3D, a: Vector2, c: Vector2, u: float, y: float) -> void:
+	var dir := (c - a).normalized()
+	var at := a + dir * u
+	var mi := MeshInstance3D.new()
+	var box := BoxMesh.new()
+	box.size = Vector3(DOOR_W + 0.3, 0.1, 0.12)
+	mi.mesh = box
+	var trim := StandardMaterial3D.new()
+	trim.albedo_color = Color(0.86, 0.8, 0.7)
+	trim.emission_enabled = true
+	trim.emission = Color(0.86, 0.8, 0.7)
+	trim.emission_energy_multiplier = 0.25
+	mi.material_override = trim
+	mi.position = Vector3(at.x, y + 0.05, at.y)
+	mi.rotation.y = -atan2(dir.y, dir.x)
+	root.add_child(mi)
 
 
 func _use_of(b: FootprintBuilding, tenants: Array) -> String:
@@ -263,10 +515,10 @@ func _slab(root: Node3D, poly: PackedVector2Array, y: float, mat: Material, up: 
 
 ## One inner wall between two floor heights: solid below the sill and above the lintel, piers between
 ## window openings, and the door gap on the ground floor. Faces inward, double-sided.
-func _wall(root: Node3D, a: Vector2, c: Vector2, y0: float, y1: float, mat: Material, kind: String, _storey: int, door_u: float, door_w: float) -> void:
+func _wall(root: Node3D, a: Vector2, c: Vector2, y0: float, y1: float, mat: Material, kind: String, door_u: float, door_w: float, windows: bool = true) -> MeshInstance3D:
 	var length := a.distance_to(c)
 	if length < 0.3:
-		return
+		return null
 	var dir := (c - a) / length
 	var sill := y0 + (0.9 if kind == "dwelling" else 1.3)
 	var win_h := minf(1.35, (y1 - y0) * 0.45) if kind == "dwelling" else 0.6
@@ -274,7 +526,7 @@ func _wall(root: Node3D, a: Vector2, c: Vector2, y0: float, y1: float, mat: Mate
 	var win_w := 1.1 if kind == "dwelling" else 0.8
 	var spacing := 2.8 if kind == "dwelling" else 5.0
 	var openings := []   # [u0, u1, ylo, yhi]
-	if length >= 2.4:
+	if windows and length >= 2.4:
 		var cols := maxi(1, int((length - 1.6) / spacing))
 		var step := length / (cols + 1)
 		for k in cols:
@@ -322,6 +574,7 @@ func _wall(root: Node3D, a: Vector2, c: Vector2, y0: float, y1: float, mat: Mate
 	cs.shape = shape
 	body.add_child(cs)
 	root.add_child(body)
+	return mi
 
 
 ## The ramp runs along the inner side of `edge` from its start; the landing square above its top end is left
@@ -405,32 +658,55 @@ func _ramp(root: Node3D, poly: PackedVector2Array, edge: int, y0: float, fh: flo
 # ---------------------------------------------------------------- furniture
 
 const SETS := {
-	"home": [["bedDouble", Vector3(1.8, 0.6, 2.0), Color(0.75, 0.3, 0.3)], ["table", Vector3(1.4, 0.75, 0.9), Color(0.6, 0.45, 0.3)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)],
-		["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)], ["loungeSofa", Vector3(2.0, 0.8, 0.9), Color(0.3, 0.4, 0.55)], ["bookcaseClosed", Vector3(1.0, 2.0, 0.4), Color(0.45, 0.32, 0.22)],
-		["kitchenCabinet", Vector3(1.0, 0.9, 0.6), Color(0.85, 0.85, 0.8)], ["plantSmall1", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)]],
-	"office": [["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22)], ["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)],
-		["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22)], ["cabinetTelevision", Vector3(1.2, 1.1, 0.5), Color(0.5, 0.5, 0.5)], ["plantSmall2", Vector3(0.4, 0.9, 0.4), Color(0.3, 0.55, 0.3)],
-		["bookcaseOpen", Vector3(1.0, 2.0, 0.4), Color(0.6, 0.6, 0.58)]],
-	"shop": [["kitchenBar", Vector3(1.8, 1.0, 0.7), Color(0.55, 0.4, 0.3)], ["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)], ["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)],
-		["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)], ["table", Vector3(1.4, 0.75, 0.9), Color(0.6, 0.45, 0.3)], ["plantSmall3", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)]],
-	"workshop": [["table", Vector3(2.0, 0.85, 0.9), Color(0.45, 0.45, 0.42)], ["cabinetBed", Vector3(1.0, 1.8, 0.6), Color(0.4, 0.4, 0.42)], ["bench", Vector3(1.4, 0.5, 0.5), Color(0.5, 0.4, 0.3)],
-		["cabinetBed", Vector3(1.0, 1.8, 0.6), Color(0.4, 0.4, 0.42)]],
+	"living": [["loungeSofa", Vector3(2.0, 0.8, 0.9), Color(0.3, 0.4, 0.55)], ["tableCoffee", Vector3(1.0, 0.45, 0.6), Color(0.6, 0.45, 0.3)],
+		["televisionModern", Vector3(1.2, 0.8, 0.3), Color(0.15, 0.15, 0.15)], ["cabinetTelevision", Vector3(1.2, 1.1, 0.5), Color(0.5, 0.5, 0.5)],
+		["bookcaseClosed", Vector3(1.0, 2.0, 0.4), Color(0.45, 0.32, 0.22)], ["plantSmall1", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)], ["lampRoundFloor", Vector3(0.4, 1.6, 0.4), Color(0.9, 0.85, 0.7)]],
+	"kitchen": [["kitchenCabinet", Vector3(1.0, 0.9, 0.6), Color(0.85, 0.85, 0.8)], ["kitchenStove", Vector3(0.9, 0.9, 0.6), Color(0.7, 0.7, 0.72)],
+		["kitchenFridge", Vector3(0.9, 1.9, 0.7), Color(0.85, 0.85, 0.88)], ["kitchenCabinet", Vector3(1.0, 0.9, 0.6), Color(0.85, 0.85, 0.8)],
+		["table", Vector3(1.4, 0.75, 0.9), Color(0.6, 0.45, 0.3)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)]],
+	"bedroom": [["bedDouble", Vector3(1.8, 0.6, 2.0), Color(0.75, 0.3, 0.3)], ["cabinetBed", Vector3(1.0, 1.8, 0.6), Color(0.4, 0.4, 0.42)],
+		["bookcaseOpen", Vector3(1.0, 2.0, 0.4), Color(0.6, 0.6, 0.58)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)],
+		["plantSmall2", Vector3(0.4, 0.9, 0.4), Color(0.3, 0.55, 0.3)], ["lampRoundFloor", Vector3(0.4, 1.6, 0.4), Color(0.9, 0.85, 0.7)]],
+	"hall": [["bookcaseClosed", Vector3(1.0, 2.0, 0.4), Color(0.45, 0.32, 0.22)], ["chair", Vector3(0.5, 0.9, 0.5), Color(0.5, 0.36, 0.24)],
+		["plantSmall3", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)], ["lampRoundFloor", Vector3(0.4, 1.6, 0.4), Color(0.9, 0.85, 0.7)]],
+	"reception": [["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22)],
+		["loungeSofa", Vector3(2.0, 0.8, 0.9), Color(0.3, 0.4, 0.55)], ["tableCoffee", Vector3(1.0, 0.45, 0.6), Color(0.6, 0.45, 0.3)],
+		["bookcaseClosed", Vector3(1.0, 2.0, 0.4), Color(0.45, 0.32, 0.22)], ["plantSmall3", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)]],
+	"office": [["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22)],
+		["desk", Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], ["chairDesk", Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22)],
+		["bookcaseOpen", Vector3(1.0, 2.0, 0.4), Color(0.6, 0.6, 0.58)], ["cabinetTelevision", Vector3(1.2, 1.1, 0.5), Color(0.5, 0.5, 0.5)], ["plantSmall2", Vector3(0.4, 0.9, 0.4), Color(0.3, 0.55, 0.3)]],
+	"salesroom": [["kitchenBar", Vector3(1.8, 1.0, 0.7), Color(0.55, 0.4, 0.3)], ["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)],
+		["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)], ["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)],
+		["table", Vector3(1.4, 0.75, 0.9), Color(0.6, 0.45, 0.3)], ["plantSmall3", Vector3(0.4, 0.8, 0.4), Color(0.3, 0.55, 0.3)]],
+	"back": [["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)], ["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)],
+		["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)], ["table", Vector3(1.4, 0.75, 0.9), Color(0.6, 0.45, 0.3)], ["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)]],
+	"workshop": [["table", Vector3(2.0, 0.85, 0.9), Color(0.45, 0.45, 0.42)], ["bench", Vector3(1.4, 0.5, 0.5), Color(0.5, 0.4, 0.3)],
+		["cabinetBed", Vector3(1.0, 1.8, 0.6), Color(0.4, 0.4, 0.42)], ["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)], ["bench", Vector3(1.4, 0.5, 0.5), Color(0.5, 0.4, 0.3)]],
+	"store": [["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)], ["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)],
+		["cabinetBed", Vector3(1.0, 1.8, 0.6), Color(0.4, 0.4, 0.42)], ["bookcaseOpen", Vector3(1.0, 2.0, 0.45), Color(0.6, 0.5, 0.4)], ["cardboardBoxClosed", Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)]],
 }
 
 
-## Pieces along the walls, skipping the door and ramp walls; a piece per ~4 m of wall.
-func _furnish(root: Node3D, poly: PackedVector2Array, y0: float, use: String, storey: int, door_edge: int, ramp_edge: int, b: FootprintBuilding) -> void:
-	var pieces: Array = SETS.get(use if storey == 0 else ("home" if use == "home" else "office"), SETS.office)
+## Pieces of `role` along the walls of one room: a piece per ~4 m of wall. Edges in `skip_edges` and edges
+## carrying a doorway or the exterior door get none, and nothing stands within CLEAR of an `avoid` point.
+func _furnish(root: Node3D, poly: PackedVector2Array, y0: float, role: String, seed_key: String, skip_edges: Array, avoid: Array) -> void:
+	var pieces: Array = SETS.get(role, SETS.office)
 	var rng := RandomNumberGenerator.new()
-	rng.seed = hash("%d_%d" % [b.building_id, storey])
+	rng.seed = hash(seed_key)
 	var idx := 0
 	for i in poly.size():
-		if i == door_edge or i == ramp_edge:
+		if i in skip_edges:
 			continue
 		var a := poly[i]
 		var c := poly[(i + 1) % poly.size()]
 		var length := a.distance_to(c)
 		if length < 2.0:
+			continue
+		var on_edge := false
+		for p in avoid:
+			if _dist_to_segment(p, a, c) < 0.1:
+				on_edge = true
+		if on_edge:
 			continue
 		var dir := (c - a) / length
 		var inward := Vector2(-dir.y, dir.x)
@@ -447,9 +723,16 @@ func _furnish(root: Node3D, poly: PackedVector2Array, y0: float, use: String, st
 			var at := a + dir * u + inward * (size.z / 2.0 + 0.3)
 			if not Geometry2D.is_point_in_polygon(at, poly):
 				continue
+			var blocked := false
+			for p in avoid:
+				if at.distance_to(p) < CLEAR:
+					blocked = true
+			if blocked:
+				continue
 			var node := _piece(str(piece[0]), size, piece[2])
 			node.position = Vector3(at.x, y0, at.y)
 			node.rotation.y = -atan2(dir.y, dir.x) + PI   # back to the wall
+			node.set_meta("piece", true)
 			root.add_child(node)
 
 
