@@ -51,6 +51,36 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("toggle_fly"):
 		flying = not flying
 		velocity = Vector3.ZERO
+		EventBus.notice.emit(tr("NOTICE_FLY_ON") if flying else tr("NOTICE_FLY_OFF"))
+	elif event.is_action_pressed("teleport"):
+		_teleport_to_view()
+	elif event.is_action_pressed("teleport_home"):
+		var world: Node = GameState.world
+		if world and "_spawn" in world:
+			set_pose(world._spawn + Vector3(0, 200, 0), rotation.y, _pitch)
+			world._snap(self, 1.0)
+			flying = false
+			EventBus.notice.emit(tr("NOTICE_HOME"))
+
+
+## T: march the view ray against the heightfield (up to 1500 m) and stand there.
+func _teleport_to_view() -> void:
+	var world: Node = GameState.world
+	if world == null:
+		return
+	var terrain: Terrain3D = world.terrain
+	var origin := camera.global_position
+	var dir := -camera.global_transform.basis.z
+	var p := origin
+	for i in 1500:
+		p += dir
+		var h := terrain.data.get_height(p)
+		if is_nan(h):
+			return
+		if p.y <= h:
+			set_pose(Vector3(p.x, h + 1.0, p.z), rotation.y, _pitch)
+			EventBus.notice.emit(tr("NOTICE_TELEPORT") % [int(p.x), int(p.z)])
+			return
 
 
 func gait() -> Gait:
