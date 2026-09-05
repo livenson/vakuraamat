@@ -63,7 +63,9 @@ its design documents in the repo root describe that version.
 
 ## Conventions and pitfalls
 - Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`
-  (or `--fullscreen`).
+  (or `--fullscreen`; `--locations` for the second page, `--creating` / `--failed` for the world-creation
+  sheet). Menu strings come from compiled translations: run `godot --headless --import` after editing
+  `strings.csv` or the screenshot shows raw keys.
 - Strings: `assets/i18n/strings.csv` (keys, et, en). Add keys, never hard-code text.
 - UI look: `BookTheme` (scripts/ui/book_theme.gd) is the one theme; new panels set `theme =
   BookTheme.theme()` and use its type variations (HeadLabel, DetailLabel, PrimaryButton, TextButton,

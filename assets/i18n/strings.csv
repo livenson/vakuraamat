@@ -90,6 +90,12 @@ MENU_NO_RESULTS,Midagi ei leitud.,Nothing found.
 MENU_WORLD_READY,Maailm on valmis.,The world is ready.
 MENU_LOCATION_NAME,Nimi,Name
 MENU_GENERATING,Maailma luuakse: %s,Creating the world: %s
+MENU_STAGE_SERVICE,kaarditeenus,tile service
+MENU_STAGE_REQUEST,tellimus,request
+MENU_STAGE_DOWNLOAD,allalaadimine,download
+MENU_STAGE_INSTALL,paigaldus,install
+MENU_CREATE_FAILED,Maailma ei õnnestunud luua.,The world could not be created.
+MENU_CREATE_NOTE,"Maa-ameti andmed, hoonete register, katastri ja äriregistri kihid laetakse ja pakitakse. See võtab tavaliselt paar minutit.","Maa-amet data, the building register, the cadastre and the business register are fetched and packed. This usually takes a couple of minutes."
 MENU_LOCATIONS,Asukohad...,Locations...
 MENU_AVAILABLE,Olemas,Available
 MENU_ON_SERVICE,Valmis teenuses,Ready on the service

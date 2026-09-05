@@ -5,7 +5,14 @@ var path: String = ""
 func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--out="): path = a.trim_prefix("--out=")
-	add_child(load("res://scenes/ui/main_menu.tscn").instantiate())
+	var menu: Control = load("res://scenes/ui/main_menu.tscn").instantiate()
+	add_child(menu)
+	var args := OS.get_cmdline_user_args()
+	if "--creating" in args or "--failed" in args:   # the progress sheet, mid-job or after a failure
+		var sheet: Control = menu.call("_progress_sheet", "Kvissentali, Tartu")
+		sheet.get_meta("stage").call("cadastre and roads", 0.58)
+		if "--failed" in args:
+			sheet.get_meta("fail").call(tr("MENU_SERVICE_DOWN") % "http://127.0.0.1:8765")
 func _process(_d: float) -> void:
 	frames += 1
 	if frames == 30:

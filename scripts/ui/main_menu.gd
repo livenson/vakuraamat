@@ -397,14 +397,107 @@ func _use_my_location() -> void:
 
 
 ## Generate (or fetch from the service cache) a pack for a place and start a new game there.
+## The page is frozen under a progress sheet until the world is ready or the job fails.
 func _create(name: String, x: float, y: float, id_override: String = "") -> void:
-	var cb := func(t: String): _status.text = t
+	var sheet := _progress_sheet(name)
+	var cb := func(text: String, f: float): sheet.get_meta("stage").call(text, f)
 	Locator.progress.connect(cb)
-	_status.text = tr("MENU_GENERATING") % "..."
 	var res: Dictionary = await Locator.create_world(name, x, y, 1024, "2026", id_override)
 	Locator.progress.disconnect(cb)
-	if not res.ok:
-		_status.text = str(res.error)
+	if not is_instance_valid(sheet):
 		return
+	if not res.ok:
+		sheet.get_meta("fail").call(str(res.error))
+		return
+	sheet.get_meta("stage").call(tr("MENU_WORLD_READY"), 1.0)
 	_status.text = tr("MENU_WORLD_READY")
+	await get_tree().create_timer(0.4).timeout
 	_start_new_game(res.id)
+
+
+## A modal sheet over the page: the heading, a note on what is fetched, the stage line, a bar and the
+## elapsed time. Blocks the page (input and focus) while it is up; `stage(text, f)` advances it,
+## `fail(error)` turns it into an error notice with a Close button that thaws the page.
+func _progress_sheet(name: String) -> Control:
+	var page := _page
+	page.process_mode = Node.PROCESS_MODE_DISABLED
+	get_viewport().gui_release_focus()
+	var overlay := Control.new()
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	overlay.mouse_filter = Control.MOUSE_FILTER_STOP
+	overlay.focus_mode = Control.FOCUS_ALL
+	add_child(overlay)
+	var tint := ColorRect.new()
+	tint.color = Color(BookTheme.INK, 0.32)
+	tint.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	tint.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	overlay.add_child(tint)
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", BookTheme.page_box(true, 32))
+	panel.custom_minimum_size = Vector2(620, 0)
+	panel.set_anchors_preset(Control.PRESET_CENTER)
+	panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	panel.grow_vertical = Control.GROW_DIRECTION_BOTH
+	overlay.add_child(panel)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 10)
+	panel.add_child(col)
+	var head := BookTheme.label(tr("MENU_GENERATING") % name, "HeadLabel", col)
+	head.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var note := BookTheme.label(tr("MENU_CREATE_NOTE"), "DetailLabel", col)
+	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(0, 8)
+	col.add_child(gap)
+	var bar := ProgressBar.new()
+	bar.min_value = 0.0
+	bar.max_value = 1.0
+	bar.show_percentage = false
+	bar.custom_minimum_size = Vector2(0, 10)
+	bar.add_theme_stylebox_override("background", BookTheme.box(BookTheme.PAGE_DARK, BookTheme.INK, 1))
+	bar.add_theme_stylebox_override("fill", BookTheme.box(BookTheme.BLUE))
+	col.add_child(bar)
+	var row := HBoxContainer.new()
+	col.add_child(row)
+	var stage := BookTheme.label("...", "ProseLabel", row)
+	stage.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	stage.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var figures := BookTheme.label("0 %   0:00", "ColumnLabel", row)
+	figures.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	var error := BookTheme.label("", "ProseLabel", col)
+	error.add_theme_color_override("font_color", BookTheme.RUBRIC)
+	error.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	error.visible = false
+	var close := Button.new()
+	close.text = tr("UI_CLOSE")
+	close.size_flags_horizontal = Control.SIZE_SHRINK_END
+	close.visible = false
+	close.pressed.connect(func():
+		if is_instance_valid(page):
+			page.process_mode = Node.PROCESS_MODE_INHERIT
+		overlay.queue_free())
+	col.add_child(close)
+	var started := Time.get_ticks_msec()
+	var frac := [0.0]
+	var refresh := func():
+		var secs := int((Time.get_ticks_msec() - started) / 1000)
+		figures.text = "%d %%   %d:%02d" % [int(round(frac[0] * 100.0)), secs / 60, secs % 60]
+	var tick := Timer.new()
+	tick.wait_time = 1.0
+	tick.autostart = true
+	tick.timeout.connect(refresh)
+	overlay.add_child(tick)
+	overlay.set_meta("stage", func(text: String, f: float):
+		stage.text = text
+		frac[0] = maxf(frac[0], f)
+		create_tween().tween_property(bar, "value", frac[0], 0.4)
+		refresh.call())
+	overlay.set_meta("fail", func(text: String):
+		tick.stop()
+		stage.text = tr("MENU_CREATE_FAILED")
+		error.text = text
+		error.visible = true
+		close.visible = true
+		close.grab_focus())
+	overlay.grab_focus()
+	return overlay
