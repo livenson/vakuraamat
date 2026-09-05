@@ -66,6 +66,7 @@ func capture(note: String, world: Node) -> String:
 	var player: Node3D = world.player
 	var cam: Camera3D = player.camera
 	var interactor: Interactor = cam.get_node_or_null("Interactor")
+	var target: Node = interactor.target if interactor and is_instance_valid(interactor.target) else null   # a reloaded layer frees the old one
 	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
 	var pos := player.global_position
 	var report := {
@@ -73,8 +74,8 @@ func capture(note: String, world: Node) -> String:
 		"site": Sites.active, "era": GameState.current_era, "month": Ledger.month(), "online": Ledger.online,
 		"position": [snappedf(pos.x, 0.01), snappedf(pos.y, 0.01), snappedf(pos.z, 0.01)],
 		"yaw_deg": snappedf(rad_to_deg(player.rotation.y), 0.1), "pitch_deg": snappedf(rad_to_deg(cam.rotation.x), 0.1),
-		"target": _describe(interactor.target if interactor else null, pos),
-		"parcel": Parcels.at(pos), "road": _nearest_road(layer, pos), "links": links_for(pos, interactor.target if interactor else null, layer),
+		"target": _describe(target, pos),
+		"parcel": Parcels.at(pos), "road": _nearest_road(layer, pos), "links": links_for(pos, target, layer),
 		"nearby": _nearby(layer, pos), "buildings_nearby": _buildings_nearby(layer, pos),
 		"cash": Ledger.cash(), "owned": Ledger.parcels().filter(func(p): return Ledger.is_mine(p.tunnus)).map(func(p): return p.tunnus),
 		"errors": recent_errors.duplicate(), "screenshot": shot,
