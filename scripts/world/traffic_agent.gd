@@ -46,6 +46,8 @@ func setup(g: RoadGraph, k: String, e: Dictionary, start_s: float, fwd: bool, se
 			_body = build_bike(true, rng, CLOTHES[rng.randi() % CLOTHES.size()])
 			for r in _body.find_children("*", "HumanFigure", true, false):
 				_rider = r
+			for w in _body.find_children("Wheel", "", true, false):
+				_wheels.append(w)
 		"car":
 			_body = _make_car(year)
 		"cart":
@@ -122,6 +124,9 @@ func _place(delta: float) -> void:
 		w.rotate_object_local(Vector3.RIGHT, -_speed_now * delta / 0.32)   # roughly a 0.3 m wheel radius
 	if kind == "cyclist" and _rider:
 		_rider.pedal_phase += _speed_now * delta * TAU / 4.5   # one crank turn per 4.5 m
+		if _body.has_meta("crank"):
+			var crank: Node3D = _body.get_meta("crank")
+			crank.rotation.x = -_rider.pedal_phase
 
 
 # ---------------------------------------------------------------- bodies
@@ -174,22 +179,173 @@ static func _wheel(parent: Node3D, radius: float, width: float, pos: Vector3) ->
 	return c
 
 
-## A bicycle, with or without a rider. Also used for the player's parked bike.
+## A cylinder from `a` to `b`.
+static func _tube(parent: Node3D, a: Vector3, b: Vector3, radius: float, mat: Material) -> MeshInstance3D:
+	var mi := MeshInstance3D.new()
+	var cm := CylinderMesh.new()
+	cm.top_radius = radius
+	cm.bottom_radius = radius
+	cm.height = a.distance_to(b)
+	cm.radial_segments = 8
+	mi.mesh = cm
+	mi.material_override = mat
+	mi.position = (a + b) * 0.5
+	var dir := (b - a).normalized()
+	if absf(dir.dot(Vector3.UP)) < 0.999:
+		mi.rotation = Basis(Vector3.UP.cross(dir).normalized(), acos(clampf(dir.dot(Vector3.UP), -1.0, 1.0))).get_euler()
+	parent.add_child(mi)
+	return mi
+
+
+## A spoked wheel at `axle`, spinning about its local X (the axle): tyre, rim, hub and spokes.
+static func _bike_wheel(axle: Vector3, chrome: Material, rubber: Material) -> Node3D:
+	var wheel := Node3D.new()
+	wheel.name = "Wheel"
+	wheel.position = axle
+	var tyre := MeshInstance3D.new()
+	var tm := TorusMesh.new()
+	tm.inner_radius = 0.305
+	tm.outer_radius = 0.345
+	tm.rings = 28
+	tm.ring_segments = 8
+	tyre.mesh = tm
+	tyre.material_override = rubber
+	tyre.rotation.z = PI / 2.0
+	wheel.add_child(tyre)
+	var rim := MeshInstance3D.new()
+	var rm := TorusMesh.new()
+	rm.inner_radius = 0.285
+	rm.outer_radius = 0.31
+	rm.rings = 28
+	rm.ring_segments = 6
+	rim.mesh = rm
+	rim.material_override = chrome
+	rim.rotation.z = PI / 2.0
+	wheel.add_child(rim)
+	var hub := MeshInstance3D.new()
+	var hm := CylinderMesh.new()
+	hm.top_radius = 0.03
+	hm.bottom_radius = 0.03
+	hm.height = 0.1
+	hub.mesh = hm
+	hub.material_override = chrome
+	hub.rotation.z = PI / 2.0
+	wheel.add_child(hub)
+	for i in 16:
+		var ang := i * TAU / 16.0
+		var spoke := MeshInstance3D.new()
+		var spm := CylinderMesh.new()
+		spm.top_radius = 0.0025
+		spm.bottom_radius = 0.0025
+		spm.height = 0.27
+		spm.radial_segments = 4
+		spoke.mesh = spm
+		spoke.material_override = chrome
+		spoke.rotation.x = ang
+		spoke.position = Vector3(0.02 if i % 2 == 0 else -0.02, cos(ang) * 0.155, sin(ang) * 0.155)
+		wheel.add_child(spoke)
+	return wheel
+
+
+## The crank at the bottom bracket: axle, chainring, two arms and pedals, turned about local X.
+static func _bike_crank(bb: Vector3, chrome: Material, rubber: Material) -> Node3D:
+	var crank := Node3D.new()
+	crank.name = "Crank"
+	crank.position = bb
+	var axle := MeshInstance3D.new()
+	var am := CylinderMesh.new()
+	am.top_radius = 0.012
+	am.bottom_radius = 0.012
+	am.height = 0.2
+	axle.mesh = am
+	axle.material_override = chrome
+	axle.rotation.z = PI / 2.0
+	crank.add_child(axle)
+	var ring := MeshInstance3D.new()
+	var rm := TorusMesh.new()
+	rm.inner_radius = 0.075
+	rm.outer_radius = 0.09
+	rm.rings = 24
+	rm.ring_segments = 4
+	ring.mesh = rm
+	ring.material_override = chrome
+	ring.rotation.z = PI / 2.0
+	ring.position.x = 0.06
+	crank.add_child(ring)
+	for side in [-1.0, 1.0]:
+		var arm := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(0.02, 0.17, 0.025)
+		arm.mesh = bm
+		arm.material_override = chrome
+		arm.position = Vector3(side * 0.1, side * 0.085, 0)
+		crank.add_child(arm)
+		var pedal := MeshInstance3D.new()
+		var pm := BoxMesh.new()
+		pm.size = Vector3(0.1, 0.02, 0.07)
+		pedal.mesh = pm
+		pedal.material_override = rubber
+		pedal.position = Vector3(side * 0.16, side * 0.17, 0)
+		crank.add_child(pedal)
+	return crank
+
+
+## A bicycle, with or without a rider. Also used for the player's parked bike. A diamond frame of
+## tubes, spoked wheels with tyres and rims, a crank with pedals (meta "crank": the agent turns it
+## with the rider's pedalling), gloss paint and chrome. Built with the handlebar at +Z.
 static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Color) -> Node3D:
 	var root := Node3D.new()
-	var paint: Color = [Color(0.1, 0.1, 0.12), Color(0.6, 0.1, 0.1), Color(0.15, 0.3, 0.55), Color(0.8, 0.8, 0.8)][r.randi() % 4]
-	_wheel(root, 0.34, 0.04, Vector3(0, 0.34, 0.55))
-	_wheel(root, 0.34, 0.04, Vector3(0, 0.34, -0.55))
-	_box(root, Vector3(0.04, 0.04, 1.1), Vector3(0, 0.62, 0), paint, 0.4)          # top tube
-	_box(root, Vector3(0.04, 0.5, 0.04), Vector3(0, 0.62, 0.45), paint, 0.4)        # head tube
-	_box(root, Vector3(0.04, 0.5, 0.04), Vector3(0, 0.62, -0.35), paint, 0.4)       # seat tube
-	_box(root, Vector3(0.45, 0.03, 0.03), Vector3(0, 0.95, 0.5), Color(0.2, 0.2, 0.2), 0.5)   # handlebar
-	_box(root, Vector3(0.18, 0.05, 0.25), Vector3(0, 0.92, -0.35), Color(0.15, 0.1, 0.08))   # saddle
+	var paint := StandardMaterial3D.new()
+	paint.albedo_color = [Color(0.12, 0.12, 0.14), Color(0.62, 0.1, 0.1), Color(0.15, 0.32, 0.6), Color(0.85, 0.85, 0.82), Color(0.2, 0.45, 0.3), Color(0.9, 0.55, 0.15)][r.randi() % 6]
+	paint.metallic = 0.35
+	paint.roughness = 0.3
+	var chrome := StandardMaterial3D.new()
+	chrome.albedo_color = Color(0.8, 0.8, 0.82)
+	chrome.metallic = 0.9
+	chrome.roughness = 0.25
+	var rubber := StandardMaterial3D.new()
+	rubber.albedo_color = Color(0.06, 0.06, 0.06)
+	rubber.roughness = 0.95
+	var leather := StandardMaterial3D.new()
+	leather.albedo_color = Color(0.16, 0.11, 0.08)
+	leather.roughness = 0.7
+	# the frame's points (x across, y up, z forward)
+	var bb := Vector3(0, 0.29, -0.06)
+	var ht := Vector3(0, 0.92, 0.40)
+	var hb := Vector3(0, 0.70, 0.46)
+	var st := Vector3(0, 0.88, -0.32)
+	var ra := Vector3(0, 0.34, -0.53)
+	var fa := Vector3(0, 0.34, 0.52)
+	_tube(root, ht, st, 0.018, paint)                      # top tube
+	_tube(root, hb, bb, 0.02, paint)                       # down tube
+	_tube(root, bb, st, 0.018, paint)                      # seat tube
+	_tube(root, hb - Vector3(0, 0.02, 0.01), ht + Vector3(0, 0.04, -0.01), 0.024, paint)   # head tube
+	for x in [-0.045, 0.045]:
+		_tube(root, bb + Vector3(x, 0, 0), ra + Vector3(x, 0, 0), 0.01, paint)     # chain stays
+		_tube(root, st + Vector3(x, 0, 0), ra + Vector3(x, 0, 0), 0.01, paint)     # seat stays
+		_tube(root, hb + Vector3(x, 0, 0.02), fa + Vector3(x, 0, 0), 0.011, paint)  # fork blades
+	_tube(root, st, st + Vector3(0, 0.1, -0.03), 0.014, chrome)                   # seat post
+	_tube(root, ht + Vector3(0, 0.04, 0), Vector3(0, 0.99, 0.33), 0.014, chrome)  # stem
+	_tube(root, Vector3(-0.28, 0.99, 0.31), Vector3(0.28, 0.99, 0.31), 0.012, chrome)   # handlebar
+	for x in [-1.0, 1.0]:
+		_tube(root, Vector3(x * 0.28, 0.99, 0.31), Vector3(x * 0.28, 0.99, 0.22), 0.016, rubber)   # grips
+	var saddle := MeshInstance3D.new()
+	var sm := BoxMesh.new()
+	sm.size = Vector3(0.15, 0.05, 0.27)
+	saddle.mesh = sm
+	saddle.material_override = leather
+	saddle.position = st + Vector3(0, 0.12, -0.06)
+	root.add_child(saddle)
+	root.add_child(_bike_wheel(fa, chrome, rubber))
+	root.add_child(_bike_wheel(ra, chrome, rubber))
+	var crank := _bike_crank(bb, chrome, rubber)
+	root.add_child(crank)
+	root.set_meta("crank", crank)
 	root.rotation.y = PI   # built with the handlebar at +Z; agents and the mounted player face -Z
 	if with_rider and HumanFigure.available():
 		var rider := HumanFigure.make(r, 2026)
 		rider.pose = "pedal"
-		rider.position = Vector3(0, 0.1, -0.42)   # hips over the saddle once the legs fold forward and the lean is on
+		rider.position = Vector3(0, 0.12, -0.38)  # hips over the saddle once the legs fold forward and the lean is on
 		rider.rotation.y = 0.0                   # HumanFigure already faces the frame's front (+Z here)
 		rider.rotation.x = 0.3                   # leaning onto the handlebar (pitch about the feet)
 		root.add_child(rider)

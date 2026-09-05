@@ -162,10 +162,10 @@ func _hold(p: String) -> void:
 			_rot("calf_r", -1.0 + 0.5 * sin(ph))
 			_rot("foot_l", 0.3 + 0.2 * cos(ph))
 			_rot("foot_r", 0.3 - 0.2 * cos(ph))
-			_rot("upperarm_l", 0.8, -ARM_DOWN)
-			_rot("upperarm_r", 0.8, ARM_DOWN)
-			_rot("lowerarm_l", 0.6)
-			_rot("lowerarm_r", 0.6)
+			_rot("upperarm_l", 1.15, -ARM_DOWN * 0.9)   # reaching the handlebar
+			_rot("upperarm_r", 1.15, ARM_DOWN * 0.9)
+			_rot("lowerarm_l", 0.25)
+			_rot("lowerarm_r", 0.25)
 		_:
 			_rot("upperarm_l", 0.05, -ARM_DOWN)
 			_rot("upperarm_r", 0.05, ARM_DOWN)
