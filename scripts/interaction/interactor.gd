@@ -18,6 +18,9 @@ func _ready() -> void:
 
 
 func _physics_process(_delta: float) -> void:
+	if target != null and not is_instance_valid(target):
+		target = null   # a reloaded layer freed it
+		target_changed.emit(null)
 	var t: Interactable = null
 	if not blocked and is_colliding():
 		var c := get_collider()
