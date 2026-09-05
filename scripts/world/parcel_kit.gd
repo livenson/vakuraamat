@@ -228,17 +228,24 @@ func _bench(at: Vector3, yaw: float) -> void:
 		_box(at + b * Vector3(dx, 0.22, 0), Vector3(0.08, 0.45, 0.4), Color(0.25, 0.25, 0.25), yaw)
 
 
+## Park benches: every 35 m along the parcel's long axis, each at the deepest point across the
+## strip, facing across it; only spots inside the polygon (a riverside strip's centroid ring used to
+## put a bench in the water).
 func _park() -> void:
-	var c := _centroid()
-	var ext := Vector2.ZERO
+	var rect := Rect2(polygon[0], Vector2.ZERO)
 	for p in polygon:
-		ext = ext.max((p - c).abs())
-	var r := minf(ext.x, ext.y) * 0.5
-	if r < 3.0:
-		return
-	for i in 4:
-		var a := i * TAU / 4.0
-		_bench(Vector3(c.x + cos(a) * r, 0, c.y + sin(a) * r), -a)
+		rect = rect.expand(p)
+	var along := Vector2.RIGHT if rect.size.x >= rect.size.y else Vector2.DOWN
+	var across := Vector2(-along.y, along.x)
+	var length: float = maxf(rect.size.x, rect.size.y)
+	var n := clampi(int(length / 35.0), 1, 8)
+	for i in n:
+		var t := (i + 0.5) / n
+		var base: Vector2 = rect.position + along * (length * t) + across * ((rect.size.y if along == Vector2.RIGHT else rect.size.x) * 0.5)
+		var at := _deepest(base, across)
+		if not Geometry2D.is_point_in_polygon(at, polygon):
+			continue
+		_bench(Vector3(at.x, 0, at.y), -atan2(across.y, across.x) + (PI if i % 2 == 0 else 0.0))
 
 
 ## Hedge or fence along the boundary, inset a little; gaps where the boundary is long enough for a gate.
