@@ -75,7 +75,7 @@ BUILD_NO_MATERIALS,Materjali ei jätku.,Not enough materials.
 BUILD_COST,Hind: %s,Cost: %s
 UI_DEBUG_MAP,Silumiskaart,Debug map
 UI_DEBUG_MAP_HINT,Klõps kaardil: teleport. M sulgeb.,Click the map to teleport. M closes.
-UI_KEYS,E tegutse   Tab vakuraamat   J päevik   I kott   L keel   M silumiskaart   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   Tab register   J journal   I bag   L language   M debug map   K codes   F fly   T teleport   H home   F8 report   Esc menu
+UI_KEYS,E tegutse   V vakuraamat   B osta siin   N uudised   Tab register   J päevik   I kott   L keel   M kaart   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   V ledger   B buy here   N news   Tab register   J journal   I bag   L language   M map   K codes   F fly   T teleport   H home   F8 report   Esc menu
 MENU_SITE,Asukoht,Location
 UI_BUILDING_GROUND,Maa ehitatakse laserandmetest...,Building the ground from the laser data...
 MENU_NEW_LOCATION,Uus asukoht...,New location...
@@ -173,3 +173,78 @@ NOTICE_RENT,Üür laekus: %d €,Rent received: %d €
 NOTICE_TAX_DUE,Maamaks ootab maksmist: %d €,Land tax due: %d €
 NOTICE_BID_RECEIVED,Pakkumine maatükile %s: %d €,An offer for %s: %d €
 NOTICE_MONTH,Uus kuu: %s,A new month: %s
+UI_LEDGER_TITLE,Vakuraamat,Vakuraamat
+UI_LEDGER_PARCELS,Maatükid,Plots
+UI_LEDGER_PLOT,Maatükk,Plot
+UI_LEDGER_PORTFOLIO,Varad,Portfolio
+UI_LEDGER_OFFERS,Pakkumised,Offers
+UI_LEDGER_TOWN,Linn,Town
+UI_LEDGER_FILTER_ALL,kõik,all
+UI_LEDGER_FILTER_MINE,minu,mine
+UI_LEDGER_FILTER_SALE,müügis,for sale
+UI_LEDGER_COL_ADDRESS,Aadress,Address
+UI_LEDGER_COL_PURPOSE,Sihtotstarve,Purpose
+UI_LEDGER_COL_AREA,Pindala,Area
+UI_LEDGER_COL_VALUE,Maa väärtus,Land value
+UI_LEDGER_COL_PRICE,Hind,Price
+UI_LEDGER_COL_OWNER,Omanik,Owner
+UI_LEDGER_COL_YIELD,Tulu,Yield
+UI_LEDGER_YOU,sina,you
+UI_LEDGER_MORE,"… ja veel %d kaugemal","… and %d more further away"
+UI_LEDGER_PICK,"Vali maatükk nimekirjast või seisa sellel ja vajuta B.","Pick a plot from the list, or stand on one and press B."
+UI_LEDGER_TENANTS,Üürnikud,Tenants
+UI_LEDGER_NO_TENANTS,Üürnikke ei ole.,No tenants.
+UI_LEDGER_ARREARS,võlg,arrears
+UI_LEDGER_BUILT,Ehitatud,Built
+UI_LEDGER_NEEDS,vajab,needs
+UI_LEDGER_CASH,Raha,Cash
+UI_LEDGER_OWNED,Maatükke,Plots owned
+UI_LEDGER_INCOME,Tulu,Income
+UI_LEDGER_FAVOURS,Teened,Favours
+UI_LEDGER_HEAT,Tähelepanu,Heat
+UI_LEDGER_REPUTATION,Maine,Reputation
+UI_LEDGER_OBLIGATIONS,Kohustused,Obligations
+UI_LEDGER_LAND_TAX,Maamaks,Land tax
+UI_LEDGER_PENALTY,Viivis,Penalty
+UI_LEDGER_DUE,tähtaeg,due
+UI_LEDGER_DONATE_HINT,Anneta linnale (maine üles, tähelepanu alla):,Donate to the town (reputation up, heat down):
+UI_LEDGER_OFFERS_IN,Pakkumised minu maatükkidele,Offers on my plots
+UI_LEDGER_OFFERS_OUT,Minu pakkumised,My offers
+UI_LEDGER_MONTH,kuu,month
+UI_LEDGER_INDEX,Hinnaindeks,Price index
+UI_LEDGER_STATUS,Ühendus,Connection
+UI_LEDGER_OWNED_TOWN,Omanikuga maatükke,Plots with an owner
+UI_LEDGER_TOWN_HINT,"Maa väärtused on Maa-ameti 2022. aasta korralise hindamise maksustamishinnad; üürnikud on äriregistri avaandmetest.","Land values are the 2022 taxation values from Maa-amet's regular valuation; tenants come from the Business Register's open data."
+UI_ONLINE,võrgus: %s,online: %s
+UI_OFFLINE,võrguta (oma raamat),offline (own ledger)
+UI_PER_MONTH,/kuus,/month
+UI_SINCE,alates,since
+UI_TENANT_INACTIVE,ei tegutse,inactive
+UI_NEWS,Uudised,News
+UI_NEWS_EMPTY,Veel ei ole midagi juhtunud.,Nothing has happened yet.
+UI_CODES_TENANT,Üürnikud,Tenants
+UI_CODES_OWNER,Omanik,Owner
+BTN_BUY,Osta,Buy
+BTN_BID,Paku,Bid
+BTN_LIST,Pane müüki,List for sale
+BTN_UNLIST,Võta müügist,Unlist
+BTN_BUILD,Ehita,Build
+BTN_PRESS,Nõua võlg sisse,Collect arrears
+BTN_ARREARS,Tasu võlg,Settle arrears
+BTN_DONATE,Anneta,Donate
+BTN_PAY,Maksa,Pay
+BTN_ACCEPT,Nõustu,Accept
+BTN_WITHDRAW,Võta tagasi,Withdraw
+BTN_LINK,Ava link,Open link
+BTN_SHOW,Näita,Show
+PURPOSE_ELAMUMAA,elamumaa,residential
+PURPOSE_ARIMAA,ärimaa,commercial
+PURPOSE_TOOTMISMAA,tootmismaa,industrial
+PURPOSE_TRANSPORDIMAA,transpordimaa,transport
+PURPOSE_ULDKASUTATAV_MAA,üldkasutatav maa,public land
+PURPOSE_UHISKONDLIKE_EHITISTE_MAA,ühiskondlike ehitiste maa,public buildings
+PURPOSE_MAATULUNDUSMAA,maatulundusmaa,agricultural/forest
+PURPOSE_SIHTOTSTARBETA_MAA,sihtotstarbeta maa,no purpose set
+PURPOSE_JAATMEHOIDLA_MAA,jäätmehoidla maa,waste
+PURPOSE_VEEKOGUDE_MAA,veekogude maa,water
+PURPOSE_KAITSEALUNE_MAA,kaitsealune maa,protected

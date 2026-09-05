@@ -129,6 +129,18 @@ local play. The Godot client is the vendored `addons/SpacetimeDB` SDK with bindi
 `spacetime_bindings/` (`godot --headless --path . --script res://addons/SpacetimeDB/cli.gd` after
 publishing the module as `vakuraamat`; commit the result).
 
+### Playing the ledger
+
+In the world, **V** opens the vakuraamat: the plots nearest to you with land value, price, owner and
+monthly yield (filters all / mine / for sale), one plot's card with Buy, Bid, List for sale, Build,
+Collect arrears, Settle arrears and Accept offer, your portfolio (cash, income, obligations to pay,
+favours, heat, reputation, donations), offers in and out, and the town's month, price index and
+connection. **B** opens the card of the plot you stand on. **N** is the town feed. Gold outlines on
+the ground are your plots, amber ones carry your open bid, blue ones nearby are for sale. Without a
+town server the same rules run in your own offline book (`LocalLedger`); a month passes every ten
+real minutes and pays rents, raises land tax and lets the Kask, Tamm and Lepik families bid on
+your plots. `--open=ledger` and `--open=news` work with `--screenshot`.
+
 ## Real buildings: ETAK footprints, the Building Register, LOD2 roofs
 
 `make buildings SITE=<id>` (part of `make tile`, and of every tile-service job) writes
