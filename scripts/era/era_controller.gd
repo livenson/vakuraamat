@@ -91,3 +91,5 @@ func set_hour(hour: float) -> void:
 	_windows_lit = lit
 	for w in _window_mats:
 		w.emission_energy_multiplier = 2.5 if lit else 0.0
+	for rn in find_children("*", "RoadNetwork", true, false):
+		rn.set_lit(lit)

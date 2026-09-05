@@ -16,6 +16,9 @@ const STYLE := {
 }
 
 var roads: Array = []
+var _lamps: Array[OmniLight3D] = []   # street lights, on after dark (set_lit)
+const LAMP_SPACING := 32.0
+const LAMP_HEIGHT := 6.0
 
 
 func _ready() -> void:
@@ -57,6 +60,82 @@ func _ready() -> void:
 		mi.material_override = mat
 		mi.name = "Roads_" + key
 		add_child(mi)
+	_street_lights(terrain)
+
+
+## Lamp posts along the streets (asphalt with a kerb): one every LAMP_SPACING metres on the right
+## side, alternating sides on long streets. Dark by day; set_lit turns the lamps on.
+func _street_lights(terrain: Terrain3D) -> void:
+	var pole_mesh := CylinderMesh.new()
+	pole_mesh.top_radius = 0.06
+	pole_mesh.bottom_radius = 0.09
+	pole_mesh.height = LAMP_HEIGHT
+	var pole_mat := StandardMaterial3D.new()
+	pole_mat.albedo_color = Color(0.35, 0.36, 0.38)
+	var head_mesh := BoxMesh.new()
+	head_mesh.size = Vector3(0.5, 0.18, 0.28)
+	var head_mat := StandardMaterial3D.new()
+	head_mat.albedo_color = Color(0.9, 0.85, 0.7)
+	head_mat.emission_enabled = true
+	head_mat.emission = Color(1.0, 0.85, 0.6)
+	head_mat.emission_energy_multiplier = 0.0
+	var side := 1.0
+	for r in roads:
+		if str(r.get("kind", "road")) != "street":
+			continue
+		var pts := _resample(r.points)
+		var half: float = maxf(float(r.get("width", 3.0)), 1.2) / 2.0
+		var along := LAMP_SPACING * 0.5
+		var acc := 0.0
+		for i in range(1, pts.size()):
+			var a: Vector2 = pts[i - 1]
+			var c: Vector2 = pts[i]
+			var seg := a.distance_to(c)
+			while acc + seg >= along:
+				var t := (along - acc) / maxf(seg, 0.001)
+				var dir := (c - a).normalized()
+				var at := a.lerp(c, t) + Vector2(-dir.y, dir.x) * side * (half + 0.9)
+				var gp := to_global(Vector3(at.x, 0.0, at.y))
+				var h: float = terrain.data.get_height(gp)
+				if not is_nan(h):
+					var base := Vector3(at.x, h - global_position.y, at.y)
+					var pole := MeshInstance3D.new()
+					pole.mesh = pole_mesh
+					pole.material_override = pole_mat
+					pole.position = base + Vector3(0, LAMP_HEIGHT / 2.0, 0)
+					add_child(pole)
+					var head := MeshInstance3D.new()
+					head.mesh = head_mesh
+					head.material_override = head_mat
+					var arm := Vector2(-dir.y, dir.x) * -side * 0.35   # the head leans over the road
+					head.position = base + Vector3(arm.x, LAMP_HEIGHT - 0.1, arm.y)
+					head.rotation.y = -atan2(dir.y, dir.x)
+					add_child(head)
+					var lamp := OmniLight3D.new()
+					lamp.position = head.position - Vector3(0, 0.25, 0)
+					lamp.light_color = Color(1.0, 0.82, 0.55)
+					lamp.light_energy = 2.2
+					lamp.omni_range = 16.0
+					lamp.omni_attenuation = 1.2
+					lamp.shadow_enabled = false
+					lamp.visible = false
+					add_child(lamp)
+					_lamps.append(lamp)
+				along += LAMP_SPACING
+				side = -side
+			acc += seg
+	_head_mat = head_mat
+
+
+var _head_mat: StandardMaterial3D = null
+
+
+## Street lights on or off (the era controller calls this with the windows after dark).
+func set_lit(on: bool) -> void:
+	for l in _lamps:
+		l.visible = on
+	if _head_mat:
+		_head_mat.emission_energy_multiplier = 3.0 if on else 0.0
 
 
 func _resample(points: Array) -> Array[Vector2]:
