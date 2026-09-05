@@ -144,6 +144,27 @@ def on_industrial_land(pond, site_dir):
     return False
 
 
+def covers_buildings(pond, site_dir):
+    """A pond's rectangle with a registered building inside it is a flat dark yard, not water
+    (buildings.json, when the register was fetched before this step)."""
+    path = os.path.join(site_dir, "buildings.json")
+    if not os.path.exists(path):
+        return False
+    try:
+        blds = json.load(open(path)).get("buildings", [])
+    except (OSError, ValueError):
+        return False
+    x0, x1 = pond["x"] - pond["w"] / 2.0, pond["x"] + pond["w"] / 2.0
+    z0, z1 = pond["z"] - pond["d"] / 2.0, pond["z"] + pond["d"] / 2.0
+    for b in blds:
+        bx, bz = b.get("x"), b.get("z")
+        if bx is None or bz is None:
+            continue
+        if x0 < bx < x1 and z0 < bz < z1:
+            return True
+    return False
+
+
 def point_in_polygon(x, z, poly):
     inside = False
     j = len(poly) - 1
@@ -215,7 +236,7 @@ def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2
         col = ortho[ys, xs].mean(axis=0)
         ponds.append({"area": int(len(pix)), "x": round(float(xs.min() + xs.max() + 1) / 2, 1), "z": round(float(ys.min() + ys.max() + 1) / 2, 1),
                       "w": w, "d": d, "level": round(level, 2), "color": [round(float(c), 2) for c in col]})
-    ponds = [p for p in ponds if not on_industrial_land(p, site_dir)]
+    ponds = [p for p in ponds if not on_industrial_land(p, site_dir) and not covers_buildings(p, site_dir)]
     ponds.sort(key=lambda p: -p["area"])
     log(f"{len(ponds)} still-water patches (>= {min_pond} m²)")
 

@@ -384,12 +384,56 @@ func place_water(pack: String, root: Node3D) -> void:
 		_water_mat.shader = load("res://assets/shaders/lake.gdshader")
 		_water_mat.set_shader_parameter("normalmap_a", load("res://assets/textures/water/Water_N_A.png"))
 		_water_mat.set_shader_parameter("foam_sampler", load("res://assets/textures/water/Foam.png"))
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash("boats_" + pack)
 	for p in ponds:
 		var pond := Pond.new()
 		pond.name = "Pond"
 		pond.setup(p, _water_mat)
 		root.add_child(pond)
 		pond.carve(terrain)
+		_moor_boats(p, root, rng)
+
+
+const BOATS := {"rowboat": 4.0, "canoe": 4.6, "boat": 5.0, "sailboat": 6.5}   # model -> length in metres
+
+## Boats moored along the long side of a pond or bay (area in m²): one to four small boats, a
+## sailboat on big water. Poly Pizza models (see THIRD_PARTY.md), scaled from their bounds.
+func _moor_boats(p: Dictionary, root: Node3D, rng: RandomNumberGenerator) -> void:
+	var area := float(p.get("area", 0))
+	if area < 300.0:
+		return
+	var n := clampi(int(area / 700.0), 1, 4)
+	var w := float(p.w)
+	var d := float(p.d)
+	var along_x := w >= d
+	var length := w if along_x else d
+	var names: Array = ["rowboat", "canoe", "boat"]
+	for i in n:
+		var name: String = names[rng.randi() % names.size()] if not (i == 0 and area >= 2000.0) else "sailboat"
+		var path := "res://assets/vendor/polypizza/%s.glb" % name
+		if not ResourceLoader.exists(path):
+			continue
+		var model: Node3D = (load(path) as PackedScene).instantiate()
+		var b: AABB = Interiors._bounds(model)
+		var longest := maxf(b.size.x, b.size.z)
+		if longest < 0.0001:
+			continue
+		var k: float = BOATS[name] / longest
+		var hull := Node3D.new()
+		model.scale = Vector3.ONE * k
+		model.position = Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k)
+		if b.size.x > b.size.z:
+			model.rotation.y = PI / 2.0   # the hull's long axis along the local Z
+		hull.add_child(model)
+		var t := (i + 0.5) / n
+		var side := 1.0 if rng.randf() < 0.5 else -1.0
+		var inset := minf(4.0, (d if along_x else w) * 0.3)
+		var at := Vector2(float(p.x) - w * 0.5 + length * t, float(p.z) + side * (d * 0.5 - inset)) if along_x \
+			else Vector2(float(p.x) + side * (w * 0.5 - inset), float(p.z) - d * 0.5 + length * t)
+		hull.position = Vector3(at.x, float(p.get("level", 0.0)) + 0.05, at.y)
+		hull.rotation.y = (0.0 if along_x else PI / 2.0) + rng.randf_range(-0.25, 0.25) + (PI if rng.randf() < 0.5 else 0.0)
+		root.add_child(hull)
 
 
 func _snap(node: Node3D, lift: float) -> void:

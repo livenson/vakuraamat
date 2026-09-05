@@ -7,6 +7,7 @@ class_name Interiors
 extends Node3D
 
 const KIT := "res://assets/vendor/kenney_furniture_kit/glb/"
+const KIT2 := "res://assets/vendor/polypizza/"   # bathroom pieces (Kenney CC0 via Poly Pizza)
 const WALL := 0.25          # inner wall inset from the footprint
 const SLAB := 0.12
 const MAX_FLOORS := 4
@@ -424,10 +425,10 @@ static func _attach_doorways(rooms: Array, doorways: Array) -> void:
 
 
 const ROLES := {
-	"home": ["living", "kitchen", "bedroom", "bedroom", "bedroom"], "office": ["reception", "office", "office", "office", "office"],
+	"home": ["living", "kitchen", "bathroom", "bedroom", "bedroom"], "office": ["reception", "office", "office", "office", "office"],
 	"shop": ["salesroom", "back", "back", "back", "back"], "workshop": ["workshop", "store", "store", "store", "store"],
 }
-const UPPER_ROLES := {"home": ["hall", "bedroom", "bedroom", "bedroom", "bedroom"], "office": ["office", "office", "office", "office", "office"],
+const UPPER_ROLES := {"home": ["hall", "bathroom", "bedroom", "bedroom", "bedroom"], "office": ["office", "office", "office", "office", "office"],
 	"shop": ["office", "office", "office", "office", "office"], "workshop": ["office", "office", "office", "office", "office"]}
 
 
@@ -791,6 +792,8 @@ const PIECES := {
 	"desk": [Vector3(1.6, 0.75, 0.8), Color(0.7, 0.7, 0.68)], "chairDesk": [Vector3(0.6, 1.0, 0.6), Color(0.2, 0.2, 0.22)],
 	"computerScreen": [Vector3(0.5, 0.4, 0.15), Color(0.1, 0.1, 0.12)],
 	"cardboardBoxClosed": [Vector3(0.6, 0.6, 0.6), Color(0.7, 0.55, 0.35)], "bench": [Vector3(1.6, 0.85, 0.7), Color(0.5, 0.4, 0.3)],
+	"toilet": [Vector3(0.4, 0.8, 0.7), Color(0.95, 0.95, 0.95)], "bathtub": [Vector3(1.7, 0.6, 0.75), Color(0.95, 0.95, 0.95)],
+	"sink": [Vector3(0.5, 0.85, 0.45), Color(0.95, 0.95, 0.95)], "mirror": [Vector3(0.5, 0.6, 0.05), Color(0.8, 0.85, 0.9)],
 }
 
 ## Room plans by role, applied in order. "anchor": the piece centred on the longest free wall, with
@@ -812,6 +815,11 @@ const PLANS := {
 		{"kind": "run", "pieces": ["kitchenCabinet", "kitchenStove", "kitchenCabinet", "kitchenFridge"], "cycle": true, "walls": 2},
 		{"kind": "island", "piece": "table", "around": "chair"},
 		{"kind": "corners", "pieces": ["plantSmall2"]},
+	],
+	"bathroom": [
+		{"kind": "anchor", "piece": "sink", "stack": "mirror"},
+		{"kind": "run", "pieces": ["toilet"], "max": 1},
+		{"kind": "run", "pieces": ["bathtub"], "max": 1, "walls": 2},
 	],
 	"bedroom": [
 		{"kind": "anchor", "piece": "bedDouble", "sides": "cabinetBed"},
@@ -1120,6 +1128,8 @@ static func _centroid(poly: PackedVector2Array) -> Vector2:
 ## A Kenney Furniture Kit model when vendored (`assets/vendor/kenney_furniture_kit/glb/<name>.glb`), else a box.
 func _piece(model: String, size: Vector3, color: Color) -> Node3D:
 	var path := KIT + model + ".glb"
+	if not ResourceLoader.exists(path):
+		path = KIT2 + model + ".glb"
 	if not _kit_cache.has(model):
 		_kit_cache[model] = load(path) if ResourceLoader.exists(path) else null
 	var scene: PackedScene = _kit_cache[model]
