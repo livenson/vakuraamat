@@ -75,7 +75,7 @@ BUILD_NO_MATERIALS,Materjali ei jätku.,Not enough materials.
 BUILD_COST,Hind: %s,Cost: %s
 UI_DEBUG_MAP,Silumiskaart,Debug map
 UI_DEBUG_MAP_HINT,Klõps kaardil: teleport. M sulgeb.,Click the map to teleport. M closes.
-UI_KEYS,E tegutse   Tab vakuraamat   J päevik   I kott   L keel   M silumiskaart   K koodid   F8 teata   Esc menüü,E interact   Tab register   J journal   I bag   L language   M debug map   K codes   F8 report   Esc menu
+UI_KEYS,E tegutse   Tab vakuraamat   J päevik   I kott   L keel   M silumiskaart   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   Tab register   J journal   I bag   L language   M debug map   K codes   F fly   T teleport   H home   F8 report   Esc menu
 MENU_SITE,Asukoht,Location
 UI_BUILDING_GROUND,Maa ehitatakse laserandmetest...,Building the ground from the laser data...
 MENU_NEW_LOCATION,Uus asukoht...,New location...
@@ -119,3 +119,7 @@ UI_CODES_BUILDING,Hoone,Building
 UI_CODES_ROAD,Tee,Road
 UI_CODES_TARGET,Sihtmärk,Target
 UI_CODES_COPIED,%d registrilinki kopeeritud lõikelauale,%d registry links copied to the clipboard
+NOTICE_FLY_ON,"Lend sees (F): Shift ja Ctrl kiirendavad, vaata ja liigu",Fly on (F): Shift and Ctrl speed up; move where you look
+NOTICE_FLY_OFF,Lend väljas,Fly off
+NOTICE_TELEPORT,"Teleport %d, %d","Teleported to %d, %d"
+NOTICE_HOME,Algus,Back at the start
