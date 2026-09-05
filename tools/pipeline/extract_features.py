@@ -11,7 +11,7 @@ Outputs (sites/<site>/, names from site.json "buildings" / "water"):
 Both are starting points for the author: delete, merge or move entries by hand.
 Needs numpy and the GDAL command line (gdal_translate) for the JPEG.
 """
-import argparse, json, os, subprocess, sys, tempfile
+import argparse, json, math, os, subprocess, sys, tempfile
 from collections import deque
 
 import numpy as np
@@ -56,11 +56,74 @@ def components(mask, min_area):
     return out
 
 
-def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2.5):
-    site_dir = os.path.join(ROOT, "sites", site)
+def box_fraction(mask, r):
+    """Fraction of True in a (2r+1)² window around every pixel (edges clamp), via summed-area table."""
+    size = mask.shape[0]
+    sat = np.zeros((size + 1, size + 1), dtype=np.int64)
+    sat[1:, 1:] = np.cumsum(np.cumsum(mask.astype(np.int64), axis=0), axis=1)
+    ys, xs = np.mgrid[0:size, 0:size]
+    y0 = np.clip(ys - r, 0, size); y1 = np.clip(ys + r + 1, 0, size); x0 = np.clip(xs - r, 0, size); x1 = np.clip(xs + r + 1, 0, size)
+    total = sat[y1, x1] - sat[y0, x1] - sat[y1, x0] + sat[y0, x0]
+    return total / ((y1 - y0) * (x1 - x0))
+
+
+def find_anchors(heights, canopy, ortho, buildings):
+    """Named spots for a generated story: register/spawn on open ground near the centre, the landmark at
+    the largest building (else the tallest trees), the farm on the widest open ground, the trade post by a
+    road, the field on crops or soil. Heuristics; the author moves them afterwards."""
+    size = heights.shape[0]
+    r, g, b = ortho[..., 0], ortho[..., 1], ortho[..., 2]
+    v = ortho.max(axis=2)
+    sat = np.where(v > 0, (v - ortho.min(axis=2)) / np.maximum(v, 1e-6), 0)
+    green_excess = g - np.maximum(r, b)
+    gravel = (v > 0.62) & (sat < 0.22)
+    tall = (canopy >= 2.5) if canopy is not None else np.zeros_like(gravel)
+    field = (~gravel) & (green_excess > 0.03) & (v > 0.5) & (sat > 0.35) & ~tall
+    soil = (~gravel) & (green_excess <= 0.03) & (v >= 0.25) & ~tall
+    built = np.zeros_like(gravel)
+    for bld in buildings:
+        x0 = int(max(bld["x"] - bld["w"] / 2 - 3, 0)); x1 = int(min(bld["x"] + bld["w"] / 2 + 3, size))
+        z0 = int(max(bld["z"] - bld["d"] / 2 - 3, 0)); z1 = int(min(bld["z"] + bld["d"] / 2 + 3, size))
+        built[z0:z1, x0:x1] = True
+    open_ground = ~tall & ~built
+    ys, xs = np.mgrid[0:size, 0:size]
+    c = size / 2.0
+    dist_c = np.hypot(xs - c, ys - c)
+
+    def best(score, mask):
+        s = np.where(mask, score, -np.inf)
+        i = int(np.argmax(s))
+        return [float(i % size), float(i // size)] if np.isfinite(s.flat[i]) else None
+
+    open25 = box_fraction(open_ground & ~gravel, 12)
+    register = best(open25 - dist_c / 1500.0, (dist_c <= 150) & open_ground & ~gravel) or [c, c]
+    rx, rz = register
+    spawn = [rx, rz + 20] if rz + 20 < size and open_ground[int(rz + 20), int(rx)] else [rx, rz - 20]
+    dist_r = np.hypot(xs - rx, ys - rz)
+    landmark = None
+    near = [bld for bld in buildings if math.hypot(bld["x"] - rx, bld["z"] - rz) <= 350 and math.hypot(bld["x"] - rx, bld["z"] - rz) >= 25]
+    if near:
+        big = max(near, key=lambda bld: bld["w"] * bld["d"])
+        landmark = [big["x"], big["z"] + big["d"] / 2 + 8]
+    elif canopy is not None:
+        landmark = best(canopy, (dist_r <= 250) & (dist_r >= 30))
+    landmark = landmark or [rx + 40, rz - 30]
+    open60 = box_fraction(open_ground & ~gravel, 30)
+    farm = best(open60, (dist_r >= 80) & (dist_r <= 350) & open_ground) or [rx - 60, rz + 40]
+    grav15 = box_fraction(gravel, 7)
+    trade = best(grav15 - dist_r / 600.0, (dist_r <= 120) & (dist_r >= 12) & (grav15 > 0.15)) or [rx + 30, rz + 30]
+    crop60 = box_fraction(field | soil, 30)
+    dist_f = np.hypot(xs - farm[0], ys - farm[1])
+    fld = best(crop60, (dist_f >= 100) & (dist_r <= 400) & open_ground) or [rx + 80, rz + 90]
+    return {k: [round(p[0], 1), round(p[1], 1)] for k, p in
+            {"register": register, "spawn": spawn, "landmark": landmark, "farm": farm, "trade": trade, "field": fld}.items()}
+
+
+def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2.5, root=ROOT):
+    site_dir = os.path.join(root, "sites", site)
     m = json.load(open(os.path.join(site_dir, "site.json")))
     tile = m.get("terrain", {}).get("tile", site)
-    tdir = os.path.join(ROOT, "assets/terrain", tile)
+    tdir = os.path.join(root, "assets/terrain", tile)
     meta = json.load(open(os.path.join(tdir, "terrain_meta.json")))
     size = int(meta["size_px"])
     heights = np.fromfile(os.path.join(tdir, meta["heightmap"]), dtype="<f4").reshape(size, size)
@@ -118,6 +181,8 @@ def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2
     ponds.sort(key=lambda p: -p["area"])
     log(f"{len(ponds)} still-water patches (>= {min_pond} m²)")
 
+    anchors = find_anchors(heights, canopy, ortho, buildings)
+    log("anchors " + ", ".join(f"{k} ({v[0]:.0f},{v[1]:.0f})" for k, v in anchors.items()))
     bfile = os.path.join(site_dir, m.get("buildings", "buildings_2026.json"))
     wfile = os.path.join(site_dir, m.get("water", "water_2026.json"))
     if dry_run:
@@ -125,11 +190,12 @@ def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2
             log(f"  building {bld}")
         for p in ponds[:8]:
             log(f"  water {p}")
-        return buildings, ponds
+        return buildings, ponds, anchors
     json.dump(buildings, open(bfile, "w"), indent=1)
     json.dump(ponds, open(wfile, "w"), indent=1)
-    log(f"wrote {os.path.relpath(bfile, ROOT)} and {os.path.relpath(wfile, ROOT)}")
-    return buildings, ponds
+    json.dump(anchors, open(os.path.join(site_dir, "anchors.json"), "w"), indent=1)
+    log(f"wrote {os.path.relpath(bfile, root)}, {os.path.relpath(wfile, root)} and anchors.json")
+    return buildings, ponds, anchors
 
 
 if __name__ == "__main__":
@@ -138,5 +204,6 @@ if __name__ == "__main__":
     ap.add_argument("--dry-run", action="store_true", help="print, write nothing")
     ap.add_argument("--min-building", type=int, default=25, help="smallest roof area in m² (default 25)")
     ap.add_argument("--min-pond", type=int, default=80, help="smallest water patch in m² (default 80)")
+    ap.add_argument("--root", default=ROOT, help="project root holding sites/ and assets/terrain/ (default: the repo)")
     a = ap.parse_args()
-    extract(a.site, a.dry_run, a.min_building, a.min_pond)
+    extract(a.site, a.dry_run, a.min_building, a.min_pond, root=a.root)

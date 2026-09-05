@@ -6,7 +6,7 @@ SITE ?= palupera
 TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
 CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
-.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate
+.PHONY: help setup import tile scatter trees props ink test lint export clean-generated site era-maps features scenes validate tile-service
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, gdal, git-lfs; npm for ink), pull LFS files, first Godot import"
@@ -96,7 +96,7 @@ ink:
 
 test:
 	@python3 tools/validate_site.py --all | grep -E "OK|FAILED"
-	@for t in boot_test site_test playthrough_test farming_test hunting_test economy_test; do \
+	@for t in boot_test site_test userpack_test playthrough_test farming_test hunting_test economy_test; do \
 	  printf "%-18s " $$t; $(GODOT) --headless --path . res://tools/godot/$$t.tscn 2>&1 | grep -E "PASSED|FAILED" | head -1; done
 
 lint:
@@ -109,3 +109,6 @@ export:
 
 clean-generated:
 	rm -rf assets/terrain/$(TILE)/data assets/models/trees/*_impostor.png assets/models/trees/*_mesh.res
+
+tile-service:
+	python3 tools/tile_service.py --port 8765

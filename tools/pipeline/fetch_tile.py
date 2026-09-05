@@ -209,6 +209,7 @@ def main():
     ap.add_argument("--no-canopy", action="store_true", help="skip the nDSM/CHM canopy layer")
     ap.add_argument("--project", default=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
                     help="project root (default: repo root)")
+    ap.add_argument("--raw-dir", help="download cache (default: <project>/data_raw)")
     a = ap.parse_args()
     era_maps = {}
     for em in a.era_map:
@@ -227,7 +228,7 @@ def main():
     if not a.name or not a.center:
         sys.exit("--name and --center are required unless --site is given")
 
-    raw_dir = os.path.join(a.project, "data_raw")
+    raw_dir = a.raw_dir or os.path.join(a.project, "data_raw")
     out_dir = os.path.join(a.project, "assets", "terrain", a.name)
     os.makedirs(raw_dir, exist_ok=True)
     os.makedirs(out_dir, exist_ok=True)

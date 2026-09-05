@@ -101,25 +101,39 @@ def unquote(v):
     return v[1:-1] if v.startswith('"') and v.endswith('"') else v
 
 
-def era_texture(tile, era_id, year, tile_dir):
+def era_texture(tile, era_id, year, tile_dir, texture_mode="import"):
     """Texture path + strength + tint for an era's ground drape: the fetched historical map if present,
-    else the orthophoto if fetched, else None (no drape until make tile / make era-maps)."""
-    ortho = f"res://assets/terrain/{tile}/ortho.jpg" if os.path.exists(os.path.join(tile_dir, "ortho.jpg")) else None
+    else the orthophoto if fetched, else None (no drape until make tile / make era-maps).
+    texture_mode "import": res:// paths (Godot imports the image); "path": user://tiles paths loaded at runtime."""
+    base = f"res://assets/terrain/{tile}" if texture_mode == "import" else f"user://tiles/{tile}"
+    ortho = f"{base}/ortho.jpg" if os.path.exists(os.path.join(tile_dir, "ortho.jpg")) else None
     em = era_map_for(year)
     if em:
         layer, stem, strength, tint = em
         fname = f"{era_id}_{stem}.png"
         if os.path.exists(os.path.join(tile_dir, fname)):
-            return f"res://assets/terrain/{tile}/{fname}", strength, tint
+            return f"{base}/{fname}", strength, tint
         return ortho, 0.6, (0.9, 0.86, 0.75)   # placeholder until make era-maps
     return ortho, 1.0, (1.0, 1.0, 1.0)
 
 
-def relink_era_maps(site):
-    site_dir = os.path.join(ROOT, "sites", site)
+def set_texture(props, tex, texture_mode):
+    """Point an era's props at its ground texture: an ext_resource for imported images, a path otherwise."""
+    props.pop("terrain_texture", None); props.pop("terrain_texture_path", None)
+    if not tex:
+        return None
+    if texture_mode == "import":
+        props["terrain_texture"] = 'ExtResource("2")'
+        return tex
+    props["terrain_texture_path"] = q(tex)
+    return None
+
+
+def relink_era_maps(site, root=ROOT, texture_mode="import"):
+    site_dir = os.path.join(root, "sites", site)
     m = json.load(open(os.path.join(site_dir, "site.json")))
     tile = m["terrain"]["tile"]
-    tile_dir = os.path.join(ROOT, "assets/terrain", tile)
+    tile_dir = os.path.join(root, "assets/terrain", tile)
     eras_dir = os.path.join(site_dir, "data/eras")
     for f in sorted(os.listdir(eras_dir)):
         if not f.endswith(".tres"):
@@ -127,35 +141,65 @@ def relink_era_maps(site):
         p = os.path.join(eras_dir, f)
         props = read_tres(p)
         era_id = unquote(props["id"]); year = int(re.sub(r"\D", "", unquote(props.get("year_label", "0"))) or 0)
-        tex, strength, tint = era_texture(tile, era_id, year, tile_dir)
+        tex, strength, tint = era_texture(tile, era_id, year, tile_dir, texture_mode)
         props["texture_strength"] = str(strength)
         props["ground_tint"] = "Color(%s, %s, %s, 1)" % tint
-        if tex:
-            props["terrain_texture"] = 'ExtResource("2")'
-        else:
-            props.pop("terrain_texture", None)
-        write_tres(p, "res://scripts/era/era_definition.gd", props, tex)
+        ext = set_texture(props, tex, texture_mode)
+        write_tres(p, "res://scripts/era/era_definition.gd", props, ext)
         print(f"[new_site] {era_id}: ground texture {tex or '(none yet: make tile)'}")
 
 
 # ---------------------------------------------------------------- scaffold
-def scaffold(a):
-    site = a.id
+def anchor_layout(half, anchors=None):
+    """Named spots for the story skeleton: from detected anchors (tile service) or a ring around the centre."""
+    cx = cz = half
+    a = {"spawn": [cx, cz + 20], "register": [cx, cz], "landmark": [cx + 40, cz - 30], "farm": [cx - 60, cz + 40],
+         "trade": [cx + 30, cz + 30], "field": [cx + 80, cz + 90]}
+    for k, v in (anchors or {}).items():
+        if k in a and isinstance(v, list) and len(v) >= 2:
+            a[k] = [round(float(v[0]), 1), round(float(v[1]), 1)]
+    layout = dict(a)
+    layout["exclusions"] = [[*a["register"], 6], [*a["landmark"], 6], [*a["farm"], 14], [*a["trade"], 4]]
+    layout["pads"] = []
+    return layout
+
+
+def apply_anchors(site, anchors, root=ROOT):
+    """Re-place a scaffolded pack's layout (and spawn) on detected anchors; rerun `make scenes` after."""
+    site_dir = os.path.join(root, "sites", site)
+    m = json.load(open(os.path.join(site_dir, "site.json")))
+    layout = anchor_layout(m["terrain"]["size"] / 2, anchors)
+    json.dump(layout, open(os.path.join(site_dir, "layout.json"), "w"), indent=1)
+    m["start"]["spawn"] = layout["spawn"]
+    reg, sp = layout["register"], layout["spawn"]
+    m["start"]["yaw_deg"] = round(math.degrees(math.atan2(-(reg[0] - sp[0]), -(reg[1] - sp[1]))) % 360, 1)   # face the register (0 = north)
+    manor = os.path.join(site_dir, "data/manors/home_farm.tres")
+    if os.path.exists(manor):
+        props = read_tres(manor)
+        props["position"] = "Vector2(%d, %d)" % (layout["farm"][0], layout["farm"][1])
+        write_tres(manor, props["_script"], props)
+    json.dump(m, open(os.path.join(site_dir, "site.json"), "w"), indent=2)
+    return layout
+
+
+def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", tile=None, template="palupera",
+             force=False, root=ROOT, template_root=ROOT, texture_mode="import", anchors=None):
     if not re.fullmatch(r"[a-z][a-z0-9_]*", site):
         sys.exit("--id must be lowercase letters, digits, underscores")
-    site_dir = os.path.join(ROOT, "sites", site)
-    if os.path.exists(site_dir) and not a.force:
+    site_dir = os.path.join(root, "sites", site)
+    if os.path.exists(site_dir) and not force:
         sys.exit(f"{site_dir} exists (use --force to overwrite the scaffold files)")
-    tile = a.tile or site
-    tile_dir = os.path.join(ROOT, "assets/terrain", tile)
-    years = sorted(int(y) for y in a.eras.split(","))
+    tile = tile or site
+    tile_dir = os.path.join(root, "assets/terrain", tile)
+    years = sorted(int(y) for y in eras.split(","))
     eras = [f"era_{y}" for y in years]
     newest, oldest = eras[-1], eras[0]
     mid = eras[-2] if len(eras) > 1 else eras[0]
-    lat, lon = lest97_to_wgs84(*a.center)
-    half = a.size / 2
+    lat, lon = lest97_to_wgs84(*center)
+    half = size / 2
+    pack = f"res://sites/{site}" if texture_mode == "import" else f"user://sites/{site}"   # where Godot will find the pack
     SITE_KEY = f"SITE_{site.upper()}"
-    name = a.name or site.capitalize()
+    name = name or site.capitalize()
     strings = [["keys", "et", "en"], [SITE_KEY, name, name],
                [f"{SITE_KEY}_SUBTITLE", f"{name}: kolm aastat, sama maa.", f"{name}: three years, the same ground."]]
 
@@ -171,20 +215,19 @@ def scaffold(a):
     os.makedirs(os.path.join(site_dir, "data/eras"), exist_ok=True)
     tods = [13.5, 9.5, 14.5]
     for i, (e, y) in enumerate(zip(eras, years)):
-        tex, strength, tint = era_texture(tile, e, y, tile_dir)
+        tex, strength, tint = era_texture(tile, e, y, tile_dir, texture_mode)
         props = {
-            "id": q(e), "display_name_key": q(f"ERA_{y}_NAME"), "year_label": q(str(y)), "scene_path": q(f"res://sites/{site}/scenes/{e}.tscn"),
+            "id": q(e), "display_name_key": q(f"ERA_{y}_NAME"), "year_label": q(str(y)), "scene_path": q(f"{pack}/scenes/{e}.tscn"),
             "texture_strength": str(strength), "ground_tint": "Color(%s, %s, %s, 1)" % tint,
-            "default_time_of_day": str(tods[i % len(tods)]), "order": str(i), "narrative_story": q(f"res://sites/{site}/narrative/{e}.ink.json"),
+            "default_time_of_day": str(tods[i % len(tods)]), "order": str(i), "narrative_story": q(f"{pack}/narrative/{e}.ink.json"),
             "currency_key": q(f"CUR_{y}"), "starting_money": str([12, 150, 2000][min(i, 2)]),
         }
-        if tex:
-            props["terrain_texture"] = 'ExtResource("2")'
-        write_tres(os.path.join(site_dir, f"data/eras/{e}.tres"), "res://scripts/era/era_definition.gd", props, tex)
+        ext = set_texture(props, tex, texture_mode)
+        write_tres(os.path.join(site_dir, f"data/eras/{e}.tres"), "res://scripts/era/era_definition.gd", props, ext)
         S(f"ERA_{y}_NAME", f"Aasta {y}", f"The year {y}")
 
     # --- gameplay content copied from the template, eras remapped by order ------------------------
-    tmpl_dir = os.path.join(ROOT, "sites", a.template)
+    tmpl_dir = os.path.join(template_root, "sites", template)
     tmpl_strings = {}
     tp = os.path.join(tmpl_dir, "strings.csv")
     if os.path.exists(tp):
@@ -279,8 +322,9 @@ def scaffold(a):
     write_tres(os.path.join(site_dir, "data/items/keepsake.tres"), "res://scripts/items/artifact_item.gd", {
         "id": q("keepsake"), "display_name_key": q("ITEM_KEEPSAKE"), "description_key": q("ITEM_KEEPSAKE_DESC"), "can_cross_eras": "true",
         "linked_consequence_point_id": q("cp1_keepsake_returned"), "valid_delivery_target": q(f"npc_{oldest}"), "origin_era": q(newest), "delivery_era": q(oldest)})
+    layout = anchor_layout(half, anchors)
     write_tres(os.path.join(site_dir, "data/manors/home_farm.tres"), "res://scripts/base_building/manor_definition.gd", {
-        "id": q("home_farm"), "display_name_key": q("MANOR_HOME"), "era_id": q(mid), "cadastral_parcel_id": q(""), "position": "Vector2(%d, %d)" % (half - 60, half + 40),
+        "id": q("home_farm"), "display_name_key": q("MANOR_HOME"), "era_id": q(mid), "cadastral_parcel_id": q(""), "position": "Vector2(%d, %d)" % (layout["farm"][0], layout["farm"][1]),
         "unlock_condition_flag": q(""), "structures": gd_array(structures)})
     S("CP1_KEEPSAKE_TRIGGER", f"Sa andsid mälestuseseme tagasi aastal {years[0]}.", f"You returned the keepsake in {years[0]}.")
     S("CP1_KEEPSAKE_EFFECT", "Mälestusese jõudis koju. Hilisematel aastatel seisab maamärgi juures kivi.", "The keepsake came home. In the later years a stone stands by the landmark.")
@@ -303,10 +347,9 @@ def scaffold(a):
         S(f"POST_{y}", f"Pood ({y})", f"The shop ({y})"); S(f"POST_{y}_TEXT", "Ostetakse ja müüakse selle aasta raha eest.", "Buying and selling for this year's money.")
 
     # --- layout -----------------------------------------------------------------------------------
-    cx = cz = half
-    layout = {"spawn": [cx, cz + 20], "register": [cx, cz], "landmark": [cx + 40, cz - 30], "farm": [cx - 60, cz + 40], "trade": [cx + 30, cz + 30],
-              "exclusions": [[cx, cz, 6], [cx + 40, cz - 30, 6], [cx - 60, cz + 40, 14], [cx + 30, cz + 30, 4]], "pads": []}
     json.dump(layout, open(os.path.join(site_dir, "layout.json"), "w"), indent=1)
+    reg, sp = layout["register"], layout["spawn"]
+    yaw = round(math.degrees(math.atan2(-(reg[0] - sp[0]), -(reg[1] - sp[1]))) % 360, 1)   # face the register (0 = north)
 
     # --- scenes -----------------------------------------------------------------------------------
     def era_nodes(e, y, i):
@@ -353,8 +396,8 @@ def scaffold(a):
     manifest = {
         "id": site, "name_key": SITE_KEY, "subtitle_key": f"{SITE_KEY}_SUBTITLE",
         "description": f"{name}: scaffolded site pack. Replace the placeholder story.",
-        "terrain": {"tile": tile, "center": list(a.center), "size": a.size, "latitude": lat, "longitude": lon, "utc_offset": 3.0, "date": [2026, 9, 3], "era_maps": era_maps},
-        "start": {"era": newest, "spawn": layout["spawn"], "yaw_deg": 0},
+        "terrain": {"tile": tile, "center": [float(center[0]), float(center[1])], "size": size, "latitude": lat, "longitude": lon, "utc_offset": 3.0, "date": [2026, 9, 3], "era_maps": era_maps},
+        "start": {"era": newest, "spawn": layout["spawn"], "yaw_deg": yaw},
         "water": "water_2026.json", "buildings": "buildings_2026.json",
         "locations": {"LOC_LANDMARK": "landmark", "LOC_FARMSTEAD": "farm"},
         "objectives": [
@@ -383,8 +426,10 @@ def scaffold(a):
         p = os.path.join(site_dir, fn)
         if not os.path.exists(p):
             json.dump([], open(p, "w"))
-    print(f"[new_site] sites/{site}: eras {', '.join(eras)}; centre EPSG:3301 {a.center[0]:.0f} {a.center[1]:.0f} = {lat} N {lon} E")
-    print(f"[new_site] next: make tile SITE={site}   (or make era-maps / make features / make scenes separately), make ink, make validate")
+    print(f"[new_site] {os.path.relpath(site_dir, root)}: eras {', '.join(eras)}; centre EPSG:3301 {center[0]:.0f} {center[1]:.0f} = {lat} N {lon} E")
+    if root == ROOT:
+        print(f"[new_site] next: make tile SITE={site}   (or make era-maps / make features / make scenes separately), make ink, make validate")
+    return site_dir
 
 
 if __name__ == "__main__":
@@ -398,10 +443,14 @@ if __name__ == "__main__":
     ap.add_argument("--template", default="palupera", help="site whose farming/hunting/trading/building content to copy")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--relink-era-maps", action="store_true", help="only re-point the era resources at fetched ground maps")
+    ap.add_argument("--root", default=ROOT, help="project root holding sites/ and assets/terrain/ (default: the repo)")
+    ap.add_argument("--texture-mode", choices=["import", "path"], default="import", help="era textures as imported res:// resources or runtime user:// paths")
+    ap.add_argument("--anchors", help="anchors.json from extract_features.py to place the layout on")
     a = ap.parse_args()
     if a.relink_era_maps:
-        relink_era_maps(a.id)
+        relink_era_maps(a.id, a.root, a.texture_mode)
     else:
         if not a.center:
             sys.exit("--center X Y is required")
-        scaffold(a)
+        anchors = json.load(open(a.anchors)) if a.anchors else None
+        scaffold(a.id, a.name, a.center, a.size, a.eras, a.tile, a.template, a.force, a.root, ROOT, a.texture_mode, anchors)

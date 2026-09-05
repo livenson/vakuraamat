@@ -1,0 +1,6 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://tools/godot/install_pack.gd" id="1"]
+
+[node name="InstallPack" type="Node"]
+script = ExtResource("1")

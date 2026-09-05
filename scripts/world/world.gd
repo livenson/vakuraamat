@@ -17,16 +17,20 @@ var _screenshot_path := ""
 var _fx := ["sdfgi", "ssao", "ssil", "fog", "glow", "grade"]   # --fx=a,b,c limits the effects (measurement)
 var _screenshot_frame := 240
 var _frames := 0
+var _ready_done := false            # screenshots and the clock wait for the terrain build
 var _era_nodes: Dictionary = {}     # era_id -> EraController
 var _spawn := Vector3(512, 0, 512)  # from the site manifest "start.spawn" (tile metres)
 
 
 func _ready() -> void:
 	GameState.world = self
-	var tile := Sites.tile()
+	var tile_dir := Sites.tile_dir()
+	fade.color.a = 1.0
+	if (terrain.data == null or terrain.data.region_locations.is_empty()) and TerrainBuilder.has_inputs(tile_dir):
+		await _build_terrain(tile_dir)   # downloaded tile: inputs present, region data not yet built
 	if terrain.data == null or terrain.data.region_locations.is_empty():
-		push_error("no terrain data for tile %s - run make tile SITE=%s" % [tile, Sites.active])
-	georef = TerrainGeoref.load_tile(tile)
+		push_error("no terrain data for tile %s - run make tile SITE=%s" % [Sites.tile(), Sites.active])
+	georef = TerrainGeoref.load_dir(tile_dir)
 	var start: Dictionary = Sites.get_value("start", {})
 	var sp: Array = start.get("spawn", [512, 512])
 	_spawn = Vector3(float(sp[0]), 0.0, float(sp[1]))
@@ -50,6 +54,7 @@ func _ready() -> void:
 		await GameState.switch_era(first_era)
 	var tw := create_tween()
 	tw.tween_property(fade, "color:a", 0.0, FADE_TIME)
+	_ready_done = true
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--screenshot="):
 			_screenshot_path = a.trim_prefix("--screenshot=")
@@ -81,6 +86,8 @@ func _exit_tree() -> void:
 
 
 func _process(_delta: float) -> void:
+	if not _ready_done:
+		return
 	if sky and sky.tod:
 		Farming.tick_clock(sky.tod.current_time)
 		var current: EraController = _era_nodes.get(GameState.current_era)
@@ -123,8 +130,9 @@ func apply_era(era: EraDefinition, first_visit: bool) -> void:
 
 func _set_drape(era: EraDefinition) -> void:
 	var mat := terrain.material
-	if era.terrain_texture:
-		mat.set_shader_param("ortho_texture", era.terrain_texture)
+	var tex := era.texture()
+	if tex:
+		mat.set_shader_param("ortho_texture", tex)
 	mat.set_shader_param("ortho_strength", era.texture_strength)
 	mat.set_shader_param("ortho_tint", era.ground_tint)
 
@@ -138,12 +146,35 @@ func _apply_orthophoto() -> void:
 ## The terrain tile named by the site. Assigned before Terrain3D enters the tree (the World
 ## node enters first), so the region data and ground assets load exactly as if baked in the scene.
 func _enter_tree() -> void:
-	var tile := Sites.tile()
+	var dir := Sites.tile_dir()
 	var t3d: Terrain3D = get_node("Terrain3D")
-	var assets_path := "res://assets/terrain/%s/terrain_assets.tres" % tile
+	var assets_path := dir + "/terrain_assets.tres"
 	if ResourceLoader.exists(assets_path):
 		t3d.assets = load(assets_path)
-	t3d.data_directory = "res://assets/terrain/%s/data" % tile
+	if TerrainBuilder.has_inputs(dir) and not TerrainBuilder.has_region_data(dir):
+		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir + "/data"))   # Terrain3D needs it to create its data object
+	t3d.data_directory = dir + "/data"
+
+
+## First visit to a downloaded tile: import the heightmap/orthophoto and scatter vegetation
+## into the live Terrain3D, saving the region data for next time. Shows progress on the fade.
+func _build_terrain(tile_dir: String) -> void:
+	var label := Label.new()
+	label.set_anchors_preset(Control.PRESET_CENTER)
+	label.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.add_theme_font_size_override("font_size", 28)
+	label.add_theme_color_override("font_color", Color(0.85, 0.68, 0.25))
+	fade.add_child(label)
+	var builder := TerrainBuilder.new()
+	builder.yielding = true
+	builder.tree = get_tree()
+	builder.progress.connect(func(stage: String, f: float): label.text = "%s\n%s  %d%%" % [tr("UI_BUILDING_GROUND"), stage, int(f * 100)])
+	var layout := Sites.layout()
+	var ok: bool = await builder.import(terrain, tile_dir, layout)
+	if ok:
+		await builder.scatter(terrain, tile_dir, layout.get("exclusions", []))
+	label.queue_free()
 
 
 func _configure_sky() -> void:

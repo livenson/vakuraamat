@@ -84,8 +84,8 @@ def ink_knots(path):
     return knots, text
 
 
-def validate(site, rep):
-    site_dir = os.path.join(ROOT, "sites", site)
+def validate(site, rep, root=ROOT):
+    site_dir = os.path.join(root, "sites", site)
     mpath = os.path.join(site_dir, "site.json")
     if not os.path.exists(mpath):
         rep.err(f"{site}: no site.json"); return
@@ -115,7 +115,7 @@ def validate(site, rep):
         x, y = t["center"]
         if not (300000 < x < 800000 and 6300000 < y < 6700000):
             rep.warn("terrain.center does not look like EPSG:3301 metres inside Estonia")
-    tile_dir = os.path.join(ROOT, "assets/terrain", str(t.get("tile", site)))
+    tile_dir = os.path.join(root, "assets/terrain", str(t.get("tile", site)))
     if not os.path.exists(os.path.join(tile_dir, "terrain_meta.json")):
         rep.warn(f"terrain tile not fetched yet: {tile_dir} (make tile SITE={site})")
     elif not os.path.exists(os.path.join(tile_dir, "data", "terrain3d_00_00.res")):
@@ -155,12 +155,12 @@ def validate(site, rep):
         key(e.get("display_name_key"), f"era {eid}")
         key(e.get("currency_key"), f"era {eid}")
         sp = e.get("scene_path", "")
-        if not sp.startswith(f"res://sites/{site}/scenes/"):
+        if not (sp.startswith(f"res://sites/{site}/scenes/") or sp.startswith(f"user://sites/{site}/scenes/")):
             rep.warn(f"era {eid}: scene_path {sp!r} is outside the site pack")
-        if not os.path.exists(os.path.join(ROOT, sp.replace("res://", ""))) and not (spec and eid in spec.get("eras", {})):
+        if not os.path.exists(os.path.join(root, sp.replace("res://", "").replace("user://", ""))) and not (spec and eid in spec.get("eras", {})):
             rep.err(f"era {eid}: scene {sp} missing and scenes.json does not define it (make scenes)")
         ns = e.get("narrative_story", "")
-        if ns and not os.path.exists(os.path.join(ROOT, ns.replace("res://", ""))):
+        if ns and not os.path.exists(os.path.join(root, ns.replace("res://", "").replace("user://", ""))):
             ink = os.path.join(site_dir, "narrative", f"{eid}.ink")
             (rep.warn if os.path.exists(ink) else rep.err)(f"era {eid}: {ns} missing ({'make ink' if os.path.exists(ink) else 'no ink source either'})")
     for cid, cp in cps.items():
@@ -331,12 +331,13 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--site", default="palupera")
     ap.add_argument("--all", action="store_true", help="validate every site under sites/")
+    ap.add_argument("--root", default=ROOT, help="project root holding sites/ (default: the repo)")
     a = ap.parse_args()
-    sites = sorted(d for d in os.listdir(os.path.join(ROOT, "sites")) if os.path.exists(os.path.join(ROOT, "sites", d, "site.json"))) if a.all else [a.site]
+    sites = sorted(d for d in os.listdir(os.path.join(a.root, "sites")) if os.path.exists(os.path.join(a.root, "sites", d, "site.json"))) if a.all else [a.site]
     failed = False
     for s in sites:
         rep = Report()
-        validate(s, rep)
+        validate(s, rep, a.root)
         for w in rep.warnings:
             print(f"[{s}] warning: {w}")
         for e in rep.errors:

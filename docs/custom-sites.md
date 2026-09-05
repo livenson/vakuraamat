@@ -54,6 +54,29 @@ covers all of Estonia; the layers used per era year are chosen in `tools/new_sit
 (`era_map_for`): one-verst map before 1923, the 1930-44 cadastral map to 1944, Soviet 1:10 000
 to 1990, the 1994-98 base map to 2004, the orthophoto after that.
 
+## Any point in Estonia from inside the game
+
+The **New location...** button in the main menu takes an address, a place name, L-EST97
+`"E N"` or `"lat, lon"` (or *Use my location*, a city-level IP lookup) and asks the **tile service**
+for a pack:
+
+```sh
+make tile-service          # python3 tools/tile_service.py, loopback port 8765; needs GDAL, numpy, node
+```
+
+The service runs the same steps as `make site` + `make tile` in a workspace under `data_raw/service/`
+(downloads shared with `data_raw/`), places the story skeleton on **anchors** found in the data
+(register on open ground near the centre, landmark at the largest building or tallest trees, farm on
+the widest open ground, trade post by a road, field on crops), and returns a zip. The game installs
+it under `user://sites/<id>/` and `user://tiles/<id>/`; the world builds the Terrain3D data on the
+first visit (about 15 s, progress on the fade) and saves it next to the tile. Runtime packs are
+ordinary packs: `.tres` files load from `user://`, `strings.csv` is read directly, era textures are
+image paths. The service URL can be changed in `user://settings.cfg` under `[service] url`.
+
+Scripted equivalent: `curl -X POST :8765/tile -d '{"name":"Aakre","x":629807,"y":6441719}'`, poll
+`/status?id=aakre`, `/download?id=aakre`, then
+`godot --headless --path . res://tools/godot/install_pack.tscn -- --zip=aakre.zip --id=aakre`.
+
 ## Iterating
 
 | Change | Then run |
