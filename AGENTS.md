@@ -72,9 +72,34 @@ The design and plan documents in the repo root are authoritative: `vakuraamat-im
 - Sky3D owns the Environment; extra effects are set in `World._configure_environment()`.
 - Buildings: origin at the base, `metadata/footprint` on the group; EraController snaps to the lowest
   corner and `import_terrain.gd` levels pads listed in the layout.
+- Facing: exported models (MakeHuman figures, Kenney cars, the CSG bicycle) face +Z; agents, NPCs
+  and the player face -Z. Turn a model once where it is loaded (`model.rotation.y = PI`), never in
+  the mover. Render a preview with a direction arrow (`tools/godot/figure_preview.tscn`) before trusting it.
+- Vendored meshes may lie on their side (the junipers did, in every tile). Check a new vegetation or
+  prop mesh standing on a plane before scattering it; `tools/godot/fix_mesh_up.gd` stands one upright.
+- Anything placed on the terrain in a scene layer is snapped by `EraController`: container groups
+  (`Buildings`, `Parcels`, `Village`) stay at y 0 and their children snap; a node that positions its
+  own pieces on the ground sets `metadata/no_snap` on itself AND on its parcel group, or its heights
+  double and it floats in the sky.
+- Streamed tiles sit at a 1024 m offset: nodes must read pack files through
+  `Sites.path_in(Sites.pack_of(self), ...)` and sample the terrain with `to_global(...)`; `Parcels.at`
+  already resolves the tile. Never assume tile-local equals world coordinates.
+- Hot reload keeps instance state: a member variable added to a script is null on the live instance
+  until restart, so guard new dictionaries and arrays (`if _cache == null: _cache = {}`), or `restart`.
+- `tools/dev.py` targets the newest game instance; while `make test` runs, its headless games are
+  newer than the player's, so pass `--pid <n>` (from `python3 tools/dev.py instances`).
+- Headless (`--headless`) has no rendering buffers: MultiMesh transforms read back as zero and AABBs
+  are empty. Verify anything visual with a windowed `--screenshot` run, not a headless probe.
+- Water shaders that composite `SCREEN_TEXTURE` must write `ALPHA` (even 1.0) to land in the
+  transparent pass; otherwise the screen copy is taken after the surface and everything below vanishes.
+- Godot `-s` tool scripts run without autoloads: static helpers used by tools take paths, not `Sites`.
+- Water patches from `extract_features.py` are bounding rectangles; long ditches become slabs over
+  land. Basins are carved only where the DTM was flat, but the surface still covers the rectangle.
 
 ## Tests
 `tools/godot/*_test.tscn`: boot (autoloads, data, ink, save), site (every pack: registries, era
-scenes, translations, ink), playthrough (all five Palupera consequences, chapters, endings, save
-round-trip), farming, hunting, economy (trading + building). Keep them green. `tools/validate_site.py`
+scenes, translations, ink), userpack, friends, devchannel, traffic, streaming, playthrough (all five
+Palupera consequences, chapters, endings, save round-trip), farming, hunting, economy (trading +
+building). Keep them green. Each test is capped at 180 s by the Makefile; a test that is silent for
+two minutes is stuck (usually a parse error in the test script), do not wait for it. `tools/validate_site.py`
 checks pack references without Godot.

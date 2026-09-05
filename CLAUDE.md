@@ -12,3 +12,12 @@ Additional Claude-specific guidance:
   fresh game at the reported spot for a screenshot check.
 - Run `make test` before committing; commit per logical step with the FPS number when rendering changed.
 - Keep `THIRD_PARTY.md` and `vakuraamat-visual-upgrade-plan.md` status lines current.
+- Playtest triage order: read the report's position first. A position outside 0..1024 means a
+  streamed tile; check whether the same thing happens in the origin tile before blaming streaming
+  (the "fallen trees" were a model problem visible everywhere).
+- Kill stray processes before a debug session: `pgrep -fl "Godot --headless|make test|tile_service"`.
+  A hung test loop keeps spawning instances that `tools/dev.py` then targets instead of the player's game.
+- After changing a mesh, texture or region data on disk, `python3 tools/dev.py restart`; hot reload
+  covers scripts, era scenes, pack data and shaders only.
+- Facing, snapping and offset rules are in `AGENTS.md` (conventions and pitfalls); read them before
+  touching movers, parcel kits or anything that samples the terrain.
