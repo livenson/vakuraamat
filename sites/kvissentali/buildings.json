@@ -317,7 +317,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405191",
+    "aadr_id": "5704458",
+    "ads_oid": "ME00762432",
+    "koodaadress": "79793815100000T450000BUWY00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 22"
+   },
+   "addresses": [
+    "Madruse tn 22"
+   ],
+   "cadastral": [
+    "79514:036:0006"
+   ]
   },
   {
    "id": 727990,
@@ -719,7 +732,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405191",
+    "aadr_id": "5704458",
+    "ads_oid": "EE00762431",
+    "koodaadress": "79793815100000T450000BUWY00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 22"
+   },
+   "addresses": [
+    "Madruse tn 22"
+   ],
+   "cadastral": [
+    "79514:036:0006"
+   ]
   },
   {
    "id": 727240,
@@ -1985,7 +2011,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405183",
+    "aadr_id": "5704449",
+    "ads_oid": "ME00764174",
+    "koodaadress": "79793815100000T450000BUWX00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 18"
+   },
+   "addresses": [
+    "Madruse tn 18"
+   ],
+   "cadastral": [
+    "79514:036:0085"
+   ]
   },
   {
    "id": 8300044,
@@ -2295,7 +2334,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405182",
+    "aadr_id": "5704448",
+    "ads_oid": "EE03773285",
+    "koodaadress": "79793815100000T450000BUWW00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 20"
+   },
+   "addresses": [
+    "Madruse tn 20"
+   ],
+   "cadastral": [
+    "79514:036:0085"
+   ]
   },
   {
    "id": 707903,
@@ -2729,7 +2781,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3021924",
+    "aadr_id": "5338572",
+    "ads_oid": "EE00753471",
+    "koodaadress": "797938560000000006JL2000000000000",
+    "full_address": "Tartu maakond, Tartu linn, Tähtvere küla, Piibu"
+   },
+   "addresses": [
+    "Piibu"
+   ],
+   "cadastral": [
+    "83101:003:0455"
+   ]
   },
   {
    "id": 8060221,
@@ -2983,7 +3048,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 5689539,
@@ -4835,7 +4903,10 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 707913,
@@ -5395,7 +5466,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 727241,
@@ -5649,7 +5723,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 724377,
@@ -5945,7 +6022,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 9061943,
@@ -6501,7 +6581,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 9061950,
@@ -6558,7 +6641,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 707917,
@@ -7602,7 +7688,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 7217019,
@@ -8124,7 +8213,10 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 6850964,
@@ -8724,7 +8816,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3081922",
+    "aadr_id": "5393528",
+    "ads_oid": "EE03609695",
+    "koodaadress": "79793815100000T3W0000BI5G00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Talmani tn 2"
+   },
+   "addresses": [
+    "Talmani tn 2"
+   ],
+   "cadastral": [
+    "79514:036:0091"
+   ]
   },
   {
    "id": 716110,
@@ -9538,7 +9643,25 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3066645",
+    "aadr_id": "5383681",
+    "ads_oid": "ME00771442",
+    "koodaadress": "79793815100000ST90000BERP00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kvissentali tee 1"
+   },
+   "addresses": [
+    "Kvissentali tee 1"
+   ],
+   "cadastral": [
+    "79514:036:0051",
+    "79514:036:0060",
+    "79514:036:0070",
+    "79514:036:0053",
+    "79514:036:0066",
+    "79301:001:1640"
+   ]
   },
   {
    "id": 7165597,
@@ -10546,7 +10669,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3069739",
+    "aadr_id": "5381957",
+    "ads_oid": "EE03538564",
+    "koodaadress": "79793815100000T3W0000BF8500000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Talmani tn 4"
+   },
+   "addresses": [
+    "Talmani tn 4"
+   ],
+   "cadastral": [
+    "79514:036:0090"
+   ]
   },
   {
    "id": 5694291,
@@ -11104,7 +11240,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3063601",
+    "aadr_id": "5376518",
+    "ads_oid": "EE01079955",
+    "koodaadress": "79793815100000T170000BDP400000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 3b"
+   },
+   "addresses": [
+    "Lootsi tn 3b"
+   ],
+   "cadastral": [
+    "79514:036:0038"
+   ]
   },
   {
    "id": 5689780,
@@ -11795,7 +11944,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3047948",
+    "aadr_id": "5362275",
+    "ads_oid": "EE01001469",
+    "koodaadress": "79793815100000T170000B8ZX00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 3c"
+   },
+   "addresses": [
+    "Lootsi tn 3c"
+   ],
+   "cadastral": [
+    "79514:036:0036"
+   ]
   },
   {
    "id": 8673710,
@@ -12091,7 +12253,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 5689559,
@@ -13159,7 +13324,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405180",
+    "aadr_id": "5704447",
+    "ads_oid": "EE01023716",
+    "koodaadress": "79793815100000T450000BUWU00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 9"
+   },
+   "addresses": [
+    "Madruse tn 9"
+   ],
+   "cadastral": [
+    "79514:036:0055"
+   ]
   },
   {
    "id": 737613,
@@ -13881,7 +14059,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405172",
+    "aadr_id": "5704439",
+    "ads_oid": "EE00986388",
+    "koodaadress": "79793815100000T450000BUWN00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 12"
+   },
+   "addresses": [
+    "Madruse tn 12"
+   ],
+   "cadastral": [
+    "79514:036:0080"
+   ]
   },
   {
    "id": 5689560,
@@ -14484,7 +14675,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405178",
+    "aadr_id": "5704445",
+    "ads_oid": "EE01040307",
+    "koodaadress": "79793815100000T450000BUWS00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 7"
+   },
+   "addresses": [
+    "Madruse tn 7"
+   ],
+   "cadastral": [
+    "79514:036:0056"
+   ]
   },
   {
    "id": 5694294,
@@ -15052,7 +15256,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3040935",
+    "aadr_id": "5356054",
+    "ads_oid": "EE01089160",
+    "koodaadress": "79793815100000T170000B69300000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 3a"
+   },
+   "addresses": [
+    "Lootsi tn 3a"
+   ],
+   "cadastral": [
+    "79514:036:0039"
+   ]
   },
   {
    "id": 5689781,
@@ -15928,7 +16145,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3063600",
+    "aadr_id": "5376517",
+    "ads_oid": "EE01055469",
+    "koodaadress": "79793815100000T170000BDP300000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 5"
+   },
+   "addresses": [
+    "Lootsi tn 5"
+   ],
+   "cadastral": [
+    "79514:036:0037"
+   ]
   },
   {
    "id": 6708911,
@@ -16404,7 +16634,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3093635",
+    "aadr_id": "5404363",
+    "ads_oid": "EE03190740",
+    "koodaadress": "79793815100000T170000BK8D00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 7"
+   },
+   "addresses": [
+    "Lootsi tn 7"
+   ],
+   "cadastral": [
+    "79514:036:0035"
+   ]
   },
   {
    "id": 5689779,
@@ -17084,7 +17327,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 5694356,
@@ -17662,7 +17908,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3047947",
+    "aadr_id": "5362274",
+    "ads_oid": "EE01114544",
+    "koodaadress": "79793815100000T170000B8ZW00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 11"
+   },
+   "addresses": [
+    "Lootsi tn 11"
+   ],
+   "cadastral": [
+    "79514:036:0033"
+   ]
   },
   {
    "id": 6493295,
@@ -18477,7 +18736,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405173",
+    "aadr_id": "5704440",
+    "ads_oid": "EE01131685",
+    "koodaadress": "79793815100000T450000BUWO00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 5"
+   },
+   "addresses": [
+    "Madruse tn 5"
+   ],
+   "cadastral": [
+    "79514:036:0057"
+   ]
   },
   {
    "id": 5689653,
@@ -18953,7 +19225,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3047946",
+    "aadr_id": "5362273",
+    "ads_oid": "EE01052195",
+    "koodaadress": "79793815100000T170000B8ZV00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 21"
+   },
+   "addresses": [
+    "Lootsi tn 21"
+   ],
+   "cadastral": [
+    "79514:036:0028"
+   ]
   },
   {
    "id": 737614,
@@ -19719,7 +20004,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405168",
+    "aadr_id": "5704436",
+    "ads_oid": "EE01165767",
+    "koodaadress": "79793815100000T450000BUWJ00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 10"
+   },
+   "addresses": [
+    "Madruse tn 10"
+   ],
+   "cadastral": [
+    "79514:036:0079"
+   ]
   },
   {
    "id": 6075408,
@@ -20291,7 +20589,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3091318",
+    "aadr_id": "5402541",
+    "ads_oid": "EE01071883",
+    "koodaadress": "79793815100000T170000BJXK00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 15"
+   },
+   "addresses": [
+    "Lootsi tn 15"
+   ],
+   "cadastral": [
+    "79514:036:0031"
+   ]
   },
   {
    "id": 5694355,
@@ -20817,7 +21128,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3111601",
+    "aadr_id": "5421704",
+    "ads_oid": "EE01108228",
+    "koodaadress": "79793815100000T170000BMLL00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 13"
+   },
+   "addresses": [
+    "Lootsi tn 13"
+   ],
+   "cadastral": [
+    "79514:036:0032"
+   ]
   },
   {
    "id": 5694296,
@@ -21479,7 +21803,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3075596",
+    "aadr_id": "5387588",
+    "ads_oid": "EE01065249",
+    "koodaadress": "79793815100000T170000BH2P00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 19"
+   },
+   "addresses": [
+    "Lootsi tn 19"
+   ],
+   "cadastral": [
+    "79514:036:0029"
+   ]
   },
   {
    "id": 5694297,
@@ -22047,7 +22384,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3063599",
+    "aadr_id": "5376516",
+    "ads_oid": "EE01106477",
+    "koodaadress": "79793815100000T170000BDP200000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 17"
+   },
+   "addresses": [
+    "Lootsi tn 17"
+   ],
+   "cadastral": [
+    "79514:036:0030"
+   ]
   },
   {
    "id": 731270,
@@ -22853,7 +23203,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405179",
+    "aadr_id": "5704446",
+    "ads_oid": "EE01101083",
+    "koodaadress": "79793815100000T450000BUWT00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 8"
+   },
+   "addresses": [
+    "Madruse tn 8"
+   ],
+   "cadastral": [
+    "79514:036:0078"
+   ]
   },
   {
    "id": 5689782,
@@ -23463,7 +23826,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3047949",
+    "aadr_id": "5362276",
+    "ads_oid": "EE01032343",
+    "koodaadress": "79793815100000T170000B8ZY00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 3"
+   },
+   "addresses": [
+    "Lootsi tn 3"
+   ],
+   "cadastral": [
+    "79514:036:0040"
+   ]
   },
   {
    "id": 5689561,
@@ -24181,7 +24557,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405167",
+    "aadr_id": "5704435",
+    "ads_oid": "EE01029072",
+    "koodaadress": "79793815100000T450000BUWI00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 3"
+   },
+   "addresses": [
+    "Madruse tn 3"
+   ],
+   "cadastral": [
+    "79514:036:0058"
+   ]
   },
   {
    "id": 5694353,
@@ -25083,7 +25472,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3091906",
+    "aadr_id": "5403012",
+    "ads_oid": "EE01081885",
+    "koodaadress": "79793815100000T170000BK1U00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 4"
+   },
+   "addresses": [
+    "Lootsi tn 4"
+   ],
+   "cadastral": [
+    "79514:036:0051"
+   ]
   },
   {
    "id": 5694357,
@@ -25693,7 +26095,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405193",
+    "aadr_id": "5704460",
+    "ads_oid": "EE01081638",
+    "koodaadress": "79793815100000T450000BUX000000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 6"
+   },
+   "addresses": [
+    "Madruse tn 6"
+   ],
+   "cadastral": [
+    "79514:036:0013"
+   ]
   },
   {
    "id": 6077850,
@@ -26343,7 +26758,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3047955",
+    "aadr_id": "5362282",
+    "ads_oid": "EE01077098",
+    "koodaadress": "79793815100000T170000B90400000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 6"
+   },
+   "addresses": [
+    "Lootsi tn 6"
+   ],
+   "cadastral": [
+    "79514:036:0050"
+   ]
   },
   {
    "id": 5694352,
@@ -26935,7 +27363,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3109350",
+    "aadr_id": "5419458",
+    "ads_oid": "EE01074001",
+    "koodaadress": "79793815100000T170000BMEG00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 8"
+   },
+   "addresses": [
+    "Lootsi tn 8"
+   ],
+   "cadastral": [
+    "79514:036:0049"
+   ]
   },
   {
    "id": 730806,
@@ -27419,7 +27860,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 6077851,
@@ -28113,7 +28557,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3079379",
+    "aadr_id": "5391307",
+    "ads_oid": "EE01083840",
+    "koodaadress": "79793815100000T170000BHWN00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 10"
+   },
+   "addresses": [
+    "Lootsi tn 10"
+   ],
+   "cadastral": [
+    "79514:036:0048"
+   ]
   },
   {
    "id": 5689654,
@@ -28639,7 +29096,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3066199",
+    "aadr_id": "5379204",
+    "ads_oid": "EE01031592",
+    "koodaadress": "79793815100000T170000BEJB00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 20"
+   },
+   "addresses": [
+    "Lootsi tn 20"
+   ],
+   "cadastral": [
+    "79514:036:0042"
+   ]
   },
   {
    "id": 5694298,
@@ -29647,7 +30117,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3073103",
+    "aadr_id": "5385251",
+    "ads_oid": "EE01104816",
+    "koodaadress": "79793815100000T170000BG5F00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 1"
+   },
+   "addresses": [
+    "Lootsi tn 1"
+   ],
+   "cadastral": [
+    "79514:036:0041"
+   ]
   },
   {
    "id": 5694299,
@@ -30257,7 +30740,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3040742",
+    "aadr_id": "5355876",
+    "ads_oid": "EE01056945",
+    "koodaadress": "79793815100000T170000B68500000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 12"
+   },
+   "addresses": [
+    "Lootsi tn 12"
+   ],
+   "cadastral": [
+    "79514:036:0047"
+   ]
   },
   {
    "id": 726029,
@@ -32717,7 +33213,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405170",
+    "aadr_id": "5704403",
+    "ads_oid": "ME00775524",
+    "koodaadress": "79793815100000T450000BUWL00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 14"
+   },
+   "addresses": [
+    "Madruse tn 14"
+   ],
+   "cadastral": [
+    "79514:036:0074"
+   ]
   },
   {
    "id": 742506,
@@ -33417,7 +33926,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405192",
+    "aadr_id": "5704459",
+    "ads_oid": "EE03404745",
+    "koodaadress": "79793815100000T450000BUWZ00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 4"
+   },
+   "addresses": [
+    "Madruse tn 4"
+   ],
+   "cadastral": [
+    "79514:036:0012"
+   ]
   },
   {
    "id": 6493296,
@@ -34154,7 +34676,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3122384",
+    "aadr_id": "5432012",
+    "ads_oid": "EE03175730",
+    "koodaadress": "79793815100000T170000BNGE00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 22"
+   },
+   "addresses": [
+    "Lootsi tn 22"
+   ],
+   "cadastral": [
+    "79514:036:0084"
+   ]
   },
   {
    "id": 5689783,
@@ -34878,7 +35413,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3063671",
+    "aadr_id": "5376593",
+    "ads_oid": "EE01034057",
+    "koodaadress": "79793815100000T170000BDR200000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 2"
+   },
+   "addresses": [
+    "Lootsi tn 2"
+   ],
+   "cadastral": [
+    "79514:036:0052"
+   ]
   },
   {
    "id": 5694354,
@@ -36440,7 +36988,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3088272",
+    "aadr_id": "5399414",
+    "ads_oid": "EE03306386",
+    "koodaadress": "79793815100000T170000BJHF00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 14"
+   },
+   "addresses": [
+    "Lootsi tn 14"
+   ],
+   "cadastral": [
+    "79514:036:0046"
+   ]
   },
   {
    "id": 6077852,
@@ -36874,7 +37435,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3109349",
+    "aadr_id": "5419457",
+    "ads_oid": "EE01075021",
+    "koodaadress": "79793815100000T170000BMEF00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 16"
+   },
+   "addresses": [
+    "Lootsi tn 16"
+   ],
+   "cadastral": [
+    "79514:036:0045"
+   ]
   },
   {
    "id": 6850945,
@@ -37626,7 +38200,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3405175",
+    "aadr_id": "5704442",
+    "ads_oid": "EE03873772",
+    "koodaadress": "79793815100000T450000BUWP00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Madruse tn 1"
+   },
+   "addresses": [
+    "Madruse tn 1"
+   ],
+   "cadastral": [
+    "79514:036:0043"
+   ]
   },
   {
    "id": 8721605,
@@ -38164,7 +38751,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3132007",
+    "aadr_id": "5440962",
+    "ads_oid": "EE04096542",
+    "koodaadress": "79793815100000SUE0000BNXK00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kvissentali põik 2"
+   },
+   "addresses": [
+    "Kvissentali põik 2"
+   ],
+   "cadastral": [
+    "79501:002:0374"
+   ]
   },
   {
    "id": 5689563,
@@ -38904,7 +39504,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3063492",
+    "aadr_id": "5376392",
+    "ads_oid": "EE01013955",
+    "koodaadress": "79793815100000T170000BDM500000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 25"
+   },
+   "addresses": [
+    "Lootsi tn 25"
+   ],
+   "cadastral": [
+    "79514:036:0011"
+   ]
   },
   {
    "id": 8535036,
@@ -39263,7 +39876,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3122578",
+    "aadr_id": "5432207",
+    "ads_oid": "EE03954631",
+    "koodaadress": "79793815100000T3L0000BNGZ00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Ignatsi tn 8"
+   },
+   "addresses": [
+    "Ignatsi tn 8"
+   ],
+   "cadastral": [
+    "79501:002:0370"
+   ]
   },
   {
    "id": 8337115,
@@ -40015,7 +40641,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3047079",
+    "aadr_id": "5361469",
+    "ads_oid": "EE03898626",
+    "koodaadress": "79793815100000T3L0000B8LS00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Ignatsi tn 6"
+   },
+   "addresses": [
+    "Ignatsi tn 6"
+   ],
+   "cadastral": [
+    "79501:002:0368"
+   ]
   },
   {
    "id": 8058794,
@@ -40383,7 +41022,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3081946",
+    "aadr_id": "5393549",
+    "ads_oid": "EE03808814",
+    "koodaadress": "79793815100000T3L0000BI5P00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Ignatsi tn 4"
+   },
+   "addresses": [
+    "Ignatsi tn 4"
+   ],
+   "cadastral": [
+    "79501:002:0366"
+   ]
   },
   {
    "id": 8155658,
@@ -41109,7 +41761,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3103980",
+    "aadr_id": "5414382",
+    "ads_oid": "EE03963112",
+    "koodaadress": "79793815100000T3L0000BLR900000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Ignatsi tn 2"
+   },
+   "addresses": [
+    "Ignatsi tn 2"
+   ],
+   "cadastral": [
+    "79501:002:0364"
+   ]
   },
   {
    "id": 8558775,
@@ -42439,7 +43104,20 @@
    "chimney": false,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3118653",
+    "aadr_id": "5428413",
+    "ads_oid": "EE04045722",
+    "koodaadress": "79793815100000ST90000BN6200000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kvissentali tee 8"
+   },
+   "addresses": [
+    "Kvissentali tee 8"
+   ],
+   "cadastral": [
+    "79501:002:0358"
+   ]
   },
   {
    "id": 5689564,
@@ -43388,7 +44066,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3046674",
+    "aadr_id": "5361081",
+    "ads_oid": "EE01002979",
+    "koodaadress": "79793815100000T170000B8I000000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Lootsi tn 27"
+   },
+   "addresses": [
+    "Lootsi tn 27"
+   ],
+   "cadastral": [
+    "79514:036:0010"
+   ]
   },
   {
    "id": 8532950,
@@ -43892,7 +44583,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3113794",
+    "aadr_id": "5423643",
+    "ads_oid": "EE03957731",
+    "koodaadress": "79793815100000ST90000BMRL00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kvissentali tee 10"
+   },
+   "addresses": [
+    "Kvissentali tee 10"
+   ],
+   "cadastral": [
+    "79501:002:0357"
+   ]
   },
   {
    "id": 8532870,
@@ -44678,7 +45382,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3113793",
+    "aadr_id": "5423642",
+    "ads_oid": "EE03940658",
+    "koodaadress": "79793815100000ST90000BMRK00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kvissentali tee 14"
+   },
+   "addresses": [
+    "Kvissentali tee 14"
+   ],
+   "cadastral": [
+    "79501:002:0355"
+   ]
   },
   {
    "id": 727598,
@@ -45302,7 +46019,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3410349",
+    "aadr_id": "5709643",
+    "ads_oid": "EE00747885",
+    "koodaadress": "79793815100000ST90000BVU000000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kvissentali tee 33"
+   },
+   "addresses": [
+    "Kvissentali tee 33"
+   ],
+   "cadastral": [
+    "79514:036:0063"
+   ]
   },
   {
    "id": 8912877,
@@ -46770,7 +47500,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3056225",
+    "aadr_id": "5369667",
+    "ads_oid": "EE04019442",
+    "koodaadress": "79793815100000ST90000BBAA00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kvissentali tee 16"
+   },
+   "addresses": [
+    "Kvissentali tee 16"
+   ],
+   "cadastral": [
+    "79501:002:0354"
+   ]
   },
   {
    "id": 723616,
@@ -47066,7 +47809,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 9767933,
@@ -47159,7 +47905,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3113792",
+    "aadr_id": "5423641",
+    "ads_oid": "EE04204399",
+    "koodaadress": "79793815100000ST90000BMRJ00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kvissentali tee 18"
+   },
+   "addresses": [
+    "Kvissentali tee 18"
+   ],
+   "cadastral": [
+    "79501:002:0353"
+   ]
   },
   {
    "id": 5689615,
@@ -48105,7 +48864,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3088294",
+    "aadr_id": "5399442",
+    "ads_oid": "EE01032338",
+    "koodaadress": "79793815100000SH90000BJI100000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 2"
+   },
+   "addresses": [
+    "Pootsmani tn 2"
+   ],
+   "cadastral": [
+    "79514:037:0121"
+   ]
   },
   {
    "id": 9108677,
@@ -48359,7 +49131,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 8429373,
@@ -49355,7 +50130,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3047082",
+    "aadr_id": "5361470",
+    "ads_oid": "EE03862003",
+    "koodaadress": "79793815100000T3L0000B8LV00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Ignatsi tn 5"
+   },
+   "addresses": [
+    "Ignatsi tn 5"
+   ],
+   "cadastral": [
+    "79501:002:0367"
+   ]
   },
   {
    "id": 737615,
@@ -50131,7 +50919,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3047956",
+    "aadr_id": "5362283",
+    "ads_oid": "EE00990591",
+    "koodaadress": "79793815100000SH90000B90500000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 3"
+   },
+   "addresses": [
+    "Pootsmani tn 3"
+   ],
+   "cadastral": [
+    "79514:037:0100"
+   ]
   },
   {
    "id": 7715669,
@@ -50709,7 +51510,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3087471",
+    "aadr_id": "5398606",
+    "ads_oid": "EE03711356",
+    "koodaadress": "79793815100000T3L0000BJBT00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Ignatsi tn 3"
+   },
+   "addresses": [
+    "Ignatsi tn 3"
+   ],
+   "cadastral": [
+    "79501:002:0365"
+   ]
   },
   {
    "id": 9767686,
@@ -50795,7 +51609,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3127135",
+    "aadr_id": "5436451",
+    "ads_oid": "EE04233876",
+    "koodaadress": "79793815100000T3L0000BNRE00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Ignatsi tn 1"
+   },
+   "addresses": [
+    "Ignatsi tn 1"
+   ],
+   "cadastral": [
+    "79501:002:0363"
+   ]
   },
   {
    "id": 7583910,
@@ -51565,7 +52392,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3056226",
+    "aadr_id": "5369668",
+    "ads_oid": "EE03676924",
+    "koodaadress": "79793815100000T3K0000BBAB00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Klaose tn 3"
+   },
+   "addresses": [
+    "Klaose tn 3"
+   ],
+   "cadastral": [
+    "79501:002:0360"
+   ]
   },
   {
    "id": 737617,
@@ -53315,7 +54155,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3042104",
+    "aadr_id": "5357085",
+    "ads_oid": "EE01110020",
+    "koodaadress": "79793815100000SH90000B6O000000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 39"
+   },
+   "addresses": [
+    "Pootsmani tn 39"
+   ],
+   "cadastral": [
+    "79514:037:0035"
+   ]
   },
   {
    "id": 737616,
@@ -54209,7 +55062,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3086022",
+    "aadr_id": "5397533",
+    "ads_oid": "EE01164521",
+    "koodaadress": "79793815100000SH90000BJ3000000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 48"
+   },
+   "addresses": [
+    "Pootsmani tn 48"
+   ],
+   "cadastral": [
+    "79514:037:0040"
+   ]
   },
   {
    "id": 737620,
@@ -54837,7 +55703,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3047981",
+    "aadr_id": "5362309",
+    "ads_oid": "EE00993563",
+    "koodaadress": "79793815100000SH90000B90U00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 4"
+   },
+   "addresses": [
+    "Pootsmani tn 4"
+   ],
+   "cadastral": [
+    "79514:037:0122"
+   ]
   },
   {
    "id": 737619,
@@ -55655,7 +56534,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3109352",
+    "aadr_id": "5419461",
+    "ads_oid": "EE01157524",
+    "koodaadress": "79793815100000SH90000BMEI00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 5"
+   },
+   "addresses": [
+    "Pootsmani tn 5"
+   ],
+   "cadastral": [
+    "79514:037:0101"
+   ]
   },
   {
    "id": 737618,
@@ -56263,7 +57155,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3053246",
+    "aadr_id": "5367030",
+    "ads_oid": "EE01157562",
+    "koodaadress": "79793815100000SOA0000BASS00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 2"
+   },
+   "addresses": [
+    "Kapteni tn 2"
+   ],
+   "cadastral": [
+    "79514:037:0063"
+   ]
   },
   {
    "id": 727301,
@@ -56845,7 +57750,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3040824",
+    "aadr_id": "5355958",
+    "ads_oid": "EE01066378",
+    "koodaadress": "79793815100000SOA0000B68C00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 3"
+   },
+   "addresses": [
+    "Kapteni tn 3"
+   ],
+   "cadastral": [
+    "79514:037:0067"
+   ]
   },
   {
    "id": 726060,
@@ -57201,7 +58119,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3040827",
+    "aadr_id": "5355961",
+    "ads_oid": "EE00779814",
+    "koodaadress": "79793815100000SH90000B68F00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 46"
+   },
+   "addresses": [
+    "Pootsmani tn 46"
+   ],
+   "cadastral": [
+    "79514:037:0039"
+   ]
   },
   {
    "id": 737621,
@@ -58981,7 +59912,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3079378",
+    "aadr_id": "5391306",
+    "ads_oid": "EE01160630",
+    "koodaadress": "79793815100000SH90000BHWM00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 37"
+   },
+   "addresses": [
+    "Pootsmani tn 37"
+   ],
+   "cadastral": [
+    "79514:037:0053"
+   ]
   },
   {
    "id": 8517335,
@@ -59643,7 +60587,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3062804",
+    "aadr_id": "5375766",
+    "ads_oid": "EE03941181",
+    "koodaadress": "79793815100000T3M0000BDF500000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Riistapuu tn 3"
+   },
+   "addresses": [
+    "Riistapuu tn 3"
+   ],
+   "cadastral": [
+    "79501:002:0372"
+   ]
   },
   {
    "id": 5689616,
@@ -61545,7 +62502,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3088295",
+    "aadr_id": "5399443",
+    "ads_oid": "EE00999067",
+    "koodaadress": "79793815100000SH90000BJI200000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 6"
+   },
+   "addresses": [
+    "Pootsmani tn 6"
+   ],
+   "cadastral": [
+    "79514:037:0123"
+   ]
   },
   {
    "id": 7494525,
@@ -62223,7 +63193,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3075463",
+    "aadr_id": "5387429",
+    "ads_oid": "EE03641359",
+    "koodaadress": "79793815100000T3M0000BGZ800000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Riistapuu tn 9"
+   },
+   "addresses": [
+    "Riistapuu tn 9"
+   ],
+   "cadastral": [
+    "79501:002:0243"
+   ]
   },
   {
    "id": 7494531,
@@ -62919,7 +63902,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3057322",
+    "aadr_id": "5370556",
+    "ads_oid": "EE03650873",
+    "koodaadress": "79793815100000T3M0000BBNB00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Riistapuu tn 5"
+   },
+   "addresses": [
+    "Riistapuu tn 5"
+   ],
+   "cadastral": [
+    "79501:002:0239"
+   ]
   },
   {
    "id": 7494527,
@@ -63611,7 +64607,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3126773",
+    "aadr_id": "5436095",
+    "ads_oid": "EE03580116",
+    "koodaadress": "79793815100000T3M0000BNQM00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Riistapuu tn 7"
+   },
+   "addresses": [
+    "Riistapuu tn 7"
+   ],
+   "cadastral": [
+    "79501:002:0241"
+   ]
   },
   {
    "id": 737622,
@@ -64265,7 +65274,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3067522",
+    "aadr_id": "5379965",
+    "ads_oid": "EE00987806",
+    "koodaadress": "79793815100000SH90000BEWH00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 7"
+   },
+   "addresses": [
+    "Pootsmani tn 7"
+   ],
+   "cadastral": [
+    "79514:037:0102"
+   ]
   },
   {
    "id": 7494523,
@@ -64968,7 +65990,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3057299",
+    "aadr_id": "5370540",
+    "ads_oid": "EE03734390",
+    "koodaadress": "79793815100000T3M0000BBMU00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Riistapuu tn 11"
+   },
+   "addresses": [
+    "Riistapuu tn 11"
+   ],
+   "cadastral": [
+    "79501:002:0245"
+   ]
   },
   {
    "id": 7583908,
@@ -65758,7 +66793,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3063272",
+    "aadr_id": "5376172",
+    "ads_oid": "EE03616634",
+    "koodaadress": "79793815100000T3M0000BDJL00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Riistapuu tn 19"
+   },
+   "addresses": [
+    "Riistapuu tn 19"
+   ],
+   "cadastral": [
+    "79501:002:0249"
+   ]
   },
   {
    "id": 8663800,
@@ -66367,7 +67415,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3113442",
+    "aadr_id": "5423323",
+    "ads_oid": "EE03915236",
+    "koodaadress": "79793815100000T3M0000BMPV00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Riistapuu tn 17"
+   },
+   "addresses": [
+    "Riistapuu tn 17"
+   ],
+   "cadastral": [
+    "79501:002:0248"
+   ]
   },
   {
    "id": 7494519,
@@ -66883,7 +67944,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3069528",
+    "aadr_id": "5381764",
+    "ads_oid": "EE03628098",
+    "koodaadress": "79793815100000T3M0000BF5700000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Riistapuu tn 13"
+   },
+   "addresses": [
+    "Riistapuu tn 13"
+   ],
+   "cadastral": [
+    "79501:002:0246"
+   ]
   },
   {
    "id": 7583905,
@@ -67535,7 +68609,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3069527",
+    "aadr_id": "5381763",
+    "ads_oid": "EE03582789",
+    "koodaadress": "79793815100000T3M0000BF5600000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Riistapuu tn 23"
+   },
+   "addresses": [
+    "Riistapuu tn 23"
+   ],
+   "cadastral": [
+    "79501:002:0251"
+   ]
   },
   {
    "id": 7494515,
@@ -68135,7 +69222,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3070968",
+    "aadr_id": "5383133",
+    "ads_oid": "EE03635243",
+    "koodaadress": "79793815100000T3M0000BFG000000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Riistapuu tn 15"
+   },
+   "addresses": [
+    "Riistapuu tn 15"
+   ],
+   "cadastral": [
+    "79501:002:0247"
+   ]
   },
   {
    "id": 728080,
@@ -68991,7 +70091,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3051091",
+    "aadr_id": "5365395",
+    "ads_oid": "EE00779586",
+    "koodaadress": "79793815100000SOA0000BA4P00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 5"
+   },
+   "addresses": [
+    "Kapteni tn 5"
+   ],
+   "cadastral": [
+    "79514:037:0068"
+   ]
   },
   {
    "id": 737623,
@@ -69557,7 +70670,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3053245",
+    "aadr_id": "5367029",
+    "ads_oid": "EE01154014",
+    "koodaadress": "79793815100000SOA0000BASR00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 4"
+   },
+   "addresses": [
+    "Kapteni tn 4"
+   ],
+   "cadastral": [
+    "79514:037:0071"
+   ]
   },
   {
    "id": 725927,
@@ -70493,7 +71619,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3067809",
+    "aadr_id": "5380254",
+    "ads_oid": "EE01066485",
+    "koodaadress": "79793815100000SH90000BEX300000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 35"
+   },
+   "addresses": [
+    "Pootsmani tn 35"
+   ],
+   "cadastral": [
+    "79514:037:0051"
+   ]
   },
   {
    "id": 737624,
@@ -71180,7 +72319,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3099422",
+    "aadr_id": "5410002",
+    "ads_oid": "EE01167141",
+    "koodaadress": "79793815100000SH90000BL9300000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 8"
+   },
+   "addresses": [
+    "Pootsmani tn 8"
+   ],
+   "cadastral": [
+    "79514:037:0124"
+   ]
   },
   {
    "id": 725929,
@@ -72370,7 +73522,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3088283",
+    "aadr_id": "5399429",
+    "ads_oid": "EE00779813",
+    "koodaadress": "79793815100000SH90000BJHQ00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 44"
+   },
+   "addresses": [
+    "Pootsmani tn 44"
+   ],
+   "cadastral": [
+    "79514:037:0038"
+   ]
   },
   {
    "id": 737625,
@@ -73540,7 +74705,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3109353",
+    "aadr_id": "5419462",
+    "ads_oid": "EE01169365",
+    "koodaadress": "79793815100000SH90000BMEJ00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 9"
+   },
+   "addresses": [
+    "Pootsmani tn 9"
+   ],
+   "cadastral": [
+    "79514:037:0103"
+   ]
   },
   {
    "id": 9680585,
@@ -73665,7 +74843,20 @@
    "chimney": false,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3098202",
+    "aadr_id": "5408839",
+    "ads_oid": "EE04269689",
+    "koodaadress": "79793815100000T3H0000BL1Y00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Aeru tn 2"
+   },
+   "addresses": [
+    "Aeru tn 2"
+   ],
+   "cadastral": [
+    "79501:002:0168"
+   ]
   },
   {
    "id": 737626,
@@ -75083,7 +76274,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3097743",
+    "aadr_id": "5408350",
+    "ads_oid": "EE01066433",
+    "koodaadress": "79793815100000SOA0000BKW600000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 6"
+   },
+   "addresses": [
+    "Kapteni tn 6"
+   ],
+   "cadastral": [
+    "79514:037:0072"
+   ]
   },
   {
    "id": 8429637,
@@ -75337,7 +76541,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 7494543,
@@ -77198,7 +78405,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3057300",
+    "aadr_id": "5370541",
+    "ads_oid": "EE03640938",
+    "koodaadress": "79793815100000T3H0000BBMV00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Aeru tn 1"
+   },
+   "addresses": [
+    "Aeru tn 1"
+   ],
+   "cadastral": [
+    "79501:002:0167"
+   ]
   },
   {
    "id": 7494537,
@@ -79384,7 +80604,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3114331",
+    "aadr_id": "5424138",
+    "ads_oid": "EE03631761",
+    "koodaadress": "79793815100000T3K0000BMTO00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Klaose tn 4"
+   },
+   "addresses": [
+    "Klaose tn 4"
+   ],
+   "cadastral": [
+    "79501:002:0195"
+   ]
   },
   {
    "id": 737628,
@@ -79786,7 +81019,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3042112",
+    "aadr_id": "5357093",
+    "ads_oid": "EE01157517",
+    "koodaadress": "79793815100000SH90000B6O800000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 10"
+   },
+   "addresses": [
+    "Pootsmani tn 10"
+   ],
+   "cadastral": [
+    "79514:037:0109"
+   ]
   },
   {
    "id": 7673723,
@@ -80578,7 +81824,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3069302",
+    "aadr_id": "5381541",
+    "ads_oid": "EE03692791",
+    "koodaadress": "79793815100000T3K0000BF3V00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Klaose tn 5"
+   },
+   "addresses": [
+    "Klaose tn 5"
+   ],
+   "cadastral": [
+    "79501:002:0196"
+   ]
   },
   {
    "id": 713512,
@@ -81298,7 +82557,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3044574",
+    "aadr_id": "5426097",
+    "ads_oid": "EE00779587",
+    "koodaadress": "79793815100000SOA0000B7PF00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 7"
+   },
+   "addresses": [
+    "Kapteni tn 7"
+   ],
+   "cadastral": [
+    "79514:037:0069"
+   ]
   },
   {
    "id": 8058796,
@@ -82402,7 +83674,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3092818",
+    "aadr_id": "5403912",
+    "ads_oid": "EE03808729",
+    "koodaadress": "79793815100000T3J0000BK5Y00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Hauskari tn 2"
+   },
+   "addresses": [
+    "Hauskari tn 2"
+   ],
+   "cadastral": [
+    "79501:002:0183"
+   ]
   },
   {
    "id": 725932,
@@ -83410,7 +84695,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3040823",
+    "aadr_id": "5355957",
+    "ads_oid": "EE01066425",
+    "koodaadress": "79793815100000SH90000B68B00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 42"
+   },
+   "addresses": [
+    "Pootsmani tn 42"
+   ],
+   "cadastral": [
+    "79514:037:0037"
+   ]
   },
   {
    "id": 737627,
@@ -84172,7 +85470,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3052417",
+    "aadr_id": "5366259",
+    "ads_oid": "EE01099696",
+    "koodaadress": "79793815100000SH90000BAPB00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 33"
+   },
+   "addresses": [
+    "Pootsmani tn 33"
+   ],
+   "cadastral": [
+    "79514:037:0049"
+   ]
   },
   {
    "id": 737629,
@@ -84980,7 +86291,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3067232",
+    "aadr_id": "5379695",
+    "ads_oid": "EE01173092",
+    "koodaadress": "79793815100000SH90000BEVD00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 13"
+   },
+   "addresses": [
+    "Pootsmani tn 13"
+   ],
+   "cadastral": [
+    "79514:037:0093"
+   ]
   },
   {
    "id": 9625598,
@@ -85045,7 +86369,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 7736324,
@@ -85299,7 +86626,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 9362682,
@@ -85428,7 +86758,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 8429656,
@@ -85682,7 +87015,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 737633,
@@ -86424,7 +87760,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3088277",
+    "aadr_id": "5399421",
+    "ads_oid": "EE01156510",
+    "koodaadress": "79793815100000SH90000BJHK00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 12"
+   },
+   "addresses": [
+    "Pootsmani tn 12"
+   ],
+   "cadastral": [
+    "79514:037:0110"
+   ]
   },
   {
    "id": 7494548,
@@ -88088,7 +89437,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3047601",
+    "aadr_id": "5361942",
+    "ads_oid": "EE03700953",
+    "koodaadress": "79793815100000T3H0000B8US00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Aeru tn 3"
+   },
+   "addresses": [
+    "Aeru tn 3"
+   ],
+   "cadastral": [
+    "79501:002:0169"
+   ]
   },
   {
    "id": 7494540,
@@ -89818,7 +91180,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3069301",
+    "aadr_id": "5381540",
+    "ads_oid": "EE03625046",
+    "koodaadress": "79793815100000T3K0000BF3U00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Klaose tn 6"
+   },
+   "addresses": [
+    "Klaose tn 6"
+   ],
+   "cadastral": [
+    "79501:002:0197"
+   ]
   },
   {
    "id": 737632,
@@ -91226,7 +92601,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3045488",
+    "aadr_id": "5359998",
+    "ads_oid": "EE01116314",
+    "koodaadress": "79793815100000SOA0000B7Z400000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 8"
+   },
+   "addresses": [
+    "Kapteni tn 8"
+   ],
+   "cadastral": [
+    "79514:037:0073"
+   ]
   },
   {
    "id": 737630,
@@ -91628,7 +93016,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3063673",
+    "aadr_id": "5376595",
+    "ads_oid": "EE01109208",
+    "koodaadress": "79793815100000SH90000BDR400000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 40"
+   },
+   "addresses": [
+    "Pootsmani tn 40"
+   ],
+   "cadastral": [
+    "79514:037:0036"
+   ]
   },
   {
    "id": 7673724,
@@ -92466,7 +93867,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3074632",
+    "aadr_id": "5386638",
+    "ads_oid": "EE03692799",
+    "koodaadress": "79793815100000T3K0000BGQ600000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Klaose tn 7"
+   },
+   "addresses": [
+    "Klaose tn 7"
+   ],
+   "cadastral": [
+    "79501:002:0198"
+   ]
   },
   {
    "id": 8010487,
@@ -93694,7 +95108,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3108420",
+    "aadr_id": "5418567",
+    "ads_oid": "EE03808765",
+    "koodaadress": "79793815100000T3J0000BM9H00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Hauskari tn 4"
+   },
+   "addresses": [
+    "Hauskari tn 4"
+   ],
+   "cadastral": [
+    "79501:002:0185"
+   ]
   },
   {
    "id": 737635,
@@ -94456,7 +95883,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3058909",
+    "aadr_id": "5372057",
+    "ads_oid": "EE00994454",
+    "koodaadress": "79793815100000SH90000BC3100000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 15"
+   },
+   "addresses": [
+    "Pootsmani tn 15"
+   ],
+   "cadastral": [
+    "79514:037:0094"
+   ]
   },
   {
    "id": 737634,
@@ -95414,7 +96854,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3096032",
+    "aadr_id": "5406621",
+    "ads_oid": "EE01100900",
+    "koodaadress": "79793815100000SH90000BKM300000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 31"
+   },
+   "addresses": [
+    "Pootsmani tn 31"
+   ],
+   "cadastral": [
+    "79514:037:0047"
+   ]
   },
   {
    "id": 7736328,
@@ -95668,7 +97121,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 737636,
@@ -96292,7 +97748,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3066663",
+    "aadr_id": "5399422",
+    "ads_oid": "EE01166691",
+    "koodaadress": "79793815100000SH90000BES700000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 14"
+   },
+   "addresses": [
+    "Pootsmani tn 14"
+   ],
+   "cadastral": [
+    "79514:037:0111"
+   ]
   },
   {
    "id": 7583913,
@@ -97904,7 +99373,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3117825",
+    "aadr_id": "5427601",
+    "ads_oid": "EE03700424",
+    "koodaadress": "79793815100000T3H0000BN4K00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Aeru tn 6"
+   },
+   "addresses": [
+    "Aeru tn 6"
+   ],
+   "cadastral": [
+    "79501:002:0172"
+   ]
   },
   {
    "id": 7583925,
@@ -98594,7 +100076,20 @@
    "chimney": false,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3081180",
+    "aadr_id": "5392795",
+    "ads_oid": "EE03692767",
+    "koodaadress": "79793815100000T3H0000BI1L00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Aeru tn 5"
+   },
+   "addresses": [
+    "Aeru tn 5"
+   ],
+   "cadastral": [
+    "79501:002:0171"
+   ]
   },
   {
    "id": 8868624,
@@ -98848,7 +100343,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 7583924,
@@ -99828,7 +101326,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3092816",
+    "aadr_id": "5403910",
+    "ads_oid": "EE03698470",
+    "koodaadress": "79793815100000T3K0000BK5W00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Klaose tn 8"
+   },
+   "addresses": [
+    "Klaose tn 8"
+   ],
+   "cadastral": [
+    "79501:002:0199"
+   ]
   },
   {
    "id": 737637,
@@ -100678,7 +102189,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3119125",
+    "aadr_id": "5428912",
+    "ads_oid": "EE01156666",
+    "koodaadress": "79793815100000SH90000BN8P00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 38"
+   },
+   "addresses": [
+    "Pootsmani tn 38"
+   ],
+   "cadastral": [
+    "79514:037:0054"
+   ]
   },
   {
    "id": 5689929,
@@ -100932,7 +102456,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 5689694,
@@ -101742,7 +103269,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3119107",
+    "aadr_id": "5428888",
+    "ads_oid": "EE01041302",
+    "koodaadress": "79793815100000SH90000BN8700000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 17"
+   },
+   "addresses": [
+    "Pootsmani tn 17"
+   ],
+   "cadastral": [
+    "79514:037:0095"
+   ]
   },
   {
    "id": 7823135,
@@ -102534,7 +104074,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3131411",
+    "aadr_id": "5440420",
+    "ads_oid": "EE03725349",
+    "koodaadress": "79793815100000T3K0000BNWB00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Klaose tn 9"
+   },
+   "addresses": [
+    "Klaose tn 9"
+   ],
+   "cadastral": [
+    "79501:002:0200"
+   ]
   },
   {
    "id": 8058798,
@@ -103634,7 +105187,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3103527",
+    "aadr_id": "5413933",
+    "ads_oid": "EE03825911",
+    "koodaadress": "79793815100000T3J0000BLP200000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Hauskari tn 6"
+   },
+   "addresses": [
+    "Hauskari tn 6"
+   ],
+   "cadastral": [
+    "79501:002:0187"
+   ]
   },
   {
    "id": 737638,
@@ -104036,7 +105602,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3088797",
+    "aadr_id": "5400030",
+    "ads_oid": "EE01110069",
+    "koodaadress": "79793815100000SH90000BJO600000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 29"
+   },
+   "addresses": [
+    "Pootsmani tn 29"
+   ],
+   "cadastral": [
+    "79514:037:0046"
+   ]
   },
   {
    "id": 7809575,
@@ -105022,7 +106601,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3113254",
+    "aadr_id": "5423164",
+    "ads_oid": "EE03750399",
+    "koodaadress": "79793815100000T3J0000BMPB00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Hauskari tn 3"
+   },
+   "addresses": [
+    "Hauskari tn 3"
+   ],
+   "cadastral": [
+    "79501:002:0184"
+   ]
   },
   {
    "id": 8111819,
@@ -105276,7 +106868,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 737639,
@@ -105900,7 +107495,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3048776",
+    "aadr_id": "5363129",
+    "ads_oid": "EE01166741",
+    "koodaadress": "79793815100000SH90000B9M200000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 16"
+   },
+   "addresses": [
+    "Pootsmani tn 16"
+   ],
+   "cadastral": [
+    "79514:037:0112"
+   ]
   },
   {
    "id": 737641,
@@ -106970,7 +108578,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3067400",
+    "aadr_id": "5379841",
+    "ads_oid": "EE01143875",
+    "koodaadress": "79793815100000STB0000BEW800000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Tüürimehe tn 2"
+   },
+   "addresses": [
+    "Tüürimehe tn 2"
+   ],
+   "cadastral": [
+    "79514:037:0056"
+   ]
   },
   {
    "id": 7583914,
@@ -108596,7 +110217,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3122207",
+    "aadr_id": "5431841",
+    "ads_oid": "EE03816313",
+    "koodaadress": "79793815100000T3H0000BNFE00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Aeru tn 8"
+   },
+   "addresses": [
+    "Aeru tn 8"
+   ],
+   "cadastral": [
+    "79501:002:0174"
+   ]
   },
   {
    "id": 737642,
@@ -109158,7 +110792,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3048020",
+    "aadr_id": "5362348",
+    "ads_oid": "EE00779809",
+    "koodaadress": "79793815100000SH90000B91W00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 36"
+   },
+   "addresses": [
+    "Pootsmani tn 36"
+   ],
+   "cadastral": [
+    "79514:037:0052"
+   ]
   },
   {
    "id": 5689928,
@@ -109412,7 +111059,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 737640,
@@ -110266,7 +111916,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3075603",
+    "aadr_id": "5387595",
+    "ads_oid": "EE01166720",
+    "koodaadress": "79793815100000SH90000BH2W00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 19"
+   },
+   "addresses": [
+    "Pootsmani tn 19"
+   ],
+   "cadastral": [
+    "79514:037:0096"
+   ]
   },
   {
    "id": 7715693,
@@ -110520,7 +112183,10 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 737643,
@@ -111416,7 +113082,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3053501",
+    "aadr_id": "5367268",
+    "ads_oid": "EE01152321",
+    "koodaadress": "79793815100000SH90000BAUB00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 27"
+   },
+   "addresses": [
+    "Pootsmani tn 27"
+   ],
+   "cadastral": [
+    "79514:037:0045"
+   ]
   },
   {
    "id": 7715695,
@@ -111684,7 +113363,21 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3438160",
+    "aadr_id": "5745946",
+    "ads_oid": "EE03726628",
+    "koodaadress": "79793815100000T3H0000C27C00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Aeru tn 7/2"
+   },
+   "addresses": [
+    "Aeru tn 7/1",
+    "Aeru tn 7/2"
+   ],
+   "cadastral": [
+    "79501:002:0173"
+   ]
   },
   {
    "id": 725097,
@@ -112912,7 +114605,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3066291",
+    "aadr_id": "5379256",
+    "ads_oid": "EE00779846",
+    "koodaadress": "79793815100000STB0000BEL900000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Tüürimehe tn 4"
+   },
+   "addresses": [
+    "Tüürimehe tn 4"
+   ],
+   "cadastral": [
+    "79514:037:0057"
+   ]
   },
   {
    "id": 7823137,
@@ -113702,7 +115408,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3074631",
+    "aadr_id": "5386637",
+    "ads_oid": "EE03725357",
+    "koodaadress": "79793815100000T3K0000BGQ500000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Klaose tn 11"
+   },
+   "addresses": [
+    "Klaose tn 11"
+   ],
+   "cadastral": [
+    "79501:002:0202"
+   ]
   },
   {
    "id": 8300402,
@@ -114586,7 +116305,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3074633",
+    "aadr_id": "5386639",
+    "ads_oid": "EE03878239",
+    "koodaadress": "79793815100000T3J0000BGQ700000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Hauskari tn 8"
+   },
+   "addresses": [
+    "Hauskari tn 8"
+   ],
+   "cadastral": [
+    "79501:002:0189"
+   ]
   },
   {
    "id": 7583883,
@@ -115204,7 +116936,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3092817",
+    "aadr_id": "5403911",
+    "ads_oid": "EE03708787",
+    "koodaadress": "79793815100000T3J0000BK5X00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Hauskari tn 5"
+   },
+   "addresses": [
+    "Hauskari tn 5"
+   ],
+   "cadastral": [
+    "79501:002:0186"
+   ]
   },
   {
    "id": 737644,
@@ -116204,7 +117949,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3109376",
+    "aadr_id": "5419493",
+    "ads_oid": "EE01101508",
+    "koodaadress": "79793815100000STB0000BMF600000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Tüürimehe tn 6"
+   },
+   "addresses": [
+    "Tüürimehe tn 6"
+   ],
+   "cadastral": [
+    "79514:037:0059"
+   ]
   },
   {
    "id": 8111818,
@@ -116458,7 +118216,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 737645,
@@ -117674,7 +119435,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3058910",
+    "aadr_id": "5372058",
+    "ads_oid": "EE01170505",
+    "koodaadress": "79793815100000SH90000BC3200000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 18"
+   },
+   "addresses": [
+    "Pootsmani tn 18"
+   ],
+   "cadastral": [
+    "79514:037:0113"
+   ]
   },
   {
    "id": 8871508,
@@ -117928,7 +119702,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 737647,
@@ -118612,7 +120389,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3075657",
+    "aadr_id": "5387661",
+    "ads_oid": "EE01128818",
+    "koodaadress": "79793815100000SH90000BH4E00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 34"
+   },
+   "addresses": [
+    "Pootsmani tn 34"
+   ],
+   "cadastral": [
+    "79514:037:0050"
+   ]
   },
   {
    "id": 7583915,
@@ -120268,7 +122058,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3069305",
+    "aadr_id": "5381544",
+    "ads_oid": "EE03808656",
+    "koodaadress": "79793815100000T3H0000BF3Y00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Aeru tn 10"
+   },
+   "addresses": [
+    "Aeru tn 10"
+   ],
+   "cadastral": [
+    "79501:002:0176"
+   ]
   },
   {
    "id": 737646,
@@ -121166,7 +122969,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3053174",
+    "aadr_id": "5366971",
+    "ads_oid": "EE01167238",
+    "koodaadress": "79793815100000SH90000BAS100000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 21"
+   },
+   "addresses": [
+    "Pootsmani tn 21"
+   ],
+   "cadastral": [
+    "79514:037:0097"
+   ]
   },
   {
    "id": 7583917,
@@ -122634,7 +124450,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3098201",
+    "aadr_id": "5408838",
+    "ads_oid": "EE03685778",
+    "koodaadress": "79793815100000T3H0000BL1X00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Aeru tn 9"
+   },
+   "addresses": [
+    "Aeru tn 9"
+   ],
+   "cadastral": [
+    "79501:002:0175"
+   ]
   },
   {
    "id": 737648,
@@ -123580,7 +125409,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3066019",
+    "aadr_id": "5379028",
+    "ads_oid": "EE01171894",
+    "koodaadress": "79793815100000SH90000BEGR00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 25"
+   },
+   "addresses": [
+    "Pootsmani tn 25"
+   ],
+   "cadastral": [
+    "79514:037:0099"
+   ]
   },
   {
    "id": 7583920,
@@ -125080,7 +126922,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3122098",
+    "aadr_id": "5431732",
+    "ads_oid": "EE03720503",
+    "koodaadress": "79793815100000T3K0000BNF800000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Klaose tn 12"
+   },
+   "addresses": [
+    "Klaose tn 12"
+   ],
+   "cadastral": [
+    "79501:002:0203"
+   ]
   },
   {
    "id": 8058754,
@@ -125716,7 +127571,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3069303",
+    "aadr_id": "5381542",
+    "ads_oid": "EE03823324",
+    "koodaadress": "79793815100000T3J0000BF3W00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Hauskari tn 10"
+   },
+   "addresses": [
+    "Hauskari tn 10"
+   ],
+   "cadastral": [
+    "79501:002:0191"
+   ]
   },
   {
    "id": 737649,
@@ -126550,7 +128418,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3072211",
+    "aadr_id": "5384323",
+    "ads_oid": "EE01161392",
+    "koodaadress": "79793815100000STB0000BFUB00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Tüürimehe tn 8"
+   },
+   "addresses": [
+    "Tüürimehe tn 8"
+   ],
+   "cadastral": [
+    "79514:037:0060"
+   ]
   },
   {
    "id": 8631009,
@@ -127371,7 +129252,20 @@
    "chimney": false,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3113244",
+    "aadr_id": "5423155",
+    "ads_oid": "EE04018871",
+    "koodaadress": "79793815100000T3K0000BMPA00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Klaose tn 13"
+   },
+   "addresses": [
+    "Klaose tn 13"
+   ],
+   "cadastral": [
+    "79501:002:0204"
+   ]
   },
   {
    "id": 8010484,
@@ -128699,7 +130593,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3069304",
+    "aadr_id": "5381543",
+    "ads_oid": "EE03732090",
+    "koodaadress": "79793815100000T3J0000BF3X00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Hauskari tn 7"
+   },
+   "addresses": [
+    "Hauskari tn 7"
+   ],
+   "cadastral": [
+    "79501:002:0188"
+   ]
   },
   {
    "id": 8193243,
@@ -129243,7 +131150,20 @@
    "chimney": false,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3057210",
+    "aadr_id": "5418856",
+    "ads_oid": "EE03714506",
+    "koodaadress": "79793815100000STB0000BBLF00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Tüürimehe tn 1"
+   },
+   "addresses": [
+    "Tüürimehe tn 1"
+   ],
+   "cadastral": [
+    "79514:037:0078"
+   ]
   },
   {
    "id": 737651,
@@ -130317,7 +132237,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3063607",
+    "aadr_id": "5376524",
+    "ads_oid": "EE01144546",
+    "koodaadress": "79793815100000SH90000BDPA00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 20"
+   },
+   "addresses": [
+    "Pootsmani tn 20"
+   ],
+   "cadastral": [
+    "79514:037:0114"
+   ]
   },
   {
    "id": 9156393,
@@ -130571,7 +132504,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 737650,
@@ -131567,7 +133503,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3117345",
+    "aadr_id": "5427115",
+    "ads_oid": "EE01144079",
+    "koodaadress": "79793815100000SH90000BN2800000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 32"
+   },
+   "addresses": [
+    "Pootsmani tn 32"
+   ],
+   "cadastral": [
+    "79514:037:0048"
+   ]
   },
   {
    "id": 5689679,
@@ -132427,7 +134376,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3067399",
+    "aadr_id": "5379840",
+    "ads_oid": "EE00994446",
+    "koodaadress": "79793815100000STB0000BEW700000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Tüürimehe tn 3"
+   },
+   "addresses": [
+    "Tüürimehe tn 3"
+   ],
+   "cadastral": [
+    "79514:037:0104"
+   ]
   },
   {
    "id": 7583916,
@@ -134001,7 +135963,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3081171",
+    "aadr_id": "5392786",
+    "ads_oid": "EE03808663",
+    "koodaadress": "79793815100000T3H0000BI1I00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Aeru tn 12"
+   },
+   "addresses": [
+    "Aeru tn 12"
+   ],
+   "cadastral": [
+    "79501:002:0178"
+   ]
   },
   {
    "id": 7583918,
@@ -135435,7 +137410,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3131413",
+    "aadr_id": "5440422",
+    "ads_oid": "EE03696586",
+    "koodaadress": "79793815100000T3H0000BNWD00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Aeru tn 11"
+   },
+   "addresses": [
+    "Aeru tn 11"
+   ],
+   "cadastral": [
+    "79501:002:0177"
+   ]
   },
   {
    "id": 7583923,
@@ -137075,7 +139063,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3126778",
+    "aadr_id": "5436101",
+    "ads_oid": "EE03720514",
+    "koodaadress": "79793815100000T3K0000BNQP00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Klaose tn 14"
+   },
+   "addresses": [
+    "Klaose tn 14"
+   ],
+   "cadastral": [
+    "79501:002:0205"
+   ]
   },
   {
    "id": 8058747,
@@ -138375,7 +140376,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3131412",
+    "aadr_id": "5440421",
+    "ads_oid": "EE03826055",
+    "koodaadress": "79793815100000T3J0000BNWC00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Hauskari tn 12"
+   },
+   "addresses": [
+    "Hauskari tn 12"
+   ],
+   "cadastral": [
+    "79501:002:0192"
+   ]
   },
   {
    "id": 737655,
@@ -139279,7 +141293,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3061665",
+    "aadr_id": "5374620",
+    "ads_oid": "EE01157513",
+    "koodaadress": "79793815100000SH90000BD2500000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 22"
+   },
+   "addresses": [
+    "Pootsmani tn 22"
+   ],
+   "cadastral": [
+    "79514:037:0115"
+   ]
   },
   {
    "id": 7494549,
@@ -140245,7 +142272,20 @@
    "chimney": false,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3081170",
+    "aadr_id": "5392785",
+    "ads_oid": "EE03625769",
+    "koodaadress": "79793815100000T3J0000BI1H00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Hauskari tn 9"
+   },
+   "addresses": [
+    "Hauskari tn 9"
+   ],
+   "cadastral": [
+    "79501:002:0190"
+   ]
   },
   {
    "id": 8631010,
@@ -141024,7 +143064,20 @@
    "chimney": false,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3092813",
+    "aadr_id": "5403907",
+    "ads_oid": "EE04017796",
+    "koodaadress": "79793815100000T3K0000BK5T00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Klaose tn 15"
+   },
+   "addresses": [
+    "Klaose tn 15"
+   ],
+   "cadastral": [
+    "79501:002:0206"
+   ]
   },
   {
    "id": 737656,
@@ -142162,7 +144215,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3048017",
+    "aadr_id": "5362345",
+    "ads_oid": "EE01161383",
+    "koodaadress": "79793815100000STB0000B91U00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Tüürimehe tn 10"
+   },
+   "addresses": [
+    "Tüürimehe tn 10"
+   ],
+   "cadastral": [
+    "79514:037:0061"
+   ]
   },
   {
    "id": 9156391,
@@ -142416,7 +144482,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 737659,
@@ -143236,7 +145305,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3063606",
+    "aadr_id": "5376523",
+    "ads_oid": "EE01162015",
+    "koodaadress": "79793815100000SH90000BDP900000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Pootsmani tn 24"
+   },
+   "addresses": [
+    "Pootsmani tn 24"
+   ],
+   "cadastral": [
+    "79514:037:0108"
+   ]
   },
   {
    "id": 737658,
@@ -143970,7 +146052,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3112664",
+    "aadr_id": "5422668",
+    "ads_oid": "EE01155815",
+    "koodaadress": "79793815100000STB0000BMNQ00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Tüürimehe tn 5"
+   },
+   "addresses": [
+    "Tüürimehe tn 5"
+   ],
+   "cadastral": [
+    "79514:037:0105"
+   ]
   },
   {
    "id": 8663866,
@@ -144487,7 +146582,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3122092",
+    "aadr_id": "5431725",
+    "ads_oid": "EE03948098",
+    "koodaadress": "79793815100000T3I0000BNF600000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 11"
+   },
+   "addresses": [
+    "Meruski tn 11"
+   ],
+   "cadastral": [
+    "79501:002:0213"
+   ]
   },
   {
    "id": 711556,
@@ -144837,7 +146945,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3069623",
+    "aadr_id": "5381846",
+    "ads_oid": "ME00752007",
+    "koodaadress": "79793815100000SOA0000BF6L00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 12"
+   },
+   "addresses": [
+    "Kapteni tn 12"
+   ],
+   "cadastral": [
+    "79514:037:0032"
+   ]
   },
   {
    "id": 9400822,
@@ -144908,7 +147029,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3454299",
+    "aadr_id": "5765643",
+    "ads_oid": "ME04065745",
+    "koodaadress": "79793815100000STB0000C5HV00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Tüürimehe tn 7"
+   },
+   "addresses": [
+    "Tüürimehe tn 7"
+   ],
+   "cadastral": [
+    "79301:001:0507"
+   ]
   },
   {
    "id": 9773267,
@@ -145001,7 +147135,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3070014",
+    "aadr_id": "5382215",
+    "ads_oid": "EE04201871",
+    "koodaadress": "79793815100000T3I0000BFAS00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 13"
+   },
+   "addresses": [
+    "Meruski tn 13"
+   ],
+   "cadastral": [
+    "79501:002:0215"
+   ]
   },
   {
    "id": 7824894,
@@ -147058,7 +149205,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3081168",
+    "aadr_id": "5392783",
+    "ads_oid": "EE03798351",
+    "koodaadress": "79793815100000T3I0000BI1F00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 12"
+   },
+   "addresses": [
+    "Meruski tn 12"
+   ],
+   "cadastral": [
+    "79501:002:0214"
+   ]
   },
   {
    "id": 8924215,
@@ -147421,7 +149581,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3069623",
+    "aadr_id": "5381846",
+    "ads_oid": "EE04068034",
+    "koodaadress": "79793815100000SOA0000BF6L00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 12"
+   },
+   "addresses": [
+    "Kapteni tn 12"
+   ],
+   "cadastral": [
+    "79514:037:0032"
+   ]
   },
   {
    "id": 9108105,
@@ -148794,7 +150967,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3454299",
+    "aadr_id": "5765643",
+    "ads_oid": "EE04065746",
+    "koodaadress": "79793815100000STB0000C5HV00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Tüürimehe tn 7"
+   },
+   "addresses": [
+    "Tüürimehe tn 7"
+   ],
+   "cadastral": [
+    "79301:001:0507"
+   ]
   },
   {
    "id": 7583899,
@@ -149344,7 +151530,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3074630",
+    "aadr_id": "5386636",
+    "ads_oid": "EE03690918",
+    "koodaadress": "79793815100000T3I0000BGQ400000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 15"
+   },
+   "addresses": [
+    "Meruski tn 15"
+   ],
+   "cadastral": [
+    "79501:002:0216"
+   ]
   },
   {
    "id": 8558783,
@@ -149610,7 +151809,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3055406",
+    "aadr_id": "5368873",
+    "ads_oid": "ME03918308",
+    "koodaadress": "79793815100000T3I0000BB2I00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 17"
+   },
+   "addresses": [
+    "Meruski tn 17"
+   ],
+   "cadastral": [
+    "79501:002:0217"
+   ]
   },
   {
    "id": 8414320,
@@ -150188,7 +152400,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3131410",
+    "aadr_id": "5440419",
+    "ads_oid": "EE03882871",
+    "koodaadress": "79793815100000T3I0000BNWA00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 20"
+   },
+   "addresses": [
+    "Meruski tn 20"
+   ],
+   "cadastral": [
+    "79501:002:0219"
+   ]
   },
   {
    "id": 8866826,
@@ -151062,7 +153287,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3046681",
+    "aadr_id": "5361088",
+    "ads_oid": "EE03990298",
+    "koodaadress": "79793815100000SOA0000B8I500000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 14"
+   },
+   "addresses": [
+    "Kapteni tn 14"
+   ],
+   "cadastral": [
+    "79301:001:0506"
+   ]
   },
   {
    "id": 8532879,
@@ -152358,7 +154596,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3055406",
+    "aadr_id": "5368873",
+    "ads_oid": "EE03918307",
+    "koodaadress": "79793815100000T3I0000BB2I00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 17"
+   },
+   "addresses": [
+    "Meruski tn 17"
+   ],
+   "cadastral": [
+    "79501:002:0217"
+   ]
   },
   {
    "id": 7583889,
@@ -153018,7 +155269,20 @@
    "chimney": true,
    "solar": true,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3081167",
+    "aadr_id": "5392782",
+    "ads_oid": "EE03701058",
+    "koodaadress": "79793815100000T3I0000BI1E00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 22"
+   },
+   "addresses": [
+    "Meruski tn 22"
+   ],
+   "cadastral": [
+    "79501:002:0222"
+   ]
   },
   {
    "id": 713351,
@@ -153452,7 +155716,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 7546396,
@@ -154102,7 +156369,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3126777",
+    "aadr_id": "5436100",
+    "ads_oid": "EE03693263",
+    "koodaadress": "79793815100000T3I0000BNQO00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 24"
+   },
+   "addresses": [
+    "Meruski tn 24"
+   ],
+   "cadastral": [
+    "79501:002:0224"
+   ]
   },
   {
    "id": 7217009,
@@ -154398,7 +156678,10 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": null,
+   "addresses": [],
+   "cadastral": []
   },
   {
    "id": 8414328,
@@ -155064,7 +157347,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3074628",
+    "aadr_id": "5386634",
+    "ads_oid": "EE03927841",
+    "koodaadress": "79793815100000T3I0000BGQ200000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 26"
+   },
+   "addresses": [
+    "Meruski tn 26"
+   ],
+   "cadastral": [
+    "79501:002:0226"
+   ]
   },
   {
    "id": 724418,
@@ -155520,7 +157816,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3055871",
+    "aadr_id": "5369335",
+    "ads_oid": "EE00775516",
+    "koodaadress": "79793815100000SOA0000BB7100000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 16"
+   },
+   "addresses": [
+    "Kapteni tn 16"
+   ],
+   "cadastral": [
+    "79514:037:0134"
+   ]
   },
   {
    "id": 8414330,
@@ -156730,7 +159039,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3069280",
+    "aadr_id": "5381523",
+    "ads_oid": "EE03910564",
+    "koodaadress": "79793815100000T3I0000BF3K00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 27"
+   },
+   "addresses": [
+    "Meruski tn 27"
+   ],
+   "cadastral": [
+    "79501:002:0227"
+   ]
   },
   {
    "id": 8457172,
@@ -157292,7 +159614,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3069097",
+    "aadr_id": "5381338",
+    "ads_oid": "EE03811061",
+    "koodaadress": "79793815100000T3I0000BF2B00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 28"
+   },
+   "addresses": [
+    "Meruski tn 28"
+   ],
+   "cadastral": [
+    "79501:002:0228"
+   ]
   },
   {
    "id": 8532876,
@@ -157934,7 +160269,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3113032",
+    "aadr_id": "5423030",
+    "ads_oid": "EE03815940",
+    "koodaadress": "79793815100000T3I0000BMOT00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 30"
+   },
+   "addresses": [
+    "Meruski tn 30"
+   ],
+   "cadastral": [
+    "79501:002:0230"
+   ]
   },
   {
    "id": 713042,
@@ -158416,7 +160764,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3055871",
+    "aadr_id": "5369335",
+    "ads_oid": "ME01087453",
+    "koodaadress": "79793815100000SOA0000BB7100000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 16"
+   },
+   "addresses": [
+    "Kapteni tn 16"
+   ],
+   "cadastral": [
+    "79514:037:0134"
+   ]
   },
   {
    "id": 9302706,
@@ -158527,7 +160888,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3055181",
+    "aadr_id": "5368666",
+    "ads_oid": "EE04106672",
+    "koodaadress": "79793815100000T3I0000BB1900000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 29"
+   },
+   "addresses": [
+    "Meruski tn 29"
+   ],
+   "cadastral": [
+    "79501:002:0229"
+   ]
   },
   {
    "id": 724421,
@@ -158967,7 +161341,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3055871",
+    "aadr_id": "5369335",
+    "ads_oid": "ME01087437",
+    "koodaadress": "79793815100000SOA0000BB7100000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Kapteni tn 16"
+   },
+   "addresses": [
+    "Kapteni tn 16"
+   ],
+   "cadastral": [
+    "79514:037:0134"
+   ]
   },
   {
    "id": 8532874,
@@ -159776,7 +162163,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3131303",
+    "aadr_id": "5440313",
+    "ads_oid": "EE03926855",
+    "koodaadress": "79793815100000T3I0000BNW000000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 32"
+   },
+   "addresses": [
+    "Meruski tn 32"
+   ],
+   "cadastral": [
+    "79501:002:0232"
+   ]
   },
   {
    "id": 8726835,
@@ -161114,7 +163514,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3113443",
+    "aadr_id": "5423324",
+    "ads_oid": "EE03986013",
+    "koodaadress": "79793815100000T3I0000BMPW00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 34"
+   },
+   "addresses": [
+    "Meruski tn 34"
+   ],
+   "cadastral": [
+    "79501:002:0234"
+   ]
   },
   {
    "id": 9026477,
@@ -162658,7 +165071,20 @@
    "chimney": true,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3081445",
+    "aadr_id": "5393060",
+    "ads_oid": "EE03943988",
+    "koodaadress": "79793815100000T3I0000BI2K00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 36"
+   },
+   "addresses": [
+    "Meruski tn 36"
+   ],
+   "cadastral": [
+    "79501:002:0236"
+   ]
   },
   {
    "id": 8429300,
@@ -163382,7 +165808,20 @@
    "chimney": false,
    "solar": false,
    "well": false,
-   "monument": false
+   "monument": false,
+   "ads": {
+    "adr_id": "3086967",
+    "aadr_id": "5398089",
+    "ads_oid": "EE03911052",
+    "koodaadress": "79793815100000T3I0000BJ8Q00000000",
+    "full_address": "Tartu maakond, Tartu linn, Tartu linn, Meruski tn 35"
+   },
+   "addresses": [
+    "Meruski tn 35"
+   ],
+   "cadastral": [
+    "79501:002:0235"
+   ]
   }
  ]
 }

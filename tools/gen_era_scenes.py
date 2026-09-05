@@ -295,6 +295,8 @@ class Scene:
             kind = "ruin" if str(b.get("type") or "") == "Vare" else b.get("kind", "dwelling")
             mats = b.get("materials") or {}
             extras += f'\nkind = "{kind}"\nfloors = {int(b.get("floors") or 0)}\nfacade = "{(mats.get("facade") or mats.get("wall_type") or "").replace(chr(34), "")}"\nroof_cover = "{(mats.get("roof_cover") or "").replace(chr(34), "")}"'
+            q = lambda v: str(v or "").replace(chr(34), "").replace("\n", " ")  # noqa: E731
+            extras += f'\nehr = "{q(b.get("ehr"))}"\naddress = "{q(b.get("address"))}"\npurpose = "{q(b.get("purpose"))}"\nyear = {int(b.get("year") or 0)}\ntunnus = "{q((b.get("cadastral") or [None])[0])}"'
             self.node("Footprint", "Node3D", f"Buildings/{name}", f'script = ExtResource("{sc}")\npolygon = PackedVector2Array({pts})\nheight = {b["h"]}\nwall_color = {color(c)}\nroof_color = {color(rc)}\nsource = "{source_rel}"\nbuilding_id = {b.get("id", 0)}{extras}')
             n += 1
         return n

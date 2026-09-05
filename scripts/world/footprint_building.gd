@@ -16,6 +16,11 @@ extends Node3D
 @export var floors := 0                                           # register floors; 0 = from the height
 @export var facade := ""                                          # register facade material text
 @export var roof_cover := ""                                      # register roof covering text
+@export var ehr := ""                                             # Building Register code
+@export var address := ""                                         # ETAK near address, e.g. "Madruse tn 22"
+@export var purpose := ""                                         # register use text
+@export var year := 0                                             # first year of use, 0 = unknown
+@export var tunnus := ""                                          # cadastral unit the register links it to
 
 const TEX := "res://assets/textures/buildings/"
 var _windows := SurfaceTool.new()
