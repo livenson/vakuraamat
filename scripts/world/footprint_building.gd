@@ -29,6 +29,8 @@ var _wall_faces: Array = []   # {pts: Array[Vector3], n: Vector3, t: Vector3, um
 
 static var _models: Dictionary = {}   # source path -> {id -> lod2 dict}
 var _sign: Label3D
+var _mesh_node: MeshInstance3D
+var _body_node: StaticBody3D
 
 
 var _walls := SurfaceTool.new()
@@ -63,9 +65,11 @@ func _ready() -> void:
 	for i in mesh.get_surface_count():
 		mesh.surface_set_material(i, mats[i] if i < mats.size() else mats[0])
 	var mi := MeshInstance3D.new()
+	_mesh_node = mi
 	mi.mesh = mesh
 	add_child(mi)
 	var body := StaticBody3D.new()
+	_body_node = body
 	body.collision_layer = 1
 	body.collision_mask = 0
 	var shape := CollisionShape3D.new()
@@ -416,3 +420,43 @@ func set_sign(text: String) -> void:
 		add_child(_sign)
 	_sign.text = text
 	_sign.position = Vector3(0, height + 1.2, 0)
+
+
+## The door the exterior draws: local position at the threshold, outward normal, wall tangent, size, and
+## the wall's base and eave heights. Empty when the building has no usable wall face.
+func door_frame() -> Dictionary:
+	var longest: Dictionary = {}
+	for f in _wall_faces:
+		if longest.is_empty() or (float(f.umax) - float(f.umin)) > (float(longest.umax) - float(longest.umin)):
+			longest = f
+	if longest.is_empty() or float(longest.ymax) < 2.2:
+		return {}
+	var spacing := 2.8 if kind == "dwelling" else 5.0
+	var lw: float = float(longest.umax) - float(longest.umin)
+	var cols := maxi(1, int((lw - 1.6) / spacing))
+	var u: float = float(longest.umin) + lw / (cols + 1) * (cols / 2 + 1)
+	var a: Vector3 = longest.pts[0]
+	var pos: Vector3 = a + longest.t * (u - a.dot(longest.t)) + Vector3.UP * (float(longest.ymin) - a.y)
+	return {"pos": pos, "n": longest.n, "t": longest.t, "width": 1.0 if kind == "dwelling" else 2.4, "height": 2.1 if kind == "dwelling" else 2.4,
+		"ymin": float(longest.ymin), "eave": float(longest.ymax)}
+
+
+## Eave height and floor count the openings use (the interior follows the same rhythm).
+func storeys() -> Dictionary:
+	var eave := height
+	for f in _wall_faces:
+		eave = minf(eave, float(f.ymax))
+	var n_floors := floors if floors > 0 else maxi(1, int(round(eave / 3.0)))
+	n_floors = clampi(n_floors, 1, maxi(1, int(eave / 2.4)))
+	return {"eave": eave, "floors": n_floors, "floor_height": eave / maxf(n_floors, 1)}
+
+
+## Hide the exterior while the player is inside (its collider too), and back.
+func set_exterior_visible(on: bool) -> void:
+	if _mesh_node:
+		_mesh_node.visible = on
+	if _body_node:
+		_body_node.collision_layer = 1 if on else 0
+	for c in get_children():
+		if c is CSGShape3D:
+			c.visible = on

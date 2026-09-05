@@ -89,6 +89,10 @@ func _ready() -> void:
 	figures.name = "PresenceFigures"
 	add_child(figures)
 	figures.setup(self)
+	var interiors := Interiors.new()
+	interiors.name = "Interiors"
+	add_child(interiors)
+	interiors.setup(self)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--screenshot="):
 			_screenshot_path = a.trim_prefix("--screenshot=")
@@ -117,6 +121,8 @@ func _ready() -> void:
 		elif a.begins_with("--fx="):
 			_fx = Array(a.trim_prefix("--fx=").split(",", false))
 			_configure_environment()
+		elif a.begins_with("--enter="):
+			get_tree().create_timer(2.5).timeout.connect(enter_building.bind(a.trim_prefix("--enter=")))
 		elif a.begins_with("--open="):
 			GameState.register_unlocked = true
 			get_tree().create_timer(2.0).timeout.connect(ui.debug_open.bind(a.trim_prefix("--open=")))
@@ -394,3 +400,16 @@ func from_dict(d: Dictionary) -> void:
 		player.rotation.y = float(d.get("player_yaw", 0.0))
 	if sky.tod and d.has("time_of_day"):
 		sky.tod.current_time = float(d.time_of_day)
+
+
+## Step into the first real building whose address contains `needle` (debug: --enter=, dev channel).
+func enter_building(needle: String) -> bool:
+	var interiors: Interiors = get_node_or_null("Interiors")
+	var layer: Node = $EraLayers.get_node_or_null(GameState.current_era)
+	if interiors == null or layer == null:
+		return false
+	for b in layer.find_children("*", "FootprintBuilding", true, false):
+		if needle.to_lower() in str(b.address).to_lower() and b.get_node_or_null("Door"):
+			interiors.enter(b, player)
+			return true
+	return false
