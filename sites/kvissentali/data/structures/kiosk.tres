@@ -1,0 +1,16 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/base_building/structure_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "kiosk"
+display_name_key = "STRUCT_KIOSK"
+description_key = "STRUCT_KIOSK_DESC"
+cost_money = 15000
+rent_bonus = 250
+requires = ""
+purposes = Array[String](["ARIMAA", "ELAMUMAA", "UHISKONDLIKE_EHITISTE_MAA", "ULDKASUTATAV_MAA"])
+size = Vector3(3.5, 2.8, 3.0)
+offset = Vector2(6, 0)
+color = Color(0.85, 0.62, 0.3, 1)

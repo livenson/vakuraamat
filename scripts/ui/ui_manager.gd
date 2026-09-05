@@ -71,6 +71,7 @@ func _ready() -> void:
 		_open(ledger_panel))
 	Ledger.player_changed.connect(_refresh_era_label)
 	Ledger.month_changed.connect(func(_m): _refresh_era_label())
+	Ledger.event_added.connect(_on_ledger_event)
 	pause.custom_minimum_size = Vector2(600, 0)
 	debug_map.custom_minimum_size = Vector2(1180, 840)
 	_center_panel(debug_map)
@@ -297,7 +298,7 @@ func _refresh_era_label() -> void:
 	if era == null:
 		era_label.text = ""
 		return
-	var badge := ("   ·   " + tr("UI_ONLINE") % Ledger.town_name) if Ledger.online else ""
+	var badge := ("   ·   " + tr("UI_ONLINE_BADGE")) if Ledger.online else ""
 	era_label.text = "%s   %s   %s   %s%s" % [Sites.display_name(Sites.active), Ledger.date_string(), world.clock_string(), Ledger.format_money(Ledger.cash()), badge]
 	var obj := _objective()
 	if obj != "":
@@ -774,3 +775,12 @@ func _fill_journal() -> void:
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size = Vector2(700, 0)
 		cbox.add_child(l)
+
+
+## Offers on my plots and sales of them become notices; everything else waits in the feed.
+func _on_ledger_event(e: Dictionary) -> void:
+	var tunnus := str(e.get("tunnus", ""))
+	if tunnus == "" or not Ledger.is_mine(tunnus):
+		return
+	if str(e.kind) == "bid" and int(e.actor_id) != Ledger.me_id():
+		show_notice(tr("NOTICE_BID_RECEIVED") % [Ledger.parcel(tunnus).get("address", tunnus), int(e.amount)])

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/base_building/structure_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "storage_hall"
+display_name_key = "STRUCT_STORAGE_HALL"
+description_key = "STRUCT_STORAGE_HALL_DESC"
+cost_money = 60000
+rent_bonus = 900
+requires = "parking"
+purposes = Array[String](["TOOTMISMAA", "ARIMAA", "MAATULUNDUSMAA"])
+size = Vector3(16, 5, 10)
+offset = Vector2(-14, -10)
+color = Color(0.72, 0.74, 0.76, 1)

@@ -135,17 +135,17 @@ ITEM_COFFEE,Kohv,Coffee
 ITEM_COFFEE_DESC,Pool kilo. Poemüüja imestas.,Half a kilo. The shopkeeper was surprised.
 MANOR_KASEOJA,Kaseoja talu,Kaseoja farm
 MANOR_PARK,Mõisa park,The manor park
-STRUCT_STOREHOUSE,Ait,Storehouse
-STRUCT_STOREHOUSE_DESC,Vilja jaoks. Kõik algab aidast.,For the grain. Everything starts with a storehouse.
-STRUCT_SAUNA,Saun,Sauna
-STRUCT_SAUNA_DESC,Laupäeviti. Aino nõuab.,Saturdays. Aino insists.
-STRUCT_BARN,Laut,Barn
-STRUCT_BARN_DESC,"Kahele lehmale ja hobusele, kui hobune tuleb.","For two cows and a horse, if the horse comes."
-STRUCT_DAIRY_STAND,Piimapukk,Milk stand
-STRUCT_DAIRY_STAND_DESC,Pargi väravas. Ühingu auto peatub siin.,At the park gate. The cooperative's lorry stops here.
-STRUCT_SWING,Külakiik,Village swing
-STRUCT_SWING_DESC,Jaanipäevaks.,For midsummer.
 OBJ_FIND_REGISTER,Leia vakuraamat varemetest (lõuna pool) ja võta see: E.,Find the register in the ruin (to the south) and take it: E.
 OBJ_VISIT_ERAS,Ava vakuraamat (Tab) ja käi kõigil kolmel lehel. Esimene leht on märgitud.,Open the register (Tab) and visit all three pages. The first page is marked.
 OBJ_MEET_1938,"1938: leia Aino talu juurest, Juhan põhjapõllult, maamõõtja mõisa eest.","1938: find Aino at the farm, Juhan on the north field, the surveyor outside the manor."
 OBJ_SIT,"Kui oled valmis, mine 2026. aastasse ja istu Leidaga tamme all.","When you are ready, go to 2026 and sit with Leida under the oak."
+STRUCT_KIOSK,Kiosk,Kiosk
+STRUCT_KIOSK_DESC,Väike müügikiosk krundi tänavapoolses servas.,A small sales kiosk at the street side of the plot.
+STRUCT_PARKING,Parkla,Parking
+STRUCT_PARKING_DESC,Kruusaga kaetud parkimisplats; iga hoone tahab seda.,A gravel parking area; every building wants one.
+STRUCT_SOLAR_TABLE,Päikesepaneelid,Solar array
+STRUCT_SOLAR_TABLE_DESC,"Rida päikesepaneele; toodab ka siis, kui üürnik ei maksa.",A row of solar panels; it produces even when the tenant does not pay.
+STRUCT_STORAGE_HALL,Laohall,Storage hall
+STRUCT_STORAGE_HALL_DESC,Kerge terashall rendipindadeks.,A light steel hall let as storage units.
+STRUCT_PLAYGROUND,Mänguväljak,Playground
+STRUCT_PLAYGROUND_DESC,"Kiik, liumägi ja pink; naabrid peavad sinust rohkem.","A swing, a slide and a bench; the neighbours think better of you."

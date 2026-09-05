@@ -6,6 +6,7 @@ extends Node3D
 var world: Node3D
 var _defs: Dictionary = {}
 var _built: Dictionary = {}    # improvement id -> Node3D
+var _signed := false
 
 
 func setup(w: Node3D) -> void:
@@ -18,6 +19,8 @@ func setup(w: Node3D) -> void:
 func refresh() -> void:
 	if world == null or world.terrain == null or world.terrain.data == null:
 		return
+	if not _signed:
+		_signed = _sign_buildings()
 	var seen := {}
 	for p in Ledger.parcels():
 		for imp in Ledger.improvements_of(p.tunnus):
@@ -53,3 +56,21 @@ func refresh() -> void:
 		if not seen.has(id):
 			_built[id].queue_free()
 			_built.erase(id)
+
+
+## Tenant name plates on the real buildings of the origin tile (the register links each building to
+## its cadastral unit). Returns false until the layer is loaded so refresh() tries again.
+func _sign_buildings() -> bool:
+	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
+	if layer == null:
+		return false
+	var n := 0
+	for b in layer.find_children("*", "FootprintBuilding", true, false):
+		if b.tunnus == "" or b.kind == "outbuilding":
+			continue
+		var names: Array = Ledger.tenants_of(b.tunnus).filter(func(t): return t.status == "R").map(func(t): return str(t.name))
+		if names.is_empty():
+			continue
+		b.set_sign("\n".join(names.slice(0, 2)) + ("\n+%d" % (names.size() - 2) if names.size() > 2 else ""))
+		n += 1
+	return true

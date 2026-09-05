@@ -72,13 +72,15 @@ func _ready() -> void:
 	# building on an owned plot: prerequisite, duplicate, cost
 	var mine: Dictionary = sellable.filter(func(p): return int(p.owner_id) == 0 and int(p.price) <= 100000)[0]
 	_check(await Ledger.buy(mine.tunnus) == "", "second buy failed")
-	_check(await Ledger.build(mine.tunnus, "barn") == "LEDGER_REQUIRES", "barn should need the storehouse")
+	await Ledger.debug_grant(100000)
+	_check(await Ledger.build(mine.tunnus, "solar_table") == "LEDGER_REQUIRES", "the solar array should need the parking")
 	before = Ledger.cash()
-	_check(await Ledger.build(mine.tunnus, "storehouse") == "", "storehouse build failed")
-	_check(Ledger.cash() == before - int(l.structures["storehouse"].cost), "build cost not charged")
-	_check(await Ledger.build(mine.tunnus, "barn") == "" and await Ledger.build(mine.tunnus, "barn") == "LEDGER_ALREADY_BUILT", "barn build or duplicate check failed")
+	_check(await Ledger.build(mine.tunnus, "parking") == "", "parking build failed")
+	_check(Ledger.cash() == before - int(l.structures["parking"].cost), "build cost not charged")
+	_check(await Ledger.build(mine.tunnus, "solar_table") == "" and await Ledger.build(mine.tunnus, "solar_table") == "LEDGER_ALREADY_BUILT", "solar build or duplicate check failed")
 	_check(Ledger.improvements_of(mine.tunnus).size() == 2, "improvement count")
-	_check(await Ledger.build(target.tunnus, "storehouse") == "LEDGER_NOT_OWNER", "building on a sold plot must fail")
+	_check(await Ledger.build(target.tunnus, "parking") == "LEDGER_NOT_OWNER", "building on a sold plot must fail")
+	_check(Ledger.yield_of(mine.tunnus) == int(Ledger.parcel(mine.tunnus).rent_month) + 120 + 300, "rent bonus of the improvements")
 
 	# save round trip
 	var cash_before := Ledger.cash()

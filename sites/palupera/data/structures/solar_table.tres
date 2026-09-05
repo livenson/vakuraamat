@@ -1,0 +1,16 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://scripts/base_building/structure_definition.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "solar_table"
+display_name_key = "STRUCT_SOLAR_TABLE"
+description_key = "STRUCT_SOLAR_TABLE_DESC"
+cost_money = 20000
+rent_bonus = 300
+requires = "parking"
+purposes = Array[String]([])
+size = Vector3(10, 1.8, 4)
+offset = Vector2(8, 10)
+color = Color(0.12, 0.18, 0.35, 1)
