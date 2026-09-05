@@ -6,7 +6,7 @@ Three pieces, all in debug builds (running from the project) and off in exported
 
 F8 grabs the frame as you see it, then opens a note box. *Send* writes to `user://reports/`:
 
-- `report_<time>.json`: your note, site, era, chapter, position, yaw and pitch, what the crosshair
+- `report_<time>.json`: your note, site, layer, month, cash, owned plots, position, yaw and pitch, what the crosshair
   was on (node path, label, hover text, ids), interactables within 15 m, register buildings within
   25 m (name, year, materials), committed flags, artifacts, the last engine errors and warnings,
   the locale and FPS, and a `replay` command line;
@@ -43,7 +43,7 @@ Every report becomes an event in the session; Claude reads the JSON and the scre
   - era `.tscn`: the cache entry is replaced and the current era layer is instanced again with the
     player where they stand (`make scenes` first when `scenes.json` changed);
   - anything under `sites/<id>/` (`.tres`, `strings.csv`, `.ink.json`, `site.json`): the pack is
-    re-read, registries and strings reload, stories reset, the era layer re-instanced;
+    re-read, registries and strings reload, the layer re-instanced;
   - shaders, textures, other resources: replaced in the cache.
 - **Restart at this spot**: `python3 tools/dev.py restart` makes the game write a report of where it
   is and relaunch itself on it. Use it after changes hot reload cannot take.

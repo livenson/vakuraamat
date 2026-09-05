@@ -1,8 +1,9 @@
 # Vakuraamat
 
-A time-travel farming / hunting / trading game set on real Estonian terrain built from
-Maa-amet (Estonian Land and Spatial Development Board) open data. Godot 4.7, GDScript,
-Terrain3D.
+An economy game on real Estonian ground: buy, rent out and build on the actual cadastral plots of
+a square kilometre, priced from Maa-amet's land values, with the real companies as tenants, alone
+or in a town shared with other players. Built from Maa-amet (Estonian Land and Spatial Development
+Board) and Business Register open data. Godot 4.7, GDScript, Terrain3D, SpacetimeDB.
 
 Design and plan: `vakuraamat-implementation-plan.md` (phases, architecture rules) and
 `vakuraamat-maaamet-data-pipeline.md` (data sources). This README covers what exists
@@ -26,44 +27,33 @@ Place and story are a **site pack** (`sites/<id>/`): Palupera is the original, K
 a scaffold, and any 1 km² of Estonia can be added with two make targets. See
 [docs/custom-sites.md](docs/custom-sites.md) and the section below.
 
-## Status: all five phases playable
+## Status: present-day economy on real plots
 
-- **Phase 1, the slice:** three eras of the Palupera square, the register as the era
-  switch, five consequence points with visible changes, four artifacts, six NPCs in
-  Estonian and English, the journal (ledger, blended era maps, codex), chapter commit
-  points, save/continue and three endings. Content follows `vakuraamat-first-iteration-design.md`.
-- **Phase 2, farming:** plots and seed bins in 1938 and 2026; four crops grow on the
-  shared day clock; harvests are era-local.
-- **Phase 3, hunting:** hare, roe deer and black grouse spawn on their land-cover class
-  (from the orthophoto + nDSM control map) in 1798 and 1938, flee, and can be taken.
-- **Phase 4, trading:** one post per era (manor granary, dairy cooperative shop, village
-  shop) with era-scoped goods and money (kopecks, cents, cents). Nothing crosses eras.
-- **Phase 5, base building:** two manors on real cadastral units (Kaseoja farm on
-  58201:002:0026, the manor park on 58201:001:0228), five structures with material and
-  money costs and prerequisites; the park unlocks from a consequence flag.
+Vakuraamat is now an economy game on the real square kilometre: every cadastral unit carries
+its 2022 land value in euros, real companies from the Business Register sit on the plots as
+tenants, and one town's ledger (owners, prices, bids, obligations, news) can be shared with other
+players through a SpacetimeDB town server. The historical three-era game (1798, 1938, 2026, farming,
+hunting, ink stories) lives on at the tag `v0.9-historical`.
 
-Farming, hunting, trading and building never reference the timeline, consequence or
-artifact systems; the tests check that by grepping the source.
+- **The book (Tab):** the plots nearest to you with land value, price, owner and monthly yield;
+  a plot's card with Buy, Bid, List for sale, Build, Collect or Settle arrears, Accept offer, Guide
+  and Go; your portfolio with cash, income, obligations, favours, heat and reputation; offers in
+  and out; the town's month, price index and connection. **B** opens the plot under your feet.
+- **A month every ten real minutes:** rents come in (tenants sometimes fall behind), land tax comes
+  due, prices drift, and the Kask, Tamm and Lepik families bid on your plots.
+- **The town feed (N):** the game's sales, rents and bids next to the region's real headlines and
+  planning notices.
+- **Online or offline:** with a town server reachable, everyone in the town shares one ledger and
+  sees each other walk; without it the same rules run in your own book, which the save holds.
+- Terrain, buildings, trees, roads, parcels and traffic are unchanged: real, regenerated per tile,
+  never sent over the network.
 
-Run the game: `godot --path .` (main menu). Controls: WASD, E interact, Tab register,
-J journal, I bag, L language, Esc menu (continue, fullscreen, language, save and quit).
-Fullscreen: F11, on macOS Cmd+Ctrl+F; remembered in `user://settings.cfg`, `-- --fullscreen` /
-`-- --windowed` override once. Headless checks:
+Run the game: `godot --path .` (main menu). Controls: WASD, E interact, Tab vakuraamat, B buy here,
+N news, J journal, K codes, M map, L language, Esc menu. Fullscreen: F11, on macOS Cmd+Ctrl+F.
+Headless checks: `make test` (validation, boot, site, user packs, dev channel, traffic, streaming,
+ledger, town).
 
-```sh
-for t in boot_test playthrough_test farming_test hunting_test economy_test; do
-  godot --headless --path . res://tools/godot/$t.tscn; done
-```
-
-Site layout lives in `sites/palupera/layout.json` (positions found from the cadastral parcel
-and the nDSM building footprint); `sites/palupera/scenes.json` says what stands where in each
-era and `make scenes` regenerates the era scenes from both.
-
-Narrative: `sites/<id>/narrative/era_*.ink` (Estonian lines with `# en:` tags, choices as
-`[et %% en]`), compiled with `make ink`. Strings: core UI keys in `assets/i18n/strings.csv`,
-place and story keys in `sites/<id>/strings.csv`. Press L in game to switch language.
-
-## Custom locations and stories
+## Custom locations
 
 ```sh
 make site SITE=kvissentali NAME="Kvissentali" CENTER="657600 6477150"   # scaffold a pack (EPSG:3301 centre)

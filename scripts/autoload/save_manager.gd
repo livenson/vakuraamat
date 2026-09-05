@@ -28,18 +28,10 @@ func has_save(slot: String = AUTOSAVE) -> bool:
 
 func save(slot: String = AUTOSAVE) -> bool:
 	var data := {
-		"version": 2,
+		"version": 3,
 		"site": Sites.active,
 		"saved_at": Time.get_datetime_string_from_system(),
-		"timeline": TimelineState.to_dict(),
 		"game": GameState.to_dict(),
-		"inventory": Inventory.to_dict(),
-		"journal": Journal.to_dict(),
-		"narrative": Narrative.to_dict(),
-		"farming": Farming.to_dict(),
-		"hunting": Hunting.to_dict(),
-		"trading": Trading.to_dict(),
-		"manors": Manors.to_dict(),
 		"ledger": Ledger.to_dict(),
 	}
 	var f := FileAccess.open(slot_path(slot), FileAccess.WRITE)
@@ -59,19 +51,14 @@ func load_slot(slot: String = AUTOSAVE) -> bool:
 	if typeof(data) != TYPE_DICTIONARY:
 		push_error("corrupt save %s" % slot)
 		return false
+	if int(data.get("version", 0)) < 3:
+		push_warning("save %s is from the historical game (version %s); starting fresh" % [slot, data.get("version")])
+		return false
 	var site := str(data.get("site", Sites.active))
 	if site != Sites.active and Sites.available.has(site):
 		Sites.select(site)   # registries reload; the menu normally does this before the world loads
-	TimelineState.from_dict(data.get("timeline", {}))
-	Inventory.from_dict(data.get("inventory", {}))
-	Journal.from_dict(data.get("journal", {}))
-	Narrative.from_dict(data.get("narrative", {}))
-	Farming.from_dict(data.get("farming", {}))
-	Hunting.from_dict(data.get("hunting", {}))
-	Trading.from_dict(data.get("trading", {}))
-	Manors.from_dict(data.get("manors", {}))
 	Ledger.from_dict(data.get("ledger", {}))
-	await GameState.from_dict(data.get("game", {}))   # last: switches era, moves the player
+	await GameState.from_dict(data.get("game", {}))   # last: loads the layer, moves the player
 	dirty = false
 	return true
 

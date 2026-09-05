@@ -70,13 +70,13 @@ func capture(note: String, world: Node) -> String:
 	var pos := player.global_position
 	var report := {
 		"id": id, "time": Time.get_datetime_string_from_system(), "note": note,
-		"site": Sites.active, "era": GameState.current_era, "chapter": GameState.chapter,
+		"site": Sites.active, "era": GameState.current_era, "month": Ledger.month(), "online": Ledger.online,
 		"position": [snappedf(pos.x, 0.01), snappedf(pos.y, 0.01), snappedf(pos.z, 0.01)],
 		"yaw_deg": snappedf(rad_to_deg(player.rotation.y), 0.1), "pitch_deg": snappedf(rad_to_deg(cam.rotation.x), 0.1),
 		"target": _describe(interactor.target if interactor else null, pos),
 		"parcel": Parcels.at(pos), "road": _nearest_road(layer, pos), "links": links_for(pos, interactor.target if interactor else null, layer),
 		"nearby": _nearby(layer, pos), "buildings_nearby": _buildings_nearby(layer, pos),
-		"flags": TimelineState.flags.keys(), "artifacts": Inventory.artifacts.duplicate(),
+		"cash": Ledger.cash(), "owned": Ledger.parcels().filter(func(p): return Ledger.is_mine(p.tunnus)).map(func(p): return p.tunnus),
 		"errors": recent_errors.duplicate(), "screenshot": shot,
 		"save_slot": id, "locale": TranslationServer.get_locale(), "fps": Engine.get_frames_per_second(),
 		"replay": "godot --path %s res://scenes/world/world.tscn -- --report=%s" % [ProjectSettings.globalize_path("res://"), ProjectSettings.globalize_path(base + ".json")],

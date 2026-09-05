@@ -3,51 +3,53 @@
 Read this before changing anything. `CLAUDE.md` points here; the human-facing overview is `README.md`.
 
 ## What this is
-A Godot 4.7 (GDScript) game on real Estonian terrain from Maa-amet open data. Three eras of one
-1 km² tile, scripted cross-era consequences, era-local farming/hunting/trading/building. Every
-place-and-story is a **site pack** under `sites/<id>/` (Palupera is the original; Kvissentali a
-scaffold); the engine reads the active pack through the `Sites` autoload and never names a site.
-Authoring guide: `docs/custom-sites.md`.
-The design and plan documents in the repo root are authoritative: `vakuraamat-implementation-plan.md`
-(architecture rules), `vakuraamat-first-iteration-design.md` (content), `vakuraamat-language-notes.md`,
-`vakuraamat-maaamet-data-pipeline.md`, `vakuraamat-visual-upgrade-plan.md`.
+A Godot 4.7 (GDScript) economy game on real Estonian terrain from Maa-amet open data: one 1 km²
+tile, its real cadastral units with 2022 land values, real buildings and real tenants (Business
+Register). The player buys, rents out and builds; a month passes every ten minutes; a town's ledger
+can be shared with other players through a SpacetimeDB module (`server/vakuraamat`). Every place is
+a **site pack** under `sites/<id>/` (Kvissentali is the first town, Palupera the rural second); the
+engine reads the active pack through the `Sites` autoload and never names a site.
+Authoring guide: `docs/custom-sites.md`. The historical three-era game is the tag `v0.9-historical`;
+its design documents in the repo root describe that version.
 
 ## Hard rules
-- No live simulation of causality: cross-era effects are flags in `TimelineState`, read by era scenes.
-- Only `ArtifactItem`s cross eras. Farming, hunting, trading and building code must not reference
-  `TimelineState`, `ConsequencePoint` or `ArtifactItem`; the tests grep for it.
+- The ledger is the only shared or saved game state. Terrain, buildings, trees, roads and traffic are
+  regenerated from data on every machine and never travel. `Ledger` (autoload) is the single entry
+  point; `scripts/ledger/local_ledger.gd` mirrors the module's rules offline, `town_ledger.gd` is the
+  only script allowed to touch the SpacetimeDB SDK (`ledger_test` greps the rest).
+- Every reducer in `server/vakuraamat` validates ownership and cash server-side; error strings are
+  `LEDGER_*` translation keys. Money is whole euros. Pure arithmetic lives in `server/vakuraamat/rules`
+  (cargo test) and must match `LocalLedger`.
 - Every third-party file gets a row in `THIRD_PARTY.md` in the same commit (the project will be
-  open source). Prefer CC0/MIT. Nothing from Fab/Megascans.
+  open source). Prefer CC0/MIT. Nothing from Fab/Megascans. Data files carry `attribution`.
 - Site content lives in `sites/<id>/`: `site.json` (manifest), `layout.json` (positions),
-  `scenes.json` (era layers), `data/` (eras, consequence points, items, manors, structures, trade
-  goods, crops, animals), `narrative/` (ink), `strings.csv`. `make scenes SITE=<id>` regenerates
-  `sites/<id>/scenes/*.tscn`; do not hand-edit those scenes. Engine code (`scripts/`, `scenes/`)
-  must not reference a site by name; go through `Sites` (manifest, `data_dir`, `layout`, `tile`).
+  `scenes.json` (the layer), `data/eras/era_2026.tres`, `data/structures`, `parcels.json`,
+  `buildings.json`, `tenants.json`, `market.json`, `roads.json`, `strings.csv`. `make scenes SITE=<id>`
+  regenerates `sites/<id>/scenes/*.tscn`; do not hand-edit those scenes. Engine code (`scripts/`,
+  `scenes/`) must not reference a site by name; go through `Sites` (manifest, `data_dir`, `layout`, `tile`).
+- Real names: tenants are real companies (legal persons only). Grey-zone actions target plots, arrears
+  and money, never a named tenant; news and notices are stored as headline, source, date and link.
 - Playtest loop: reports from F8 land in `user://reports/` (feed.log); `python3 tools/dev.py reload|restart|replay|
-  teleport|era|screenshot` talks to the running debug game through `user://dev/commands.jsonl`
+  teleport|screenshot` talks to the running debug game through `user://dev/commands.jsonl`
   (`DevChannel` autoload). See `docs/dev-loop.md`.
 - Country data adapters: `tools/pipeline/sources.py` (Estonia implemented; add a class per country).
 - Buildings come from `tools/pipeline/fetch_buildings.py` (ETAK polygons + Building Register attributes +
-  Geo3D LOD2 roofs) into `sites/<id>/buildings.json`; the `footprints` scene node filters them by era year.
-- Services: `tools/tile_service.py` (packs for a point, port 8765) and `tools/world_service.py` (shared
-  worlds and deliveries, port 8766) are loopback Python servers; the game talks to them through the
-  `Locator` and `Friends` autoloads. Tests that need them start their own instance (`friends_test`).
-- Town ledger: `server/vakuraamat/` is a SpacetimeDB module (Rust; `make module`, `make server` on
-  127.0.0.1:3300, `make town SITE=<id>` publishes and seeds through `tools/town_admin.py`). Every
-  mutation is validated in a reducer; error strings are `LEDGER_*` translation keys; money is whole
-  euros. Client bindings in `spacetime_bindings/` are generated by `addons/SpacetimeDB/cli.gd` from
-  the `vakuraamat` dev database and committed; regenerate after every schema change. Pure economy
-  arithmetic goes in `server/vakuraamat/rules` so `cargo test` covers it.
-- Generated stories come from `blocks/*.json` via `tools/compose_story.py` (used by `tools/new_site.py`
-  and the tile service `tools/tile_service.py`); the Palupera pack is hand-written and does not use blocks.
-- Core UI strings stay in `assets/i18n/strings.csv`; story/place strings go in the pack's
-  `strings.csv` (imported to `.translation` next to it; `make import` after editing).
+  Geo3D LOD2 roofs) into `sites/<id>/buildings.json`; parcels with land values from `fetch_parcels.py`,
+  tenants from `fetch_tenants.py`, the market snapshot from `market.py`.
+- Services: `tools/tile_service.py` (packs for a point, port 8765) is a loopback Python server the game
+  talks to through `Locator`; the town server is SpacetimeDB on 127.0.0.1:3300 (`make server`,
+  `make town SITE=<id>`); `tools/news_feeder.py` pushes real headlines and notices into a town.
+- Client bindings in `spacetime_bindings/` are generated by `addons/SpacetimeDB/cli.gd` from the
+  `vakuraamat` dev database and committed; regenerate after every schema change.
+- Core UI strings stay in `assets/i18n/strings.csv`; place strings go in the pack's `strings.csv`
+  (imported to `.translation` next to it; `make import` after editing).
 - Generated data is not committed: `assets/terrain/*/data`, tree meshes and impostor atlases. Rebuild
   with `make tile` / `make trees`. Large stable binaries are in git LFS (`.gitattributes`).
 
 ## Commands
-- `make setup` once; `make test` before every commit (validates every pack, boots every pack, then
-  the Palupera story tests); `make lint`; `make export` for a macOS build.
+- `make setup` once; `make test` before every commit (validates every pack, boots every pack, dev
+  channel, traffic, streaming, the offline ledger and the two-client town test); `make lint`;
+  `make export` for a macOS build.
 - New location: `make site SITE=<id> NAME="..." CENTER="<easting> <northing>"` then `make tile SITE=<id>`
   (fetches DTM/nDSM/orthophoto/historical maps, builds terrain, derives buildings and water,
   generates scenes, validates). `make validate` is pure python and fast; run it after editing a pack.
@@ -62,9 +64,6 @@ The design and plan documents in the repo root are authoritative: `vakuraamat-im
 ## Conventions and pitfalls
 - Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`
   (or `--fullscreen`).
-- Ink: Estonian lines with `# en:` tags; choices `[et %% en]` (ink reserves `|`); `# me` marks the
-  player; `# speaker: KEY` overrides. Compile with `make ink`. EXTERNAL functions are listed in
-  `scripts/autoload/narrative.gd`.
 - Strings: `assets/i18n/strings.csv` (keys, et, en). Add keys, never hard-code text.
 - A node added from a `SceneTree._init()` script enters the tree one frame later: `await process_frame`
   before touching Terrain3D or inkgd objects. `assert()` does not stop headless tests; use the
@@ -103,9 +102,7 @@ The design and plan documents in the repo root are authoritative: `vakuraamat-im
   land. Basins are carved only where the DTM was flat, but the surface still covers the rectangle.
 
 ## Tests
-`tools/godot/*_test.tscn`: boot (autoloads, data, ink, save), site (every pack: registries, era
-scenes, translations, ink), userpack, friends, devchannel, traffic, streaming, playthrough (all five
-Palupera consequences, chapters, endings, save round-trip), farming, hunting, economy (trading +
-building). Keep them green. Each test is capped at 180 s by the Makefile; a test that is silent for
-two minutes is stuck (usually a parse error in the test script), do not wait for it. `tools/validate_site.py`
-checks pack references without Godot.
+`tools/godot/*_test.tscn`: boot (autoloads, the layer, offline ledger, save), site (every pack:
+registry, layer scene, translations, structures, ledger), userpack, devchannel, traffic, streaming,
+ledger (offline rules, isolation grep), town (two clients on a throwaway SpacetimeDB; skips without
+the toolchain). Keep them green. `tools/validate_site.py` checks pack references without Godot.

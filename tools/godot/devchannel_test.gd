@@ -1,5 +1,5 @@
 # Headless check of the development loop: a report is captured (json, png, save, feed line), commands
-# dropped into user://dev/commands.jsonl are executed (teleport, era, hot reload of a script, an era
+# dropped into user://dev/commands.jsonl are executed (teleport, hot reload of a script, the layer
 # scene and pack data) and answered in results.log.
 #   godot --headless --path . res://tools/godot/devchannel_test.tscn
 extends Node
@@ -42,19 +42,17 @@ func _ready() -> void:
 	cmdf.seek_end()
 	var pid := OS.get_process_id()   # addressed to this test only, never to a game the player has open
 	cmdf.store_line(JSON.stringify({"pid": pid, "teleport": [600, 320, 90]}))
-	cmdf.store_line(JSON.stringify({"pid": pid, "era": "era_1938"}))
-	cmdf.store_line(JSON.stringify({"pid": pid, "reload": ["res://scripts/interaction/examinable.gd", "res://sites/palupera/scenes/era_1938.tscn", "res://sites/palupera/strings.csv", "res://assets/shaders/water.gdshader"]}))
+	cmdf.store_line(JSON.stringify({"pid": pid, "reload": ["res://scripts/interaction/examinable.gd", "res://sites/palupera/scenes/era_2026.tscn", "res://sites/palupera/strings.csv", "res://assets/shaders/water.gdshader"]}))
 	cmdf.close()
 	await get_tree().create_timer(1.5).timeout
 	await get_tree().create_timer(1.0).timeout
 	_check(world.player.global_position.distance_to(Vector3(600, world.player.global_position.y, 320)) < 0.5, "teleport not applied: %s" % world.player.global_position)
-	_check(GameState.current_era == "era_1938", "era command not applied")
 	var results := FileAccess.get_file_as_string(DevChannel.RESULTS)
 	_check(results.contains("examinable.gd: reloaded"), "script hot reload failed: " + results.right(600))
-	_check(results.contains("era layer era_1938 re-instanced"), "era scene reload failed")
+	_check(results.contains("era layer era_2026 re-instanced"), "layer scene reload failed")
 	_check(results.contains("pack reloaded"), "pack data reload failed")
 	_check(results.contains("water.gdshader: cache replaced"), "shader reload failed")
-	_check(world.get_node("EraLayers").get_node_or_null("era_1938") != null and GameState.eras.size() == 3, "world state after reload")
+	_check(world.get_node("EraLayers").get_node_or_null("era_2026") != null and GameState.eras.size() == 1, "world state after reload")
 	# the direct API too
 	var out: Array = await DevChannel.execute({"note": "hello"})
 	_check(out == ["note ok"], "execute() result")

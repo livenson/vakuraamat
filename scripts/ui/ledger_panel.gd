@@ -50,8 +50,8 @@ func setup(w: Node3D) -> void:
 		tabs.add_child(sc)
 		_pages[key] = body
 	tabs.tab_changed.connect(func(_i): fill())
-	Ledger.player_changed.connect(func(): if visible: fill())
-	Ledger.month_changed.connect(func(_m): if visible: fill())
+	Ledger.player_changed.connect(_refill_if_visible)
+	Ledger.month_changed.connect(func(_m): _refill_if_visible())
 
 
 func fill() -> void:
@@ -354,3 +354,8 @@ func _month_name(m: int) -> String:
 	var date: Array = t.get("date", [2026, 1, 1]) if typeof(t) == TYPE_DICTIONARY else [2026, 1, 1]
 	var idx := int(date[1]) - 1 + m
 	return "%s %d" % [tr("MONTH_%d" % (idx % 12 + 1)), int(date[0]) + int(idx / 12)]
+
+
+func _refill_if_visible() -> void:
+	if visible:
+		fill()

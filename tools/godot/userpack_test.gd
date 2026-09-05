@@ -1,6 +1,6 @@
 # Headless check of runtime (user://) packs: zips the Palupera pack and tile inputs the way the tile
 # service does, installs it through Locator as "palupera_copy", selects it, and checks that the
-# registries, CSV translations, tile directory and era textures resolve. Cleans up after itself.
+# registry, CSV translations, tile directory and textures resolve. Cleans up after itself.
 #   godot --headless --path . res://tools/godot/userpack_test.tscn
 extends Node
 
@@ -23,7 +23,7 @@ func _ready() -> void:
 	var z := ZIPPacker.new()
 	_check(z.open(zip_path) == OK, "cannot create zip")
 	var n := _add_dir(z, "res://sites/palupera", "site/")
-	for f in ["terrain_meta.json", "heightmap.r32", "canopy.r32", "ortho.jpg", "era_1938_cadastral.png"]:
+	for f in ["terrain_meta.json", "heightmap.r32", "canopy.r32", "ortho.jpg"]:
 		z.start_file("tile/" + f)
 		z.write_file(FileAccess.get_file_as_bytes("res://assets/terrain/palupera/" + f))
 		z.close_file()
@@ -50,8 +50,8 @@ func _ready() -> void:
 	_check(Sites.active == ID and Sites.is_user_pack(ID), "select failed")
 	_check(Sites.path("layout.json").begins_with("user://sites/"), "path() not under user://: " + Sites.path("layout.json"))
 	_check(tr("SITE_PALUPERA_COPY") == "Palupera, copy" or tr("SITE_PALUPERA_COPY") == "Palupera, koopia", "CSV translation missing: " + tr("SITE_PALUPERA_COPY"))
-	_check(tr("ERA_1938_NAME") != "ERA_1938_NAME", "pack CSV strings not loaded")
-	_check(GameState.eras.size() == 3 and GameState.items.size() > 10, "registries did not load from user://")
+	_check(tr("ERA_2026_NAME") != "ERA_2026_NAME", "pack CSV strings not loaded")
+	_check(GameState.eras.size() == 1, "registries did not load from user://")
 	_check(Sites.tile_dir() == "res://assets/terrain/palupera", "tile_dir should prefer the shipped tile: " + Sites.tile_dir())
 	for era in GameState.eras_in_order():
 		_check(ResourceLoader.exists(era.scene_path) or FileAccess.file_exists(era.scene_path), "%s scene missing under user://" % era.id)
@@ -61,7 +61,7 @@ func _ready() -> void:
 	# texture by path (what the service writes for runtime packs)
 	var e := EraDefinition.new()
 	e.id = "x"
-	e.terrain_texture_path = "user://tiles/palupera/era_1938_cadastral.png"
+	e.terrain_texture_path = "user://tiles/palupera/ortho.jpg"
 	_check(e.texture() != null and e.texture().get_width() > 0, "texture by user:// path failed")
 	# terrain builder inputs recognised for the copied tile
 	_check(TerrainBuilder.has_inputs("user://tiles/palupera") and not TerrainBuilder.has_region_data("user://tiles/palupera"), "builder input detection")

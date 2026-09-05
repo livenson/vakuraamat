@@ -1,201 +1,96 @@
-[gd_scene load_steps=33 format=3]
+[gd_scene load_steps=14 format=3]
 
-[ext_resource type="Script" path="res://scripts/interaction/conditional.gd" id="1"]
-[ext_resource type="PackedScene" path="res://assets/models/props/oak.glb" id="2"]
-[ext_resource type="PackedScene" path="res://scenes/props/examine_point.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://assets/models/buildings/ruin.glb" id="4"]
-[ext_resource type="Script" path="res://scripts/interaction/register_pickup.gd" id="5"]
-[ext_resource type="PackedScene" path="res://assets/vegetation/tree_juniper.tscn" id="6"]
-[ext_resource type="PackedScene" path="res://assets/vegetation/bush_jello.tscn" id="7"]
-[ext_resource type="PackedScene" path="res://assets/models/props/boundary_stone.glb" id="8"]
-[ext_resource type="PackedScene" path="res://scenes/npc/npc.tscn" id="9"]
-[ext_resource type="PackedScene" path="res://scenes/props/pickup.tscn" id="10"]
-[ext_resource type="PackedScene" path="res://scenes/farming/farm_plot.tscn" id="11"]
-[ext_resource type="Script" path="res://scripts/farming/seed_bin.gd" id="12"]
-[ext_resource type="Script" path="res://scripts/world/footprint_building.gd" id="13"]
-[ext_resource type="Script" path="res://scripts/world/road_network.gd" id="14"]
-[ext_resource type="Script" path="res://scripts/world/parcel_kit.gd" id="15"]
-[ext_resource type="Script" path="res://scripts/world/traffic_system.gd" id="16"]
-[ext_resource type="Script" path="res://scripts/interaction/bicycle.gd" id="17"]
-[ext_resource type="Script" path="res://scripts/trading/trade_post.gd" id="18"]
-[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="19"]
+[ext_resource type="PackedScene" path="res://assets/models/props/oak.glb" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/props/examine_point.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://assets/models/buildings/ruin.glb" id="3"]
+[ext_resource type="PackedScene" path="res://assets/vegetation/tree_juniper.tscn" id="4"]
+[ext_resource type="PackedScene" path="res://assets/models/props/boundary_stone.glb" id="5"]
+[ext_resource type="Script" path="res://scripts/world/footprint_building.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/world/road_network.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/world/parcel_kit.gd" id="8"]
+[ext_resource type="Script" path="res://scripts/world/traffic_system.gd" id="9"]
+[ext_resource type="Script" path="res://scripts/interaction/bicycle.gd" id="10"]
+[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="11"]
 
 [sub_resource type="StandardMaterial3D" id="M1"]
-albedo_color = Color(0.450, 0.250, 0.100, 1)
-roughness = 0.6
-
-[sub_resource type="StandardMaterial3D" id="M2"]
-albedo_color = Color(0.700, 0.680, 0.620, 1)
-roughness = 0.9
-
-[sub_resource type="SphereShape3D" id="S3"]
-radius = 1.2
-
-[sub_resource type="StandardMaterial3D" id="M4"]
 albedo_color = Color(0.450, 0.450, 0.420, 1)
 roughness = 0.9
 
-[sub_resource type="StandardMaterial3D" id="M5"]
+[sub_resource type="StandardMaterial3D" id="M2"]
 albedo_color = Color(0.550, 0.530, 0.500, 1)
 roughness = 0.9
 
-[sub_resource type="BoxShape3D" id="SB_era_2026_6"]
-size = Vector3(1.4, 1.2, 1.0)
-
-[sub_resource type="StandardMaterial3D" id="M7"]
-albedo_color = Color(0.300, 0.220, 0.140, 1)
-roughness = 0.9
-
-[sub_resource type="BoxShape3D" id="TP_era_2026_8"]
-size = Vector3(2.6, 2.4, 2.2)
-
-[sub_resource type="StandardMaterial3D" id="M9"]
-albedo_color = Color(0.420, 0.380, 0.320, 1)
-roughness = 0.9
-
-[sub_resource type="StandardMaterial3D" id="M10"]
-albedo_color = Color(0.850, 0.850, 0.800, 1)
-roughness = 0.9
-
-[sub_resource type="StandardMaterial3D" id="M11"]
-albedo_color = Color(0.500, 0.450, 0.300, 1)
-roughness = 0.9
-
-[sub_resource type="StandardMaterial3D" id="M12"]
-albedo_color = Color(0.300, 0.220, 0.140, 1)
-roughness = 0.9
-
-[sub_resource type="StandardMaterial3D" id="M13"]
-albedo_color = Color(0.300, 0.220, 0.140, 1)
-roughness = 0.9
-
 [node name="era_2026" type="Node3D"]
-script = ExtResource("19")
+script = ExtResource("11")
 era_id = "era_2026"
 
 [node name="Oak" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 422, 0, 534)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 422, 0.0, 534)
 
-[node name="OakTree" parent="Oak" instance=ExtResource("2")]
+[node name="OakTree" parent="Oak" instance=ExtResource("1")]
 transform = Transform3D(0.7660, 0, 0.6428, 0, 1.0, 0, -0.6428, 0, 0.7660, 0.0, 0.0, 0.0)
 
-[node name="OakExamine" parent="Oak" instance=ExtResource("3")]
+[node name="OakExamine" parent="Oak" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 1.5)
 text_key = "EX_OAK_2026"
 location_id = "LOC_OAK"
 label_key = "LOC_OAK"
 
 [node name="Ruin" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 508, 0, 545)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 508, 0.0, 545)
 
-[node name="RuinModel" parent="Ruin" instance=ExtResource("4")]
+[node name="RuinModel" parent="Ruin" instance=ExtResource("3")]
 transform = Transform3D(-1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, -1.0000, 0, 0.0, 0)
 
-[node name="RuinExamine" parent="Ruin" instance=ExtResource("3")]
+[node name="RuinExamine" parent="Ruin" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -19.0)
 text_key = "EX_MANOR_2026"
 location_id = "LOC_MANOR"
 label_key = "LOC_MANOR"
 
-[node name="RegisterBook" type="Node3D" parent="Ruin"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -11.0)
-script = ExtResource("5")
-text_key = "EX_REGISTER_2026"
-
-[node name="BookMesh" type="CSGBox3D" parent="Ruin/RegisterBook"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.96, 0)
-size = Vector3(0.45, 0.12, 0.32)
-material = SubResource("M1")
-
-[node name="Plinth" type="CSGBox3D" parent="Ruin/RegisterBook"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.45, 0)
-size = Vector3(0.9, 0.9, 0.7)
-material = SubResource("M2")
-
-[node name="Body3D" type="StaticBody3D" parent="Ruin/RegisterBook"]
-collision_layer = 2
-collision_mask = 0
-
-[node name="Shape" type="CollisionShape3D" parent="Ruin/RegisterBook/Body3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
-shape = SubResource("S3")
-
 [node name="OrchardKept" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 469, 0, 541)
-script = ExtResource("1")
-flag = "cellar_opened"
-visible_when = true
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 469, 0.0, 541)
 
-[node name="Apple0" parent="OrchardKept" instance=ExtResource("6")]
+[node name="Apple0" parent="OrchardKept" instance=ExtResource("4")]
 transform = Transform3D(0.5500, 0, 0.0000, 0, 0.55, 0, -0.0000, 0, 0.5500, 0.0, 0.0, 0)
 
-[node name="Apple1" parent="OrchardKept" instance=ExtResource("6")]
+[node name="Apple1" parent="OrchardKept" instance=ExtResource("4")]
 transform = Transform3D(0.2948, 0, 0.5793, 0, 0.65, 0, -0.5793, 0, 0.2948, 4.5, 0.0, 0)
 
-[node name="Apple2" parent="OrchardKept" instance=ExtResource("6")]
+[node name="Apple2" parent="OrchardKept" instance=ExtResource("4")]
 transform = Transform3D(-0.4414, 0, 0.6064, 0, 0.75, 0, -0.6064, 0, -0.4414, 9.0, 0.0, 0)
 
-[node name="Apple3" parent="OrchardKept" instance=ExtResource("6")]
+[node name="Apple3" parent="OrchardKept" instance=ExtResource("4")]
 transform = Transform3D(-0.5431, 0, -0.0868, 0, 0.55, 0, 0.0868, 0, -0.5431, 13.5, 0.0, 0)
 
-[node name="Apple4" parent="OrchardKept" instance=ExtResource("6")]
+[node name="Apple4" parent="OrchardKept" instance=ExtResource("4")]
 transform = Transform3D(-0.1998, 0, -0.6185, 0, 0.65, 0, 0.6185, 0, -0.1998, 18.0, 0.0, 0)
 
-[node name="Apple5" parent="OrchardKept" instance=ExtResource("6")]
+[node name="Apple5" parent="OrchardKept" instance=ExtResource("4")]
 transform = Transform3D(0.5315, 0, -0.5292, 0, 0.75, 0, 0.5292, 0, 0.5315, 22.5, 0.0, 0)
 
-[node name="OrchardExamine" parent="OrchardKept" instance=ExtResource("3")]
+[node name="OrchardExamine" parent="OrchardKept" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 2.5)
 text_key = "EX_ORCHARD_2026"
 location_id = "LOC_ORCHARD"
 label_key = "LOC_ORCHARD"
 
-[node name="OrchardScrub" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 469, 0, 541)
-script = ExtResource("1")
-flag = "cellar_opened"
-visible_when = false
-
-[node name="Scrub0" parent="OrchardScrub" instance=ExtResource("7")]
-transform = Transform3D(1.3000, 0, 0.0000, 0, 1.3, 0, -0.0000, 0, 1.3000, 2, 0.0, 1.5)
-
-[node name="Scrub1" parent="OrchardScrub" instance=ExtResource("7")]
-transform = Transform3D(0.8081, 0, 1.0183, 0, 1.3, 0, -1.0183, 0, 0.8081, 8, 0.0, 1.5)
-
-[node name="Scrub2" parent="OrchardScrub" instance=ExtResource("7")]
-transform = Transform3D(-0.2954, 0, 1.2660, 0, 1.3, 0, -1.2660, 0, -0.2954, 14, 0.0, 1.5)
-
-[node name="Scrub3" parent="OrchardScrub" instance=ExtResource("7")]
-transform = Transform3D(-1.1753, 0, 0.5556, 0, 1.3, 0, -0.5556, 0, -1.1753, 20, 0.0, 1.5)
-
-[node name="ScrubExamine" parent="OrchardScrub" instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11, 0, 2.5)
-text_key = "EX_ORCHARD_SCRUB_2026"
-location_id = "LOC_ORCHARD"
-label_key = "LOC_ORCHARD"
-
 [node name="Farm" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 377, 0, 552)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 377, 0.0, 552)
 
 [node name="Foundation" type="CSGBox3D" parent="Farm"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0.0, 0.17, 0.0)
 size = Vector3(14, 0.35, 8)
-material = SubResource("M4")
+material = SubResource("M1")
 
-[node name="FarmExamine" parent="Farm" instance=ExtResource("3")]
+[node name="FarmExamine" parent="Farm" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.5)
 text_key = "EX_FARM_2026"
 location_id = "LOC_FARMSTEAD"
 label_key = "LOC_FARMSTEAD"
 
 [node name="WellRing" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 399, 0, 543)
-script = ExtResource("1")
-flag = "well_kept_open"
-visible_when = true
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 399, 0.0, 543)
 
 [node name="Ring" type="CSGTorus3D" parent="WellRing"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.3, 0)
@@ -203,231 +98,43 @@ inner_radius = 0.8
 outer_radius = 1.2
 sides = 12
 ring_sides = 6
-material = SubResource("M5")
+material = SubResource("M2")
 
-[node name="WellExamine" parent="WellRing" instance=ExtResource("3")]
+[node name="WellExamine" parent="WellRing" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
 text_key = "EX_WELL_2026"
 location_id = "LOC_WELL"
 label_key = "LOC_WELL"
 
-[node name="WellDip" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 399, 0, 543)
-script = ExtResource("1")
-flag = "well_kept_open"
-visible_when = false
-
-[node name="DipExamine" parent="WellDip" instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
-text_key = "EX_WELL_DIP_2026"
-location_id = "LOC_WELL"
-label_key = "LOC_WELL"
-
 [node name="StoneKept" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 600, 0, 335)
-script = ExtResource("1")
-flag = "family_recorded_1798"
-visible_when = true
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 600, 0.0, 335)
 
-[node name="BoundaryStone" parent="StoneKept" instance=ExtResource("8")]
+[node name="BoundaryStone" parent="StoneKept" instance=ExtResource("5")]
 transform = Transform3D(0.9397, 0, 0.3420, 0, 1.0, 0, -0.3420, 0, 0.9397, 0.0, 0.0, 0.0)
 
-[node name="StoneExamine" parent="StoneKept" instance=ExtResource("3")]
+[node name="StoneExamine" parent="StoneKept" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
 text_key = "EX_STONE_2026"
 label_key = "LOC_NORTH_FIELD"
 
 [node name="FieldMeadow" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 600, 0, 320)
-script = ExtResource("1")
-flag = "north_field_ploughed"
-visible_when = true
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 600, 0.0, 320)
 
-[node name="MeadowExamine" parent="FieldMeadow" instance=ExtResource("3")]
+[node name="MeadowExamine" parent="FieldMeadow" instance=ExtResource("2")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
 text_key = "EX_FIELD_MEADOW_2026"
 location_id = "LOC_NORTH_FIELD"
 label_key = "LOC_NORTH_FIELD"
 
-[node name="FieldForest" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 600, 0, 320)
-script = ExtResource("1")
-flag = "north_field_ploughed"
-visible_when = false
-
-[node name="Young0" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.6179, 0, 0.0513, 0, 0.62, 0, -0.0513, 0, 0.6179, -34.7, 0.0, 4.4)
-
-[node name="Young1" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.2065, 0, -0.4444, 0, 0.49, 0, 0.4444, 0, -0.2065, 6.7, 0.0, 9.7)
-
-[node name="Young2" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.4462, 0, 0.1120, 0, 0.46, 0, -0.1120, 0, -0.4462, -28.4, 0.0, 4.2)
-
-[node name="Young3" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.3074, 0, -0.2060, 0, 0.37, 0, 0.2060, 0, 0.3074, -41.4, 0.0, -3.9)
-
-[node name="Young4" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3863, 0, 0.3915, 0, 0.55, 0, -0.3915, 0, -0.3863, -0.4, 0.0, -20.4)
-
-[node name="Young5" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0837, 0, -0.6244, 0, 0.63, 0, 0.6244, 0, 0.0837, -6.2, 0.0, 41.3)
-
-[node name="Young6" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.5775, 0, 0.2256, 0, 0.62, 0, -0.2256, 0, -0.5775, -30.7, 0.0, -19.9)
-
-[node name="Young7" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3998, 0, -0.0122, 0, 0.4, 0, 0.0122, 0, -0.3998, -42.9, 0.0, 0.4)
-
-[node name="Young8" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.1733, 0, -0.5849, 0, 0.61, 0, 0.5849, 0, 0.1733, -3.2, 0.0, -33.6)
-
-[node name="Young9" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.2524, 0, 0.4660, 0, 0.53, 0, -0.4660, 0, 0.2524, -1.2, 0.0, 30.4)
-
-[node name="Young10" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0472, 0, 0.6082, 0, 0.61, 0, -0.6082, 0, 0.0472, -5.8, 0.0, 13.2)
-
-[node name="Young11" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.3805, 0, 0.2759, 0, 0.47, 0, -0.2759, 0, 0.3805, 7.6, 0.0, -35.8)
-
-[node name="Young12" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.1082, 0, -0.4984, 0, 0.51, 0, 0.4984, 0, -0.1082, -30.4, 0.0, 13.6)
-
-[node name="Young13" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0412, 0, -0.6387, 0, 0.64, 0, 0.6387, 0, 0.0412, 27.5, 0.0, -30.6)
-
-[node name="Young14" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.0114, 0, 0.4399, 0, 0.44, 0, -0.4399, 0, -0.0114, -31.7, 0.0, 13.0)
-
-[node name="Young15" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3449, 0, 0.0594, 0, 0.35, 0, -0.0594, 0, -0.3449, 40.1, 0.0, 7.7)
-
-[node name="Young16" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.1965, 0, -0.4922, 0, 0.53, 0, 0.4922, 0, -0.1965, -27.5, 0.0, 26.7)
-
-[node name="Young17" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3590, 0, 0.0274, 0, 0.36, 0, -0.0274, 0, -0.3590, -25.8, 0.0, -27.7)
-
-[node name="Young18" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.5693, 0, 0.1108, 0, 0.58, 0, -0.1108, 0, 0.5693, 8.1, 0.0, -35.7)
-
-[node name="Young19" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0958, 0, 0.6328, 0, 0.64, 0, -0.6328, 0, 0.0958, 26.1, 0.0, 21.0)
-
-[node name="Young20" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.5931, 0, -0.2125, 0, 0.63, 0, 0.2125, 0, 0.5931, -3.9, 0.0, -31.0)
-
-[node name="Young21" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.3491, 0, 0.1738, 0, 0.39, 0, -0.1738, 0, 0.3491, 21.0, 0.0, 31.2)
-
-[node name="Young22" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3776, 0, 0.1319, 0, 0.4, 0, -0.1319, 0, -0.3776, -37.0, 0.0, -18.5)
-
-[node name="Young23" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3814, 0, 0.4370, 0, 0.58, 0, -0.4370, 0, -0.3814, 17.8, 0.0, -28.2)
-
-[node name="Young24" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0028, 0, 0.5900, 0, 0.59, 0, -0.5900, 0, 0.0028, -30.4, 0.0, -29.2)
-
-[node name="Young25" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.2684, 0, -0.5254, 0, 0.59, 0, 0.5254, 0, -0.2684, 40.4, 0.0, -16.2)
-
-[node name="Young26" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0824, 0, -0.3607, 0, 0.37, 0, 0.3607, 0, 0.0824, -32.3, 0.0, -20.8)
-
-[node name="Young27" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.2249, 0, 0.4466, 0, 0.5, 0, -0.4466, 0, 0.2249, 34.4, 0.0, -7.4)
-
-[node name="Young28" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.4921, 0, 0.0887, 0, 0.5, 0, -0.0887, 0, -0.4921, 37.4, 0.0, 8.3)
-
-[node name="Young29" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.4328, 0, -0.4439, 0, 0.62, 0, 0.4439, 0, -0.4328, -28.5, 0.0, 3.6)
-
-[node name="Young30" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.6399, 0, -0.1141, 0, 0.65, 0, 0.1141, 0, 0.6399, 5.2, 0.0, -20.7)
-
-[node name="Young31" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.1406, 0, 0.3422, 0, 0.37, 0, -0.3422, 0, 0.1406, -37.3, 0.0, 7.7)
-
-[node name="Young32" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.3504, 0, 0.1471, 0, 0.38, 0, -0.1471, 0, -0.3504, -42.1, 0.0, -15.6)
-
-[node name="Young33" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.0498, 0, -0.5277, 0, 0.53, 0, 0.5277, 0, 0.0498, -4.4, 0.0, -8.0)
-
-[node name="Young34" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(-0.2508, 0, -0.3736, 0, 0.45, 0, 0.3736, 0, -0.2508, 12.1, 0.0, 18.5)
-
-[node name="Young35" parent="FieldForest" instance=ExtResource("6")]
-transform = Transform3D(0.6300, 0, 0.0060, 0, 0.63, 0, -0.0060, 0, 0.6300, 33.9, 0.0, 25.2)
-
-[node name="ForestExamine" parent="FieldForest" instance=ExtResource("3")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0.0)
-text_key = "EX_FIELD_FOREST_2026"
-location_id = "LOC_NORTH_FIELD"
-label_key = "LOC_NORTH_FIELD"
-
-[node name="Leida" parent="." instance=ExtResource("9")]
-transform = Transform3D(-0.7374, 0, 0.6755, 0, 1.0, 0, -0.6755, 0, -0.7374, 418, 0.0, 540)
-npc_id = "npc_leida"
-knot = "leida"
-label_key = "NPC_LEIDA"
-body_color = Color(0.450, 0.500, 0.620, 1)
-height = 1.55
-pose = "holding"
-
-[node name="RustedTool" parent="." instance=ExtResource("10")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 425, 0, 536)
-item_id = "rusted_tool"
-era_id = "era_2026"
-examine_key = "EX_RUSTED_TOOL"
-
-[node name="Farming" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 379, 0, 566)
-script = ExtResource("1")
-
-[node name="Plot0" parent="Farming" instance=ExtResource("11")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0, 0, 0)
-plot_id = "plot0"
-era_id = "era_2026"
-
-[node name="Plot1" parent="Farming" instance=ExtResource("11")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5, 0, 0)
-plot_id = "plot1"
-era_id = "era_2026"
-
-[node name="SeedBin" type="Node3D" parent="Farming"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.5, 0, 0)
-script = ExtResource("12")
-era_id = "era_2026"
-seed_item_ids = Array[String](["seed_potato", "seed_cabbage"])
-
-[node name="Bin" type="CSGBox3D" parent="Farming/SeedBin"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 0.45, 0)
-size = Vector3(1.2, 0.9, 0.8)
-material = SubResource("M7")
-
-[node name="Body3D" type="StaticBody3D" parent="Farming/SeedBin"]
-collision_layer = 2
-collision_mask = 0
-
-[node name="Shape" type="CollisionShape3D" parent="Farming/SeedBin/Body3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.6, 0)
-shape = SubResource("SB_era_2026_6")
-
 [node name="Buildings" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 0.0, 0)
 
 [node name="B381159" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 350.3, 0, 199.1)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 350.3, 0.0, 199.1)
 metadata/footprint = Vector2(20.4, 38.3)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B381159"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(10.20, -17.27, 5.72, 19.13, -10.17, 17.18, -5.70, -19.22)
 height = 9.2
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -445,12 +152,11 @@ year = 0
 tunnus = ""
 
 [node name="B380430" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 450.3, 0, 211.8)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 450.3, 0.0, 211.8)
 metadata/footprint = Vector2(20.9, 37.7)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B380430"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-8.76, 3.26, -5.93, -18.83, 10.42, -16.73, 5.86, 18.87, -10.49, 16.77)
 height = 8.7
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -468,12 +174,11 @@ year = 0
 tunnus = ""
 
 [node name="B6344831" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 394.0, 0, 245.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 394.0, 0.0, 245.0)
 metadata/footprint = Vector2(8.0, 5.6)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6344831"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-3.42, -2.79, 3.95, -1.82, 3.33, 2.84, -4.03, 1.86)
 height = 4.9
 wall_color = Color(0.680, 0.680, 0.650, 1)
@@ -491,12 +196,11 @@ year = 2002
 tunnus = "58201:002:1360"
 
 [node name="B6967038" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 363.0, 0, 278.7)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 363.0, 0.0, 278.7)
 metadata/footprint = Vector2(31.6, 80.4)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6967038"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(15.75, -37.63, 12.27, -5.99, 10.71, 8.20, 7.18, 40.25, -15.84, 37.72, -7.27, -40.16)
 height = 11.8
 wall_color = Color(0.620, 0.360, 0.280, 1)
@@ -514,12 +218,11 @@ year = 1970
 tunnus = "58201:002:1360"
 
 [node name="B8200048" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 464.0, 0, 283.8)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 464.0, 0.0, 283.8)
 metadata/footprint = Vector2(54.9, 68.9)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B8200048"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-19.71, -34.45, 26.42, -28.77, 20.55, 18.87, 27.49, 19.73, 25.68, 34.46, -27.40, 27.92)
 height = 10.4
 wall_color = Color(0.700, 0.720, 0.740, 1)
@@ -538,12 +241,11 @@ year = 2020
 tunnus = "58201:002:1360"
 
 [node name="B380433" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 402.1, 0, 285.1)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 402.1, 0.0, 285.1)
 metadata/footprint = Vector2(56.9, 81.4)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B380433"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(19.81, 40.67, -3.83, 38.07, -0.17, 4.91, -28.39, 1.80, -26.83, -12.39, 1.71, -9.24, 5.17, -40.74, 28.49, -38.18)
 height = 11.4
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -561,12 +263,11 @@ year = 0
 tunnus = ""
 
 [node name="B383790" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 210.8, 0, 290.3)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 210.8, 0.0, 290.3)
 metadata/footprint = Vector2(26.6, 39.6)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B383790"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(13.34, 14.74, 0.02, 19.85, -13.25, -14.67, 0.08, -19.79)
 height = 7.4
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -584,12 +285,11 @@ year = 0
 tunnus = ""
 
 [node name="B383792" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 863.0, 0, 313.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 863.0, 0.0, 313.6)
 metadata/footprint = Vector2(11.3, 11.4)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B383792"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(5.71, 2.13, -2.10, 5.64, -5.62, -2.22, 2.19, -5.72)
 height = 6.7
 wall_color = Color(0.550, 0.420, 0.280, 1)
@@ -608,12 +308,11 @@ year = 2011
 tunnus = "17101:001:1997"
 
 [node name="B379304" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 795.6, 0, 317.4)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 795.6, 0.0, 317.4)
 metadata/footprint = Vector2(7.4, 6.2)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B379304"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(3.67, 0.57, -2.03, 3.17, -3.69, -0.48, 2.01, -3.07)
 height = 8.4
 wall_color = Color(0.620, 0.360, 0.280, 1)
@@ -631,12 +330,11 @@ year = 1980
 tunnus = "58201:002:2480"
 
 [node name="B383376" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 877.5, 0, 328.5)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 877.5, 0.0, 328.5)
 metadata/footprint = Vector2(8.8, 10.7)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B383376"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(4.38, 3.12, -1.04, 5.30, -4.46, -3.20, 0.95, -5.38)
 height = 5.0
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -654,12 +352,11 @@ year = 0
 tunnus = ""
 
 [node name="B6343052" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 356.0, 0, 341.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 356.0, 0.0, 341.6)
 metadata/footprint = Vector2(28.3, 50.4)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6343052"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(14.18, -22.65, 8.91, 25.23, -14.11, 22.70, -8.84, -25.18)
 height = 11.7
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -677,12 +374,11 @@ year = 0
 tunnus = ""
 
 [node name="B6344384" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 896.9, 0, 345.8)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 896.9, 0.0, 345.8)
 metadata/footprint = Vector2(11.2, 11.2)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6344384"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(0.02, -5.59, 0.99, -5.51, 1.93, -5.26, 2.82, -4.85, 3.61, -4.29, 4.30, -3.60, 4.86, -2.80, 5.28, -1.92, 5.53, -0.97, 5.61, 0.00, 5.53, 0.97, 5.28, 1.91, 4.86, 2.79, 4.30, 3.59, 3.61, 4.28, 2.82, 4.84, 1.93, 5.25, 0.99, 5.50, 0.02, 5.59, -0.95, 5.50, -1.89, 5.25, -2.78, 4.84, -3.58, 4.28, -4.26, 3.59, -4.82, 2.79, -5.23, 1.91, -5.49, 0.97, -5.57, 0.00, -5.49, -0.97, -5.23, -1.92, -4.82, -2.80, -4.26, -3.60, -3.58, -4.29, -2.78, -4.85, -1.89, -5.26, -0.95, -5.51)
 height = 7.8
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -700,12 +396,11 @@ year = 0
 tunnus = ""
 
 [node name="B9131790" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 407.5, 0, 348.1)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 407.5, 0.0, 348.1)
 metadata/footprint = Vector2(28.9, 49.8)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B9131790"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(14.41, -22.33, 9.21, 24.92, -14.44, 22.32, -9.23, -24.93)
 height = 11.1
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -723,12 +418,11 @@ year = 0
 tunnus = ""
 
 [node name="B383378" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 958.9, 0, 356.3)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 958.9, 0.0, 356.3)
 metadata/footprint = Vector2(11.6, 13.2)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B383378"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-5.81, -2.59, -3.97, -2.86, -4.39, -5.68, 1.86, -6.60, 2.27, -3.79, 4.48, -4.12, 5.83, 5.02, -4.45, 6.55)
 height = 7.9
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -746,12 +440,11 @@ year = 1930
 tunnus = "58201:002:2130"
 
 [node name="B383379" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 971.5, 0, 362.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 971.5, 0.0, 362.6)
 metadata/footprint = Vector2(5.1, 6.7)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B383379"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(2.52, 2.55, -1.36, 3.32, -2.55, -2.64, 1.33, -3.41)
 height = 13.4
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -770,12 +463,11 @@ year = 0
 tunnus = "58201:002:2130"
 
 [node name="B383381" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 966.9, 0, 375.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 966.9, 0.0, 375.6)
 metadata/footprint = Vector2(6.7, 6.6)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B383381"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(3.35, 2.55, -2.55, 3.34, -3.33, -2.52, 2.57, -3.31)
 height = 5.7
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -793,12 +485,11 @@ year = 0
 tunnus = "58201:002:2130"
 
 [node name="B6092642" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 980.6, 0, 381.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 980.6, 0.0, 381.6)
 metadata/footprint = Vector2(8.0, 10.5)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6092642"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(4.05, -3.52, 1.11, 5.27, -4.00, 3.56, -1.07, -5.23)
 height = 7.1
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -816,12 +507,11 @@ year = 0
 tunnus = "58201:002:2130"
 
 [node name="B466991" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 851.3, 0, 393.5)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 851.3, 0.0, 393.5)
 metadata/footprint = Vector2(14.2, 13.4)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B466991"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-2.76, 6.66, -7.12, -1.58, 2.74, -6.76, 7.08, 1.48)
 height = 7.7
 wall_color = Color(0.550, 0.420, 0.280, 1)
@@ -840,12 +530,11 @@ year = 1950
 tunnus = "58201:002:2400"
 
 [node name="B6343874" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 745.6, 0, 401.4)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 745.6, 0.0, 401.4)
 metadata/footprint = Vector2(10.1, 8.6)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6343874"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-5.09, -0.20, 2.71, -4.26, 5.06, 0.25, -2.75, 4.31)
 height = 3.5
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -863,12 +552,11 @@ year = 0
 tunnus = ""
 
 [node name="B466993" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 851.5, 0, 408.8)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 851.5, 0.0, 408.8)
 metadata/footprint = Vector2(6.4, 6.6)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B466993"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(3.16, 1.17, -0.91, 3.26, -3.22, -1.23, 0.85, -3.32)
 height = 4.5
 wall_color = Color(0.550, 0.420, 0.280, 1)
@@ -887,12 +575,11 @@ year = 1950
 tunnus = "58201:002:2400"
 
 [node name="B382021" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 331.0, 0, 423.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 331.0, 0.0, 423.0)
 metadata/footprint = Vector2(6.2, 6.9)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B382021"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-0.97, 3.46, -3.07, -1.88, 1.02, -3.48, 3.12, 1.86)
 height = 3.3
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -911,12 +598,11 @@ year = 1975
 tunnus = "58201:002:1360"
 
 [node name="B379826" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 342.9, 0, 453.2)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 342.9, 0.0, 453.2)
 metadata/footprint = Vector2(17.0, 15.0)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B379826"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-4.16, 7.46, -8.53, -0.98, 4.13, -7.55, 8.51, 0.90)
 height = 4.1
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -934,12 +620,11 @@ year = 0
 tunnus = ""
 
 [node name="B469816" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 769.6, 0, 465.9)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 769.6, 0.0, 465.9)
 metadata/footprint = Vector2(24.2, 32.0)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B469816"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(2.41, 16.04, -12.12, -10.74, -2.42, -16.00, 12.11, 10.78)
 height = 9.6
 wall_color = Color(0.880, 0.820, 0.680, 1)
@@ -958,12 +643,11 @@ year = 1999
 tunnus = "58201:002:2600"
 
 [node name="B6345378" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 745.7, 0, 466.8)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 745.7, 0.0, 466.8)
 metadata/footprint = Vector2(7.2, 8.0)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6345378"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(0.61, -4.04, 3.57, 1.83, -0.63, 3.95, -3.59, -1.92)
 height = 2.8
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -981,12 +665,11 @@ year = 0
 tunnus = ""
 
 [node name="B379869" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 354.6, 0, 473.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 354.6, 0.0, 473.6)
 metadata/footprint = Vector2(21.1, 25.4)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B379869"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(0.08, 12.77, -10.50, -7.08, 0.01, -12.68, 10.58, 7.16)
 height = 4.4
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1004,12 +687,11 @@ year = 0
 tunnus = ""
 
 [node name="B424126" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 463.6, 0, 476.4)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 463.6, 0.0, 476.4)
 metadata/footprint = Vector2(29.3, 41.5)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B424126"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(14.61, 16.15, 6.63, 20.77, -2.24, 5.44, -14.70, -16.09, -6.72, -20.71, 5.74, 0.82)
 height = 13.5
 wall_color = Color(0.620, 0.360, 0.280, 1)
@@ -1028,12 +710,11 @@ year = 1900
 tunnus = "58201:002:2500"
 
 [node name="B424127" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 725.4, 0, 478.9)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 725.4, 0.0, 478.9)
 metadata/footprint = Vector2(31.8, 24.1)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B424127"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-10.72, 12.07, -15.85, 2.95, 10.77, -12.03, 15.90, -2.91)
 height = 9.8
 wall_color = Color(0.880, 0.820, 0.680, 1)
@@ -1052,12 +733,11 @@ year = 1970
 tunnus = "58201:002:2610"
 
 [node name="B379872" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 420.0, 0, 492.1)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 420.0, 0.0, 492.1)
 metadata/footprint = Vector2(33.3, 42.9)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B379872"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(2.04, 21.39, -16.59, -13.71, -1.94, -21.49, 16.68, 13.61)
 height = 7.2
 wall_color = Color(0.620, 0.360, 0.280, 1)
@@ -1075,12 +755,11 @@ year = 1965
 tunnus = "58201:002:0026"
 
 [node name="B378721" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 511.1, 0, 494.3)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 511.1, 0.0, 494.3)
 metadata/footprint = Vector2(16.6, 12.8)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B378721"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-8.26, -1.31, 5.43, -6.41, 8.29, 1.25, -5.41, 6.35)
 height = 10.6
 wall_color = Color(0.550, 0.420, 0.280, 1)
@@ -1098,12 +777,11 @@ year = 2014
 tunnus = "58201:002:1512"
 
 [node name="B430585" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 789.1, 0, 495.8)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 789.1, 0.0, 495.8)
 metadata/footprint = Vector2(16.7, 21.2)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B430585"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(1.86, 10.60, -8.33, -6.87, -1.86, -10.65, 8.33, 6.83)
 height = 4.8
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -1121,12 +799,11 @@ year = 1980
 tunnus = "58201:002:2600"
 
 [node name="B389491" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1030.1, 0, 496.8)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 1030.1, 0.0, 496.8)
 metadata/footprint = Vector2(22.8, 8.6)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B389491"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-11.40, 2.95, -10.97, -4.32, 11.41, -3.02, 10.99, 4.25)
 height = 5.9
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1144,12 +821,11 @@ year = 0
 tunnus = ""
 
 [node name="B382540" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 635.5, 0, 501.4)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 635.5, 0.0, 501.4)
 metadata/footprint = Vector2(15.5, 19.1)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B382540"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(3.21, 7.63, -0.91, 9.60, -5.57, -0.11, -7.78, -4.71, 2.26, -9.53, 7.76, 1.93, 1.84, 4.77)
 height = 7.1
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -1169,12 +845,11 @@ year = 1950
 tunnus = "58201:002:1000"
 
 [node name="B473922" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 752.8, 0, 502.9)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 752.8, 0.0, 502.9)
 metadata/footprint = Vector2(19.3, 27.1)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B473922"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-3.52, -13.56, -0.24, -7.65, 2.13, -8.97, 8.43, 2.36, 6.06, 3.68, 9.64, 10.13, 3.51, 13.54, -9.65, -10.15)
 height = 3.9
 wall_color = Color(0.620, 0.360, 0.280, 1)
@@ -1193,12 +868,11 @@ year = 1970
 tunnus = "58201:002:2610"
 
 [node name="B389490" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 680.2, 0, 503.3)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 680.2, 0.0, 503.3)
 metadata/footprint = Vector2(30.4, 22.3)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B389490"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-10.69, 11.12, -15.14, 3.00, 10.80, -11.20, 15.23, -3.08)
 height = 9.8
 wall_color = Color(0.840, 0.760, 0.600, 1)
@@ -1217,12 +891,11 @@ year = 1975
 tunnus = "58201:002:0960"
 
 [node name="B6343847" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1016.5, 0, 507.8)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 1016.5, 0.0, 507.8)
 metadata/footprint = Vector2(6.6, 4.8)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6343847"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-2.34, -2.38, 3.33, -0.64, 2.38, 2.46, -3.30, 0.72)
 height = 3.0
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1240,12 +913,11 @@ year = 0
 tunnus = ""
 
 [node name="B378720" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 335.9, 0, 509.2)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 335.9, 0.0, 509.2)
 metadata/footprint = Vector2(37.5, 44.0)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B378720"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(8.01, 22.03, -11.59, -10.84, -15.18, -8.70, -18.81, -14.77, -6.78, -21.94, 11.03, 7.94, 13.32, 6.58, 18.72, 15.65)
 height = 10.6
 wall_color = Color(0.620, 0.360, 0.280, 1)
@@ -1264,12 +936,11 @@ year = 1890
 tunnus = "58201:002:0026"
 
 [node name="B378723" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 619.3, 0, 514.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 619.3, 0.0, 514.6)
 metadata/footprint = Vector2(11.4, 12.6)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B378723"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(5.66, 2.99, -1.26, 6.29, -5.69, -2.97, 1.24, -6.27)
 height = 7.2
 wall_color = Color(0.420, 0.320, 0.220, 1)
@@ -1289,12 +960,11 @@ year = 2015
 tunnus = "58201:002:1000"
 
 [node name="B6344835" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 744.3, 0, 522.4)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 744.3, 0.0, 522.4)
 metadata/footprint = Vector2(5.7, 7.4)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6344835"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(0.31, -3.71, 2.86, 2.40, -0.32, 3.72, -2.86, -2.39)
 height = 2.5
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1312,12 +982,11 @@ year = 0
 tunnus = ""
 
 [node name="B378724" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 712.4, 0, 524.1)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 712.4, 0.0, 524.1)
 metadata/footprint = Vector2(18.3, 25.3)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B378724"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(9.11, 9.12, 2.76, 12.59, -9.17, -9.22, -2.82, -12.69)
 height = 4.2
 wall_color = Color(0.680, 0.680, 0.650, 1)
@@ -1336,12 +1005,11 @@ year = 1975
 tunnus = "58201:002:0960"
 
 [node name="B7822510" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 739.6, 0, 524.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 739.6, 0.0, 524.6)
 metadata/footprint = Vector2(5.2, 6.3)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B7822510"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(0.16, -3.15, 2.56, 1.79, -0.21, 3.14, -2.61, -1.81)
 height = 3.6
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1359,12 +1027,11 @@ year = 0
 tunnus = ""
 
 [node name="B8861089" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 627.1, 0, 530.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 627.1, 0.0, 530.0)
 metadata/footprint = Vector2(9.9, 10.7)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B8861089"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-4.98, -2.15, 0.53, -5.34, 4.90, 2.18, -0.62, 5.38)
 height = 4.3
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -1382,12 +1049,11 @@ year = 0
 tunnus = "58201:002:1000"
 
 [node name="B6345610" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 664.2, 0, 541.3)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 664.2, 0.0, 541.3)
 metadata/footprint = Vector2(6.6, 7.1)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6345610"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(3.35, 1.49, -0.65, 3.59, -3.29, -1.42, 0.72, -3.52)
 height = 3.4
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -1406,12 +1072,11 @@ year = 1990
 tunnus = "58201:002:1000"
 
 [node name="B6344524" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 650.1, 0, 557.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 650.1, 0.0, 557.0)
 metadata/footprint = Vector2(11.7, 10.3)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6344524"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(5.86, 0.83, -2.89, 5.16, -5.87, -0.86, 2.88, -5.18)
 height = 4.2
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1429,12 +1094,11 @@ year = 0
 tunnus = ""
 
 [node name="B7822474" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 309.8, 0, 559.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 309.8, 0.0, 559.0)
 metadata/footprint = Vector2(33.4, 19.6)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B7822474"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-13.72, -9.77, 16.70, -2.41, 13.75, 9.80, -16.67, 2.44)
 height = 9.0
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1453,12 +1117,11 @@ year = 2013
 tunnus = "58201:002:0026"
 
 [node name="B379635" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 435.2, 0, 559.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 435.2, 0.0, 559.0)
 metadata/footprint = Vector2(10.9, 10.8)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B379635"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-1.93, 5.36, -2.81, 4.95, -5.25, 2.04, -5.50, -0.81, -3.60, -4.10, -0.04, -5.39, 3.52, -4.10, 5.42, -0.81, 4.76, 2.92, 1.86, 5.36)
 height = 7.5
 wall_color = Color(0.880, 0.820, 0.680, 1)
@@ -1476,12 +1139,11 @@ year = 1879
 tunnus = "58201:001:0228"
 
 [node name="B381197" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1019.8, 0, 593.7)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 1019.8, 0.0, 593.7)
 metadata/footprint = Vector2(12.0, 9.8)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B381197"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(6.04, -4.66, 5.69, 4.92, -6.01, 4.49, -5.79, -1.60, 0.53, -1.37, 0.65, -4.85)
 height = 6.2
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1499,12 +1161,11 @@ year = 0
 tunnus = ""
 
 [node name="B6345089" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 993.6, 0, 599.5)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 993.6, 0.0, 599.5)
 metadata/footprint = Vector2(7.3, 5.4)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6345089"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(2.84, 2.73, -3.70, 1.54, -2.92, -2.69, 3.61, -1.50)
 height = 5.0
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1522,12 +1183,11 @@ year = 0
 tunnus = ""
 
 [node name="B6343367" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1019.1, 0, 607.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 1019.1, 0.0, 607.0)
 metadata/footprint = Vector2(4.0, 6.9)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6343367"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(2.02, -3.28, 1.68, 3.47, -1.99, 3.28, -1.64, -3.46)
 height = 9.3
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1545,12 +1205,11 @@ year = 0
 tunnus = ""
 
 [node name="B381198" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1006.1, 0, 611.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 1006.1, 0.0, 611.0)
 metadata/footprint = Vector2(9.5, 10.0)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B381198"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(4.77, -4.59, 4.37, 5.06, -4.74, 4.67, -4.34, -4.98)
 height = 6.9
 wall_color = Color(0.840, 0.760, 0.600, 1)
@@ -1569,12 +1228,11 @@ year = 1948
 tunnus = "58201:002:0261"
 
 [node name="B7876741" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 503.2, 0, 621.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 503.2, 0.0, 621.0)
 metadata/footprint = Vector2(9.1, 8.6)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B7876741"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(4.60, -0.47, -1.60, 4.28, -4.53, 0.46, 1.67, -4.29)
 height = 7.6
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1592,12 +1250,11 @@ year = 0
 tunnus = "17101:001:2048"
 
 [node name="B379828" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 678.6, 0, 623.7)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 678.6, 0.0, 623.7)
 metadata/footprint = Vector2(12.4, 12.8)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B379828"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(6.20, 1.63, -0.33, 6.38, -6.18, -1.67, 0.34, -6.42)
 height = 7.9
 wall_color = Color(0.550, 0.420, 0.280, 1)
@@ -1616,12 +1273,11 @@ year = 1948
 tunnus = "58201:002:0980"
 
 [node name="B7876744" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 505.9, 0, 624.5)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 505.9, 0.0, 624.5)
 metadata/footprint = Vector2(8.6, 7.8)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B7876744"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(4.26, -0.89, -1.93, 3.87, -4.30, 0.78, 1.90, -3.97)
 height = 9.7
 wall_color = Color(0.660, 0.420, 0.320, 1)
@@ -1639,12 +1295,11 @@ year = 0
 tunnus = "17101:001:2048"
 
 [node name="B379397" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 692.8, 0, 627.2)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 692.8, 0.0, 627.2)
 metadata/footprint = Vector2(7.7, 7.3)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B379397"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(3.88, -0.37, -1.23, 3.69, -3.79, 0.46, 1.31, -3.60)
 height = 5.6
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -1664,12 +1319,11 @@ year = 1950
 tunnus = "58201:002:0980"
 
 [node name="B464340" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 508.7, 0, 628.1)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 508.7, 0.0, 628.1)
 metadata/footprint = Vector2(9.4, 9.0)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B464340"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-4.73, 0.27, 1.46, -4.49, 4.69, -0.28, -1.51, 4.47)
 height = 7.3
 wall_color = Color(0.660, 0.420, 0.320, 1)
@@ -1688,12 +1342,11 @@ year = 0
 tunnus = "17101:001:2048"
 
 [node name="B6344571" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 485.0, 0, 632.7)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 485.0, 0.0, 632.7)
 metadata/footprint = Vector2(6.4, 5.1)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6344571"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(3.18, -1.37, 2.36, 2.53, -3.22, 1.37, -2.41, -2.53)
 height = 17.0
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1711,12 +1364,11 @@ year = 0
 tunnus = ""
 
 [node name="B464341" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 512.0, 0, 659.4)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 512.0, 0.0, 659.4)
 metadata/footprint = Vector2(13.8, 13.6)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B464341"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(6.85, 0.42, -1.27, 6.82, -6.95, -0.39, 1.17, -6.78)
 height = 9.1
 wall_color = Color(0.550, 0.420, 0.280, 1)
@@ -1735,12 +1387,11 @@ year = 1939
 tunnus = "17101:001:2048"
 
 [node name="B464343" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 661.7, 0, 681.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 661.7, 0.0, 681.6)
 metadata/footprint = Vector2(13.4, 13.5)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B464343"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(6.74, 1.14, -0.80, 6.76, -6.65, -1.10, 0.89, -6.72)
 height = 11.8
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1758,12 +1409,11 @@ year = 0
 tunnus = ""
 
 [node name="B464342" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 471.2, 0, 683.9)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 471.2, 0.0, 683.9)
 metadata/footprint = Vector2(20.2, 19.0)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B464342"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-4.05, 9.49, -10.11, 2.10, 4.06, -9.52, 10.11, -2.13)
 height = 8.1
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -1781,12 +1431,11 @@ year = 0
 tunnus = ""
 
 [node name="B739808" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 597.8, 0, 697.3)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 597.8, 0.0, 697.3)
 metadata/footprint = Vector2(24.9, 18.3)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B739808"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(2.93, -9.14, 12.43, 4.32, 5.98, 8.87, 1.73, 2.83, -7.21, 9.14, -12.45, 1.72)
 height = 5.3
 wall_color = Color(0.880, 0.820, 0.680, 1)
@@ -1805,12 +1454,11 @@ year = 1989
 tunnus = "58201:002:2000"
 
 [node name="B7390677" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 980.9, 0, 704.4)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 980.9, 0.0, 704.4)
 metadata/footprint = Vector2(7.2, 7.7)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B7390677"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(3.62, -1.32, 0.49, 3.81, -3.59, 1.06, -0.24, -3.91)
 height = 12.3
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -1828,12 +1476,11 @@ year = 1960
 tunnus = "58201:002:0271"
 
 [node name="B380594" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 631.4, 0, 705.3)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 631.4, 0.0, 705.3)
 metadata/footprint = Vector2(17.2, 14.7)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B380594"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(0.92, -7.37, 8.65, 2.12, 5.88, 4.06, 4.52, 2.13, -2.94, 7.35, -8.59, -0.71)
 height = 5.3
 wall_color = Color(0.620, 0.360, 0.280, 1)
@@ -1851,12 +1498,11 @@ year = 1989
 tunnus = "58201:002:2000"
 
 [node name="B380595" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 985.1, 0, 707.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 985.1, 0.0, 707.0)
 metadata/footprint = Vector2(7.4, 7.8)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B380595"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-3.71, 1.21, -0.58, -3.92, 3.70, -1.04, 0.33, 3.93)
 height = 6.1
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -1874,12 +1520,11 @@ year = 1960
 tunnus = "58201:002:0271"
 
 [node name="B380596" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 967.3, 0, 708.2)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 967.3, 0.0, 708.2)
 metadata/footprint = Vector2(11.4, 12.7)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B380596"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(5.70, -2.88, -0.02, 6.32, -5.69, 2.80, 0.03, -6.40)
 height = 6.6
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -1897,12 +1542,11 @@ year = 1960
 tunnus = "58201:002:0271"
 
 [node name="B6343361" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 934.3, 0, 716.9)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 934.3, 0.0, 716.9)
 metadata/footprint = Vector2(6.9, 6.4)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6343361"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-1.50, -3.23, 3.39, -0.88, 1.43, 3.19, -3.46, 0.84)
 height = 7.9
 wall_color = Color(0.420, 0.320, 0.220, 1)
@@ -1921,12 +1565,11 @@ year = 1956
 tunnus = "58201:002:0271"
 
 [node name="B383500" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 984.0, 0, 719.7)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 984.0, 0.0, 719.7)
 metadata/footprint = Vector2(12.4, 12.8)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B383500"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(0.22, 6.37, -6.22, 1.64, -0.29, -6.42, 6.15, -1.69)
 height = 7.5
 wall_color = Color(0.550, 0.420, 0.280, 1)
@@ -1945,12 +1588,11 @@ year = 1948
 tunnus = "58201:002:0271"
 
 [node name="B382363" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 931.4, 0, 803.2)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 931.4, 0.0, 803.2)
 metadata/footprint = Vector2(25.8, 21.1)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B382363"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(12.93, -6.27, 11.08, 3.25, -1.56, 0.79, -3.46, 10.55, -12.87, 8.71, -9.11, -10.57)
 height = 8.9
 wall_color = Color(0.880, 0.820, 0.680, 1)
@@ -1969,12 +1611,11 @@ year = 1930
 tunnus = "58201:002:0830"
 
 [node name="B382531" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 969.0, 0, 810.7)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 969.0, 0.0, 810.7)
 metadata/footprint = Vector2(16.8, 19.3)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B382531"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-6.44, -9.65, 8.40, -7.20, 7.33, -0.73, 2.46, -1.53, 0.63, 9.62, -6.27, 8.48, -5.86, 5.98, -5.29, 2.51, -8.36, 2.01)
 height = 7.2
 wall_color = Color(0.880, 0.820, 0.680, 1)
@@ -1993,12 +1634,11 @@ year = 1989
 tunnus = "58201:002:0831"
 
 [node name="B6342852" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 950.7, 0, 816.9)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 950.7, 0.0, 816.9)
 metadata/footprint = Vector2(9.1, 7.9)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6342852"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(4.52, -3.03, 3.71, 3.95, -4.53, 2.99, -3.72, -3.99)
 height = 12.5
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -2016,12 +1656,11 @@ year = 1950
 tunnus = "58201:002:0830"
 
 [node name="B6345180" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 959.8, 0, 818.5)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 959.8, 0.0, 818.5)
 metadata/footprint = Vector2(6.8, 5.6)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6345180"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(3.34, -1.82, 2.93, 0.68, 2.58, 2.79, -3.42, 1.80, -2.66, -2.81)
 height = 4.3
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -2039,12 +1678,11 @@ year = 0
 tunnus = ""
 
 [node name="B6344450" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 933.9, 0, 868.3)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 933.9, 0.0, 868.3)
 metadata/footprint = Vector2(5.1, 7.3)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6344450"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-1.02, -3.65, 2.56, -2.83, 1.06, 3.69, -2.52, 2.86)
 height = 14.7
 wall_color = Color(0.420, 0.320, 0.220, 1)
@@ -2064,12 +1702,11 @@ year = 1950
 tunnus = "58201:002:0004"
 
 [node name="B472353" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 951.1, 0, 874.8)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 951.1, 0.0, 874.8)
 metadata/footprint = Vector2(10.3, 11.7)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B472353"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(3.99, 5.79, -5.17, 4.77, -3.99, -5.87, 5.17, -4.86)
 height = 7.1
 wall_color = Color(0.740, 0.600, 0.320, 1)
@@ -2089,12 +1726,11 @@ year = 1948
 tunnus = "58201:002:0004"
 
 [node name="B425593" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 933.1, 0, 884.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 933.1, 0.0, 884.0)
 metadata/footprint = Vector2(5.4, 8.2)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B425593"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-2.66, 3.44, -1.51, -4.12, 2.74, -3.47, 1.59, 4.09)
 height = 10.3
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -2112,12 +1748,11 @@ year = 1950
 tunnus = "58201:002:0004"
 
 [node name="B7427029" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 938.0, 0, 884.7)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 938.0, 0.0, 884.7)
 metadata/footprint = Vector2(6.5, 8.4)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B7427029"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-3.31, 3.39, -2.16, -4.17, 3.23, -3.35, 2.08, 4.21)
 height = 10.3
 wall_color = Color(0.550, 0.420, 0.280, 1)
@@ -2135,12 +1770,11 @@ year = 1950
 tunnus = "58201:002:0004"
 
 [node name="B425594" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 606.6, 0, 907.7)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 606.6, 0.0, 907.7)
 metadata/footprint = Vector2(11.9, 11.1)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B425594"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(2.25, 5.54, -5.92, 0.31, -2.17, -5.54, 6.00, -0.30)
 height = 7.9
 wall_color = Color(0.550, 0.420, 0.280, 1)
@@ -2159,12 +1793,11 @@ year = 1948
 tunnus = "58201:002:2560"
 
 [node name="B425596" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 616.1, 0, 920.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 616.1, 0.0, 920.6)
 metadata/footprint = Vector2(10.9, 12.3)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B425596"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(5.46, -2.94, 0.52, 6.13, -5.45, 2.87, -0.51, -6.19)
 height = 6.2
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -2182,12 +1815,11 @@ year = 0
 tunnus = ""
 
 [node name="B7822522" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 623.6, 0, 927.5)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 623.6, 0.0, 927.5)
 metadata/footprint = Vector2(7.2, 8.1)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B7822522"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(0.37, 4.02, -3.64, 1.86, -0.44, -4.08, 3.57, -1.91)
 height = 5.6
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -2205,12 +1837,11 @@ year = 0
 tunnus = ""
 
 [node name="B378310" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 695.8, 0, 939.2)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 695.8, 0.0, 939.2)
 metadata/footprint = Vector2(12.4, 15.2)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B378310"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(6.20, -4.83, 2.12, 7.63, -6.17, 4.92, -2.09, -7.55)
 height = 7.4
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -2228,12 +1859,11 @@ year = 0
 tunnus = ""
 
 [node name="B378311" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 716.3, 0, 942.9)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 716.3, 0.0, 942.9)
 metadata/footprint = Vector2(11.1, 14.5)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B378311"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(0.17, -3.79, 5.51, -2.29, 2.82, 7.24, -5.16, 4.98, -3.74, -0.08, -5.56, -0.59, -3.68, -7.25, 0.79, -5.99)
 height = 7.5
 wall_color = Color(0.550, 0.420, 0.280, 1)
@@ -2252,12 +1882,11 @@ year = 1948
 tunnus = "58201:002:1170"
 
 [node name="B6345209" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 690.3, 0, 954.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 690.3, 0.0, 954.6)
 metadata/footprint = Vector2(9.8, 10.5)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B6345209"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(4.94, -2.86, 2.23, 5.30, -4.88, 2.93, -2.17, -5.23)
 height = 6.8
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -2275,12 +1904,11 @@ year = 0
 tunnus = ""
 
 [node name="B378312" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 684.6, 0, 1000.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 684.6, 0.0, 1000.6)
 metadata/footprint = Vector2(7.2, 6.5)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B378312"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(-3.57, -1.80, 2.33, -3.28, 3.60, 1.71, -2.31, 3.19)
 height = 8.8
 wall_color = Color(0.460, 0.380, 0.290, 1)
@@ -2298,12 +1926,11 @@ year = 0
 tunnus = ""
 
 [node name="B430587" type="Node3D" parent="Buildings"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 978.0, 0, 1023.7)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 978.0, 0.0, 1023.7)
 metadata/footprint = Vector2(10.1, 9.9)
 
 [node name="Footprint" type="Node3D" parent="Buildings/B430587"]
-script = ExtResource("13")
+script = ExtResource("6")
 polygon = PackedVector2Array(4.99, 0.16, -1.05, 4.92, -5.08, -0.20, 0.95, -4.96)
 height = 7.5
 wall_color = Color(0.550, 0.420, 0.280, 1)
@@ -2321,20 +1948,18 @@ year = 1928
 tunnus = "58201:002:2490"
 
 [node name="Roads" type="Node3D" parent="."]
-script = ExtResource("14")
+script = ExtResource("7")
 source = "roads.json"
 metadata/no_snap = true
 
 [node name="Parcels" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 0.0, 0)
 
 [node name="P17101_001_1998" type="Node3D" parent="Parcels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 912.0, 0, 196.6)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 912.0, 0.0, 196.6)
 
 [node name="Kit" type="Node3D" parent="Parcels/P17101_001_1998"]
-script = ExtResource("15")
+script = ExtResource("8")
 kit = "solar"
 tunnus = "17101:001:1998"
 polygon = PackedVector2Array(-112.7, 114.3, -14.5, 65.8, 57.8, 132.9, 70.0, 130.4, 110.9, 121.6, 163.1, 110.7, 200.6, 93.2, 213.2, 85.8, -213.2, -132.9)
@@ -2342,107 +1967,97 @@ row_period = 6.19
 row_angle = 0.0
 
 [node name="P58201_001_0228" type="Node3D" parent="Parcels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 534.3, 0, 602.1)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 534.3, 0.0, 602.1)
 
 [node name="Kit" type="Node3D" parent="Parcels/P58201_001_0228"]
-script = ExtResource("15")
+script = ExtResource("8")
 kit = "park"
 tunnus = "58201:001:0228"
 polygon = PackedVector2Array(-41.7, -3.7, -35.7, 2.0, -31.1, 7.2, -27.2, 12.8, -21.8, 20.8, -15.2, 29.4, -8.0, 39.5, 8.9, 62.2, 21.9, 80.1, 26.5, 85.7, 36.7, 98.2, 36.9, 88.5, 70.5, 60.9, 100.4, 37.3, 139.9, 3.2, 88.1, -60.4, 81.6, -69.9, 71.4, -97.1, 71.0, -98.2, 65.6, -96.1, 53.8, -93.2, 44.1, -92.1, 26.6, -91.4, 8.6, -91.2, -1.1, -90.8, -10.8, -90.1, -28.1, -86.2, -28.7, -89.2, -37.7, -87.1, -47.1, -83.4, -45.9, -80.6, -63.3, -72.6, -90.6, -61.5, -110.6, -53.6, -128.7, -45.7, -139.9, -40.4, -101.7, 0.4, -68.5, -26.9, -68.1, -27.3, -62.4, -22.3)
 
 [node name="P58201_002_0026" type="Node3D" parent="Parcels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 387.6, 0, 519.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 387.6, 0.0, 519.0)
 
 [node name="Kit" type="Node3D" parent="Parcels/P58201_002_0026"]
-script = ExtResource("15")
+script = ExtResource("8")
 kit = "fence"
 tunnus = "58201:002:0026"
 polygon = PackedVector2Array(102.7, -12.7, 97.5, -21.7, 57.3, -7.9, 38.8, -45.8, 39.9, -69.5, -29.8, -62.0, -51.8, -50.2, -86.4, -47.3, -102.0, 42.7, -102.6, 46.5, -48.8, 59.1, -41.6, 69.4, -37.3, 63.2, -8.2, 35.1)
 
 [node name="P58201_002_0831" type="Node3D" parent="Parcels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 995.7, 0, 811.3)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 995.7, 0.0, 811.3)
 
 [node name="Kit" type="Node3D" parent="Parcels/P58201_002_0831"]
-script = ExtResource("15")
+script = ExtResource("8")
 kit = "hedge"
 tunnus = "58201:002:0831"
 polygon = PackedVector2Array(-38.2, -16.5, -40.8, 9.9, 38.4, 16.5, 40.8, -9.8)
 
 [node name="P58201_002_1360" type="Node3D" parent="Parcels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -86.4, 0, 659.1)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, -86.4, 0.0, 659.1)
 
 [node name="Kit" type="Node3D" parent="Parcels/P58201_002_1360"]
-script = ExtResource("15")
+script = ExtResource("8")
 kit = "fence"
 tunnus = "58201:002:1360"
 polygon = PackedVector2Array(-76.3, 61.3, 51.6, -68.7, 56.4, -73.8, 171.2, -201.8, 256.7, -297.3, 297.4, -179.4, 387.6, -187.4, 422.2, -190.3, 444.2, -202.1, 513.9, -209.6, 537.1, -220.0, 550.1, -219.1, 647.9, -253.7, 548.7, -494.8, 423.9, -489.7, 384.5, -462.2, 423.3, -411.3, 407.9, -385.0, 379.7, -356.4, 370.2, -419.3, 274.4, -384.4, 197.4, -501.3, 137.0, -598.4, 88.2, -549.0, 87.3, -548.1, 82.0, -543.0, 80.9, -541.9, 191.5, -475.8, 49.5, -329.5, 95.6, -274.9, 29.9, -205.1, 16.9, -112.4, -26.3, -67.4, -46.2, -63.5, -77.8, -71.9, -349.1, -67.0, -379.3, -67.0, -382.9, -67.0, -451.6, 65.5, -480.2, 65.6, -486.6, 69.4, -513.8, 103.1, -541.6, 138.3, -569.4, 173.6, -597.0, 208.7, -626.3, 245.9, -647.8, 272.7, -204.6, 271.9, 145.6, 598.3, 242.1, 430.1, 86.4, 236.3, -2.6, 140.2)
 
 [node name="P58201_002_1512" type="Node3D" parent="Parcels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 530.9, 0, 455.0)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 530.9, 0.0, 455.0)
 
 [node name="Kit" type="Node3D" parent="Parcels/P58201_002_1512"]
-script = ExtResource("15")
+script = ExtResource("8")
 kit = "park"
 tunnus = "58201:002:1512"
 polygon = PackedVector2Array(-67.2, -15.0, -34.5, 49.6, 5.3, 41.2, 38.4, 41.0, 59.9, 38.7, 67.1, 35.5, 30.6, -49.6)
 
 [node name="P58201_002_1513" type="Node3D" parent="Parcels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 670.9, 0, 400.9)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 670.9, 0.0, 400.9)
 
 [node name="Kit" type="Node3D" parent="Parcels/P58201_002_1513"]
-script = ExtResource("15")
+script = ExtResource("8")
 kit = "park"
 tunnus = "58201:002:1513"
 polygon = PackedVector2Array(-60.1, 84.1, 98.1, 4.0, 95.8, -1.4, 60.6, -84.1, -98.1, -2.7)
 
 [node name="P58201_002_1650" type="Node3D" parent="Parcels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 915.8, 0, 413.4)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 915.8, 0.0, 413.4)
 
 [node name="Kit" type="Node3D" parent="Parcels/P58201_002_1650"]
-script = ExtResource("15")
+script = ExtResource("8")
 kit = "fence"
 tunnus = "58201:002:1650"
 polygon = PackedVector2Array(3.8, -3.3, -2.1, -4.5, -3.9, 3.3, 2.1, 4.4)
 
 [node name="P58201_002_1670" type="Node3D" parent="Parcels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 343.4, 0, 399.4)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 343.4, 0.0, 399.4)
 
 [node name="Kit" type="Node3D" parent="Parcels/P58201_002_1670"]
-script = ExtResource("15")
+script = ExtResource("8")
 kit = "fence"
 tunnus = "58201:002:1670"
 polygon = PackedVector2Array(-0.5, -8.3, -8.7, 1.7, 1.5, 8.3, 8.7, -2.7)
 
 [node name="P58201_002_2480" type="Node3D" parent="Parcels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 808.5, 0, 345.9)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 808.5, 0.0, 345.9)
 
 [node name="Kit" type="Node3D" parent="Parcels/P58201_002_2480"]
-script = ExtResource("15")
+script = ExtResource("8")
 kit = "fence"
 tunnus = "58201:002:2480"
 polygon = PackedVector2Array(-18.2, -30.6, 7.3, 29.4, 9.7, 35.0, 18.1, 32.1, 17.8, 31.5, -9.2, -35.0)
 
 [node name="P58201_002_2500" type="Node3D" parent="Parcels"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 455.8, 0, 475.1)
-script = ExtResource("1")
+transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 455.8, 0.0, 475.1)
 
 [node name="Kit" type="Node3D" parent="Parcels/P58201_002_2500"]
-script = ExtResource("15")
+script = ExtResource("8")
 kit = "hedge"
 tunnus = "58201:002:2500"
 polygon = PackedVector2Array(-5.1, -36.0, -28.3, -25.6, -29.4, -1.9, -10.9, 36.0, 29.3, 22.2, 5.1, -26.0)
 
 [node name="Traffic" type="Node3D" parent="."]
-script = ExtResource("16")
+script = ExtResource("9")
 year = 2026
 density = 1.0
 max_agents = 40
@@ -2450,45 +2065,4 @@ metadata/no_snap = true
 
 [node name="Bicycle" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 492, 0, 539)
-script = ExtResource("17")
-
-[node name="TradePost" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 484.0, 0, 535)
-script = ExtResource("18")
-era_id = "era_2026"
-post_name_key = "POST_2026"
-intro_key = "POST_2026_TEXT"
-metadata/footprint = Vector2(3.0, 2.4)
-
-[node name="Base" type="CSGBox3D" parent="TradePost"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, -1.0, 0)
-size = Vector3(3.0, 2.0, 2.4)
-material = SubResource("M9")
-
-[node name="Stall" type="CSGBox3D" parent="TradePost"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 0.55, 0)
-size = Vector3(2.4, 1.1, 1.2)
-material = SubResource("M10")
-
-[node name="Awning" type="CSGBox3D" parent="TradePost"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 0, 2.2, -0.3)
-size = Vector3(2.8, 0.12, 2.0)
-material = SubResource("M11")
-
-[node name="PostA" type="CSGBox3D" parent="TradePost"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, -1.3, 1.1, -1.2)
-size = Vector3(0.1, 2.2, 0.1)
-material = SubResource("M12")
-
-[node name="PostB" type="CSGBox3D" parent="TradePost"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 1.3, 1.1, -1.2)
-size = Vector3(0.1, 2.2, 0.1)
-material = SubResource("M13")
-
-[node name="Body3D" type="StaticBody3D" parent="TradePost"]
-collision_layer = 2
-collision_mask = 0
-
-[node name="Shape" type="CollisionShape3D" parent="TradePost/Body3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1, 0)
-shape = SubResource("TP_era_2026_8")
+script = ExtResource("10")

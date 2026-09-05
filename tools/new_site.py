@@ -1,24 +1,20 @@
 #!/usr/bin/env python3
-"""Scaffolds a new location/story pack under sites/<id>/ and keeps its era ground maps linked.
+"""Scaffolds a new town pack under sites/<id>/.
 
     python3 tools/new_site.py --id kvissentali --name "Kvissentali" --center 657600 6477150
-        [--size 1024] [--eras 1798,1938,2026] [--template palupera] [--force]
+        [--size 1024] [--template palupera] [--force]
     python3 tools/new_site.py --id kvissentali --relink-era-maps
 
-What you get: site.json (terrain centre, latitude/longitude, eras' historical map layers, start,
-objectives, ending), layout.json (named spots around the tile centre), scenes.json (a register, one NPC per era, the quest
-blocks from blocks/ composed by tools/compose_story.py, a trade post, farm plots, hunting, village massing), data/ (eras, one consequence point, the artifact,
-and the template site's farming/hunting/trading/building content with era ids remapped),
-narrative/<era>.ink (Estonian lines with '# en:' tags) and strings.csv. Everything is meant
-to be rewritten; it is a working skeleton that passes validate_site.py and boots.
-
-Then: make tile SITE=<id>   (fetch Maa-amet data, build terrain, era maps, buildings, water, scenes)
-      make ink; make validate; godot --path . -- --site=<id>
+What you get: site.json (terrain centre, latitude/longitude, start, codex), layout.json (named spots
+around the tile centre), scenes.json (a landmark, the real footprints, roads, cadastral parcels, traffic,
+a bicycle), data/eras/era_2026.tres (the present-day layer on the orthophoto), data/structures copied
+from the template, and strings.csv. `make tile SITE=<id>` then fetches the ground, buildings, parcels
+with land values, tenants and the market snapshot; `make town SITE=<id>` opens it as a shared town.
+The `--eras` option is accepted for the tile service and ignored: the present day is the only layer.
 """
 import argparse, csv, json, math, os, re, shutil, sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import compose_story  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CREDIT_ET = 'Maa maksustamishind 2022: Maakataster, Maa- ja Ruumiamet. Ettevõtted: Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0). Teated: Ametlikud Teadaanded (ainult pealkiri ja link). Uudised: ERR ja Postimees (pealkirjad ja lingid).'
@@ -186,8 +182,9 @@ def apply_anchors(site, anchors, root=ROOT):
     return layout
 
 
-def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", tile=None, template="palupera",
+def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None, template="palupera",
              force=False, root=ROOT, template_root=ROOT, texture_mode="import", anchors=None, seed=None, block_ids=None):
+    """A present-day town pack. `eras`, `seed` and `block_ids` are accepted for older callers and ignored."""
     if not re.fullmatch(r"[a-z][a-z0-9_]*", site):
         sys.exit("--id must be lowercase letters, digits, underscores")
     site_dir = os.path.join(root, "sites", site)
@@ -198,44 +195,29 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
             shutil.rmtree(os.path.join(site_dir, sub), ignore_errors=True)
     tile = tile or site
     tile_dir = os.path.join(root, "assets/terrain", tile)
-    years = sorted(int(y) for y in eras.split(","))
-    eras = [f"era_{y}" for y in years]
-    newest, oldest = eras[-1], eras[0]
-    mid = eras[-2] if len(eras) > 1 else eras[0]
+    e, y = "era_2026", 2026
     lat, lon = lest97_to_wgs84(*center)
     half = size / 2
-    if seed is None:
-        seed = int(center[0] + center[1]) % 100000   # each place gets its own composition
     pack = f"res://sites/{site}" if texture_mode == "import" else f"user://sites/{site}"   # where Godot will find the pack
     SITE_KEY = f"SITE_{site.upper()}"
     name = name or site.capitalize()
     strings = [["keys", "et", "en"], [SITE_KEY, name, name],
-               [f"{SITE_KEY}_SUBTITLE", f"{name}: kolm aastat, sama maa.", f"{name}: three years, the same ground."]]
+               [f"{SITE_KEY}_SUBTITLE", f"{name}: päris maa, päris väärtused.", f"{name}: real plots, real values."]]
 
     def S(key, et, en):
         strings.append([key, et, en])
 
-    # --- era maps + era resources ------------------------------------------------------------
-    era_maps = {}
-    for e, y in zip(eras, years):
-        em = era_map_for(y)
-        if em:
-            era_maps[e] = {"layer": em[0], "file": f"{e}_{em[1]}.png"}
+    # --- the present-day layer -------------------------------------------------------------------
     os.makedirs(os.path.join(site_dir, "data/eras"), exist_ok=True)
-    tods = [13.5, 9.5, 14.5]
-    for i, (e, y) in enumerate(zip(eras, years)):
-        tex, strength, tint = era_texture(tile, e, y, tile_dir, texture_mode)
-        props = {
-            "id": q(e), "display_name_key": q(f"ERA_{y}_NAME"), "year_label": q(str(y)), "scene_path": q(f"{pack}/scenes/{e}.tscn"),
-            "texture_strength": str(strength), "ground_tint": "Color(%s, %s, %s, 1)" % tint,
-            "default_time_of_day": str(tods[i % len(tods)]), "order": str(i), "narrative_story": q(f"{pack}/narrative/{e}.ink.json"),
-            "currency_key": q(f"CUR_{y}"), "starting_money": str([12, 150, 2000][min(i, 2)]),
-        }
-        ext = set_texture(props, tex, texture_mode)
-        write_tres(os.path.join(site_dir, f"data/eras/{e}.tres"), "res://scripts/era/era_definition.gd", props, ext)
-        S(f"ERA_{y}_NAME", f"Aasta {y}", f"The year {y}")
+    tex, strength, tint = era_texture(tile, e, y, tile_dir, texture_mode)
+    props = {"id": q(e), "display_name_key": q(f"ERA_{y}_NAME"), "year_label": q(str(y)), "scene_path": q(f"{pack}/scenes/{e}.tscn"),
+             "texture_strength": str(strength), "ground_tint": "Color(%s, %s, %s, 1)" % tint, "default_time_of_day": "14.5", "order": "0",
+             "currency_key": q("CUR_EUR"), "starting_money": "0"}
+    ext = set_texture(props, tex, texture_mode)
+    write_tres(os.path.join(site_dir, f"data/eras/{e}.tres"), "res://scripts/era/era_definition.gd", props, ext)
+    S(f"ERA_{y}_NAME", f"Aasta {y}", f"The year {y}")
 
-    # --- gameplay content copied from the template, eras remapped by order ------------------------
+    # --- structures copied from the template (their strings too) ---------------------------------
     tmpl_dir = os.path.join(template_root, "sites", template)
     tmpl_strings = {}
     tp = os.path.join(tmpl_dir, "strings.csv")
@@ -243,164 +225,46 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
         for r in list(csv.reader(open(tp, newline="", encoding="utf-8")))[1:]:
             if r and r[0].strip():
                 tmpl_strings[r[0]] = r
-    tmpl_eras = []
-    ted = os.path.join(tmpl_dir, "data/eras")
-    if os.path.isdir(ted):
-        tmpl_eras = sorted((int(read_tres(os.path.join(ted, f)).get("order", "0")), unquote(read_tres(os.path.join(ted, f))["id"]), read_tres(os.path.join(ted, f)))
-                           for f in os.listdir(ted) if f.endswith(".tres"))
-    era_map = {}
-    for i, (_, tid, tprops) in enumerate(tmpl_eras):
-        j = round(i * (len(eras) - 1) / max(len(tmpl_eras) - 1, 1)) if len(tmpl_eras) > 1 else len(eras) - 1
-        era_map[tid] = eras[min(j, len(eras) - 1)]
-    # currency texts follow the mapped template era
-    for i, (_, tid, tprops) in enumerate(tmpl_eras):
-        ck = unquote(tprops.get("currency_key", '""'))
-        target = era_map[tid]; y = target[4:]
-        if ck in tmpl_strings and not any(r[0] == f"CUR_{y}" for r in strings):
-            S(f"CUR_{y}", tmpl_strings[ck][1], tmpl_strings[ck][2])
-    for e, y in zip(eras, years):
-        if not any(r[0] == f"CUR_{y}" for r in strings):
-            S(f"CUR_{y}", "senti", "cents")
-
-    needed_items = set(); used_keys = set()
-
-    def remap_eras(v):
-        ids = re.findall(r'"([^"]*)"', v)
-        out = []
-        for i in ids:
-            n = era_map.get(i, i)
-            if n not in out:
-                out.append(n)
-        return gd_array(out)
-
-    def copy_dir(sub, fix):
-        src = os.path.join(tmpl_dir, "data", sub)
-        if not os.path.isdir(src):
-            return
+    src = os.path.join(tmpl_dir, "data", "structures")
+    if os.path.isdir(src):
         for f in sorted(os.listdir(src)):
-            if not f.endswith(".tres"):
-                continue
-            props = read_tres(os.path.join(src, f))
-            name = fix(f, props)
-            if name is None:
-                continue
-            for k in ("display_name_key", "description_key"):
-                if k in props:
-                    used_keys.add(unquote(props[k]))
-            write_tres(os.path.join(site_dir, "data", sub, name), props["_script"], props)
-
-    def fix_crop(f, p):
-        p["eras"] = remap_eras(p.get("eras", "Array[String]([])")); needed_items.update(unquote(p.get("seed_item_id", '""')).split() + unquote(p.get("yield_item_id", '""')).split()); return f
-    def fix_animal(f, p):
-        p["eras"] = remap_eras(p.get("eras", "Array[String]([])")); needed_items.add(unquote(p.get("yield_item_id", '""'))); return f
-    def fix_structure(f, p):
-        needed_items.update(re.findall(r'"([^"]+)":', p.get("cost_items", "{}"))); return f
-    seen_goods = set()
-    def fix_good(f, p):
-        old = unquote(p["era_id"]); new = era_map.get(old, eras[-1]); p["era_id"] = q(new)
-        item = unquote(p["item_id"]); needed_items.add(item)
-        key = (new, item)
-        if key in seen_goods:
-            return None
-        seen_goods.add(key); return f"{new}_{item}.tres"
-    copy_dir("crops", fix_crop); copy_dir("animals", fix_animal); copy_dir("structures", fix_structure); copy_dir("trade_goods", fix_good)
-    isrc = os.path.join(tmpl_dir, "data/items")
-    if os.path.isdir(isrc):
-        for f in sorted(os.listdir(isrc)):
             if f.endswith(".tres"):
-                p = read_tres(os.path.join(isrc, f))
-                if unquote(p["id"]) in needed_items and not p["_script"].endswith("artifact_item.gd"):
-                    used_keys.update(unquote(p[k]) for k in ("display_name_key", "description_key") if k in p)
-                    write_tres(os.path.join(site_dir, "data/items", f), p["_script"], p)
-    for k in sorted(used_keys):
-        if k in tmpl_strings:
-            strings.append(tmpl_strings[k])
-    structures = sorted(unquote(read_tres(os.path.join(site_dir, "data/structures", f))["id"]) for f in os.listdir(os.path.join(site_dir, "data/structures"))) if os.path.isdir(os.path.join(site_dir, "data/structures")) else []
-    crops_by_era = {}
-    cdir = os.path.join(site_dir, "data/crops")
-    if os.path.isdir(cdir):
-        for f in os.listdir(cdir):
-            p = read_tres(os.path.join(cdir, f))
-            for e in re.findall(r'"([^"]*)"', p.get("eras", "")):
-                crops_by_era.setdefault(e, []).append(unquote(p["seed_item_id"]))
+                p = read_tres(os.path.join(src, f))
+                for k in ("display_name_key", "description_key"):
+                    if k in p and unquote(p[k]) in tmpl_strings:
+                        strings.append(tmpl_strings[unquote(p[k])])
+                write_tres(os.path.join(site_dir, "data", "structures", f), p["_script"], p)
 
-    # --- story: quest blocks composed for these eras (tools/compose_story.py, blocks/) -------------
-    comp = compose_story.compose(site, name, years, seed, block_ids)
-    for fname, props in comp["items"]:
-        write_tres(os.path.join(site_dir, "data/items", fname), "res://scripts/items/artifact_item.gd", props)
-    for fname, props in comp["cps"]:
-        write_tres(os.path.join(site_dir, "data/consequence_points", fname), "res://scripts/consequence/consequence_point.gd", props)
+    # --- layout and scenes --------------------------------------------------------------------------
     layout = anchor_layout(half, anchors)
-    write_tres(os.path.join(site_dir, "data/manors/home_farm.tres"), "res://scripts/base_building/manor_definition.gd", {
-        "id": q("home_farm"), "display_name_key": q("MANOR_HOME"), "era_id": q(mid), "cadastral_parcel_id": q(""), "position": "Vector2(%d, %d)" % (layout["farm"][0], layout["farm"][1]),
-        "unlock_condition_flag": q(""), "structures": gd_array(structures)})
-    strings.extend(comp["strings"])
-    S("MANOR_HOME", "Kodutalu", "Home farm")
-    S("LOC_LANDMARK", "Maamärk", "The landmark"); S("LOC_FARMSTEAD", "Talu", "The farmstead")
-    S("ITEM_REGISTER", "Vakuraamat", "The register"); S("EX_REGISTER", "Raamat aastate vahel. Võta see.", "A book between the years. Take it.")
-    S("NOTICE_REGISTER_FOUND", "Vakuraamat. Ava see (Tab) ja vali lehekülg.", "The register. Open it (Tab) and choose a page.")
-    S("CODEX_REAL_TITLE", "Päris", "Real"); S("CODEX_REAL", f"Maa: {name}, Maa- ja Ruumiameti kõrgusandmed, ortofoto ja ajaloolised kaardid, meetri täpsusega.", f"The ground: {name}, from the Land Board's elevation data, orthophoto and historical maps, to the metre.")
-    S("CODEX_INVENTED_TITLE", "Välja mõeldud", "Invented"); S("CODEX_INVENTED", "Inimesed, nende nimed ja lugu on kokku pandud lugude klotsidest; ükski neist ei kujuta päris inimest.", "The people, their names and the story are assembled from story blocks; none depicts a real person.")
-    S("CODEX_DATA_TITLE", "Andmed", "Data"); S("CODEX_DATA", "Kaardiandmed: Maa- ja Ruumiamet 2026. %s" % CREDIT_ET, "Map data: Maa- ja Ruumiamet 2026. %s" % CREDIT_EN)
-    for e, y in zip(eras, years):
-        S(f"EX_LANDMARK_{y}", f"Maamärk aastal {y}.", f"The landmark in {y}.")
-        S(f"POST_{y}", f"Pood ({y})", f"The shop ({y})"); S(f"POST_{y}_TEXT", "Ostetakse ja müüakse selle aasta raha eest.", "Buying and selling for this year's money.")
-
-    # --- layout -----------------------------------------------------------------------------------
     json.dump(layout, open(os.path.join(site_dir, "layout.json"), "w"), indent=1)
     reg, sp = layout["register"], layout["spawn"]
-    yaw = round(math.degrees(math.atan2(-(reg[0] - sp[0]), -(reg[1] - sp[1]))) % 360, 1)   # face the register (0 = north)
-
-    # --- scenes: the base of every era plus the blocks' nodes ------------------------------------------
-    def era_nodes(e, y, i):
-        npc = comp["npcs"][e]
-        nodes = [{"type": "npc", "name": npc["node"], "id": npc["id"], "knot": "greeter", "label": npc["label"], "color": [0.4 + 0.1 * i, 0.35, 0.3], "at": {"ref": "register", "offset": [6, 4]}, "height": 1.7, "yaw": 2.6},
-                 {"type": "group", "name": "Landmark", "at": "landmark", "children": [
-                     {"type": "examine", "name": "LandmarkExamine", "key": f"EX_LANDMARK_{y}", "loc": "LOC_LANDMARK", "label": "LOC_LANDMARK"}]},
-                 {"type": "trade_post", "at": "trade", "key": f"POST_{y}", "color": [0.7, 0.65, 0.5]}]
-        if e == newest:
-            nodes.insert(0, {"type": "register", "name": "RegisterBook", "at": "register"})
-        if os.path.exists(os.path.join(site_dir, "buildings.json")):
-            nodes.append({"type": "footprints", "source": "buildings.json", "year": y, "include_undated": e == newest})
-        if e == newest:
-            nodes.append({"type": "roads", "source": "roads.json"})
-            nodes.append({"type": "parcels", "source": "parcels.json", "year": y})
-            nodes.append({"type": "traffic", "year": y})
-            nodes.append({"type": "bicycle", "name": "Bicycle", "at": {"ref": "register", "offset": [4, 5]}})
-        elif e == newest:
-            nodes.append({"type": "village", "source": "buildings_2026.json"})
-        if e == mid:
-            nodes.append({"type": "manor_site", "id": "home_farm", "at": "farm"})
-        if crops_by_era.get(e):
-            nodes.append({"type": "farm_plots", "at": {"ref": "farm", "offset": [8, 12]}, "count": 2, "seeds": crops_by_era[e][:3]})
-        if i < len(eras) - 1:
-            nodes.append({"type": "hunting", "max_animals": 6})
-        return nodes + comp["nodes"][e]
-    scenes = {"colors": {"darkwood": [0.30, 0.22, 0.14], "stone": [0.55, 0.53, 0.50]}, "fragments": {},
-              "eras": {e: {"nodes": era_nodes(e, y, i)} for i, (e, y) in enumerate(zip(eras, years))}}
+    yaw = round(math.degrees(math.atan2(-(reg[0] - sp[0]), -(reg[1] - sp[1]))) % 360, 1)   # face the landmark side (0 = north)
+    nodes = [{"type": "group", "name": "Landmark", "at": "landmark", "children": [
+        {"type": "examine", "name": "LandmarkExamine", "key": f"EX_LANDMARK_{y}", "loc": "LOC_LANDMARK", "label": "LOC_LANDMARK"}]}]
+    if os.path.exists(os.path.join(site_dir, "buildings.json")):
+        nodes.append({"type": "footprints", "source": "buildings.json", "year": y, "include_undated": True})
+    else:
+        nodes.append({"type": "village", "source": "buildings_2026.json"})
+    nodes += [{"type": "roads", "source": "roads.json"}, {"type": "parcels", "source": "parcels.json", "year": y}, {"type": "traffic", "year": y},
+              {"type": "bicycle", "name": "Bicycle", "at": {"ref": "register", "offset": [4, 5]}}]
+    scenes = {"colors": {"darkwood": [0.30, 0.22, 0.14], "stone": [0.55, 0.53, 0.50]}, "fragments": {}, "eras": {e: {"nodes": nodes}}}
     json.dump(scenes, open(os.path.join(site_dir, "scenes.json"), "w"), indent=1)
-
-    # --- ink ---------------------------------------------------------------------------------------
-    os.makedirs(os.path.join(site_dir, "narrative"), exist_ok=True)
-    for e in eras:
-        open(os.path.join(site_dir, "narrative", f"{e}.ink"), "w", encoding="utf-8").write(comp["ink"][e])
+    S("LOC_LANDMARK", "Maamärk", "The landmark"); S("LOC_FARMSTEAD", "Talu", "The farmstead")
+    S(f"EX_LANDMARK_{y}", f"{name}: siit algab sinu raamat.", f"{name}: your book starts here.")
+    S("CODEX_REAL_TITLE", "Päris", "Real"); S("CODEX_REAL", f"Maa: {name}, Maa- ja Ruumiameti kõrgusandmed, ortofoto, hooned, katastriüksused ja maa väärtused, meetri täpsusega.", f"The ground: {name}, from the Land Board's elevation data, orthophoto, buildings, cadastral units and land values, to the metre.")
+    S("CODEX_INVENTED_TITLE", "Välja mõeldud", "Invented"); S("CODEX_INVENTED", "Hinnad liiguvad, üürnikud jäävad võlgu ja perekonnad Kask, Tamm ja Lepik teevad pakkumisi mängu reeglite järgi; ükski tehing ei ole päris.", "Prices move, tenants fall behind and the Kask, Tamm and Lepik families bid by the game's rules; no deal is real.")
+    S("CODEX_DATA_TITLE", "Andmed", "Data"); S("CODEX_DATA", "Kaardiandmed: Maa- ja Ruumiamet 2026. %s" % CREDIT_ET, "Map data: Maa- ja Ruumiamet 2026. %s" % CREDIT_EN)
 
     # --- manifest + strings ---------------------------------------------------------------------------
-    locations = {"LOC_LANDMARK": "landmark", "LOC_FARMSTEAD": "farm"}
-    locations.update(comp["locations"])
     manifest = {
         "id": site, "name_key": SITE_KEY, "subtitle_key": f"{SITE_KEY}_SUBTITLE",
-        "description": f"{name}: generated site pack (blocks {', '.join(comp['blocks'])}, seed {seed}).",
-        "terrain": {"tile": tile, "center": [float(center[0]), float(center[1])], "size": size, "latitude": lat, "longitude": lon, "utc_offset": 3.0, "date": [2026, 9, 3], "era_maps": era_maps},
-        "start": {"era": newest, "spawn": layout["spawn"], "yaw_deg": yaw},
+        "description": f"{name}: generated town pack.",
+        "terrain": {"tile": tile, "center": [float(center[0]), float(center[1])], "size": size, "latitude": lat, "longitude": lon, "utc_offset": 3.0, "date": [2026, 9, 3]},
+        "start": {"era": e, "spawn": layout["spawn"], "yaw_deg": yaw},
         "water": "water_2026.json", "buildings": "buildings_2026.json",
-        "locations": locations,
-        "objectives": comp["objectives"],
-        "register_nudge": {"chapter": 1, "era": oldest},
-        "ending": comp["ending"],
+        "locations": {"LOC_LANDMARK": "landmark", "LOC_FARMSTEAD": "farm"},
         "codex": ["CODEX_REAL", "CODEX_INVENTED", "CODEX_DATA"],
-        "debug": {"build_node": "Manor_home_farm"},
-        "story": {"seed": seed, "blocks": comp["blocks"], "npcs": {e: comp["npcs"][e]["name"] for e in eras}, "coop_flags": comp["coop_flags"]},
     }
     json.dump(manifest, open(os.path.join(site_dir, "site.json"), "w"), indent=2)
     seen = set(); rows = []
@@ -415,10 +279,11 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
         p = os.path.join(site_dir, fn)
         if not os.path.exists(p):
             json.dump([], open(p, "w"))
-    print(f"[new_site] {os.path.relpath(site_dir, root)}: eras {', '.join(eras)}; blocks {', '.join(comp['blocks'])} (seed {seed}); centre EPSG:3301 {center[0]:.0f} {center[1]:.0f} = {lat} N {lon} E")
+    print(f"[new_site] {os.path.relpath(site_dir, root)}: centre EPSG:3301 {center[0]:.0f} {center[1]:.0f} = {lat} N {lon} E")
     if root == ROOT:
-        print(f"[new_site] next: make tile SITE={site}   (or make era-maps / make features / make scenes separately), make ink, make validate")
+        print(f"[new_site] next: make tile SITE={site}   (ground, buildings, parcels, tenants, market, scenes), make validate, make town SITE={site}")
     return site_dir
+
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -426,16 +291,16 @@ if __name__ == "__main__":
     ap.add_argument("--name", help="display name (default: id capitalised)")
     ap.add_argument("--center", nargs=2, type=float, metavar=("X", "Y"), help="tile centre in EPSG:3301 (easting northing)")
     ap.add_argument("--size", type=int, default=1024)
-    ap.add_argument("--eras", default="1798,1938,2026", help="comma-separated years, default 1798,1938,2026")
+    ap.add_argument("--eras", default="2026", help="accepted and ignored: the present day is the only layer")
     ap.add_argument("--tile", help="terrain tile name (default: the site id)")
-    ap.add_argument("--template", default="palupera", help="site whose farming/hunting/trading/building content to copy")
+    ap.add_argument("--template", default="palupera", help="site whose structures to copy")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--relink-era-maps", action="store_true", help="only re-point the era resources at fetched ground maps")
     ap.add_argument("--root", default=ROOT, help="project root holding sites/ and assets/terrain/ (default: the repo)")
     ap.add_argument("--texture-mode", choices=["import", "path"], default="import", help="era textures as imported res:// resources or runtime user:// paths")
     ap.add_argument("--anchors", help="anchors.json from extract_features.py to place the layout on")
-    ap.add_argument("--seed", type=int, help="story composition seed (default: from the centre coordinates)")
-    ap.add_argument("--blocks", help="comma-separated quest block ids (default: every usable block)")
+    ap.add_argument("--seed", type=int, help="accepted and ignored")
+    ap.add_argument("--blocks", help="accepted and ignored")
     a = ap.parse_args()
     if a.relink_era_maps:
         relink_era_maps(a.id, a.root, a.texture_mode)

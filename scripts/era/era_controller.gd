@@ -1,5 +1,5 @@
-# Root of an era's layer scene: props, NPCs, pickups for one era. Activation refreshes
-# every Conditional child from TimelineState (no simulation, just flag reads).
+# Root of a layer scene: the pack's props, buildings, parcels, roads and traffic. Children are
+# authored at y 0 and snapped to the ground on first activation; window panes light up at night.
 class_name EraController
 extends Node3D
 
@@ -17,10 +17,6 @@ func activate() -> void:
 		_collect_windows()
 		_snapped = true
 	process_mode = Node.PROCESS_MODE_INHERIT
-	for c in find_children("*", "Conditional", true, false):
-		c.refresh()
-	for c in find_children("*", "Pickup", true, false):
-		c.visible = not TimelineState.has_flag(c.taken_flag())
 
 
 func deactivate() -> void:

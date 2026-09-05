@@ -1,6 +1,6 @@
-# Headless check of every site pack under res://sites: the registries load through Sites, every
-# era scene instantiates as an EraController, translations resolve, the compiled ink exists,
-# the start era and artifact/consequence links are consistent. Runs before the story tests.
+# Headless check of every site pack under res://sites: the registry loads through Sites, the layer
+# scene instantiates as an EraController, translations resolve, the structures are consistent and
+# the offline ledger can open the pack.
 #   godot --headless --path . res://tools/godot/site_test.tscn
 extends Node
 
@@ -34,30 +34,18 @@ func _ready() -> void:
 				var node: Node = load(era.scene_path).instantiate()
 				_check(node is EraController and node.era_id == era.id, "%s: %s scene root is not that era's EraController" % [site, era.id])
 				node.free()
-			_check(FileAccess.file_exists(era.narrative_story), "%s: %s story %s missing (make ink)" % [site, era.id, era.narrative_story])
 			if FileAccess.file_exists("res://assets/terrain/%s/terrain_meta.json" % Sites.tile()):
 				_check(era.texture() != null, "%s: %s has no terrain texture (make era-maps)" % [site, era.id])
 			_check(tr(era.currency_key) != era.currency_key, "%s: %s currency key untranslated" % [site, era.id])
-		for cp in GameState.consequence_points.values():
-			_check(GameState.era(cp.trigger_era) != null, "%s: %s trigger era unknown" % [site, cp.id])
-			for e in cp.affected_eras:
-				_check(GameState.era(e) != null, "%s: %s affected era %s unknown" % [site, cp.id, e])
-		for it in GameState.items.values():
-			if it is ArtifactItem:
-				_check(GameState.consequence(it.linked_consequence_point_id) != null, "%s: artifact %s links an unknown consequence" % [site, it.id])
-		for g in Trading.goods:
-			_check(GameState.item(g.item_id) != null and GameState.era(g.era_id) != null, "%s: trade good %s/%s dangling" % [site, g.era_id, g.item_id])
-		for m in Manors.manors.values():
-			for sid in m.structures:
-				_check(Manors.structures.has(sid), "%s: manor %s lists unknown structure %s" % [site, m.id, sid])
-		# the ink story of the start era must load
-		var lines := []
-		var cb := func(t, _s, _tags): lines.append(t)
-		Narrative.line.connect(cb)
-		var player: Node = await Narrative._player_for(str(start.get("era", "")))
-		Narrative.line.disconnect(cb)
-		_check(player != null, "%s: ink story for the start era did not load" % site)
-		print("[site] %s ok: %d eras, %d consequence points, %d items, %d trade goods, %d manors" % [site, eras.size(), GameState.consequence_points.size(), GameState.items.size(), Trading.goods.size(), Manors.manors.size()])
+		var defs := {}
+		Sites.load_dir(Sites.data_dir("structures"), defs)
+		for sid in defs:
+			var st: StructureDefinition = defs[sid]
+			_check(st.requires == "" or defs.has(st.requires), "%s: structure %s requires unknown %s" % [site, sid, st.requires])
+		var l := LocalLedger.new()
+		l.start(site, "Tester")
+		_check(l.parcels.size() > 10, "%s: the offline ledger found %d parcels" % [site, l.parcels.size()])
+		print("[site] %s ok: %d layer(s), %d structures, %d parcels, %d tenants" % [site, eras.size(), defs.size(), l.parcels.size(), l.tenants.size()])
 	Sites.select(original, false)
 	if not _failed:
 		print("[site] PASSED")

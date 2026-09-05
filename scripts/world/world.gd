@@ -76,7 +76,6 @@ func _ready() -> void:
 	var tw := create_tween()
 	tw.tween_property(fade, "color:a", 0.0, FADE_TIME)
 	_ready_done = true
-	Friends.pull_deliveries()
 	Ledger.start(Sites.active)
 	var marks := ParcelMarks.new()
 	marks.name = "ParcelMarks"
@@ -176,7 +175,6 @@ func _process(_delta: float) -> void:
 	if not _ready_done:
 		return
 	if sky and sky.tod:
-		Farming.tick_clock(sky.tod.current_time)
 		var current: EraController = _era_nodes.get(GameState.current_era)
 		if current:
 			current.set_hour(sky.tod.current_time)

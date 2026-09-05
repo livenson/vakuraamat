@@ -147,7 +147,7 @@ func _pump() -> void:
 		var years: Array = []
 		for e in GameState.eras_in_order():
 			years.append(str(e.id).rsplit("_", true, 1)[-1])
-		var eras := ",".join(years) if not years.is_empty() else "1798,1938,2026"
+		var eras := ",".join(years) if not years.is_empty() else "2026"
 		print("[Tiles] fetching %s for tile %s (%d, %d)" % [pack, loc, cx, cy])
 		var r: Dictionary = await Locator.fetch_pack(pack, "Tile %d %d" % [cx, cy], cx, cy, int(size), eras)
 		if tiles.has(loc) and tiles[loc].state == "fetching":

@@ -1,9 +1,0 @@
-[gd_resource type="Resource" format=3]
-
-[ext_resource type="Script" path="res://scripts/items/item_base.gd" id="1"]
-
-[resource]
-script = ExtResource("1")
-id = "rusted_tool"
-display_name_key = "ITEM_RUSTED_TOOL"
-description_key = "ITEM_RUSTED_TOOL_DESC"

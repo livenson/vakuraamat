@@ -30,7 +30,7 @@ func setup() -> void:
 	_page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_page.add_theme_constant_override("separation", 4)
 	sc.add_child(_page)
-	Ledger.event_added.connect(func(_e): if visible: fill())
+	Ledger.event_added.connect(func(_e): _refill_if_visible())
 
 
 func fill() -> void:
@@ -76,3 +76,8 @@ func _lbl(text: String, size: int, color: Color = Color.WHITE) -> Label:
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_color", color)
 	return l
+
+
+func _refill_if_visible() -> void:
+	if visible:
+		fill()

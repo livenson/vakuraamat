@@ -174,7 +174,7 @@ static func slug(name: String) -> String:
 
 ## Ask the service for a pack at (x, y), wait for it, install it, make it the active site.
 ## Returns {ok, id, error}.
-func create_world(name: String, x: float, y: float, size: int = 1024, eras: String = "1798,1938,2026", id_override: String = "", seed_value: int = -1, blocks: Array = []) -> Dictionary:
+func create_world(name: String, x: float, y: float, size: int = 1024, eras: String = "2026", id_override: String = "", seed_value: int = -1, blocks: Array = []) -> Dictionary:
 	var id := id_override if id_override != "" else slug(name)
 	var r := await fetch_pack(id, name, x, y, size, eras, seed_value, blocks)
 	if r.ok:
@@ -185,7 +185,7 @@ func create_world(name: String, x: float, y: float, size: int = 1024, eras: Stri
 
 ## Generate (or reuse from the service cache), download and install a pack without activating it:
 ## the world streamer uses this for neighbouring tiles. Returns {ok, id, error}.
-func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, eras: String = "1798,1938,2026", seed_value: int = -1, blocks: Array = []) -> Dictionary:
+func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, eras: String = "2026", seed_value: int = -1, blocks: Array = []) -> Dictionary:
 	var base := service_url()
 	var error := ""
 	if not await ensure_service():
