@@ -8,6 +8,7 @@
     python3 tools/dev.py reload <path> [<path>...]  # hot reload scripts / era scenes / pack data / shaders
     python3 tools/dev.py restart                    # the game saves a report and relaunches itself there
     python3 tools/dev.py quit
+    python3 tools/dev.py codes                      # toggle the K codes overlay
     python3 tools/dev.py teleport <x> <z> [yaw_deg]
     python3 tools/dev.py era <era_id>
     python3 tools/dev.py screenshot </abs/path.png>
@@ -98,6 +99,8 @@ def main(argv):
         send({"restart": True})
     elif cmd == "quit":
         send({"quit": True})
+    elif cmd == "codes":
+        send({"codes": True})
     elif cmd == "teleport":
         send({"teleport": [float(a) for a in args]})
     elif cmd == "era":

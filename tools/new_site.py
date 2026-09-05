@@ -359,6 +359,9 @@ def scaffold(site, name=None, center=None, size=1024, eras="1798,1938,2026", til
             nodes.insert(0, {"type": "register", "name": "RegisterBook", "at": "register"})
         if os.path.exists(os.path.join(site_dir, "buildings.json")):
             nodes.append({"type": "footprints", "source": "buildings.json", "year": y, "include_undated": e == newest})
+        if e == newest:
+            nodes.append({"type": "roads", "source": "roads.json"})
+            nodes.append({"type": "parcels", "source": "parcels.json", "year": y})
         elif e == newest:
             nodes.append({"type": "village", "source": "buildings_2026.json"})
         if e == mid:

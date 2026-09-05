@@ -1,0 +1,14 @@
+[remap]
+
+importer="inkgd.ink.json"
+type="Resource"
+uid="uid://uedoernrfvsq"
+valid=false
+
+[deps]
+
+source_file="res://sites/palupera/parcels.json"
+
+[params]
+
+compress=true

@@ -45,6 +45,9 @@ var _manor_ctl: ManorController = null
 var debug_map: PanelContainer
 var pause: PanelContainer
 var report_panel: PanelContainer
+var codes_label: Label            # K: cadastral number, building codes, road, registry links
+var codes_on := false
+var _codes_lines: MeshInstance3D = null
 var _debug_canvas: Control
 var _open_panel: Control = null
 
@@ -97,6 +100,8 @@ func _process(_delta: float) -> void:
 		_refresh_era_label()
 	if compass:
 		compass.queue_redraw()
+	if codes_on and Engine.get_process_frames() % 20 == 0:
+		_refresh_codes()
 	if marker:
 		marker.queue_redraw()
 
@@ -412,6 +417,9 @@ func _unhandled_input(event: InputEvent) -> void:
 			_next_line()
 			get_viewport().set_input_as_handled()
 		return
+	if event.is_action_pressed("codes"):
+		_toggle_codes()
+		return
 	if event.is_action_pressed("report"):
 		if _open_panel != report_panel:
 			Reporter.snapshot(world)   # the frame as seen, before the panel covers it
@@ -462,6 +470,84 @@ func _clear_body(p: PanelContainer) -> VBoxContainer:
 		if c.name != "Title":
 			c.queue_free()
 	return body
+
+
+# --- codes overlay (K): what the registers say about where you stand and what you look at
+func _toggle_codes() -> void:
+	codes_on = not codes_on
+	if codes_label == null:
+		codes_label = Label.new()
+		codes_label.position = Vector2(16, 112)
+		codes_label.add_theme_font_size_override("font_size", 14)
+		codes_label.add_theme_color_override("font_color", GOLD)
+		codes_label.add_theme_constant_override("outline_size", 4)
+		codes_label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.8))
+		hud.add_child(codes_label)
+	codes_label.visible = codes_on
+	if codes_on:
+		_refresh_codes()
+		var links: Dictionary = Reporter.links_for(player.global_position, interactor.target, world.get_node("EraLayers").get_node_or_null(GameState.current_era))
+		var urls := []
+		for k in ["cadastre", "ehr", "xgis_map"]:
+			if links.has(k):
+				urls.append(str(links[k]))
+		if not urls.is_empty():
+			DisplayServer.clipboard_set("\n".join(urls))
+			show_notice(tr("UI_CODES_COPIED") % urls.size())
+	elif _codes_lines:
+		_codes_lines.queue_free()
+		_codes_lines = null
+
+
+func _refresh_codes() -> void:
+	if not codes_on or codes_label == null:
+		return
+	var pos := player.global_position
+	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
+	var lines := []
+	var geo: TerrainGeoref = world.georef
+	if geo and geo.is_valid():
+		var e := geo.world_to_lest97(pos)
+		lines.append("L-EST97 %d %d   tile %d,%d" % [int(e.x), int(e.y), int(pos.x), int(pos.z)])
+	var u := Parcels.at(pos)
+	lines.append(tr("UI_CODES_PARCEL") + ": " + (Parcels.describe(u) if not u.is_empty() else "-"))
+	if not u.is_empty():
+		lines.append("   " + str(u.get("link", "")))
+	var links := Reporter.links_for(pos, interactor.target, layer)
+	if links.has("etak_id"):
+		lines.append(tr("UI_CODES_BUILDING") + ": ETAK %d   %s" % [int(links.etak_id), str(links.get("ehr", ""))])
+	var road := Reporter._nearest_road(layer, pos)
+	if not road.is_empty():
+		lines.append(tr("UI_CODES_ROAD") + ": %s %s %s m %s (%.0f m)" % [str(road.get("name", "") if road.get("name") else ""), str(road.get("type", "")), str(road.get("width", "")), str(road.get("surface", "") if road.get("surface") else ""), float(road.get("distance", 0))])
+	if interactor.target:
+		lines.append(tr("UI_CODES_TARGET") + ": %s  %s" % [interactor.target.name, str(interactor.target.get_path())])
+	codes_label.text = "\n".join(lines)
+	_draw_parcel(u)
+
+
+## The current cadastral unit's boundary as a line strip just above the ground.
+func _draw_parcel(u: Dictionary) -> void:
+	if _codes_lines:
+		_codes_lines.queue_free()
+		_codes_lines = null
+	if u.is_empty():
+		return
+	var st := ImmediateMesh.new()
+	st.surface_begin(Mesh.PRIMITIVE_LINE_STRIP)
+	var poly: Array = u.polygon
+	for i in poly.size() + 1:
+		var c: Array = poly[i % poly.size()]
+		var p := Vector3(float(c[0]), 0, float(c[1]))
+		p.y = world.terrain.data.get_height(p) + 0.3
+		st.surface_add_vertex(p)
+	st.surface_end()
+	_codes_lines = MeshInstance3D.new()
+	_codes_lines.mesh = st
+	var m := StandardMaterial3D.new()
+	m.albedo_color = GOLD
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_codes_lines.material_override = m
+	world.add_child(_codes_lines)
 
 
 # --- issue report (F8): the frame is already grabbed; type what is wrong, where, how it should be
@@ -897,7 +983,7 @@ func _fill_debug_map() -> void:
 	stack.add_child(bg)
 	_debug_canvas = Control.new()
 	_debug_canvas.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	_debug_canvas.draw.connect(_draw_debug_map)
+	_debug_canvas.draw.connect(_draw_debug_map.bind(_debug_canvas))
 	_debug_canvas.gui_input.connect(_debug_map_input)
 	stack.add_child(_debug_canvas)
 
@@ -907,8 +993,11 @@ func _map_frame(c: Control) -> Array:
 	return [(c.size - Vector2(side, side)) * 0.5, side]
 
 
-func _draw_debug_map() -> void:
-	var c := _debug_canvas
+## Draws on the canvas that emitted `draw` (bound at connect time): when the panel is rebuilt, the
+## old canvas still gets one last draw while `_debug_canvas` already points at the new one.
+func _draw_debug_map(c: Control) -> void:
+	if not is_instance_valid(c) or c != _debug_canvas:
+		return
 	var f := _map_frame(c)
 	var origin: Vector2 = f[0]
 	var side: float = f[1]
