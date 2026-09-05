@@ -42,7 +42,7 @@ Farming, hunting, trading and building never reference the timeline, consequence
 artifact systems; the tests check that by grepping the source.
 
 Run the game: `godot --path .` (main menu). Controls: WASD, E interact, Tab register,
-J journal, I bag, L language, F11 fullscreen (or start with `godot --path . -- --fullscreen`), Esc. Headless checks:
+J journal, I bag, L language, fullscreen from the menu (F11, on macOS Cmd+Ctrl+F; remembered in `user://settings.cfg`, `-- --fullscreen` / `-- --windowed` override once), Esc. Headless checks:
 
 ```sh
 for t in boot_test playthrough_test farming_test hunting_test economy_test; do

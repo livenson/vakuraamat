@@ -96,6 +96,9 @@ UI_LEDGER_EMPTY,Veel pole midagi muutunud.,Nothing has changed yet.
 UI_PLAY_AGAIN,Mängi uuesti,Play again
 MENU_SUBTITLE,"Ühe Lõuna-Eesti mõisa maaraamat, kolm aastat, sama maa.","One South Estonian manor's land register, three years, the same ground."
 MENU_LANGUAGE,Keel / Language,Keel / Language
+MENU_FULLSCREEN,Täisekraan,Fullscreen
+MENU_ON,sees,on
+MENU_OFF,väljas,off
 MENU_CREDIT,Kaardiandmed: Maa- ja Ruumiamet 2026,Map data: Maa- ja Ruumiamet 2026
 ENDING_FOREST_TITLE,Mets,Forest
 ENDING_FURROWS_TITLE,Vaod,Furrows

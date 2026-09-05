@@ -31,6 +31,17 @@ func _build() -> void:
 	_button("MENU_LANGUAGE", func():
 		TranslationServer.set_locale("en" if TranslationServer.get_locale().begins_with("et") else "et")
 		_build())
+	var fs := Button.new()
+	fs.toggle_mode = true
+	fs.add_theme_font_size_override("font_size", 24)
+	fs.custom_minimum_size = Vector2(320, 44)
+	var relabel := func(on: bool):
+		fs.set_pressed_no_signal(on)
+		fs.text = "%s: %s  (%s)" % [tr("MENU_FULLSCREEN"), tr("MENU_ON") if on else tr("MENU_OFF"), WindowMode.shortcut_text()]
+	relabel.call(WindowMode.is_fullscreen())
+	fs.toggled.connect(func(on: bool): WindowMode.set_fullscreen(on))
+	WindowMode.changed.connect(relabel)
+	box.add_child(fs)
 	_button("UI_QUIT", func(): get_tree().quit())
 	var credit := Label.new()
 	credit.text = tr("MENU_CREDIT")
