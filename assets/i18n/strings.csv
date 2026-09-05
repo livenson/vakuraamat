@@ -152,6 +152,7 @@ MONTH_10,oktoober,October
 MONTH_11,november,November
 MONTH_12,detsember,December
 LEDGER_NO_MONEY,Raha ei jätku.,Not enough money.
+LEDGER_NO_MONEY_SHORT,Raha ei jätku: puudu %s.,Not enough money: %s short.
 LEDGER_NOT_FOR_SALE,See maatükk ei ole müügis.,This plot is not for sale.
 LEDGER_NOT_OWNER,See ei ole sinu maatükk.,This is not your plot.
 LEDGER_ALREADY_OWNER,See on juba sinu oma.,You already own this.

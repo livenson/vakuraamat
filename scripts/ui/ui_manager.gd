@@ -365,6 +365,8 @@ func _on_target_changed(t: Interactable) -> void:
 
 
 func show_notice(text: String) -> void:
+	if notice_card and notice_card.get_parent():
+		notice_card.get_parent().move_child(notice_card, -1)   # above any open panel
 	if text.is_empty():
 		return
 	notice_label.text = text
@@ -916,6 +918,10 @@ func _debug_map_input(event: InputEvent) -> void:
 
 ## Debug hook for verification runs: open a panel by name.
 func debug_open(which: String) -> void:
+	if which.begins_with("plot:"):   # the book open on one plot: --open=plot:<tunnus>
+		ledger_panel.open_parcel(which.trim_prefix("plot:"))
+		_open(ledger_panel)
+		return
 	match which:
 		"journal": _toggle(journal, _fill_journal)
 		"map": _toggle(debug_map, _fill_debug_map)

@@ -17,6 +17,8 @@ var _filter := "all"
 var _selected := ""
 var _pages: Dictionary = {}
 var _price_box: SpinBox
+var _status: Label = null     # the plot page's error line
+var _short := ""              # "not enough money" text for the plot page
 var _bid_box: SpinBox
 var _build_pick: OptionButton
 var _donate_box: SpinBox
@@ -160,8 +162,14 @@ func _fill_plot() -> void:
 	var actions := HBoxContainer.new()
 	actions.add_theme_constant_override("separation", 10)
 	body.add_child(actions)
+	_short = ""
 	if not mine and p.for_sale and p.sellable:
-		_btn(actions, tr("BTN_BUY") + "  " + Ledger.format_money(int(p.price)), func(): _do(await Ledger.buy(p.tunnus), "NOTICE_BOUGHT", p.address)).theme_type_variation = "PrimaryButton"
+		var buy := _btn(actions, tr("BTN_BUY") + "  " + Ledger.format_money(int(p.price)), func(): _do(await Ledger.buy(p.tunnus), "NOTICE_BOUGHT", p.address))
+		buy.theme_type_variation = "PrimaryButton"
+		if Ledger.cash() < int(p.price):
+			buy.disabled = true
+			buy.tooltip_text = tr("LEDGER_NO_MONEY")
+			_short = tr("LEDGER_NO_MONEY_SHORT") % Ledger.format_money(int(p.price) - Ledger.cash())
 	if not mine and int(p.owner_id) != 0:
 		_bid_box = _spin(actions, int(p.price), 1000, 5_000_000)
 		_btn(actions, tr("BTN_BID"), func(): _do(await Ledger.place_bid(p.tunnus, int(_bid_box.value)), "", ""))
@@ -210,6 +218,9 @@ func _fill_plot() -> void:
 
 
 # ---------------------------------------------------------------- portfolio, offers, town
+	_status = _lbl(_short, 14, BookTheme.RUBRIC)   # what went wrong with the last action, in the book itself
+	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	body.add_child(_status)
 
 func _fill_portfolio() -> void:
 	var body := _clear(_pages["UI_LEDGER_PORTFOLIO"])
@@ -289,6 +300,8 @@ func _do(err: String, ok_key: String, arg: String) -> void:
 	elif ok_key != "":
 		EventBus.notice.emit(tr(ok_key) % arg)
 	fill()
+	if err != "" and _status and is_instance_valid(_status):
+		_status.text = tr(err)
 
 
 func _clear(page: VBoxContainer) -> VBoxContainer:
