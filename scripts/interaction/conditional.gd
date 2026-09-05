@@ -9,7 +9,9 @@ extends Node3D
 
 
 func _ready() -> void:
-	EventBus.flag_changed.connect(func(f, _v): if f == flag: refresh())
+	EventBus.flag_changed.connect(func(f, _v):
+		if f == flag:
+			refresh())
 	EventBus.chapter_changed.connect(func(_c): refresh())
 	refresh()
 

@@ -1,0 +1,9 @@
+# gdlint (gdtoolkit) settings. Long lines are common in labels, format strings and data
+# tables here, and members are grouped by topic rather than by kind, so those two style
+# checks are off; everything else (unused arguments, duplicated loads, self-comparison,
+# naming) stays on.
+disable:
+  - max-line-length
+  - class-definitions-order
+# ui_manager.gd builds every panel in code and is over the default 1000-line limit.
+max-file-lines: 1500

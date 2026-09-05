@@ -3,14 +3,14 @@
 #   Blender -b -P tools/blender/make_trees.py -- assets/models/trees
 # Each species exports <name>.glb at natural size with two materials (Bark, Foliage).
 # Foliage cards use alpha-scissor textures so Godot renders them without sorting issues.
-import bpy, sys, os, math, random, ast
+import bpy, sys, os, ast
 
 out_dir = sys.argv[sys.argv.index("--") + 1] if "--" in sys.argv else "trees"
 os.makedirs(out_dir, exist_ok=True)
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 FOLIAGE = os.path.join(ROOT, "assets/textures/foliage")
 bpy.ops.preferences.addon_enable(module="bl_ext.blender_org.sapling_tree_gen")
-import importlib
+import importlib  # noqa: E402  (the add-on must be enabled before it can be imported)
 sap = importlib.import_module("bl_ext.blender_org.sapling_tree_gen")
 PRESETS = os.path.join(os.path.dirname(sap.__file__), "presets")
 
