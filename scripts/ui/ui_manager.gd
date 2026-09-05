@@ -47,6 +47,7 @@ var pause: PanelContainer
 var report_panel: PanelContainer
 var codes_label: Label            # K: cadastral number, building codes, road, registry links
 var ledger_panel: LedgerPanel    # V (Tab once the register goes): the town's book
+var _guide: Dictionary = {}      # {tunnus, pos, label}: the plot the HUD arrow points at
 var news_panel: NewsPanel        # N: the town feed
 var codes_on := false
 var _codes_lines: MeshInstance3D = null
@@ -88,6 +89,8 @@ func _ready() -> void:
 		var marks: Node = world.get_node_or_null("ParcelMarks")
 		if marks:
 			marks.flash(t))
+	ledger_panel.guide.connect(guide_to)
+	ledger_panel.teleport.connect(teleport_to)
 	news_panel = NewsPanel.new()
 	add_child(news_panel)
 	news_panel.setup()
@@ -158,8 +161,43 @@ func _current_objective() -> Dictionary:
 	return {}
 
 
+## Point the HUD arrow at a plot (again on the same plot: clear it).
+func guide_to(tunnus: String) -> void:
+	if _guide.get("tunnus", "") == tunnus:
+		_guide = {}
+		return
+	var p := Ledger.parcel(tunnus)
+	if p.is_empty():
+		return
+	var pos := Vector3(float(p.x), 0.0, float(p.z))
+	if world.terrain and world.terrain.data:
+		pos.y = world.terrain.data.get_height(pos)
+	_guide = {"tunnus": tunnus, "pos": pos + Vector3(0, 1.5, 0), "label": str(p.address)}
+	_close()
+	show_notice(tr("NOTICE_GUIDE_SET") % str(p.address))
+
+
+## Jump to a plot: the game's teleport, the same as T and a click on the map.
+func teleport_to(tunnus: String) -> void:
+	var p := Ledger.parcel(tunnus)
+	if p.is_empty():
+		return
+	_close()
+	player.set_pose(Vector3(float(p.x), 200.0, float(p.z)), player.rotation.y, 0.0)
+	world._snap(player, 1.0)
+	if _guide.get("tunnus", "") == tunnus:
+		_guide = {}
+	show_notice(tr("NOTICE_TELEPORT") % [int(p.x), int(p.z)])
+
+
 ## World position of the current objective, or null.
 func _objective_target() -> Variant:
+	if not _guide.is_empty():
+		if player.global_position.distance_to(_guide.pos) < 12.0:
+			show_notice(tr("NOTICE_GUIDE_ARRIVED") % str(_guide.label))
+			_guide = {}
+		else:
+			return _guide.pos
 	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
 	if layer == null:
 		return null
@@ -478,14 +516,9 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _filler_for(p: Control) -> Callable:
-	if p == register: return _fill_register
-	if p == ledger_panel: return ledger_panel.fill
-	if p == news_panel: return news_panel.fill
-	if p == report_panel: return _fill_report
-	if p == inventory: return _fill_inventory
-	if p == debug_map: return _fill_debug_map
-	if p == pause: return _fill_pause
-	return _fill_journal
+	var fillers := {register: _fill_register, ledger_panel: ledger_panel.fill, news_panel: news_panel.fill, report_panel: _fill_report,
+		inventory: _fill_inventory, debug_map: _fill_debug_map, pause: _fill_pause}
+	return fillers.get(p, _fill_journal)
 
 
 func _toggle(p: PanelContainer, fill: Callable) -> void:

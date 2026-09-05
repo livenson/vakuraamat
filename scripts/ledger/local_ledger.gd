@@ -238,25 +238,30 @@ func pay_obligation(actor: int, obligation_id: int) -> String:
 
 func build(actor: int, tunnus: String, structure_id: String) -> String:
 	var p := parcel(tunnus)
+	var s: Dictionary = structures.get(structure_id, {})
+	var built: Array = improvements_of(tunnus).map(func(i): return i.structure_id)
+	var err := _build_check(actor, p, s, built)
+	if err != "":
+		return err
+	var who: Dictionary = players[actor]
+	who.cash -= int(s.cost)
+	improvements.append({"id": _id(), "tunnus": tunnus, "structure_id": structure_id, "player_id": actor, "built_month": month})
+	_event("build", "%s built %s at %s" % [who.name, structure_id, p.address], tunnus, actor, -int(s.cost))
+	return ""
+
+
+func _build_check(actor: int, p: Dictionary, s: Dictionary, built: Array) -> String:
 	if p.is_empty() or int(p.owner_id) != actor:
 		return "LEDGER_NOT_OWNER"
-	var s: Dictionary = structures.get(structure_id, {})
 	if s.is_empty():
 		return "LEDGER_NO_STRUCTURE"
-	var built: Array = improvements_of(tunnus).map(func(i): return i.structure_id)
-	if structure_id in built:
+	if s.id in built:
 		return "LEDGER_ALREADY_BUILT"
 	if s.requires != "" and not (s.requires in built):
 		return "LEDGER_REQUIRES"
 	if s.purposes.size() > 0 and not (p.purpose in s.purposes):
 		return "LEDGER_WRONG_PURPOSE"
-	var who: Dictionary = players[actor]
-	if int(who.cash) < int(s.cost):
-		return "LEDGER_NO_MONEY"
-	who.cash -= int(s.cost)
-	improvements.append({"id": _id(), "tunnus": tunnus, "structure_id": structure_id, "player_id": actor, "built_month": month})
-	_event("build", "%s built %s at %s" % [who.name, structure_id, p.address], tunnus, actor, -int(s.cost))
-	return ""
+	return "LEDGER_NO_MONEY" if int(players[actor].cash) < int(s.cost) else ""
 
 
 func press_tenant(actor: int, tunnus: String) -> String:

@@ -5,6 +5,8 @@ class_name LedgerPanel
 extends PanelContainer
 
 signal show_parcel(tunnus: String)
+signal guide(tunnus: String)      # point the HUD arrow at a plot
+signal teleport(tunnus: String)   # jump to a plot
 
 const GOLD := Color(0.93, 0.78, 0.35)
 const MAX_ROWS := 120
@@ -90,11 +92,11 @@ func _fill_parcels() -> void:
 		return (_filter == "all" and (p.sellable or int(p.owner_id) != 0)) or (_filter == "mine" and Ledger.is_mine(p.tunnus)) or (_filter == "sale" and p.for_sale))
 	rows.sort_custom(func(a, b): return pos.distance_to(Vector2(float(a.x), float(a.z))) < pos.distance_to(Vector2(float(b.x), float(b.z))))
 	var grid := GridContainer.new()
-	grid.columns = 7
+	grid.columns = 8
 	grid.add_theme_constant_override("h_separation", 14)
 	body.add_child(grid)
-	for h in ["UI_LEDGER_COL_ADDRESS", "UI_LEDGER_COL_PURPOSE", "UI_LEDGER_COL_AREA", "UI_LEDGER_COL_VALUE", "UI_LEDGER_COL_PRICE", "UI_LEDGER_COL_OWNER", "UI_LEDGER_COL_YIELD"]:
-		grid.add_child(_lbl(tr(h), 13, GOLD))
+	for h in ["UI_LEDGER_COL_ADDRESS", "UI_LEDGER_COL_PURPOSE", "UI_LEDGER_COL_AREA", "UI_LEDGER_COL_VALUE", "UI_LEDGER_COL_PRICE", "UI_LEDGER_COL_OWNER", "UI_LEDGER_COL_YIELD", ""]:
+		grid.add_child(_lbl(tr(h) if h != "" else "", 13, GOLD))
 	var n := 0
 	for p in rows:
 		if n >= MAX_ROWS:
@@ -114,6 +116,7 @@ func _fill_parcels() -> void:
 		grid.add_child(_lbl(Ledger.format_money(int(p.price)) if p.for_sale else "–", 13))
 		grid.add_child(_lbl(tr("UI_LEDGER_YOU") if Ledger.is_mine(p.tunnus) else str(p.owner_name), 13, GOLD if Ledger.is_mine(p.tunnus) else Color.WHITE))
 		grid.add_child(_lbl(Ledger.format_money(Ledger.yield_of(p.tunnus)) + tr("UI_PER_MONTH"), 13))
+		grid.add_child(_nav_buttons(tunnus))
 	if rows.size() > MAX_ROWS:
 		body.add_child(_lbl(tr("UI_LEDGER_MORE") % (rows.size() - MAX_ROWS), 13))
 
@@ -126,7 +129,11 @@ func _fill_plot() -> void:
 	if p.is_empty():
 		body.add_child(_lbl(tr("UI_LEDGER_PICK"), 16))
 		return
-	body.add_child(_lbl("%s   %s" % [p.address, p.tunnus], 22, GOLD))
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 14)
+	body.add_child(head)
+	head.add_child(_lbl("%s   %s" % [p.address, p.tunnus], 22, GOLD))
+	head.add_child(_nav_buttons(p.tunnus))
 	var mine := Ledger.is_mine(p.tunnus)
 	body.add_child(_lbl("%s · %d m² · %s: %s · %s: %s" % [_purpose(p.purpose), int(p.area), tr("UI_LEDGER_COL_VALUE"), Ledger.format_money(int(p.land_value)),
 		tr("UI_LEDGER_COL_OWNER"), tr("UI_LEDGER_YOU") if mine else str(p.owner_name)], 15))
@@ -310,6 +317,23 @@ func _spin(parent: Node, value: int, min_v: int, max_v: int) -> SpinBox:
 	s.custom_minimum_size.x = 170
 	parent.add_child(s)
 	return s
+
+
+## "Guide" points the HUD arrow at the plot; "Go" jumps there (the game's teleport, like T and the map).
+func _nav_buttons(tunnus: String) -> HBoxContainer:
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", 4)
+	var g := Button.new()
+	g.text = tr("BTN_GUIDE")
+	g.tooltip_text = tr("BTN_GUIDE_TIP")
+	g.pressed.connect(func(): guide.emit(tunnus))
+	h.add_child(g)
+	var t := Button.new()
+	t.text = tr("BTN_TELEPORT")
+	t.tooltip_text = tr("BTN_TELEPORT_TIP")
+	t.pressed.connect(func(): teleport.emit(tunnus))
+	h.add_child(t)
+	return h
 
 
 func _purpose(code: String) -> String:
