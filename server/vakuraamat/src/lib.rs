@@ -762,13 +762,16 @@ pub fn tick(ctx: &ReducerContext, _s: TickSchedule) -> Result<(), String> {
         if tenants.is_empty() {
             paid = base;
         } else {
-            let share = (base / tenants.len() as u64).max(1);
-            for ten in tenants {
+            let n = tenants.len() as u64;
+            let share = base / n;
+            for (k, ten) in tenants.into_iter().enumerate() {
+                // the last tenant carries the remainder so the parcel pays exactly its yield
+                let part = if (k as u64) < n - 1 { share } else { base - share * (n - 1) };
                 let chance = if ten.status == "R" { cfg.arrears_chance_permille } else { cfg.arrears_chance_bad_status_permille };
                 if rng.gen_range(0..1000u32) < chance {
-                    ctx.db.tenant().id().update(Tenant { arrears: ten.arrears + share, ..ten });
+                    ctx.db.tenant().id().update(Tenant { arrears: ten.arrears + part, ..ten });
                 } else {
-                    paid += share;
+                    paid += part;
                 }
             }
         }

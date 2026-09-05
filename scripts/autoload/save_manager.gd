@@ -40,6 +40,7 @@ func save(slot: String = AUTOSAVE) -> bool:
 		"hunting": Hunting.to_dict(),
 		"trading": Trading.to_dict(),
 		"manors": Manors.to_dict(),
+		"ledger": Ledger.to_dict(),
 	}
 	var f := FileAccess.open(slot_path(slot), FileAccess.WRITE)
 	if f == null:
@@ -69,6 +70,7 @@ func load_slot(slot: String = AUTOSAVE) -> bool:
 	Hunting.from_dict(data.get("hunting", {}))
 	Trading.from_dict(data.get("trading", {}))
 	Manors.from_dict(data.get("manors", {}))
+	Ledger.from_dict(data.get("ledger", {}))
 	await GameState.from_dict(data.get("game", {}))   # last: switches era, moves the player
 	dirty = false
 	return true

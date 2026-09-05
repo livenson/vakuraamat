@@ -38,6 +38,7 @@ func reset() -> void:
 	for e in eras.values():
 		Trading.money[e.id] = e.starting_money
 	Manors.built = {}
+	Ledger.reset_local(Sites.active)
 
 
 func _ready() -> void:

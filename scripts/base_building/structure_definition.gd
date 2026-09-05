@@ -12,3 +12,5 @@ extends Resource
 @export var offset: Vector2 = Vector2(8, 0)  # metres from the manor origin
 @export var color: Color = Color(0.5, 0.4, 0.3)
 @export var requires: String = ""            # another structure id that must exist first
+@export var rent_bonus: int = 0               # euros per month added to the parcel's rent (town ledger)
+@export var purposes: Array[String] = []      # cadastral purposes it may stand on; empty = any
