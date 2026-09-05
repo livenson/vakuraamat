@@ -259,6 +259,7 @@ class Scene:
             purposes = u.get("purpose") or []
             kit = None
             rows = None
+            matched = {}
             for r in rules:
                 if r.get("purpose") and not any(p in r["purpose"] for p in purposes):
                     continue
@@ -269,6 +270,8 @@ class Scene:
                     continue
                 if r.get("ownership") and u.get("ownership") not in r["ownership"]:
                     continue
+                if r.get("tunnus") and u.get("tunnus") not in r["tunnus"]:
+                    continue
                 if year is not None and (("from_year" in r and year < r["from_year"]) or ("until_year" in r and year > r["until_year"])):
                     continue
                 if r.get("needs_rows"):
@@ -276,6 +279,7 @@ class Scene:
                     if rows is None:
                         continue
                 kit = r.get("kit")
+                matched = r
                 break
             if not kit:
                 continue
@@ -285,6 +289,8 @@ class Scene:
             name = "P" + str(u.get("tunnus", n)).replace(":", "_")
             self.group(name, "Parcels", u["x"], u["z"])
             extra = f"\nrow_period = {rows[0]:.2f}\nrow_angle = {rows[1]:.1f}" if rows else ""
+            if matched.get("at"):   # a pinned spot for the kit, tile metres, and a heading in degrees from north
+                extra += f"\nanchor = Vector2({float(matched['at'][0]) - u['x']:.1f}, {float(matched['at'][1]) - u['z']:.1f})\nanchor_yaw = {float(matched.get('yaw', 0.0)):.1f}"
             self.node("Kit", "Node3D", f"Parcels/{name}", f'script = ExtResource("{sc}")\nkit = "{kit}"\ntunnus = "{u.get("tunnus", "")}"\npolygon = PackedVector2Array({pts}){extra}')
             n += 1
         return n
@@ -445,7 +451,10 @@ class Interpreter:
                     rules_path = os.path.join(ROOT, "assets/data/parcel_rules.json")
                 if os.path.exists(src) and os.path.exists(rules_path):
                     units = json.load(open(src)).get("parcels", [])
-                    rules = json.load(open(rules_path)).get("rules", [])
+                    rules_doc = json.load(open(rules_path))
+                    rules = rules_doc.get("rules", [])
+                    if rules_doc.get("extend_global"):   # a pack's own rules first, then the shared ones
+                        rules = rules + json.load(open(os.path.join(ROOT, "assets/data/parcel_rules.json"))).get("rules", [])
                     year = self.num(n.get("year"), env) if n.get("year") is not None else None
                     s.parcels(units, rules, int(year) if year is not None else None, self.layout.get("exclusions", []), self.ortho_path(), self.tile_size())
             elif t == "footprints":

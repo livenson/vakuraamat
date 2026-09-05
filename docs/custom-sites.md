@@ -224,6 +224,11 @@ Interaction components after Cogito's patterns (MIT, credited in `THIRD_PARTY.md
 Bathrooms (toilet, bathtub, sink and mirror, Kenney models from Poly Pizza) are one room of every
 home; boats (Quaternius, Google and jeremy models from Poly Pizza) moor along the long side of every
 still-water patch over 300 m², a sailboat on big water; the parked bicycle is the Google model.
+Playgrounds are built from the Poly Pizza swing, slide, seesaw, jungle gym, monkey bars, trampoline
+and play structure (more of them on bigger grounds). A `court` kit lays a tennis court along the
+parcel's long side (two on big plots, a basketball court beyond); the purpose does not say where
+courts are, so a pack names them in its own `parcel_rules.json` (`extend_global: true`, a rule with
+`tunnus`, optionally `at: [x, z]` and `yaw` to pin the spot).
 `tools/godot/model_preview.tscn -- --dir=res://assets/vendor/polypizza/ --fit=2` renders a vendored
 directory in a row, each model scaled to `--fit` metres.
 

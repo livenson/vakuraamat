@@ -4,11 +4,13 @@
 class_name ParcelKit
 extends Node3D
 
-@export var kit := ""                         # playground | park | hedge | fence
+@export var kit := ""                         # playground | park | hedge | fence | solar | court
 @export var tunnus := ""                      # cadastral number, for the codes overlay
 @export var polygon: PackedVector2Array = PackedVector2Array()   # boundary around the origin (x east, y = z south)
 @export var row_period := 6.0                 # solar: metres between rows (from the orthophoto)
 @export var row_angle := 0.0                  # solar: direction the rows run, degrees from east towards south
+@export var anchor := Vector2.INF             # court: a pinned spot from the pack's parcel_rules.json (metres from the origin)
+@export var anchor_yaw := 0.0                 # court: its heading in degrees from north
 
 var _st := SurfaceTool.new()
 var _colors: Array[Color] = []
@@ -17,7 +19,7 @@ var _colors: Array[Color] = []
 func _ready() -> void:
 	if polygon.size() < 3:
 		return
-	if kit in ["hedge", "fence", "solar"]:
+	if kit in ["hedge", "fence", "solar", "playground", "court"]:
 		# these place every piece on the ground themselves: neither the kit nor its parcel group may be snapped
 		set_meta("no_snap", true)
 		if get_parent():
@@ -25,6 +27,8 @@ func _ready() -> void:
 	match kit:
 		"playground":
 			_playground()
+		"court":
+			_court()
 		"park":
 			_park()
 		"hedge":
@@ -77,33 +81,142 @@ func _centroid() -> Vector2:
 	return c / polygon.size()
 
 
+const MODELS := "res://assets/vendor/polypizza/"
+
+## A playground from the Poly Pizza models (see THIRD_PARTY.md): a swing set, a slide and a seesaw
+## around the centre, a sandpit, a bench; bigger grounds add a jungle gym, monkey bars, a trampoline
+## and a play structure. The pieces stand on the ground wherever the terrain puts it.
 func _playground() -> void:
 	var c := _centroid()
+	var area := absf(_area())
 	var wood := Color(0.55, 0.38, 0.2)
-	var red := Color(0.75, 0.2, 0.15)
-	var blue := Color(0.15, 0.3, 0.65)
 	var sand := Color(0.85, 0.78, 0.6)
-	# swing frame
-	for dx in [-1.6, 1.6]:
-		_box(Vector3(c.x + dx, 1.2, c.y), Vector3(0.12, 2.4, 0.12), wood)
-	_box(Vector3(c.x, 2.4, c.y), Vector3(3.4, 0.12, 0.12), wood)
-	for dx in [-0.6, 0.6]:
-		_box(Vector3(c.x + dx, 0.55, c.y), Vector3(0.45, 0.06, 0.2), red)
-		_box(Vector3(c.x + dx, 1.5, c.y), Vector3(0.03, 1.8, 0.03), Color(0.3, 0.3, 0.3))
-	# slide: platform, ladder posts, ramp
-	var sx := c.x + 5.0
-	var sz := c.y + 1.0
-	_box(Vector3(sx, 1.5, sz), Vector3(1.0, 0.1, 1.0), wood)
-	for d in [Vector2(-0.45, -0.45), Vector2(0.45, -0.45), Vector2(-0.45, 0.45), Vector2(0.45, 0.45)]:
-		_box(Vector3(sx + d.x, 0.75, sz + d.y), Vector3(0.08, 1.5, 0.08), wood)
-	_box(Vector3(sx + 1.6, 0.8, sz), Vector3(2.6, 0.08, 0.6), blue, 0.0)
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(tunnus)
+	var spin := rng.randf_range(0.0, TAU)
+	var pieces: Array = [["swing", 3.6, 0.0], ["slide", 3.2, 2.2], ["seesaw", 3.0, 4.2]]
+	if area > 1200.0:
+		pieces.append(["junglegym", 3.2, 1.1])
+		pieces.append(["monkeybars", 2.6, 3.3])
+	if area > 2200.0:
+		pieces.append(["trampoline", 3.2, 5.3])
+		pieces.append(["playstructure", 6.5, 0.6])
+	var ring := 4.5 if area < 1200.0 else 6.5
+	for i in pieces.size():
+		var piece: Array = pieces[i]
+		var ang: float = spin + piece[2]
+		var at := c + Vector2(cos(ang), sin(ang)) * (ring if i < 3 else ring + 5.0)
+		if not Geometry2D.is_point_in_polygon(at, polygon):
+			at = c + (at - c) * 0.4
+		if not _model(str(piece[0]), at, float(piece[1]), atan2(-sin(ang), -cos(ang)) + PI / 2.0):
+			_box(Vector3(at.x, 1.0, at.y), Vector3(float(piece[1]), 2.0, 0.6), wood)   # stand-in without the model
 	# sandpit
 	var px := c.x - 5.0
 	var pz := c.y - 1.5
 	_box(Vector3(px, 0.15, pz), Vector3(3.0, 0.3, 3.0), sand)
 	for side in [[Vector3(0, 0.2, -1.55), Vector3(3.2, 0.4, 0.12)], [Vector3(0, 0.2, 1.55), Vector3(3.2, 0.4, 0.12)], [Vector3(-1.55, 0.2, 0), Vector3(0.12, 0.4, 3.2)], [Vector3(1.55, 0.2, 0), Vector3(0.12, 0.4, 3.2)]]:
 		_box(Vector3(px, 0, pz) + side[0], side[1], wood)
-	_bench(Vector3(c.x, 0, c.y + 5.0), 0.0)
+	_bench(Vector3(c.x, 0, c.y + ring + 2.0), 0.0)
+
+
+## A tennis court (24 x 11 m) fitted along the parcel's longest side; a basketball half court beside
+## it when the parcel is big enough.
+func _court() -> void:
+	var c := _centroid()
+	var best := 0.0
+	var dir := Vector2.RIGHT
+	for i in polygon.size():
+		var d: Vector2 = polygon[(i + 1) % polygon.size()] - polygon[i]
+		if d.length() > best:
+			best = d.length()
+			dir = d.normalized()
+	var yaw := atan2(dir.x, dir.y)   # the model's long axis (local Z) along the parcel's long side
+	var at := _deepest(c, dir)
+	if anchor != Vector2.INF:
+		at = anchor
+		yaw = deg_to_rad(anchor_yaw)
+		dir = Vector2(sin(yaw), cos(yaw))
+	var across := Vector2(-dir.y, dir.x)
+	var area := absf(_area())
+	if area > 2500.0 and Geometry2D.is_point_in_polygon(at + across * 14.0, polygon) and Geometry2D.is_point_in_polygon(at - across * 14.0, polygon):
+		_model("tenniscourt", at - across * 7.0, 24.0, yaw)   # two courts side by side
+		_model("tenniscourt", at + across * 7.0, 24.0, yaw)
+	else:
+		_model("tenniscourt", at, 24.0, yaw)
+	if area > 4000.0:
+		var bt := at + dir * 22.0
+		if Geometry2D.is_point_in_polygon(bt, polygon):
+			_model("basketball", bt, 15.0, yaw)
+
+
+## The point on the line through `c` along `dir` that lies deepest inside the parcel (farthest
+## from every boundary edge): where a court or a field sits, away from the street.
+func _deepest(c: Vector2, dir: Vector2) -> Vector2:
+	var best := c
+	var best_d := -1.0
+	for i in range(-20, 21):
+		var q := c + dir * (i * 1.0)
+		if not Geometry2D.is_point_in_polygon(q, polygon):
+			continue
+		var d := INF
+		for k in polygon.size():
+			d = minf(d, _dist_to_segment(q, polygon[k], polygon[(k + 1) % polygon.size()]))
+		if d > best_d:
+			best_d = d
+			best = q
+	return best
+
+
+static func _dist_to_segment(p: Vector2, a: Vector2, b: Vector2) -> float:
+	var ab := b - a
+	var t := clampf((p - a).dot(ab) / maxf(ab.length_squared(), 0.0001), 0.0, 1.0)
+	return p.distance_to(a + ab * t)
+
+
+## A vendored model on the ground at `at`, scaled so its longest side is `length` metres, turned by
+## `yaw` about its centre. False when the model is not vendored.
+func _model(name: String, at: Vector2, length: float, yaw: float) -> bool:
+	var path := MODELS + name + ".glb"
+	if not ResourceLoader.exists(path):
+		return false
+	var model: Node3D = (load(path) as PackedScene).instantiate()
+	var b: AABB = Interiors._bounds(model)
+	var longest := maxf(b.size.x, b.size.z)
+	if longest < 0.0001:
+		return false
+	var k := length / longest
+	var holder := Node3D.new()
+	model.scale = Vector3.ONE * k
+	model.position = Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k)
+	if b.size.x > b.size.z:
+		var turn := Node3D.new()   # the long axis along local Z, whatever the export did
+		turn.rotation.y = PI / 2.0
+		turn.add_child(model)
+		holder.add_child(turn)
+	else:
+		holder.add_child(model)
+	holder.position = Vector3(at.x, _ground(at), at.y)
+	holder.rotation.y = yaw
+	add_child(holder)
+	var body := StaticBody3D.new()
+	body.collision_layer = 1
+	var shape := CollisionShape3D.new()
+	var box := BoxShape3D.new()
+	box.size = Vector3(b.size.x * k, maxf(b.size.y * k, 0.3), b.size.z * k)
+	shape.shape = box
+	shape.position = Vector3(0, box.size.y * 0.5, 0)
+	body.add_child(shape)
+	holder.add_child(body)
+	return true
+
+
+func _area() -> float:
+	var a := 0.0
+	for i in polygon.size():
+		var p := polygon[i]
+		var q := polygon[(i + 1) % polygon.size()]
+		a += p.x * q.y - q.x * p.y
+	return a * 0.5
 
 
 func _bench(at: Vector3, yaw: float) -> void:

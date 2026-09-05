@@ -1,0 +1,13 @@
+{
+  "_doc": "Kvissentali's own parcel rules, tried before assets/data/parcel_rules.json (extend_global). A rule may name cadastral units (tunnus) when the purpose does not tell what stands there.",
+  "extend_global": true,
+  "rules": [
+    {
+      "id": "tennis_courts",
+      "tunnus": [
+        "79514:036:0077"
+      ],
+      "kit": "court"
+    }
+  ]
+}
