@@ -221,11 +221,13 @@ func _build_hud() -> void:
 	prompt_label.position = Vector2(-200, 120)
 	prompt_label.add_theme_color_override("font_color", GOLD)
 	notice_label = _label(hud, 20)
-	notice_label.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP)
+	notice_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	notice_label.offset_left = -380
+	notice_label.offset_right = 380
+	notice_label.offset_top = 70
+	notice_label.grow_horizontal = Control.GROW_DIRECTION_BOTH
 	notice_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	notice_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	notice_label.custom_minimum_size = Vector2(760, 0)
-	notice_label.position = Vector2(-380, 70)
 	notice_label.modulate.a = 0.0
 	# compass tape, top centre: north is -Z on the tile (map up)
 	compass = Control.new()

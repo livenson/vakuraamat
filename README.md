@@ -45,6 +45,9 @@ hunting, ink stories) lives on at the tag `v0.9-historical`.
   planning notices.
 - **Online or offline:** with a town server reachable, everyone in the town shares one ledger and
   sees each other walk; without it the same rules run in your own book, which the save holds.
+- **Walk in:** every real building has a door; inside is generated from its footprint and register
+  data (storeys, window rhythm, a ramp between floors) and furnished by use with Kenney's CC0
+  furniture. The exterior hides while you are in, so the windows look out at the real street.
 - Terrain, buildings, trees, roads, parcels and traffic are unchanged: real, regenerated per tile,
   never sent over the network.
 

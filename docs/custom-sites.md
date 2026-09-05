@@ -167,6 +167,19 @@ preferred as the story's landmark anchor. All of it is in `buildings.json` under
 well, a wooden house from 1930, a listed building). Buildings inside the layout's exclusion circles
 are skipped so hand-placed models keep their spot.
 
+### Inside the buildings
+
+Every real building that is not an outbuilding gets a door on the wall the exterior draws it on.
+E at the door steps in: the first visit generates the interior from the footprint (a floor per
+storey on the register's floor count, inner walls with window openings on the exterior's rhythm and a
+gap at the door, a ceiling, a ramp between storeys with an open landing, a warm light) and furnishes
+it by use: shop counters and shelves where a company is registered, desks for offices, a bed, table
+and sofa in dwellings, benches and cabinets in workshops. Pieces are Kenney Furniture Kit models
+(CC0, `assets/vendor/kenney_furniture_kit`). While inside, the exterior mesh and its collider hide so
+the openings look out at the real street; E at the door or simply walking out through it restores
+the exterior. `--enter="<address part>"` starts a screenshot run inside a building; the door's hover
+text shows the register's use, year and storeys.
+
 ## Cadastral units, roads and what stands on a plot
 
 `make parcels SITE=<id>` fetches the cadastral units of the tile (Maa-amet cadastre WFS: number,
