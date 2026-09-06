@@ -24,7 +24,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools")); sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
-import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads, fetch_tenants, fetch_fields, market  # noqa: E402
+import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads, fetch_stops, fetch_tenants, fetch_fields, market  # noqa: E402
 
 import fetch_tile  # noqa: E402
 STATS_PATH = os.path.join(ROOT, "data_raw", "service_stats.json")
@@ -192,6 +192,11 @@ def run_job(job):
             fetch_roads.fetch(sid, root=ws)
         except Exception as e:  # noqa: BLE001 - optional layer
             log(f"{sid}: fetch_roads unavailable ({e})")
+        stage("bus stops (OpenStreetMap)", 0.632)
+        try:
+            fetch_stops.fetch(sid, root=ws)
+        except Exception as e:  # noqa: BLE001 - optional layer
+            log(f"{sid}: fetch_stops unavailable ({e})")
         stage("fields (PRIA)", 0.635)
         try:
             fetch_fields.fetch(sid, root=ws)

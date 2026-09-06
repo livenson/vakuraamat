@@ -47,6 +47,9 @@ mcp:                            # the Sketchfab MCP server for Claude Code (tool
 import:
 	$(GODOT) --headless --path . --import >/dev/null 2>&1 || true
 
+stops:                          # bus stops from OpenStreetMap snapped to the ETAK roads (sites/<id>/stops.json)
+	python3 tools/pipeline/fetch_stops.py --site $(SITE)
+
 tile:
 	python3 tools/pipeline/fetch_tile.py --site $(SITE)
 	python3 tools/new_site.py --id $(SITE) --relink-era-maps
