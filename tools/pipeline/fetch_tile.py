@@ -33,6 +33,7 @@ Sheet numbers can be looked up from a point automatically (downloads the
 import argparse
 import datetime as dt
 import json
+import time
 import os
 import re
 import shutil
@@ -67,7 +68,9 @@ def run(cmd, quiet=False):
     return subprocess.run([str(c) for c in cmd], check=True, capture_output=True, text=True).stdout
 
 
-def download(url, dest, post=None):
+def download(url, dest, post=None, label=None, span=None):
+    """Fetch `url` to `dest` (cached). With `label` and `span` = (f0, f1) it reports progress lines while
+    it downloads: "<label> 12/74 MB, 3.1 MB/s", the fraction moving from f0 to f1."""
     if os.path.exists(dest) and os.path.getsize(dest) > 0:
         log(f"reusing {dest}")
         return dest
@@ -75,7 +78,22 @@ def download(url, dest, post=None):
     req = urllib.request.Request(url, data=post, headers={"User-Agent": "vakuraamat-pipeline/0.1"})
     tmp = dest + ".part"
     with urllib.request.urlopen(req, timeout=600) as r, open(tmp, "wb") as f:
-        shutil.copyfileobj(r, f, length=1 << 20)
+        total = int(r.headers.get("Content-Length") or 0)
+        done = 0
+        t0 = last = time.time()
+        while True:
+            chunk = r.read(1 << 18)
+            if not chunk:
+                break
+            f.write(chunk)
+            done += len(chunk)
+            now = time.time()
+            if label and span and now - last >= 0.5:
+                last = now
+                speed = done / max(now - t0, 0.001) / 1e6
+                part = done / total if total else 0.0
+                size = f"{done / 1e6:.0f}/{total / 1e6:.0f} MB" if total else f"{done / 1e6:.0f} MB"
+                progress(span[0] + (span[1] - span[0]) * part, f"{label} {size}, {speed:.1f} MB/s")
     os.replace(tmp, dest)
     log(f"saved {dest} ({os.path.getsize(dest) / 1e6:.1f} MB)")
     return dest
@@ -314,8 +332,10 @@ def main():
         fname = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)["f"][0]
         dtm_urls.append(url)
         cached = os.path.exists(os.path.join(raw_dir, fname))
-        progress(0.05 + 0.4 * i / len(sheets), f"1 m ground model, sheet {sh} ({i + 1}/{len(sheets)}{', cached' if cached else ', ~74 MB'})")
-        dtm_paths.append(download(url, os.path.join(raw_dir, fname)))
+        f0, f1 = 0.05 + 0.4 * i / len(sheets), 0.05 + 0.4 * (i + 1) / len(sheets)
+        text = f"1 m ground model, sheet {sh} ({i + 1}/{len(sheets)})"
+        progress(f0, text + (", cached" if cached else ""))
+        dtm_paths.append(download(url, os.path.join(raw_dir, fname), label=text, span=(f0, f1)))
     progress(0.5, "clipping the ground model")
     dtm_url = dtm_urls[0]
     dtm_name = ",".join(os.path.basename(p) for p in dtm_paths)
@@ -355,7 +375,7 @@ def main():
     ortho_path = os.path.join(out_dir, "ortho.jpg")
     if os.path.exists(ortho_path):
         os.remove(ortho_path)
-    download(WMS + "?" + urllib.parse.urlencode(q), ortho_path)
+    download(WMS + "?" + urllib.parse.urlencode(q), ortho_path, label="orthophoto, 25 cm", span=(0.56, 0.61))
     with open(ortho_path, "rb") as f:
         if f.read(3) != b"\xff\xd8\xff":
             sys.exit("WMS did not return a JPEG (service exception?) - see ortho.jpg")
