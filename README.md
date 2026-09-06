@@ -35,13 +35,21 @@ Business Register open data with Godot 4.7, GDScript, Terrain3D and SpacetimeDB.
 ## Play
 
 ```sh
-make setup       # Homebrew tools, git-lfs pull, first Godot import
-make tile        # Maa-amet data for Palupera and its terrain (~10 min, network); SITE=<id> for another pack
-tools/play.sh    # the game with the tile service (or: godot --path .)
+make setup                        # Homebrew tools (godot, blender, gdal, git-lfs), LFS pull, first Godot import
+make tile                         # Maa-amet data for Palupera and its terrain (~10 min, network); SITE=<id> for another pack
+make news-local SITE=kvissentali  # optional: today's regional headlines and notices into the pack for offline play
+tools/play.sh                     # the tile service plus the game; tools/play.sh -- --site=kvissentali --windowed
 ```
 
 WASD move, E interact, Tab the book, B buy here, N news, J journal, M map, K codes, F fly,
 T teleport, H home, F8 report, Esc menu. `make test` runs the headless suite.
+
+The shipped packs already carry their companies; `make tenants SITE=<id>` refreshes them and, on the
+first run, downloads about 460 MB of Business Register and Tax Board open data into `data_raw/`
+(cached for a week; worlds created from the menu do the same through the tile service). A shared
+town needs the SpacetimeDB CLI: `make server` in one terminal, `make town SITE=<id>` once, then play;
+without it the same rules run in your own book. `make mcp` builds the Sketchfab MCP server for
+Claude Code (token in `sketchfab.token`).
 
 ## Data sources and how they become a town
 
