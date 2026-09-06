@@ -304,3 +304,40 @@ MENU_DELETE_ALL_TILES,Kustuta kõik naabruse ruudud,Remove all neighbour tiles
 MENU_REMOVED,Prügikasti viidud.,Moved to the trash.
 UI_BUS_STOP,Bussipeatus,Bus stop
 UI_BUS_LINES,Liinid: %s,Lines: %s
+UI_MAP_MODE,Kiht,Layer
+UI_MAP_MODE_OFF,väljas,off
+UI_MAP_MODE_SECTOR,tegevusala,sector
+UI_MAP_MODE_SIZE,töötajad,employees
+UI_MAP_MODE_HEALTH,tervis,health
+UI_MAP_MODE_AGE,asutamisaasta,founded
+UI_MAP_MODE_OWNERS,ühised omanikud,shared owners
+UI_MAP_SIZE_LEGEND,ring: töötajate arv,circle: employees
+UI_MAP_OWNERS_LEGEND,joon: sama omanik või juhatuse liige,line: same owner or board member
+SECTOR_FARM,põllumajandus ja metsandus,farming and forestry
+SECTOR_INDUSTRY,tööstus ja energia,industry and energy
+SECTOR_CONSTRUCTION,ehitus,construction
+SECTOR_TRADE,kaubandus,trade and repair
+SECTOR_TRANSPORT,transport,transport and storage
+SECTOR_HOSPITALITY,majutus ja toitlustus,hotels and restaurants
+SECTOR_MEDIA,meedia ja IT,media and IT
+SECTOR_FINANCE,rahandus,finance and insurance
+SECTOR_PROPERTY,kinnisvara,real estate
+SECTOR_SERVICES,teenused,professional services
+SECTOR_PUBLIC,"avalik sektor, haridus, tervis","public, education, health"
+SECTOR_CULTURE,"kultuur, sport, muud teenused","arts, sport, other services"
+HEALTH_SOUND,korras,sound
+HEALTH_WATCH,jälgimisel,watch
+HEALTH_DISTRESSED,raskustes,distressed
+UI_EMPLOYEES,%d töötajat,%d employees
+UI_TURNOVER,käive %s/a,turnover %s/yr
+UI_TAXES,maksud %s/a,taxes %s/yr
+UI_BOARD,juhatuses %d,board of %d
+UI_OWNER_MANAGED,omanik juhib,owner-managed
+UI_CAPITAL,kapital %s,capital %s
+UI_ALL,Kõik,All
+UI_LEDGER_COMPANIES,Ettevõtted,Companies
+UI_LEDGER_COL_COMPANY,Ettevõte,Company
+UI_LEDGER_COL_SECTOR,Tegevusala,Sector
+UI_LEDGER_COL_EMPLOYEES,Töötajaid,Employees
+UI_LEDGER_COL_TURNOVER,Käive,Turnover
+UI_LEDGER_COL_ADDRESS,Aadress,Address

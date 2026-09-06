@@ -507,15 +507,22 @@ func _lintel(root: Node3D, a: Vector2, c: Vector2, u: float, y: float) -> void:
 func _use_of(b: FootprintBuilding, tenants: Array) -> String:
 	var active := tenants.filter(func(t): return t.status == "R")
 	var p := b.purpose.to_lower()
-	if "kauplus" in p or "kaubandus" in p or "toitlustus" in p or "teenindus" in p:
-		return "shop"
-	if not active.is_empty():
-		return "shop" if b.kind != "dwelling" else "office"
-	if "tööstus" in p or "ladu" in p or "tootmis" in p or "garaaž" in p:
-		return "workshop"
-	if b.kind == "dwelling" or "elamu" in p or "korter" in p:
-		return "home"
-	return "office"
+	# the register's activity sector of the biggest active company decides before the building's purpose text
+	const BY_SECTOR := {"trade": "shop", "hospitality": "shop", "industry": "workshop", "construction": "workshop", "transport": "workshop",
+		"services": "office", "media": "office", "finance": "office", "property": "office", "public": "office", "culture": "office"}
+	var use: String = BY_SECTOR.get(str(MapPalette.dominant(active).get("sector", "")), "")
+	if use == "":
+		if "kauplus" in p or "kaubandus" in p or "toitlustus" in p or "teenindus" in p:
+			use = "shop"
+		elif not active.is_empty():
+			use = "shop" if b.kind != "dwelling" else "office"
+		elif "tööstus" in p or "ladu" in p or "tootmis" in p or "garaaž" in p:
+			use = "workshop"
+		elif b.kind == "dwelling" or "elamu" in p or "korter" in p:
+			use = "home"
+		else:
+			use = "office"
+	return use
 
 
 ## Floor or ceiling: the inset polygon, minus the stair notches (polygons that reach past the wall, so
@@ -985,11 +992,16 @@ static func register_sheet(b: FootprintBuilding) -> String:
 		lines.append("EHR " + b.ehr)
 	lines.append("")
 	lines.append(TranslationServer.translate("UI_SHEET_TENANTS"))
-	var names: Array = Tenants.active_names(Sites.pack_of(b), b.tunnus)
-	if names.is_empty():
+	var rows: Array = Tenants.of(Sites.pack_of(b), b.tunnus).filter(func(t): return str(t.get("status", "")) == "R")
+	if rows.is_empty():
 		lines.append(TranslationServer.translate("UI_SHEET_NO_TENANTS"))
-	for n in names:
-		lines.append("  " + str(n))
+	for t in rows:
+		var facts: Array[String] = [str(t.get("name", ""))]
+		if t.get("sector"):
+			facts.append(TranslationServer.translate("SECTOR_" + str(t.sector).to_upper()))
+		if t.get("employees") != null and int(t.employees) > 0:
+			facts.append(TranslationServer.translate("UI_EMPLOYEES") % int(t.employees))
+		lines.append("  " + " · ".join(facts))
 	var p := Ledger.parcel(b.tunnus)
 	if not p.is_empty():
 		lines.append("")
