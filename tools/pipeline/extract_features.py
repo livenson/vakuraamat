@@ -271,8 +271,8 @@ def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2
         ring[max(ys.min() - 3, 0) - y0:min(ys.max() + 4, size) - y0, max(xs.min() - 3, 0) - x0:min(xs.max() + 4, size) - x0] = False
         bank = heights[y0:y1, x0:x1][ring]
         level = float(np.median(heights[ys, xs]))
-        if bank.size == 0 or level > float(np.median(bank)) - 0.15:
-            continue   # not a depression: a flat dark yard, car park or shadow
+        if bank.size == 0 or level > float(np.median(bank)) - 0.3:
+            continue   # not a depression: a flat dark yard, car park, lawn in shadow
         col = ortho[ys, xs].mean(axis=0)
         ponds.append({"area": int(len(pix)), "x": round(float(xs.min() + xs.max() + 1) / 2, 1), "z": round(float(ys.min() + ys.max() + 1) / 2, 1),
                       "w": w, "d": d, "level": round(level, 2), "color": [round(float(c), 2) for c in col]})
