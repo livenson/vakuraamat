@@ -61,6 +61,70 @@ func _ready() -> void:
 		mi.name = "Roads_" + key
 		add_child(mi)
 	_street_lights(terrain)
+	_bus_stops(terrain)
+
+
+const STOP_MODELS := {"rural": "res://assets/vendor/sketchfab/bus_stop_rural.glb", "town": "res://assets/vendor/sketchfab/bus_stop_town.glb"}   # Ottto3ds, CC BY
+
+
+## Bus shelters where OpenStreetMap has a stop (tools/pipeline/fetch_stops.py writes stops.json with
+## each stop moved to the roadside and its heading): the Soviet-era shelter on roads, the small
+## modern one on streets; the timetable board is readable (E) with the stop's name and lines.
+func _bus_stops(terrain: Terrain3D) -> void:
+	var path := Sites.path_in(Sites.pack_of(self), "stops.json")
+	if not FileAccess.file_exists(path):
+		return
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	var scenes := {}
+	var bounds := {}
+	for key in STOP_MODELS:
+		if ResourceLoader.exists(STOP_MODELS[key]):
+			scenes[key] = load(STOP_MODELS[key])
+			var probe: Node3D = scenes[key].instantiate()
+			bounds[key] = Interiors._bounds(probe)   # the open front faces +Z
+			probe.free()
+	if scenes.is_empty():
+		return
+	for st in parsed.get("stops", []):
+		var kind: String = "town" if str(st.get("road_kind", "")) == "street" else "rural"
+		if not scenes.has(kind):
+			kind = scenes.keys()[0]
+		var at := Vector2(float(st.get("x", 0.0)), float(st.get("z", 0.0)))
+		var gp := to_global(Vector3(at.x, 0.0, at.y))
+		var h: float = terrain.data.get_height(gp)
+		if is_nan(h):
+			continue
+		var b: AABB = bounds[kind]
+		var k := (3.4 if kind == "town" else 3.0) / maxf(b.size.x, 0.01)
+		var model: Node3D = scenes[kind].instantiate()
+		model.scale = Vector3.ONE * k
+		model.position = Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k)
+		var holder := Node3D.new()
+		holder.name = "Stop_" + str(st.get("id", ""))
+		holder.position = Vector3(at.x, h - global_position.y, at.y)
+		holder.rotation.y = float(st.get("yaw", 0.0))
+		holder.add_child(model)
+		var body := StaticBody3D.new()
+		body.collision_layer = 1
+		var shape := CollisionShape3D.new()
+		var box := BoxShape3D.new()
+		box.size = Vector3(b.size.x * k, b.size.y * k, b.size.z * k * 0.5)
+		shape.shape = box
+		shape.position = Vector3(0, box.size.y * 0.5, -b.size.z * k * 0.25)   # the back half: the front stays open to stand in
+		body.add_child(shape)
+		holder.add_child(body)
+		var board := Readable.new()
+		var name := str(st.get("name", ""))
+		var lines := str(st.get("refs", ""))
+		var text := tr("UI_BUS_STOP") + ("\n" + str(st.get("road_name", "")) if st.get("road_name") else "")
+		if lines != "":
+			text += "\n" + tr("UI_BUS_LINES") % lines
+		board.setup(name if name != "" else tr("UI_BUS_STOP"), text, Vector3(b.size.x * k, b.size.y * k, b.size.z * k))
+		board.position = Vector3(0, b.size.y * k * 0.5, 0)
+		holder.add_child(board)
+		add_child(holder)
 
 
 ## Lamp posts along the streets (asphalt with a kerb): one every LAMP_SPACING metres on the right

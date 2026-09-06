@@ -302,3 +302,5 @@ MENU_DELETE,Kustuta,Remove
 MENU_CONFIRM_DELETE,Kindlasti kustuta,Really remove
 MENU_DELETE_ALL_TILES,Kustuta kõik naabruse ruudud,Remove all neighbour tiles
 MENU_REMOVED,Prügikasti viidud.,Moved to the trash.
+UI_BUS_STOP,Bussipeatus,Bus stop
+UI_BUS_LINES,Liinid: %s,Lines: %s
