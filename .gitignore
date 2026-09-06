@@ -28,3 +28,5 @@ sites/*/news.json.import
 sketchfab.token
 # MCP servers cloned and built locally (make mcp)
 tools/mcp/sketchfab-mcp-server/
+# Sketchfab candidates under review (tools/mcp/sketchfab.sh), not vendored
+assets/vendor/_review/

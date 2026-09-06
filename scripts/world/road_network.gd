@@ -65,7 +65,16 @@ func _ready() -> void:
 
 ## Lamp posts along the streets (asphalt with a kerb): one every LAMP_SPACING metres on the right
 ## side, alternating sides on long streets. Dark by day; set_lit turns the lamps on.
+const LAMP_MODEL := "res://assets/vendor/sketchfab/street_lamp.glb"   # pinokio21, CC BY (THIRD_PARTY.md)
+
+
 func _street_lights(terrain: Terrain3D) -> void:
+	var lamp_scene: PackedScene = load(LAMP_MODEL) if ResourceLoader.exists(LAMP_MODEL) else null
+	var lamp_bounds := AABB()
+	if lamp_scene:
+		var probe: Node3D = lamp_scene.instantiate()
+		lamp_bounds = Interiors._bounds(probe)   # the arm points to -X in the model, the base sits at y 0
+		probe.free()
 	var pole_mesh := CylinderMesh.new()
 	pole_mesh.top_radius = 0.06
 	pole_mesh.bottom_radius = 0.09
@@ -99,15 +108,30 @@ func _street_lights(terrain: Terrain3D) -> void:
 				var h: float = terrain.data.get_height(gp)
 				if not is_nan(h):
 					var base := Vector3(at.x, h - global_position.y, at.y)
-					var pole := MeshInstance3D.new()
-					pole.mesh = pole_mesh
-					pole.material_override = pole_mat
-					pole.position = base + Vector3(0, LAMP_HEIGHT / 2.0, 0)
-					add_child(pole)
-					var head := MeshInstance3D.new()
+					var toward := Vector2(-dir.y, dir.x) * -side   # across the road, from the lamp
+					var arm := toward * 0.35   # the head leans over the road
+					if lamp_scene and lamp_bounds.size.y > 0.01:
+						# the vendored lamp: its height fitted to LAMP_HEIGHT, its -X arm turned over the road
+						var k := LAMP_HEIGHT / lamp_bounds.size.y
+						var model: Node3D = lamp_scene.instantiate()
+						model.scale = Vector3.ONE * k
+						model.position = Vector3(-(lamp_bounds.position.x + lamp_bounds.size.x) * k, -lamp_bounds.position.y * k, -(lamp_bounds.position.z + lamp_bounds.size.z * 0.5) * k)
+						var turn := Node3D.new()
+						turn.add_child(model)
+						turn.position = base
+						turn.rotation.y = atan2(toward.x, toward.y) + PI / 2.0
+						add_child(turn)
+						arm = toward * maxf(lamp_bounds.size.x * k - 0.2, 0.3)
+						head_mesh.size = Vector3(0.3, 0.08, 0.2)
+					else:
+						var pole := MeshInstance3D.new()
+						pole.mesh = pole_mesh
+						pole.material_override = pole_mat
+						pole.position = base + Vector3(0, LAMP_HEIGHT / 2.0, 0)
+						add_child(pole)
+					var head := MeshInstance3D.new()   # the glowing lamp itself, also over the model's head
 					head.mesh = head_mesh
 					head.material_override = head_mat
-					var arm := Vector2(-dir.y, dir.x) * -side * 0.35   # the head leans over the road
 					head.position = base + Vector3(arm.x, LAMP_HEIGHT - 0.1, arm.y)
 					head.rotation.y = -atan2(dir.y, dir.x)
 					add_child(head)

@@ -139,7 +139,8 @@ static func _mesh(kind: String) -> ArrayMesh:
 	var mesh := st.commit()
 	var mat := ShaderMaterial.new()
 	mat.shader = load("res://assets/shaders/crop.gdshader")
-	mat.set_shader_parameter("tex", _texture(plant))
+	var baked := "res://assets/textures/crops/%s.png" % kind   # cards baked from the Sketchfab farm plants (tools/godot/bake_cards.tscn)
+	mat.set_shader_parameter("tex", load(baked) if ResourceLoader.exists(baked) else _texture(plant))
 	mesh.surface_set_material(0, mat)
 	_meshes[kind] = mesh
 	return mesh

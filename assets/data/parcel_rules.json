@@ -63,6 +63,14 @@
         "TRANSPORDIMAA"
       ],
       "kit": null
+    },
+    {
+      "id": "farm",
+      "purpose": [
+        "MAATULUNDUSMAA"
+      ],
+      "min_area": 20000,
+      "kit": "farm"
     }
   ]
 }

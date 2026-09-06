@@ -74,6 +74,14 @@ its design documents in the repo root describe that version.
 - Poly Pizza downloads cannot be scripted (403 on the file host); the user saves the glb by hand into
   `assets/vendor/polypizza/<name>.glb`, then add a THIRD_PARTY.md row (Kenney and Quaternius there are
   CC0, "Poly by Google" is CC BY 3.0). Scale every vendored model from its bounds (`Interiors._bounds`).
+- Sketchfab is scriptable: `make mcp` builds the MCP server (`sketchfab-search`, `-model-details`,
+  `-download`; token in the ignored `sketchfab.token`). The MCP omits the licence: check it with
+  `GET https://api.sketchfab.com/v3/models/<uid>` (`license.label`); only CC BY / CC0 ship, "Free
+  Standard" forbids redistribution. Models go to `assets/vendor/sketchfab/<name>.glb` with a row in
+  `CREDITS.md` there and in THIRD_PARTY.md. Packs are split into one glb per model with
+  `blender --background --python tools/blender/split_glb.py -- <pack.glb> <out_dir> "<name>=<regex>" ...`;
+  the download tool needs the output directory to exist. Sketchfab exports are often in cm or with
+  a scaled root: never assume metres, fit from bounds.
 - "Resource file not found: res://" and "Error loading resource: ''" right after a pack switch, with no
   GDScript backtrace: Terrain3D reading a downloaded tile's still-empty data directory on its first
   visit. Harmless; the region is built and saved right after.

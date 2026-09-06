@@ -232,6 +232,14 @@ and play structure (more of them on bigger grounds). A `court` kit lays a tennis
 parcel's long side (two on big plots, a basketball court beyond); the purpose does not say where
 courts are, so a pack names them in its own `parcel_rules.json` (`extend_global: true`, a rule with
 `tunnus`, optionally `at: [x, z]` and `yaw` to pin the spot).
+Sketchfab models (CC BY, `assets/vendor/sketchfab/CREDITS.md`) stand in for the procedural props:
+street lights (`RoadNetwork._street_lights`), park benches (`ParcelKit._bench`), most traffic cars
+(`TrafficAgent._make_sketchfab_car`, fitted to real lengths; the Kenney kit keeps vans, taxis and
+trucks), junipers (`assets/vegetation/tree_juniper.tscn`), and the `farm` parcel kit: hay bales in a
+row across each PRIA grassland field on a MAATULUNDUSMAA unit and a tractor by it. Crop cards for
+potato, maize and legume fields are baked from the farm-plants pack with `tools/godot/bake_cards.tscn`
+into `assets/textures/crops/<kind>.png`; kinds without a card keep the procedural texture.
+
 `tools/godot/model_preview.tscn -- --dir=res://assets/vendor/polypizza/ --fit=2` renders a vendored
 directory in a row, each model scaled to `--fit` metres.
 
