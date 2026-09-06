@@ -54,7 +54,8 @@ flowchart LR
     ADS[in-ADS gazetteer]
   end
   EHR[Building Register: year, storeys, materials, addresses]
-  ARI[e-Business Register CSV: companies by address]
+  ARI[e-Business Register: companies by address, activity, capital, structure]
+  EMTA[Tax Board quarterly: taxes, turnover, employees]
   PRIA[PRIA field register WFS: fields and declared crops]
   OSM[OpenStreetMap: bus stops]
   RSS[ERR and Postimees RSS, Ametlikud Teadaanded]
@@ -66,7 +67,7 @@ flowchart LR
   ETAKB & EHR & LOD2 --> FB[fetch_buildings.py] --> BJ[(buildings.json)]
   ETAKR --> FR[fetch_roads.py] --> RJ[(roads.json)]
   KAT --> FP[fetch_parcels.py] --> PJ[(parcels.json)] --> MK[market.py] --> MJ[(market.json)]
-  ARI --> FTE[fetch_tenants.py] --> TEJ[(tenants.json)]
+  ARI & EMTA --> FTE[fetch_tenants.py] --> TEJ[(tenants.json)]
   PRIA --> FF[fetch_fields.py] --> FJ[(fields_2026.json)]
   OSM & RJ --> FS[fetch_stops.py] --> SJ[(stops.json)]
   PJ & BJ --> FTE

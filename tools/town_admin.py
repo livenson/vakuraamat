@@ -135,7 +135,8 @@ def seed(site, server, db, debug, root=ROOT):
         for tunnus, ts in by_tunnus.items():
             c.call("clear_tenants", tunnus)
             for t in ts:
-                c.call("seed_tenant", tunnus, t["name"], str(t["registry_code"]), t.get("legal_form") or "", t.get("status") or "", t.get("since") or "")
+                c.call("seed_tenant", tunnus, t["name"], str(t["registry_code"]), t.get("legal_form") or "", t.get("status") or "", t.get("since") or "",
+                       t.get("sector") or "", int(t.get("employees") or 0), int(t.get("turnover") or 0), t.get("health") or "")
                 nt += 1
     log(f"{nt} tenants seeded")
     ns = 0

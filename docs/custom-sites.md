@@ -499,3 +499,16 @@ space and the service cache (`GET /cache`). Remove moves a pack to the system tr
 press; the current world cannot be removed. `tools/godot/menu_shot.tscn -- --locations --bottom
 --query=<place>` screenshots the page.
 
+## Companies: what the register and the Tax Board add
+
+`tenants.json` rows carry, beside the name and address: `emtak` (code, text, NACE, the game's
+`sector`: farm, industry, construction, trade, transport, hospitality, media, finance, property,
+services, public, culture), `capital`, `web`, `employees`, `turnover` (last four Tax Board
+quarters), `taxes`, `employees_hist`, `quarters`, `board_size`, `shareholders`, `owner_managed`,
+`owners` (the register's hashed person ids, used only to link companies sharing an owner; never
+shown), `deleted`, `report_overdue` and `health` (sound, watch, distressed). The strongest tenant
+moves a parcel's rent by 0.8 to 1.3 (`rules::tenant_factor_permille`, mirrored in
+`LocalLedger`). The register dumps are slimmed once per download; a tile job then takes seconds.
+`python3 tools/pipeline/fetch_tenants.py --site <id> --stats` prints the sector histogram.
+Offline play reads the pack's `news.json` into the book (the tile service writes one per world).
+

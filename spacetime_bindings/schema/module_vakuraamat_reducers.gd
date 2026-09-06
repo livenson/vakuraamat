@@ -120,8 +120,12 @@ func seed_structure(id: String, cost: int, rent_bonus: int, requires: String, pu
 ## 3. legal_form: String [br]
 ## 4. status: String [br]
 ## 5. since: String [br]
-func seed_tenant(tunnus: String, name: String, registry_code: String, legal_form: String, status: String, since: String) -> SpacetimeDBReducerCall:
-	return _client.call_reducer('seed_tenant', [tunnus, name, registry_code, legal_form, status, since], [&'string', &'string', &'string', &'string', &'string', &'string'], &'')
+## 6. sector: String [br]
+## 7. employees: int [br]
+## 8. turnover: int [br]
+## 9. health: String [br]
+func seed_tenant(tunnus: String, name: String, registry_code: String, legal_form: String, status: String, since: String, sector: String, employees: int, turnover: int, health: String) -> SpacetimeDBReducerCall:
+	return _client.call_reducer('seed_tenant', [tunnus, name, registry_code, legal_form, status, since, sector, employees, turnover, health], [&'string', &'string', &'string', &'string', &'string', &'string', &'string', &'u32', &'u64', &'string'], &'')
 
 ## 0. name: String [br]
 func set_name(name: String) -> SpacetimeDBReducerCall:

@@ -94,6 +94,30 @@ func find_by_arrears(value: int) -> Array[VakuraamatTenant]:
 func first_by_arrears(value: int) -> VakuraamatTenant:
 	return first_by(&"arrears", value)
 
+func find_by_sector(value: String) -> Array[VakuraamatTenant]:
+	return find_by(&"sector", value)
+
+func first_by_sector(value: String) -> VakuraamatTenant:
+	return first_by(&"sector", value)
+
+func find_by_employees(value: int) -> Array[VakuraamatTenant]:
+	return find_by(&"employees", value)
+
+func first_by_employees(value: int) -> VakuraamatTenant:
+	return first_by(&"employees", value)
+
+func find_by_turnover(value: int) -> Array[VakuraamatTenant]:
+	return find_by(&"turnover", value)
+
+func first_by_turnover(value: int) -> VakuraamatTenant:
+	return first_by(&"turnover", value)
+
+func find_by_health(value: String) -> Array[VakuraamatTenant]:
+	return find_by(&"health", value)
+
+func first_by_health(value: String) -> VakuraamatTenant:
+	return first_by(&"health", value)
+
 func _emit_inserted(row: _ModuleTableType) -> void:
 	inserted.emit(row as VakuraamatTenant)
 

@@ -78,6 +78,9 @@ its design documents in the repo root describe that version.
 - Poly Pizza downloads cannot be scripted (403 on the file host); the user saves the glb by hand into
   `assets/vendor/polypizza/<name>.glb`, then add a THIRD_PARTY.md row (Kenney and Quaternius there are
   CC0, "Poly by Google" is CC BY 3.0). Scale every vendored model from its bounds (`Interiors._bounds`).
+- Company data: `tenants.json` keeps the register's people files as structure only (`board_size`,
+  `shareholders`, `owners` = hashed ids for links). Never print an `owners` entry, never add names,
+  e-mails or phones; `make validate` rejects them.
 - Sketchfab is scriptable: `make mcp` builds the MCP server (`sketchfab-search`, `-model-details`,
   `-download`; token in the ignored `sketchfab.token`). The MCP omits the licence: check it with
   `GET https://api.sketchfab.com/v3/models/<uid>` (`license.label`); only CC BY / CC0 ship, "Free

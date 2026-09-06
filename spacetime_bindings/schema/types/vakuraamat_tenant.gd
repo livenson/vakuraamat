@@ -6,7 +6,7 @@ class_name VakuraamatTenant extends _ModuleTableType
 const module_name : String = "Vakuraamat"
 const table_names: Array[StringName] = [&'tenant']
 const PRIMARY_KEY: StringName = &"id"
-const BSATN_TYPES: Dictionary[StringName, StringName] = { &"id": &"u64", &"tunnus": &"string", &"name": &"string", &"registry_code": &"string", &"legal_form": &"string", &"status": &"string", &"since": &"string", &"arrears": &"u64" }
+const BSATN_TYPES: Dictionary[StringName, StringName] = { &"id": &"u64", &"tunnus": &"string", &"name": &"string", &"registry_code": &"string", &"legal_form": &"string", &"status": &"string", &"since": &"string", &"arrears": &"u64", &"sector": &"string", &"employees": &"u32", &"turnover": &"u64", &"health": &"string" }
 
 @export var id: int
 @export var tunnus: String
@@ -16,6 +16,10 @@ const BSATN_TYPES: Dictionary[StringName, StringName] = { &"id": &"u64", &"tunnu
 @export var status: String
 @export var since: String
 @export var arrears: int
+@export var sector: String
+@export var employees: int
+@export var turnover: int
+@export var health: String
 
 ## 0. id: int[br]
 ## 1. tunnus: String[br]
@@ -25,7 +29,11 @@ const BSATN_TYPES: Dictionary[StringName, StringName] = { &"id": &"u64", &"tunnu
 ## 5. status: String[br]
 ## 6. since: String[br]
 ## 7. arrears: int[br]
-static func create(p_id: int, p_tunnus: String, p_name: String, p_registry_code: String, p_legal_form: String, p_status: String, p_since: String, p_arrears: int) -> VakuraamatTenant:
+## 8. sector: String[br]
+## 9. employees: int[br]
+## 10. turnover: int[br]
+## 11. health: String[br]
+static func create(p_id: int, p_tunnus: String, p_name: String, p_registry_code: String, p_legal_form: String, p_status: String, p_since: String, p_arrears: int, p_sector: String, p_employees: int, p_turnover: int, p_health: String) -> VakuraamatTenant:
 	var result: VakuraamatTenant = VakuraamatTenant.new()
 	result.id = p_id
 	result.tunnus = p_tunnus
@@ -35,4 +43,8 @@ static func create(p_id: int, p_tunnus: String, p_name: String, p_registry_code:
 	result.status = p_status
 	result.since = p_since
 	result.arrears = p_arrears
+	result.sector = p_sector
+	result.employees = p_employees
+	result.turnover = p_turnover
+	result.health = p_health
 	return result
