@@ -290,3 +290,15 @@ UI_BUILDING,Hoone,Building
 UI_FLOORS,%d korrust,%d floors
 NOTICE_ENTERED,Sees: %s,Inside: %s
 MENU_PACKS_COUNT,%d kohta,%d places
+MENU_ESTIMATING,Hindan allalaadimist...,Estimating the download...
+MENU_ESTIMATE,"Allalaadimine umbes %s (%s juba vahemälus), aeg umbes %s: laadimine %s ja töötlus %s. Kettal vaba %s.","Download about %s (%s already cached), roughly %s: %s to download and %s to process. %s free on disk."
+MENU_ESTIMATE_UNKNOWN,Allalaadimise mahtu ei õnnestunud hinnata.,The download size could not be estimated.
+MENU_LOW_DISK,"Kettal on vaba vaid %s; maailma jaoks on vaja vähemalt %s. Kustuta vanu maailmu jaotisest Salvestatud.","Only %s free on disk; a world needs at least %s. Remove old worlds under Storage."
+MENU_STORAGE,Salvestatud maailmad,Storage
+MENU_STORAGE_LINE,"%s paigaldatud maailmades, %s naabruse ruutudes, kettal vaba %s","%s in installed worlds, %s in neighbour tiles, %s free on disk"
+MENU_SERVICE_CACHE,"Kaarditeenuse vahemälu: %s (%s)","Tile service cache: %s (%s)"
+MENU_NEIGHBOUR_TILES,"Naabruse ruudud (%d)","Neighbour tiles (%d)"
+MENU_DELETE,Kustuta,Remove
+MENU_CONFIRM_DELETE,Kindlasti kustuta,Really remove
+MENU_DELETE_ALL_TILES,Kustuta kõik naabruse ruudud,Remove all neighbour tiles
+MENU_REMOVED,Prügikasti viidud.,Moved to the trash.

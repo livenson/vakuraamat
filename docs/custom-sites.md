@@ -471,3 +471,20 @@ bonus and the purposes they may stand on; the module and the offline ledger both
 
 Every data source a pack uses gets a row in `THIRD_PARTY.md`; the Maa-amet attribution is
 shown in the menu and must stay, and the codex names the register, notice and news sources.
+
+## The Locations page: search, estimate, storage
+
+Typing in the search field asks the Maa-amet in-ADS gazetteer after a short pause and lists up to
+six places; Search or Enter does the same at once. Picking a place fills the name and asks the
+tile service for an estimate (`GET /estimate?x&y&size`): it resolves the tile's DTM and nDSM
+sheets, sends a HEAD request for each one not yet in `data_raw/`, and adds the orthophoto; the
+answer carries the bytes, what is cached, the service's last measured download rate and the mean
+duration of its past jobs (`data_raw/service_stats.json`). Creating a world is refused when the
+game's disk has under 1 GB free or the service's under 2 GB.
+
+The Storage section lists installed worlds with their size (site files, tile files and built region
+data, the downloaded zip), the streamed neighbour tiles (`t<E>_<N>` packs) as one line, the free
+space and the service cache (`GET /cache`). Remove moves a pack to the system trash after a second
+press; the current world cannot be removed. `tools/godot/menu_shot.tscn -- --locations --bottom
+--query=<place>` screenshots the page.
+

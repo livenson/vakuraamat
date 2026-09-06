@@ -16,6 +16,10 @@ var _results: VBoxContainer
 var _name_edit: LineEdit
 var _query: LineEdit
 var _service_box: VBoxContainer
+var _estimate: Label
+var _suggest_timer: Timer
+var _suggest_serial := 0
+var _storage_box: VBoxContainer
 
 
 func _ready() -> void:
@@ -180,6 +184,8 @@ func _build_locations_panel() -> void:
 	_section(list, "MENU_AVAILABLE")
 	var saved := SaveManager.saved_site()
 	for id in Sites.available:
+		if _is_tile_pack(id):
+			continue   # streamed neighbour tiles are ground, not worlds to start in (see Storage)
 		var m := Sites.manifest_for(id)
 		var t: Dictionary = m.get("terrain", {})
 		var tags := [tr("MENU_INSTALLED") if Sites.is_user_pack(id) else tr("MENU_SHIPPED")]
@@ -225,11 +231,14 @@ func _build_locations_panel() -> void:
 	_query.placeholder_text = "Kvissentali tee, Tartu"
 	_query.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_query.text_submitted.connect(func(_t): _search())
+	_query.text_changed.connect(_on_query_changed)   # suggestions while typing
 	srow.add_child(_query)
 	_small(srow, "MENU_SEARCH", _search)
 	_small(srow, "MENU_USE_MY_LOCATION", _use_my_location)
 	_results = VBoxContainer.new()
 	list.add_child(_results)
+	_estimate = BookTheme.label("", "DetailLabel", list)
+	_estimate.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var nrow := HBoxContainer.new()
 	list.add_child(nrow)
 	var nl := Label.new()
@@ -244,6 +253,13 @@ func _build_locations_panel() -> void:
 			return
 		var n := _name_edit.text.strip_edges()
 		_create(n if n != "" else str(_picked.name), float(_picked.x), float(_picked.y)))
+
+	# --- storage: what created worlds and streamed tiles take on disk, and how to drop them
+	_section(list, "MENU_STORAGE")
+	_storage_box = VBoxContainer.new()
+	_storage_box.add_theme_constant_override("separation", 6)
+	list.add_child(_storage_box)
+	_fill_storage()
 
 	# --- town (the shared ledger)
 	_section(list, "MENU_TOWN")
@@ -367,19 +383,69 @@ func _show_results(results: Array) -> void:
 		b.theme_type_variation = "TextButton"
 		b.text = "%s   (%d, %d)" % [r.name, r.x, r.y]
 		b.pressed.connect(func():
-			_picked = r
-			_name_edit.text = str(r.name).split(",")[-1].strip_edges() if "," in str(r.name) else str(r.name)
+			_pick(r)
 			_status.text = "%s: %d, %d" % [r.name, r.x, r.y])
 		_results.add_child(b)
 
 
+## A chosen place: the name field follows it and the service estimates its download.
+func _pick(r: Dictionary) -> void:
+	_picked = r
+	_name_edit.text = str(r.name).split(",")[-1].strip_edges() if "," in str(r.name) else str(r.name)
+	_show_estimate(float(r.x), float(r.y))
+
+
+func _show_estimate(x: float, y: float) -> void:
+	if not is_instance_valid(_estimate):
+		return
+	_estimate.text = tr("MENU_ESTIMATING")
+	var e: Dictionary = await Locator.estimate(x, y)
+	if not is_instance_valid(_estimate) or _picked.is_empty() or float(_picked.x) != x:
+		return
+	if e.is_empty():
+		_estimate.text = tr("MENU_ESTIMATE_UNKNOWN")
+		return
+	var free := Locator.free_bytes()
+	var total := float(e.get("seconds_download", 0)) + float(e.get("seconds_process", 0))
+	_estimate.text = tr("MENU_ESTIMATE") % [Locator.fmt_bytes(float(e.get("bytes", 0))), Locator.fmt_bytes(float(e.get("cached_bytes", 0))),
+		Locator.fmt_seconds(total), Locator.fmt_seconds(float(e.get("seconds_download", 0))), Locator.fmt_seconds(float(e.get("seconds_process", 0))),
+		Locator.fmt_bytes(float(free)) if free >= 0 else "?"]
+	if free >= 0 and free < Locator.MIN_FREE_BYTES:
+		_estimate.text += "  " + tr("MENU_LOW_DISK") % [Locator.fmt_bytes(float(free)), Locator.fmt_bytes(float(Locator.MIN_FREE_BYTES))]
+
+
+## Suggestions while typing: a short pause after the last key, then the gazetteer; late answers to
+## an older query are dropped.
+func _on_query_changed(text: String) -> void:
+	if _suggest_timer == null:
+		_suggest_timer = Timer.new()
+		_suggest_timer.one_shot = true
+		_suggest_timer.wait_time = 0.35
+		add_child(_suggest_timer)
+		_suggest_timer.timeout.connect(_suggest)
+	if text.strip_edges().length() < 3:
+		return
+	_suggest_timer.start()
+
+
+func _suggest() -> void:
+	_suggest_serial += 1
+	var serial := _suggest_serial
+	var q := _query.text
+	var results: Array = await Locator.geocode(q)
+	if serial != _suggest_serial or not is_instance_valid(_results) or _query.text != q:
+		return
+	if not results.is_empty():
+		_show_results(results)
+
+
 func _search() -> void:
 	_status.text = "..."
+	_suggest_serial += 1   # a submitted search outranks pending suggestions
 	var results: Array = await Locator.geocode(_query.text)
 	_show_results(results)
 	if results.size() == 1:
-		_picked = results[0]
-		_name_edit.text = str(results[0].name).split(",")[-1].strip_edges()
+		_pick(results[0])
 
 
 func _use_my_location() -> void:
@@ -392,8 +458,62 @@ func _use_my_location() -> void:
 		_status.text = tr("MENU_OUTSIDE_ESTONIA") + "  (%s)" % d.name
 		return
 	_show_results([d])
-	_picked = d
+	_pick(d)
 	_name_edit.text = str(d.name).split(",")[0].strip_edges()
+
+
+## The storage section: each installed world with its size and a Remove button (two presses),
+## the streamed neighbour tiles as one line, the service's cache, and the free space.
+func _fill_storage() -> void:
+	for c in _storage_box.get_children():
+		c.queue_free()
+	var worlds := 0
+	var tiles := 0
+	var tile_ids: Array[String] = []
+	for id in Sites.available:
+		if not Sites.is_user_pack(id):
+			continue
+		var n: int = Locator.pack_bytes(id).total
+		if _is_tile_pack(id):
+			tiles += n
+			tile_ids.append(id)
+			continue
+		worlds += n
+		var row := _row(_storage_box, Sites.display_name(id), Locator.fmt_bytes(float(n)) + ("   " + tr("MENU_CURRENT") if id == Sites.active else ""))
+		if id != Sites.active:
+			_remove_button(row, [id])
+	if not tile_ids.is_empty():
+		var row := _row(_storage_box, tr("MENU_NEIGHBOUR_TILES") % tile_ids.size(), Locator.fmt_bytes(float(tiles)))
+		_remove_button(row, tile_ids, "MENU_DELETE_ALL_TILES")
+	var free := Locator.free_bytes()
+	var line := BookTheme.label(tr("MENU_STORAGE_LINE") % [Locator.fmt_bytes(float(worlds)), Locator.fmt_bytes(float(tiles)), Locator.fmt_bytes(float(free)) if free >= 0 else "?"], "DetailLabel", _storage_box)
+	line.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var cache: Dictionary = await Locator.service_cache()
+	if is_instance_valid(line) and not cache.is_empty():
+		line.text += "\n" + tr("MENU_SERVICE_CACHE") % [Locator.fmt_bytes(float(cache.get("bytes", 0))), str(cache.get("path", ""))]
+
+
+## A pack the streamer fetched for a neighbouring tile: t<E>_<N>.
+static func _is_tile_pack(id: String) -> bool:
+	return id.begins_with("t") and id.substr(1).replace("_", "").is_valid_int()
+
+
+## Remove asks twice: the first press turns the button into "Really remove".
+func _remove_button(row: HBoxContainer, ids: Array, key: String = "MENU_DELETE") -> void:
+	var b := Button.new()
+	b.text = tr(key)
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	b.set_meta("armed", false)
+	b.pressed.connect(func():
+		if not b.get_meta("armed"):
+			b.set_meta("armed", true)
+			b.text = tr("MENU_CONFIRM_DELETE")
+			return
+		for id in ids:
+			Locator.remove_pack(id)
+		_status.text = tr("MENU_REMOVED")
+		_fill_storage())
+	row.add_child(b)
 
 
 ## Generate (or fetch from the service cache) a pack for a place and start a new game there.

@@ -73,7 +73,10 @@ func _ready() -> void:
 	body.collision_layer = 1
 	body.collision_mask = 0
 	var shape := CollisionShape3D.new()
-	shape.shape = mesh.create_trimesh_shape()
+	# walls and roof only: sills, casings and trim in the collider snagged a player walking along a wall
+	var solid: ArrayMesh = _walls.commit()
+	solid = _roof.commit(solid)
+	shape.shape = solid.create_trimesh_shape()
 	body.add_child(shape)
 	add_child(body)
 
