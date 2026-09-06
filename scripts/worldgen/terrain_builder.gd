@@ -22,7 +22,7 @@ const MATERIALS := [
 # Vegetation rules. Control-map ids: 0 meadow, 1 field, 2 canopy/forest, 3 gravel, 4 bare soil.
 # "height" = [min, max] canopy height (m, from canopy.r32) the rule applies to; trees are
 # scaled so the model (MODEL_HEIGHT m tall) matches the measured canopy height.
-const MODEL_HEIGHT := {"tree_birch": 18.8, "tree_pine": 20.7, "tree_spruce": 22.2, "tree_juniper": 4.3, "tree_juniper_dead": 5.6}
+const MODEL_HEIGHT := {"tree_birch": 18.8, "tree_pine": 20.7, "tree_spruce": 4.3, "tree_juniper": 4.3, "tree_juniper_dead": 5.6}
 const RULES := [
 	{"scene": "tree_pine", "ids": [2], "height": Vector2(13.0, 40.0), "per_100m2": 1.6, "scale": Vector2(0.9, 1.1), "range": 1200.0, "lod": [110.0, 1200.0], "shadows": true},
 	{"scene": "tree_spruce", "ids": [2], "height": Vector2(3.0, 40.0), "per_100m2": 1.3, "scale": Vector2(0.9, 1.1), "range": 1200.0, "lod": [110.0, 1200.0], "shadows": true},
@@ -361,7 +361,7 @@ func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Arr
 		pos.y = terrain.data.get_height(pos)
 		if is_nan(pos.y):
 			continue
-		var s := clampf(h / MODEL_HEIGHT[scene], 0.2, 3.0)
+		var s := clampf(h / MODEL_HEIGHT[scene], 0.2, 6.0)   # the spruce model is 4.3 m: a 25 m tree is 5.8x
 		var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * s)
 		var i: int = rule_index[scene]
 		batches[i].append(Transform3D(basis, pos))
@@ -436,7 +436,7 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 					pos.y = terrain.data.get_height(pos)
 					var s: float = rng.randf_range(r.scale.x, r.scale.y)
 					if canopy and MODEL_HEIGHT.has(r.scene) and h > 0.0:
-						s *= clampf(h / MODEL_HEIGHT[r.scene], 0.2, 3.0)   # low canopy: young trees, not bushes
+						s *= clampf(h / MODEL_HEIGHT[r.scene], 0.2, 6.0)   # low canopy: young trees, not bushes
 					var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * s)
 					batches[i].append(Transform3D(basis, pos))
 					var v: float = rng.randf_range(0.72, 1.08)

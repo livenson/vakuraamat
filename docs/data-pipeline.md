@@ -111,7 +111,7 @@ bake). Large stable binaries (models, textures, addon binaries) are tracked with
 | `make scenes SITE=<id>` | `sites/<id>/scenes/era_2026.tscn` | `scenes.json`, `layout.json`, the JSONs |
 | `make import` | Terrain3D region data and assets | the tile's inputs |
 | `make scatter` | vegetation instances in the region file | control map, `canopy.r32`, layout exclusions |
-| `make trees` | `assets/models/trees/*.glb`, `*_lod.tscn`, impostor atlases | Blender Sapling presets |
+| `make trees` | `assets/models/trees/*.glb`, `*_lod.tscn`, impostor atlases | Blender Sapling presets; a vendored `<name>_src.glb` (the Sketchfab spruce) wins over the generated tree and is merged, pruned and baked the same way |
 | `make props` | boundary stone, figures, prepared vegetation scenes | Blender scripts in `tools/blender` |
 | `make validate` | report | every `sites/*/` (no Godot) |
 | `make server`, `make town SITE=<id>`, `make news` | a local SpacetimeDB, a seeded town, the feed | the pack |
