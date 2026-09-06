@@ -37,12 +37,14 @@ Business Register open data with Godot 4.7, GDScript, Terrain3D and SpacetimeDB.
 Builds for macOS, Windows and Linux are on the [releases page](https://github.com/livenson/vakuraamat/releases)
 (GitHub Actions, `.github/workflows/build.yml`): unzip and run; the macOS app is not notarised, so
 run `xattr -dr com.apple.quarantine Vakuraamat.app` once or right-click and Open. A build plays the
-shipped packs; creating a world for another address needs the tile service from this repository.
+shipped packs and carries the tile service as a sidecar executable, so *Locations* turns any Estonian
+address into a world from the build itself (its packs and downloads live under the game's user
+directory).
 
 From the source tree:
 
 ```sh
-make setup                        # Homebrew tools (godot, blender, gdal, git-lfs), LFS pull, first Godot import
+make setup                        # Homebrew tools (godot, blender, uv, git-lfs), the pipeline's Python venv, LFS pull, first Godot import
 make tile                         # Maa-amet data for Palupera and its terrain (~10 min, network); SITE=<id> for another pack
 make news-local SITE=kvissentali  # optional: today's regional headlines and notices into the pack for offline play
 tools/play.sh                     # the tile service plus the game; tools/play.sh -- --site=kvissentali --windowed

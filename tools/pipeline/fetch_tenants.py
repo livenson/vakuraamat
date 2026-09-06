@@ -188,7 +188,8 @@ def fetch(site, root=ROOT, stats=False, refresh=False, max_age_days=7, keep_unma
     bpath = os.path.join(site_dir, "buildings.json")
     buildings = json.load(open(bpath)).get("buildings", []) if os.path.exists(bpath) else []
     idx = build_index(parcels, buildings)
-    zip_path, reg_date = download_register(os.path.join(root, "data_raw", "ariregister"), max_age_days, refresh)
+    import paths
+    zip_path, reg_date = download_register(paths.raw("ariregister"), max_age_days, refresh)
     t0 = time.time()
     st = {"scanned": 0, "in_ehak": 0, "fie_skipped": 0, "kept": 0, "exact": 0, "exact_ads": 0, "exact_address": 0, "exact_building": 0,
           "exact_farm": 0, "street": 0, "none": 0, "by_status": {}}

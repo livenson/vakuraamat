@@ -19,7 +19,8 @@ start_service() {  # name port script
     echo "$1 already running on $2"
     return
   fi
-  nohup python3 "$3" --port "$2" >>"$U/logs/$1.log" 2>&1 &
+  PY=python3; [ -x .venv-service/bin/python ] && PY=.venv-service/bin/python   # the pipeline's venv (make setup)
+  nohup "$PY" "$3" --port "$2" >>"$U/logs/$1.log" 2>&1 &
   echo "$1 started (pid $!, log $U/logs/$1.log)"
   i=0
   while ! curl -fs "http://127.0.0.1:$2/health" >/dev/null 2>&1; do

@@ -7,11 +7,11 @@ Writes sites/<site>/stops.json: {"attribution", "source", "fetched", "stops": [{
 road_kind, road_name, refs}]} in local metres (x east from the tile's west edge, z south from its north edge).
 Each stop is moved onto the nearest road segment's edge: `yaw` is the heading (radians, Godot's -Z forward,
 clockwise-positive about Y) a shelter faces to look across that road, `side` +1/-1 which side of the
-segment it stands on. WGS84 <-> L-EST97 goes through GDAL's gdaltransform (the pipeline needs GDAL anyway).
+segment it stands on. WGS84 <-> L-EST97 goes through pyproj.
 Estonia's national stop feed (peatus.ee GTFS) is offline in 2026 and the Tallinn feed covers Harju only, so
 OSM is the source; its ODbL licence asks for "© OpenStreetMap contributors" (THIRD_PARTY.md).
 """
-import argparse, json, math, os, subprocess, sys, time, urllib.parse, urllib.request
+import argparse, json, math, os, sys, time, urllib.parse, urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"]
@@ -25,12 +25,12 @@ def log(msg):
 
 
 def transform(points, s_srs, t_srs):
-    """[(a, b)] through gdaltransform; returns [(x, y)]."""
+    """[(a, b)] from one CRS to another (pyproj); returns [(x, y)]."""
     if not points:
         return []
-    inp = "\n".join(f"{a} {b}" for a, b in points) + "\n"
-    out = subprocess.run(["gdaltransform", "-s_srs", s_srs, "-t_srs", t_srs], input=inp, capture_output=True, text=True, check=True).stdout
-    return [tuple(float(v) for v in line.split()[:2]) for line in out.strip().splitlines()]
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import geo
+    return geo.transform_points(points, s_srs.split(":")[1], t_srs.split(":")[1])
 
 
 def overpass(south, west, north, east):

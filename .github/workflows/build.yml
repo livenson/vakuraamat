@@ -1,7 +1,7 @@
 # Playable builds for macOS, Windows and Linux: on a version tag (v*) they are attached to a GitHub
-# release; "Run workflow" builds them as artifacts. The exports carry the shipped packs (Kvissentali,
-# Palupera); creating a world for another address needs the tile service from the repository
-# (python3 tools/tile_service.py), which a build can point at through the Locations page.
+# release; "Run workflow" builds them as artifacts. Each carries the shipped packs (Kvissentali,
+# Palupera) and the tile-service sidecar (tools/service, PyInstaller), so a build creates worlds for
+# any address by itself; the Windows sidecar is built on Windows, the others on their own platform.
 # LFS objects (models, textures, Terrain3D binaries, ~450 MB) are cached between runs and
 # platforms so a build does not spend the LFS bandwidth quota; the export presets exclude the
 # vendored source scenes the game never loads.
@@ -31,7 +31,7 @@ jobs:
             path: build/Vakuraamat-macos.zip
             artifact: Vakuraamat-macos
           - preset: Windows Desktop
-            os: ubuntu-latest
+            os: windows-latest
             path: build/windows/Vakuraamat.exe
             artifact: Vakuraamat-windows
           - preset: Linux
@@ -53,6 +53,14 @@ jobs:
         run: |
           git lfs install --local
           git lfs pull --exclude="assets/vendor/forest_vegetation/Scenes/**,assets/vendor/forest_vegetation/Models/**"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: "Tile-service sidecar (PyInstaller: the pipeline with rasterio, pyogrio, shapely, pyproj)"
+        run: |
+          python -m pip install -q -r tools/service/requirements.txt
+          python -m PyInstaller --clean --noconfirm --distpath dist --workpath build/pyinstaller tools/service/tile_service.spec
+          ls -la dist
       - uses: chickensoft-games/setup-godot@v2
         with:
           version: ${{ env.GODOT_VERSION }}
@@ -67,10 +75,18 @@ jobs:
           mkdir -p "$(dirname '${{ matrix.path }}')"
           godot --headless --path . --export-release "${{ matrix.preset }}" "${{ matrix.path }}"
           ls -la "$(dirname '${{ matrix.path }}')"
-      - name: "Bundle (Windows and Linux: the executable with its pck)"
+      - name: "Bundle (Windows and Linux: the executable, its pck and the sidecar)"
         if: matrix.preset != 'macOS'
         run: |
+          cp dist/tile_service* "$(dirname '${{ matrix.path }}')/"
           cd "$(dirname '${{ matrix.path }}')" && zip -r "../${{ matrix.artifact }}.zip" . && cd - && ls -la build
+      - name: "Bundle (macOS: the sidecar into the app bundle)"
+        if: matrix.preset == 'macOS'
+        run: |
+          rm -rf build/mac && mkdir -p build/mac && cd build/mac && unzip -q "../../${{ matrix.path }}"
+          cp ../../dist/tile_service Vakuraamat.app/Contents/MacOS/ && chmod +x Vakuraamat.app/Contents/MacOS/tile_service
+          codesign --force --deep --sign - Vakuraamat.app || true
+          rm -f "../../${{ matrix.path }}" && zip -qry "../../${{ matrix.path }}" Vakuraamat.app && cd ../.. && ls -la build
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
@@ -90,6 +106,6 @@ jobs:
         with:
           files: dist/**/*.zip
           body: |
-            Playable builds with the shipped packs. macOS: the app is not notarised; after unzipping run
-            `xattr -dr com.apple.quarantine Vakuraamat.app` once, or right-click and Open. Creating a
-            world for another address needs the tile service from the repository (see README).
+            Playable builds with the shipped packs and the tile-service sidecar (any address in Estonia
+            becomes a world from the Locations page). macOS: the app is not notarised; after unzipping run
+            `xattr -dr com.apple.quarantine Vakuraamat.app` once, or right-click and Open.

@@ -153,16 +153,46 @@ func ensure_service() -> bool:
 	return await spawn_local("tools/tile_service.py", 8765, service_url() + "/health")
 
 
-## Start one of the Python services (tools/*.py) as a background process when the game runs from
-## the source tree and the configured URL is local; exported builds and remote URLs leave it alone.
-## Waits until /health answers (up to ~15 s). The process outlives the game; tools/play.sh manages it.
+## The tile-service sidecar shipped beside an exported game (tools/service/build.sh): next to the
+## executable, or inside the macOS bundle's MacOS directory. "" when there is none.
+static func sidecar_path() -> String:
+	var dir := OS.get_executable_path().get_base_dir()
+	for name in ["tile_service", "tile_service.exe"]:
+		if FileAccess.file_exists(dir.path_join(name)):
+			return dir.path_join(name)
+	return ""
+
+
+## Start the tile service as a background process when the configured URL is local: from the
+## source tree the Python script, in an exported build the sidecar executable (its packs and cache
+## under user://service). Remote URLs and headless tests leave it alone. Waits until /health answers
+## (up to ~15 s). From the source tree the process outlives the game (tools/play.sh manages it);
+## the sidecar ends with the game (killed on quit, and it watches the game's pid itself).
+var _sidecar_pid := -1
+
+
+func _exit_tree() -> void:
+	if _sidecar_pid > 0:
+		OS.kill(_sidecar_pid)
+
+
 func spawn_local(script_rel: String, port: int, health_url: String) -> bool:
-	if OS.has_feature("template") or DisplayServer.get_name() == "headless" or not (health_url.contains("127.0.0.1") or health_url.contains("localhost")):
-		return false   # exported builds, headless tests and remote services: never spawn
+	if DisplayServer.get_name() == "headless" or not (health_url.contains("127.0.0.1") or health_url.contains("localhost")):
+		return false   # headless tests and remote services: never spawn
+	var pid := -1
 	var script := ProjectSettings.globalize_path("res://" + script_rel)
-	if not FileAccess.file_exists(script):
+	var sidecar := sidecar_path()
+	if not OS.has_feature("template") and FileAccess.file_exists(script):
+		var venv := ProjectSettings.globalize_path("res://.venv-service/bin/python")   # the pipeline's venv (make setup)
+		pid = OS.create_process(venv if FileAccess.file_exists(venv) else "python3", [script, "--port", str(port)])
+	elif sidecar != "":
+		var work := ProjectSettings.globalize_path("user://service")
+		DirAccess.make_dir_recursive_absolute(work)
+		pid = OS.create_process(sidecar, ["--port", str(port), "--workspace", work, "--raw-dir", work.path_join("data_raw"), "--parent-pid", str(OS.get_process_id())])
+		_sidecar_pid = pid
+		script_rel = sidecar.get_file()
+	else:
 		return false
-	var pid := OS.create_process("python3", [script, "--port", str(port)])
 	if pid <= 0:
 		push_warning("could not start %s" % script_rel)
 		return false

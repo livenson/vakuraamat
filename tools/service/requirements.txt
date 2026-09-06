@@ -1,0 +1,8 @@
+# The tile service and pipeline as pip packages (no system GDAL): rasterio, pyogrio, shapely, pyproj wheels.
+numpy>=2.0
+pillow>=10
+rasterio>=1.4
+pyogrio>=0.10
+shapely>=2.0
+pyproj>=3.6
+pyinstaller>=6.10

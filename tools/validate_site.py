@@ -10,6 +10,9 @@ Warnings are for things that are probably unintended but not fatal.
 import argparse, csv, json, os, re, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
+import paths  # noqa: E402
+ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 
 
@@ -281,12 +284,12 @@ def validate(site, rep, root=ROOT):
         rep.warn("no scenes.json: the layer scene must be hand-made")
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--site", default="palupera")
     ap.add_argument("--all", action="store_true", help="validate every site under sites/")
     ap.add_argument("--root", default=ROOT, help="project root holding sites/ (default: the repo)")
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
     sites = sorted(d for d in os.listdir(os.path.join(a.root, "sites")) if os.path.exists(os.path.join(a.root, "sites", d, "site.json"))) if a.all else [a.site]
     failed = False
     for s in sites:

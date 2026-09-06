@@ -35,7 +35,7 @@ adapter interface are in `tools/pipeline/sources.py`; only Estonia is implemente
 ## Transformations
 
 1. **Terrain tile** (`make tile SITE=<id>`, or the tile service): `fetch_tile.py` finds the 1:10 000
-   sheets under the corners, downloads and mosaics the DTM, clips the square with GDAL, fills NoData,
+   sheets under the corners, downloads and mosaics the DTM, clips the square (rasterio), fills NoData,
    writes the raw float heightmap, fetches the orthophoto and the nDSM for the same extent and writes
    `terrain_meta.json` (extent, sheets, height range, sources, attribution).
 2. **Features** (`make features`): `extract_features.py` derives the village massing
@@ -81,12 +81,12 @@ the menu and packs the result as a zip the game installs under `user://`.
 | Godot | 4.7.2 stable | `brew install --cask godot` |
 | Terrain3D | 1.0.2 stable (vendored in `addons/terrain_3d`, MIT) | in the repo |
 | Sky3D | 2.1.0 (vendored in `addons/sky_3d`, MIT, pure GDScript) | in the repo |
-| GDAL | 3.13 | `brew install gdal` |
+| Python 3.12 venv with numpy, Pillow, rasterio, pyogrio, shapely, pyproj (`tools/service/requirements.txt`) | `.venv-service`, made by `make setup` (uv) | no system GDAL: the wheels carry it |
 | Blender | 5.2 LTS (only to regenerate props and trees) | `brew install --cask blender` |
 | Python 3 | any 3.9+ (stdlib only) | system |
 | SpacetimeDB | 2.10 CLI and a Rust toolchain (only for towns) | `make server` prints what is missing |
 
-QGIS is not needed: the whole clip and convert step is scripted with GDAL. First open: run
+QGIS is not needed: the whole clip and convert step is scripted with rasterio (`tools/pipeline/geo.py`). First open: run
 `godot --headless --path . --import` once (or open the project in the editor). Terrain3D's macOS
 binaries are unsigned; if Gatekeeper blocks them run `xattr -dr com.apple.quarantine addons/terrain_3d`.
 
@@ -136,8 +136,7 @@ python3 tools/pipeline/fetch_tile.py --site palupera        # or --name <tile> -
 
 Step 1 finds the 1:10 000 map sheets under the four corners (the sheet grid is downloaded once into
 `data_raw/`), POSTs the geoportal download form for each sheet's 1 m DTM GeoTIFF (~74 MB, cached),
-mosaics them with `gdalbuildvrt`, clips a square with `gdal_translate -projwin`, fills NoData with
-`gdal_fillnodata` and writes a raw float32 heightmap (Godot's PNG loader truncates 16-bit to 8-bit
+mosaics and clips them with `rasterio.merge`, fills NoData with `rasterio.fill` and writes a raw float32 heightmap (Godot's PNG loader truncates 16-bit to 8-bit
 and its EXR loader rejects GDAL's channel names). It then fetches the orthophoto from the `fotokaart`
 WMS (JPEG, at most 4096 px per request: 1024 m at 4096 px is 25 cm per pixel) and the nDSM.
 
@@ -200,3 +199,15 @@ Maa-amet open data, free for commercial use with attribution. In-game credit lin
 `terrain_meta.json`): "Map data: Maa- ja Ruumiamet (Estonian Land and Spatial Development Board),
 2026". Companies: e-Business Register open data, CC BY 4.0. Everything else is listed in
 `THIRD_PARTY.md`.
+
+## The tile service as a sidecar
+
+`make service` (`tools/service/build.sh`, PyInstaller) freezes `tools/tile_service.py` with the
+pipeline, rasterio, pyogrio, shapely, pyproj, the template pack and the rules into one executable
+in `dist/`. The CI build puts it beside the game (inside `Vakuraamat.app/Contents/MacOS` on macOS);
+an exported game starts it with `--workspace user://service --raw-dir user://service/data_raw`, so
+the Locations page works without the repository. From the source tree the game and `tools/play.sh`
+run `tools/tile_service.py` with the venv's Python instead. The service runs the fetch, the news
+feeder and the validation in-process (no subprocesses), and every download cache (sheets, register
+dumps, Tax Board, LOD2, trees) lives under one raw directory (`VAKURAAMAT_RAW_DIR`).
+
