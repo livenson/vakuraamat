@@ -14,6 +14,11 @@ config/name="Vakuraamat"
 config/description="Present-day property and business game on real Estonian ground: Maa-amet terrain, orthophoto, buildings and cadastre, PRIA fields, the business register; a shared town ledger for players in the same place. Any address becomes a world (site packs under sites/, created worlds under user://sites)."
 run/main_scene="res://scenes/ui/main_menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
+boot_splash/bg_color=Color(0.8627, 0.8353, 0.7569, 1)
+boot_splash/image="res://assets/branding/splash.png"
+boot_splash/fullsize=true
+boot_splash/use_filter=true
+config/icon="res://assets/branding/icon.png"
 
 [autoload]
 
