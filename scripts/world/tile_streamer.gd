@@ -209,6 +209,12 @@ func _load(loc: Vector2i) -> void:
 			_fail(loc, "no terrain data in " + tile_dir)
 			return
 		terrain.data.calc_height_range(true)
+	var probe: float = terrain.data.get_height(offset_of(loc) + Vector3(size * 0.5, 0.0, size * 0.5))
+	if is_nan(probe):
+		# the region is registered but answers no heights: never place a layer over a void
+		terrain.data.remove_region(terrain.data.get_region(loc), true)
+		_fail(loc, "region without heights at %s" % loc)
+		return
 	var root := Node3D.new()
 	root.name = "Tile_%d_%d" % [loc.x, loc.y]
 	root.position = offset_of(loc)
