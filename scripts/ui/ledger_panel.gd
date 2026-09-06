@@ -40,7 +40,7 @@ func setup(w: Node3D) -> void:
 	tabs = TabContainer.new()
 	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(tabs)
-	for key in ["UI_LEDGER_PARCELS", "UI_LEDGER_PLOT", "UI_LEDGER_PORTFOLIO", "UI_LEDGER_OFFERS", "UI_LEDGER_TOWN"]:
+	for key in ["UI_LEDGER_PARCELS", "UI_LEDGER_PLOT", "UI_LEDGER_PORTFOLIO", "UI_LEDGER_OFFERS", "UI_LEDGER_COMPANIES", "UI_LEDGER_TOWN"]:
 		var sc := ScrollContainer.new()
 		sc.name = key
 		sc.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -65,6 +65,7 @@ func fill() -> void:
 		1: _fill_plot()
 		2: _fill_portfolio()
 		3: _fill_offers()
+		4: _fill_companies()
 		_: _fill_town()
 
 
@@ -125,6 +126,139 @@ func _fill_parcels() -> void:
 		body.add_child(_lbl(tr("UI_LEDGER_MORE") % (rows.size() - MAX_ROWS), 13))
 
 
+## What the register and the Tax Board say about a company, on one line.
+func _company_facts(t: Dictionary) -> String:
+	var full := _full_row(t)
+	var bits: Array[String] = []
+	if full.get("emtak") and full.emtak.get("text"):
+		bits.append(str(full.emtak.text))
+	elif full.get("sector"):
+		bits.append(tr("SECTOR_" + str(full.sector).to_upper()))
+	if full.get("employees") != null and int(full.employees) > 0:
+		bits.append(tr("UI_EMPLOYEES") % int(full.employees))
+	if full.get("turnover") != null and int(full.turnover) > 0:
+		bits.append(tr("UI_TURNOVER") % Ledger.format_money(int(full.turnover)))
+	if full.get("taxes") != null and int(full.taxes) > 0:
+		bits.append(tr("UI_TAXES") % Ledger.format_money(int(full.taxes)))
+	if full.get("board_size") != null:
+		bits.append(tr("UI_BOARD") % int(full.board_size))
+	if full.get("owner_managed") == true:
+		bits.append(tr("UI_OWNER_MANAGED"))
+	if full.get("capital") != null and float(full.capital) >= 2500.0:
+		bits.append(tr("UI_CAPITAL") % Ledger.format_money(int(full.capital)))
+	if full.get("health") and str(full.health) != "sound":
+		bits.append(tr("HEALTH_" + str(full.health).to_upper()))
+	return " · ".join(bits)
+
+
+## The full tenants.json row of a ledger tenant (the ledger keeps the four game columns only).
+func _full_row(t: Dictionary) -> Dictionary:
+	var pack := Sites.active
+	var p := Ledger.parcel(str(t.get("tunnus", "")))
+	if not p.is_empty() and p.has("pack"):
+		pack = str(p.pack)
+	for r in Tenants.of(pack, str(t.get("tunnus", ""))):
+		if str(r.get("registry_code", "")) == str(t.get("registry_code", "")) and r.has("emtak"):
+			return r
+	if _tenant_file(pack).has(str(t.get("registry_code", ""))):
+		return _tenant_file(pack)[str(t.get("registry_code", ""))]
+	return t
+
+
+static var _tenant_files: Dictionary = {}
+
+
+static func _tenant_file(pack: String) -> Dictionary:
+	if not _tenant_files.has(pack):
+		var by_code := {}
+		var path := Sites.path_in(pack, "tenants.json")
+		if FileAccess.file_exists(path):
+			var d = JSON.parse_string(FileAccess.get_file_as_string(path))
+			if typeof(d) == TYPE_DICTIONARY:
+				for r in d.get("tenants", []):
+					by_code[str(r.get("registry_code", ""))] = r
+		_tenant_files[pack] = by_code
+	return _tenant_files[pack]
+
+
+# ---------------------------------------------------------------- companies
+
+## Every company of the tile with a plot, biggest employers first; a sector filter on top.
+var _sector_filter := ""
+
+
+func _fill_companies() -> void:
+	var body := _clear(_pages["UI_LEDGER_COMPANIES"])
+	var rows: Array = _tenant_file(Sites.active).values().filter(func(r): return r.get("match") == "exact" and r.get("tunnus") != null)
+	var sectors := {}
+	for r in rows:
+		if r.get("sector"):
+			sectors[str(r.sector)] = sectors.get(str(r.sector), 0) + 1
+	var bar := HFlowContainer.new()
+	bar.add_theme_constant_override("h_separation", 6)
+	body.add_child(bar)
+	var all := Button.new()
+	all.text = tr("UI_ALL") + " (%d)" % rows.size()
+	all.theme_type_variation = "TextButton" if _sector_filter != "" else ""
+	all.pressed.connect(func():
+		_sector_filter = ""
+		fill())
+	bar.add_child(all)
+	var keys := sectors.keys()
+	keys.sort_custom(func(a, b): return sectors[a] > sectors[b])
+	for k in keys:
+		var b := Button.new()
+		b.text = "%s (%d)" % [tr("SECTOR_" + str(k).to_upper()), sectors[k]]
+		b.theme_type_variation = "TextButton" if _sector_filter != k else ""
+		b.pressed.connect(func():
+			_sector_filter = str(k)
+			fill())
+		bar.add_child(b)
+	var shown: Array = rows.filter(func(r): return _sector_filter == "" or str(r.get("sector", "")) == _sector_filter)
+	shown.sort_custom(func(a, b):
+		var ea := int(a.get("employees", 0) if a.get("employees") != null else 0)
+		var eb := int(b.get("employees", 0) if b.get("employees") != null else 0)
+		if ea != eb:
+			return ea > eb
+		return int(a.get("turnover", 0) if a.get("turnover") != null else 0) > int(b.get("turnover", 0) if b.get("turnover") != null else 0))
+	var grid := GridContainer.new()
+	grid.columns = 5
+	grid.add_theme_constant_override("h_separation", 16)
+	grid.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	body.add_child(grid)
+	for h in ["UI_LEDGER_COL_COMPANY", "UI_LEDGER_COL_SECTOR", "UI_LEDGER_COL_EMPLOYEES", "UI_LEDGER_COL_TURNOVER", "UI_LEDGER_COL_ADDRESS"]:
+		var hl := _lbl(tr(h), 13, GOLD)
+		hl.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+		grid.add_child(hl)
+	for r in shown.slice(0, 120):
+		var nb := Button.new()
+		nb.text = str(r.get("name", ""))
+		nb.theme_type_variation = "TextButton"
+		nb.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		nb.clip_text = true
+		nb.custom_minimum_size = Vector2(280, 0)
+		nb.pressed.connect(func(): open_parcel(str(r.tunnus)))
+		if str(r.get("health", "")) == "distressed":
+			nb.add_theme_color_override("font_color", BookTheme.RUBRIC)
+		grid.add_child(nb)
+		var sl := _lbl(tr("SECTOR_" + str(r.get("sector", "")).to_upper()) if r.get("sector") else "-", 13)
+		sl.clip_text = true
+		sl.custom_minimum_size = Vector2(190, 0)
+		grid.add_child(sl)
+		var el := _lbl(str(int(r.employees)) if r.get("employees") != null and int(r.employees) > 0 else "-", 13)
+		el.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		el.custom_minimum_size = Vector2(80, 0)
+		grid.add_child(el)
+		var tl := _lbl(Ledger.format_money(int(r.turnover)) if r.get("turnover") != null and int(r.turnover) > 0 else "-", 13)
+		tl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+		tl.custom_minimum_size = Vector2(130, 0)
+		grid.add_child(tl)
+		var al := _lbl(str(r.get("address", "")), 13)
+		al.clip_text = true
+		al.custom_minimum_size = Vector2(200, 0)
+		grid.add_child(al)
+
+
 # ---------------------------------------------------------------- one plot
 
 func _fill_plot() -> void:
@@ -156,6 +290,10 @@ func _fill_plot() -> void:
 			if int(t.arrears) > 0:
 				tl.add_theme_color_override("font_color", BookTheme.RUBRIC)
 			body.add_child(tl)
+			var facts := _company_facts(t)
+			if facts != "":
+				var fl := _lbl("      " + facts, 13, BookTheme.FADED if str(t.get("health", "")) != "distressed" else BookTheme.RUBRIC)
+				body.add_child(fl)
 	var imps := Ledger.improvements_of(p.tunnus)
 	if imps.size() > 0:
 		body.add_child(_lbl(tr("UI_LEDGER_BUILT") + ": " + ", ".join(imps.map(func(i): return _struct_name(i.structure_id))), 14))

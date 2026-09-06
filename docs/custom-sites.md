@@ -512,3 +512,9 @@ moves a parcel's rent by 0.8 to 1.3 (`rules::tenant_factor_permille`, mirrored i
 `python3 tools/pipeline/fetch_tenants.py --site <id> --stats` prints the sector histogram.
 Offline play reads the pack's `news.json` into the book (the tile service writes one per world).
 
+The debug map (M) has a company layer: the Layer button cycles sector, employees, health, founded
+and shared owners (`scripts/ui/map_palette.gd`, legend in the corner; `--open=map:<mode>` for a
+screenshot). The K overlay and the plot sheet list each tenant's activity, staff, turnover, taxes,
+board and health; the book's Companies page lists the tile's companies by employees with a sector
+filter (`--open=companies`). Interiors take their use from the biggest tenant's sector.
+

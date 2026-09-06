@@ -41,6 +41,7 @@ var _tile_ortho: Dictionary = {}      # pack id -> ImageTexture of its orthophot
 var _map_layers: Dictionary = {}      # pack id -> {streets, numbers} read from roads.json and buildings.json
 var _map_layout: Dictionary = {}      # the last label layout of the debug map (see _lay_out_map)
 var _map_hover := Vector2(-1, -1)     # mouse position over the debug map canvas
+var _map_mode := "off"                # company layer of the debug map: off, sector, size, health, age, owners (MapPalette.MODES)
 var _open_panel: Control = null
 
 
@@ -526,9 +527,11 @@ func _refresh_codes() -> void:
 			var owner: String = tr("UI_LEDGER_YOU") if Ledger.is_mine(u.tunnus) else str(row.owner_name)
 			lines.append("   %s: %s   %s: %s   %s: %s%s" % [tr("UI_CODES_OWNER"), owner, tr("UI_LEDGER_COL_PRICE"), Ledger.format_money(int(row.price)),
 				tr("UI_LEDGER_COL_YIELD"), Ledger.format_money(Ledger.yield_of(u.tunnus)), tr("UI_PER_MONTH")])
-			var names := Ledger.tenants_of(u.tunnus).map(func(t): return str(t.name))
-			if not names.is_empty():
-				lines.append("   " + tr("UI_CODES_TENANT") + ": " + ", ".join(names))
+			var rows := Ledger.tenants_of(u.tunnus)
+			if not rows.is_empty():
+				lines.append("   " + tr("UI_CODES_TENANT") + ":")
+				for t in rows:
+					lines.append("      " + _company_line(t))
 	var links := Reporter.links_for(pos, interactor.target, layer)
 	if links.has("etak_id"):
 		lines.append(tr("UI_CODES_BUILDING") + ": ETAK %d   %s" % [int(links.etak_id), str(links.get("ehr", ""))])
@@ -539,6 +542,20 @@ func _refresh_codes() -> void:
 		lines.append(tr("UI_CODES_TARGET") + ": %s  %s" % [interactor.target.name, str(interactor.target.get_path())])
 	codes_label.text = "\n".join(lines)
 	_draw_parcel(u)
+
+
+## One line about a company: name · sector · employees · turnover class · health.
+static func _company_line(t: Dictionary) -> String:
+	var bits: Array[String] = [str(t.get("name", ""))]
+	if t.get("sector"):
+		bits.append(TranslationServer.translate("SECTOR_" + str(t.sector).to_upper()))
+	if t.get("employees") != null and int(t.employees) > 0:
+		bits.append(TranslationServer.translate("UI_EMPLOYEES") % int(t.employees))
+	if t.get("turnover") != null and int(t.turnover) > 0:
+		bits.append(TranslationServer.translate("UI_TURNOVER") % Ledger.format_money(int(t.turnover)))
+	if t.get("health") and str(t.health) != "sound":
+		bits.append(TranslationServer.translate("HEALTH_" + str(t.health).to_upper()))
+	return " · ".join(bits)
 
 
 ## B: open the book at the plot under the player's feet.
@@ -675,6 +692,12 @@ func _fill_debug_map() -> void:
 		Ledger.debug_advance_month()
 		_fill_debug_map())
 	row.add_child(bn)
+	var bm := Button.new()
+	bm.text = tr("UI_MAP_MODE") + ": " + tr("UI_MAP_MODE_" + _map_mode.to_upper())
+	bm.pressed.connect(func():
+		_map_mode = MapPalette.MODES[(MapPalette.MODES.find(_map_mode) + 1) % MapPalette.MODES.size()]
+		_fill_debug_map())
+	row.add_child(bm)
 	var hint := Label.new()
 	hint.text = tr("UI_DEBUG_MAP_HINT")
 	hint.add_theme_font_size_override("font_size", 13)
@@ -731,6 +754,8 @@ func _draw_debug_map(c: Control) -> void:
 	if _map_layout.is_empty() or _map_layout.loc != loc or _map_layout.pack != pack or _map_layout.side != side \
 			or _map_layout.origin != origin or pp.distance_to(_map_layout.at) > side * 0.06:
 		_lay_out_map(origin, side, loc, pack, pp)
+	if _map_mode != "off":
+		_draw_company_layer(c, origin, side, pack, font)
 	for d in _map_layout.dots:
 		c.draw_circle(d.pos, 4, d.col)
 		c.draw_circle(d.pos, 4, Color.BLACK, false, 1.0)
@@ -770,6 +795,68 @@ func _draw_debug_map(c: Control) -> void:
 	var tile_text := "tile %d,%d  %s" % [loc.x, loc.y, pack if pack != "" else "(not loaded)"]
 	c.draw_string(font, origin + Vector2(11, 19), tile_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.BLACK)
 	c.draw_string(font, origin + Vector2(10, 18), tile_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, GOLD)
+
+
+## The company layer: parcels filled by their dominant tenant (sector, health, founding age), dots
+## sized by employees, or lines between parcels whose companies share an owner; with a legend.
+func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String, font: Font) -> void:
+	var k := side / 1024.0
+	var layer := _map_layer(pack)
+	var parcels: Array = layer.get("parcels", [])
+	for pr in parcels:
+		var col: Color = MapPalette.colour(_map_mode, pr.tenant)
+		if _map_mode in ["size", "owners"] and pr.tenant.is_empty():
+			continue
+		if _map_mode == "size":
+			var n := float(pr.tenant.get("employees", 0) if pr.tenant.get("employees") != null else 0)
+			if n <= 0.0:
+				continue
+			var r := clampf(3.0 + sqrt(n) * 2.2, 3.0, 40.0) * k * (1024.0 / 700.0)
+			c.draw_circle(origin + Vector2(pr.at) * k, r, Color(0.3, 0.6, 1.0, 0.45))
+			c.draw_circle(origin + Vector2(pr.at) * k, r, Color(0.15, 0.3, 0.6), false, 1.0)
+			continue
+		if _map_mode == "owners":
+			continue
+		var pts := PackedVector2Array()
+		for q in pr.poly:
+			pts.append(origin + Vector2(float(q[0]), float(q[1])) * k)
+		if pts.size() >= 3:
+			col.a = 0.38 if not pr.tenant.is_empty() else col.a
+			c.draw_colored_polygon(pts, col)
+			c.draw_polyline(pts + PackedVector2Array([pts[0]]), Color(col.r, col.g, col.b, 0.8), 1.0)
+	if _map_mode == "owners":
+		var by_hash := {}
+		for pr in parcels:
+			for h in pr.get("owners", []):
+				by_hash.get_or_add(str(h), []).append(pr)
+		var drawn := {}
+		for h in by_hash:
+			var group: Array = by_hash[h]
+			for i in group.size():
+				for j in range(i + 1, group.size()):
+					var key := str(group[i].tunnus) + "|" + str(group[j].tunnus)
+					if drawn.has(key) or group[i].tunnus == group[j].tunnus:
+						continue
+					drawn[key] = true
+					c.draw_line(origin + Vector2(group[i].at) * k, origin + Vector2(group[j].at) * k, Color(1.0, 0.85, 0.3, 0.8), 1.5)
+		for pr in parcels:
+			if not pr.get("owners", []).is_empty():
+				c.draw_circle(origin + Vector2(pr.at) * k, 3.0, Color(1.0, 0.85, 0.3))
+	# legend: bottom right, one line per class
+	var items: Array = MapPalette.legend(_map_mode)
+	var title := tr("UI_MAP_MODE_" + _map_mode.to_upper())
+	var w := 150.0
+	for it in items:
+		w = maxf(w, font.get_string_size(tr(str(it[0])), HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x + 30.0)
+	var h := 20.0 + items.size() * 15.0
+	var box := Rect2(origin + Vector2(side - w - 8, side - h - 24), Vector2(w, h))
+	c.draw_rect(box, Color(BookTheme.PAGE, 0.92))
+	c.draw_rect(box, BookTheme.INK, false, 1.0)
+	c.draw_string(font, box.position + Vector2(6, 14), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, BookTheme.INK)
+	for i in items.size():
+		var y := box.position.y + 26 + i * 15
+		c.draw_rect(Rect2(box.position.x + 6, y - 9, 10, 10), items[i][1])
+		c.draw_string(font, Vector2(box.position.x + 20, y), tr(str(items[i][0])), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, BookTheme.INK)
 
 
 ## Lay the map's text out without overlaps: street names along their longest stretch first, then
@@ -881,7 +968,29 @@ func _map_layer(pack: String) -> Dictionary:
 		var m := re.search(str(addrs[0]).strip_edges())
 		if m:
 			numbers.append({"text": m.get_string(1), "at": Vector2(float(b.get("x", 0.0)), float(b.get("z", 0.0)))})
-	_map_layers[pack] = {"streets": streets, "numbers": numbers}
+	# parcels with their dominant company (tenants.json, exact matches), for the company layer
+	var by_tunnus := {}
+	var tpath := Sites.path_in(pack, "tenants.json")
+	if FileAccess.file_exists(tpath):
+		var td = JSON.parse_string(FileAccess.get_file_as_string(tpath))
+		if typeof(td) == TYPE_DICTIONARY:
+			for t in td.get("tenants", []):
+				if t.get("match") == "exact" and t.get("tunnus") != null:
+					by_tunnus.get_or_add(str(t.tunnus), []).append(t)
+	var parcels: Array = []
+	for u in Parcels.units(pack):
+		var poly: Array = u.get("polygon", [])
+		if poly.size() < 3:
+			continue
+		var rows: Array = by_tunnus.get(str(u.get("tunnus", "")), [])
+		var dom: Dictionary = MapPalette.dominant(rows)
+		var owners := {}
+		for t in rows:
+			for h in t.get("owners", []):
+				owners[str(h)] = true
+		parcels.append({"tunnus": str(u.get("tunnus", "")), "poly": poly, "at": Vector2(float(u.get("x", 0.0)), float(u.get("z", 0.0))),
+			"tenant": dom, "owners": owners.keys()})
+	_map_layers[pack] = {"streets": streets, "numbers": numbers, "parcels": parcels}
 	return _map_layers[pack]
 
 
@@ -919,6 +1028,10 @@ func _debug_map_input(event: InputEvent) -> void:
 
 ## Debug hook for verification runs: open a panel by name.
 func debug_open(which: String) -> void:
+	if which.begins_with("map:"):   # the map in a company mode: --open=map:sector|size|health|age|owners
+		_map_mode = which.trim_prefix("map:")
+		_toggle(debug_map, _fill_debug_map)
+		return
 	if which.begins_with("plot:"):   # the book open on one plot: --open=plot:<tunnus>
 		ledger_panel.open_parcel(which.trim_prefix("plot:"))
 		_open(ledger_panel)
@@ -928,6 +1041,9 @@ func debug_open(which: String) -> void:
 		"map": _toggle(debug_map, _fill_debug_map)
 		"ledger": _toggle(ledger_panel, ledger_panel.fill)
 		"town":
+			ledger_panel.tabs.current_tab = 5
+			_toggle(ledger_panel, ledger_panel.fill)
+		"companies":
 			ledger_panel.tabs.current_tab = 4
 			_toggle(ledger_panel, ledger_panel.fill)
 		"news": _toggle(news_panel, news_panel.fill)
