@@ -18,6 +18,10 @@ permissions:
 env:
   GODOT_VERSION: 4.7.2
 
+defaults:
+  run:
+    shell: bash   # the Windows runner would otherwise run the steps in PowerShell
+
 jobs:
   export:
     name: ${{ matrix.preset }}
@@ -79,7 +83,9 @@ jobs:
         if: matrix.preset != 'macOS'
         run: |
           cp dist/tile_service* "$(dirname '${{ matrix.path }}')/"
-          cd "$(dirname '${{ matrix.path }}')" && zip -r "../${{ matrix.artifact }}.zip" . && cd - && ls -la build
+          cd "$(dirname '${{ matrix.path }}')"
+          if command -v zip >/dev/null; then zip -r "../${{ matrix.artifact }}.zip" .; else 7z a -tzip "../${{ matrix.artifact }}.zip" .; fi
+          cd - && ls -la build
       - name: "Bundle (macOS: the sidecar into the app bundle)"
         if: matrix.preset == 'macOS'
         run: |
