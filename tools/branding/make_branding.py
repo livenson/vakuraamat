@@ -41,6 +41,10 @@ def owned():
     cx, cz = (WINDOW[0] + WINDOW[2]) / 2, (WINDOW[1] + WINDOW[3]) / 2
     best = None
     for tunnus, poly in parcels():
+        area = abs(sum(poly[i][0] * poly[(i + 1) % len(poly)][1] - poly[(i + 1) % len(poly)][0] * poly[i][1] for i in range(len(poly)))) / 2
+        perim = sum(((poly[i][0] - poly[(i + 1) % len(poly)][0]) ** 2 + (poly[i][1] - poly[(i + 1) % len(poly)][1]) ** 2) ** 0.5 for i in range(len(poly)))
+        if not 600 <= area <= 2500 or area / (perim * perim) < 0.045:
+            continue   # a house plot (compact), not a road strip or a field
         mx = sum(p[0] for p in poly) / len(poly); mz = sum(p[1] for p in poly) / len(poly)
         d = (mx - cx) ** 2 + (mz - cz) ** 2
         if best is None or d < best[0]:
