@@ -17,3 +17,8 @@ All CC BY (Creative Commons Attribution); fetched 2026-09-06 through the Sketchf
 | `bus_stop_town.glb` | Small Bus Stop Shelter | Ottto3ds | https://sketchfab.com/3d-models/2286fddbe24d45d482f9b94a406eca49 |
 | `assets/textures/crops/{potato,maize,legume}.png` (baked cards) | Farm plants models (mobile game-ready, lowpoly) | lolipop_1707 | https://sketchfab.com/3d-models/9b59e7cf3bcd4feb80ff0cf5fb780055 |
 | `assets/models/trees/spruce_src.glb` | Low-Poly Game-Ready Spruce Tree | Dark_Knife15 | https://sketchfab.com/3d-models/ef06bbc949b64e81a5016e18d3263416 |
+| `billboard.glb`, `billboard_overhang.glb` | Low Poly Billboard Sign - Standard / Overhang | jeffkolada | https://sketchfab.com/3d-models/269d489f468c430da74ed4921ee6361d , https://sketchfab.com/3d-models/bbbc335c94724061b5caaed3bb52b7cd |
+| `neon_open.glb` | CC0 - Neon Sign Open | plaggy | https://sketchfab.com/3d-models/9a924db296cf4a1eb12991702ab48da5 |
+| `hanging_sign.glb` | Hanging Sign | JK3Ds | https://sketchfab.com/3d-models/309064650ba44519b968854943fbb790 |
+| `wooden_sign.glb` | Low Poly Sign Board, Stylized Wooden Sign | gamelancer835 | https://sketchfab.com/3d-models/47606ca864584360aa594ccbf7b668b7 |
+| `kiosk.glb` | Low-Poly Russian kiosk | VovaRice | https://sketchfab.com/3d-models/bf81455b1fb141e4be2954be84f121d8 |

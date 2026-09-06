@@ -518,3 +518,9 @@ screenshot). The K overlay and the plot sheet list each tenant's activity, staff
 board and health; the book's Companies page lists the tile's companies by employees with a sector
 filter (`--open=companies`). Interiors take their use from the biggest tenant's sector.
 
+In the world, a shop or café (sector trade or hospitality) gets a bracket sign with its name beside
+the door and a neon OPEN over it, lit in opening hours (`FootprintBuilding.set_props`, hours by
+sector); a farm's house gets a wooden name sign; roads (not streets) carry a billboard every 400 m
+with a poster of one of the tile's biggest employers (`RoadNetwork._billboards`); small commercial
+plots (ARIMAA under 600 m²) with a retail tenant get a kiosk (`kiosk` parcel rule).
+

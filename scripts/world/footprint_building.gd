@@ -565,6 +565,109 @@ func set_sign(text: String) -> void:
 	_sign.position = Vector3(0, height + 1.2, 0)
 
 
+const PROPS := "res://assets/vendor/sketchfab/"   # CC BY models, see assets/vendor/sketchfab/CREDITS.md
+const OPEN_HOURS := {"trade": Vector2(9.0, 19.0), "hospitality": Vector2(11.0, 23.0)}
+var _neon_mats: Array = []
+var _neon_hours := Vector2.ZERO
+
+
+## What a company hangs on its building: shops and cafés get a bracket sign with the name beside the
+## door and a neon OPEN over it (lit in opening hours, see set_open_hour); a farm gets a wooden sign
+## in front of the door. `rows` are the active tenants (tenants.json shape) of this building's plot.
+func set_props(rows: Array) -> void:
+	var dom: Dictionary = MapPalette.dominant(rows)
+	if dom.is_empty():
+		return
+	var f := door_frame()
+	if f.is_empty():
+		return
+	var sector := str(dom.get("sector", ""))
+	var n: Vector3 = f.n
+	var t: Vector3 = f.t
+	var yaw := atan2(n.x, n.z)   # a prop's local +Z turned onto the wall's outward normal
+	if sector in ["trade", "hospitality"]:
+		var bracket := _prop("hanging_sign", 1.3)
+		if bracket:
+			bracket.position = f.pos + t * (float(f.width) * 0.5 + 0.7) + Vector3.UP * (float(f.height) + 0.4) + n * 0.05
+			bracket.rotation.y = yaw
+			add_child(bracket)
+			var board := Label3D.new()
+			board.text = str(dom.get("name", "")).left(28)
+			board.font_size = 48
+			board.pixel_size = 0.006
+			board.modulate = Color(0.98, 0.95, 0.85)
+			board.outline_size = 8
+			board.outline_modulate = Color(0.15, 0.1, 0.05)
+			board.double_sided = true
+			board.position = bracket.position + n * 0.6 + Vector3.DOWN * 0.35
+			board.rotation.y = yaw + PI / 2.0   # across the arm, readable from along the street
+			board.visibility_range_end = 60.0
+			add_child(board)
+		var neon := _prop("neon_open", 0.7)
+		if neon:
+			neon.position = f.pos + Vector3.UP * (float(f.height) + 0.45) + n * 0.06
+			neon.rotation.y = yaw
+			add_child(neon)
+			for mi in neon.find_children("*", "MeshInstance3D", true, false):
+				for si in mi.mesh.get_surface_count():
+					var m: Material = mi.mesh.surface_get_material(si)
+					if m is StandardMaterial3D:
+						var own: StandardMaterial3D = m.duplicate()
+						own.emission_enabled = true
+						own.emission = Color(1.0, 0.35, 0.45)
+						mi.set_surface_override_material(si, own)
+						_neon_mats.append(own)
+			_neon_hours = OPEN_HOURS[sector]
+			add_to_group("neon_open")
+			set_open_hour(EraController.current_hour if "current_hour" in EraController else 12.0)
+	elif sector == "farm" and kind == "dwelling":
+		var sign := _prop("wooden_sign", 2.2)
+		if sign:
+			sign.position = f.pos + n * 3.0 + t * 1.5
+			sign.position.y = float(f.ymin)
+			sign.rotation.y = yaw
+			add_child(sign)
+			var board := Label3D.new()
+			board.text = str(dom.get("name", "")).left(24)
+			board.font_size = 40
+			board.pixel_size = 0.007
+			board.modulate = Color(0.95, 0.9, 0.75)
+			board.outline_size = 6
+			board.outline_modulate = Color(0.2, 0.12, 0.05)
+			board.position = sign.position + Vector3.UP * 1.75 + n * 0.08
+			board.rotation.y = yaw
+			board.visibility_range_end = 80.0
+			add_child(board)
+
+
+## The neon sign lit in opening hours.
+func set_open_hour(hour: float) -> void:
+	if _neon_mats.is_empty():
+		return
+	var on := hour >= _neon_hours.x and hour < _neon_hours.y
+	for m in _neon_mats:
+		m.emission_energy_multiplier = 4.0 if on else 0.0
+		m.albedo_color = Color(1, 1, 1) if on else Color(0.5, 0.5, 0.5)
+
+
+## A vendored prop fitted from its bounds to `size` metres on its longest side, base at y 0, centred.
+func _prop(name: String, size: float) -> Node3D:
+	var path := PROPS + name + ".glb"
+	if not ResourceLoader.exists(path):
+		return null
+	var model: Node3D = (load(path) as PackedScene).instantiate()
+	var b: AABB = Interiors._bounds(model)
+	var longest := maxf(b.size.x, maxf(b.size.y, b.size.z))
+	if longest < 0.001:
+		return null
+	var k := size / longest
+	model.scale = Vector3.ONE * k
+	model.position = Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k)
+	var holder := Node3D.new()
+	holder.add_child(model)
+	return holder
+
+
 ## The door the exterior draws: local position at the threshold, outward normal, wall tangent, size, and
 ## the wall's base and eave heights. Empty when the building has no usable wall face.
 func door_frame() -> Dictionary:
