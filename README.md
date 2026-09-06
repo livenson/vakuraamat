@@ -34,6 +34,13 @@ Business Register open data with Godot 4.7, GDScript, Terrain3D and SpacetimeDB.
 
 ## Play
 
+Builds for macOS, Windows and Linux are on the [releases page](https://github.com/livenson/vakuraamat/releases)
+(GitHub Actions, `.github/workflows/build.yml`): unzip and run; the macOS app is not notarised, so
+run `xattr -dr com.apple.quarantine Vakuraamat.app` once or right-click and Open. A build plays the
+shipped packs; creating a world for another address needs the tile service from this repository.
+
+From the source tree:
+
 ```sh
 make setup                        # Homebrew tools (godot, blender, gdal, git-lfs), LFS pull, first Godot import
 make tile                         # Maa-amet data for Palupera and its terrain (~10 min, network); SITE=<id> for another pack

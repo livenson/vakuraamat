@@ -2,11 +2,12 @@
 GODOT ?= /Applications/Godot.app/Contents/MacOS/Godot
 BLENDER ?= /Applications/Blender.app/Contents/MacOS/Blender
 # The active site pack (sites/<SITE>/site.json) names its terrain tile and the tile centre (EPSG:3301).
+PRESET ?= macOS
 SITE ?= palupera
 TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
 CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
-.PHONY: help setup import tile scatter trees props test lint export clean-generated site era-maps features scenes validate tile-service buildings real-trees dev-watch parcels roads market tenants stops mcp module server town news news-local
+.PHONY: help setup import tile scatter trees props test lint export clean-generated site era-maps features scenes validate tile-service buildings real-trees dev-watch parcels roads market tenants stops mcp branding module server town news news-local
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, gdal, git-lfs), pull LFS files, first Godot import"
@@ -16,7 +17,8 @@ help:
 	@echo "make props            regenerate Blender props (oak, boundary stone, buildings, figures)"
 	@echo "make test             run the headless test suite"
 	@echo "make lint             gdlint, ruff, shellcheck (same as the GitHub workflow; needs uv and shellcheck)"
-	@echo "make export           export the macOS build to build/Vakuraamat.zip"
+	@echo "make export           export a build (PRESET=macOS|\"Windows Desktop\"|Linux) into build/; CI does all three on a v* tag"
+	@echo "make branding         regenerate assets/branding (icon.png/.icns/.ico, splash.png)"
 	@echo "make site SITE=x NAME=\"X\" CENTER=\"E N\"  scaffold a new location/story pack under sites/x (EPSG:3301 centre)"
 	@echo "make era-maps         fetch the historical ground maps (WMS) named in sites/$(SITE)/site.json and relink the eras"
 	@echo "make features         derive sites/$(SITE)/buildings_*.json and water_*.json from the tile (author edits afterwards)"
@@ -162,8 +164,11 @@ lint:
 	uvx ruff@0.16.6 check tools
 	git ls-files '*.sh' | xargs shellcheck
 
-export:
-	mkdir -p build && $(GODOT) --headless --path . --export-release "macOS" build/Vakuraamat.zip
+export:                         # PRESET=macOS|"Windows Desktop"|Linux (needs the 4.7.2 export templates installed)
+	mkdir -p build build/windows build/linux && $(GODOT) --headless --path . --export-release "$(PRESET)" $(if $(filter macOS,$(PRESET)),build/Vakuraamat.zip,$(if $(filter Linux,$(PRESET)),build/linux/Vakuraamat.x86_64,build/windows/Vakuraamat.exe))
+
+branding:                       # icon set and boot splash from the book's palette and a plate of Kvissentali's plots
+	python3 tools/branding/make_branding.py
 
 clean-generated:
 	rm -rf assets/terrain/$(TILE)/data assets/models/trees/*_impostor.png assets/models/trees/*_mesh.res

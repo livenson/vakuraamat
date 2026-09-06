@@ -1,0 +1,95 @@
+# Playable builds for macOS, Windows and Linux: on a version tag (v*) they are attached to a GitHub
+# release; "Run workflow" builds them as artifacts. The exports carry the shipped packs (Kvissentali,
+# Palupera); creating a world for another address needs the tile service from the repository
+# (python3 tools/tile_service.py), which a build can point at through the Locations page.
+# LFS objects (models, textures, Terrain3D binaries, ~450 MB) are cached between runs and
+# platforms so a build does not spend the LFS bandwidth quota; the export presets exclude the
+# vendored source scenes the game never loads.
+name: build
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  GODOT_VERSION: 4.7.2
+
+jobs:
+  export:
+    name: ${{ matrix.preset }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - preset: macOS
+            os: macos-latest
+            path: build/Vakuraamat-macos.zip
+            artifact: Vakuraamat-macos
+          - preset: Windows Desktop
+            os: ubuntu-latest
+            path: build/windows/Vakuraamat.exe
+            artifact: Vakuraamat-windows
+          - preset: Linux
+            os: ubuntu-latest
+            path: build/linux/Vakuraamat.x86_64
+            artifact: Vakuraamat-linux
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - name: LFS object cache
+        id: lfs-cache
+        uses: actions/cache@v4
+        with:
+          path: .git/lfs
+          key: lfs-${{ hashFiles('.gitattributes') }}-${{ hashFiles('**/*.glb', 'assets/**/*.png', 'assets/**/*.jpg', 'assets/**/*.r32', 'assets/models/trees/*.res', 'addons/terrain_3d/bin/**') }}
+          restore-keys: lfs-
+      - name: "LFS pull (without the vendored source scenes the export excludes)"
+        run: |
+          git lfs install --local
+          git lfs pull --exclude="assets/vendor/forest_vegetation/Scenes/**,assets/vendor/forest_vegetation/Models/**"
+      - uses: chickensoft-games/setup-godot@v2
+        with:
+          version: ${{ env.GODOT_VERSION }}
+          include-templates: true
+          use-dotnet: false
+      - name: "Import (two passes: the first registers classes and Terrain3D)"
+        run: |
+          godot --headless --path . --import || true
+          godot --headless --path . --import || true
+      - name: Export ${{ matrix.preset }}
+        run: |
+          mkdir -p "$(dirname '${{ matrix.path }}')"
+          godot --headless --path . --export-release "${{ matrix.preset }}" "${{ matrix.path }}"
+          ls -la "$(dirname '${{ matrix.path }}')"
+      - name: "Bundle (Windows and Linux: the executable with its pck)"
+        if: matrix.preset != 'macOS'
+        run: |
+          cd "$(dirname '${{ matrix.path }}')" && zip -r "../${{ matrix.artifact }}.zip" . && cd - && ls -la build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.preset == 'macOS' && matrix.path || format('build/{0}.zip', matrix.artifact) }}
+          if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: export
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+      - name: Attach the builds to the release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*.zip
+          body: |
+            Playable builds with the shipped packs. macOS: the app is not notarised; after unzipping run
+            `xattr -dr com.apple.quarantine Vakuraamat.app` once, or right-click and Open. Creating a
+            world for another address needs the tile service from the repository (see README).
