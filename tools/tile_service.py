@@ -19,7 +19,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools")); sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
-import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads, fetch_tenants, market  # noqa: E402
+import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads, fetch_tenants, fetch_fields, market  # noqa: E402
 
 GEOCODER = "https://inaadress.maaamet.ee/inaadress/gazetteer?results=8&features=EHAK,TANAV,KATASTRIYKSUS,EHITISHOONE&address="
 JOBS = {}
@@ -99,6 +99,11 @@ def run_job(job):
             fetch_roads.fetch(sid, root=ws)
         except Exception as e:  # noqa: BLE001 - optional layer
             log(f"{sid}: fetch_roads unavailable ({e})")
+        stage("fields (PRIA)", 0.635)
+        try:
+            fetch_fields.fetch(sid, root=ws)
+        except Exception as e:  # noqa: BLE001 - optional layer
+            log(f"{sid}: fetch_fields unavailable ({e})")
         stage("tenants (business register)", 0.64)
         try:
             fetch_tenants.fetch(sid, root=ws)

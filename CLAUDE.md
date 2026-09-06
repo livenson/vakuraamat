@@ -11,7 +11,7 @@ Additional Claude-specific guidance:
   read each report's JSON and screenshot, fix, then `python3 tools/dev.py reload <files>` or `restart`; `replay <id>` puts a
   fresh game at the reported spot for a screenshot check.
 - Run `make test` before committing; commit per logical step with the FPS number when rendering changed.
-- Keep `THIRD_PARTY.md` and `vakuraamat-visual-upgrade-plan.md` status lines current.
+- Keep `THIRD_PARTY.md` and `docs/visual-upgrade-plan.md` status lines current.
 - Playtest triage order: read the report's position first. A position outside 0..1024 means a
   streamed tile; check whether the same thing happens in the origin tile before blaming streaming
   (the "fallen trees" were a model problem visible everywhere).

@@ -1,6 +1,6 @@
 # Vakuraamat — Maa-amet data types and conversion pipeline
 
-**Purpose of this document:** a reference for exactly what data is available from the Estonian Land and Spatial Development Board's geoportal (geoportaal.maaamet.ee), and the concrete conversion path from each raw data type to a usable Godot/Terrain3D/Blender game artifact. Meant to sit alongside `vakuraamat-implementation-plan.md` — this document is the "what data, what tools, what output file" reference; the implementation plan is the "what code" reference.
+**Purpose of this document:** a reference for exactly what data is available from the Estonian Land and Spatial Development Board's geoportal (geoportaal.maaamet.ee), and the concrete conversion path from each raw data type to a usable Godot/Terrain3D/Blender game artifact. Meant to sit alongside `docs/history/implementation-plan.md` — this document is the "what data, what tools, what output file" reference; the implementation plan is the "what code" reference.
 
 ---
 
