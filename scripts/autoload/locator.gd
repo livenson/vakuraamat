@@ -193,8 +193,9 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 		error = tr("MENU_SERVICE_DOWN") % base
 	elif not in_estonia(x, y):
 		error = tr("MENU_OUTSIDE_ESTONIA")
+	var req := {}
 	if error == "":
-		var req := {"id": id, "name": name, "x": x, "y": y, "size": size, "eras": eras}
+		req = {"id": id, "name": name, "x": x, "y": y, "size": size, "eras": eras}
 		if seed_value >= 0:
 			req["seed"] = seed_value
 		if not blocks.is_empty():
@@ -206,6 +207,11 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 			error = r.body if r.body != "" else "HTTP %d" % r.code
 	if error == "":
 		error = await _wait_for_job(base, id)
+		if error == "status: HTTP 404" and not req.is_empty():
+			# the service was restarted mid-job and forgot it: submit once more (its caches make it quick)
+			progress.emit(tr("MENU_STAGE_REQUEST"), 0.02)
+			var again := await http(base + "/tile", HTTPClient.METHOD_POST, JSON.stringify(req))
+			error = await _wait_for_job(base, id) if again.ok else ("HTTP %d" % again.code)
 	if error == "":
 		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cache"))
 		var zip_path := "user://cache/%s.zip" % id
