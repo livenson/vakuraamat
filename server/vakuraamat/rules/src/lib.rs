@@ -72,3 +72,26 @@ mod tests {
         assert_eq!(penalty(1000, 100), 100);
     }
 }
+
+
+/// How much a tenant's strength moves the rent, in permille of the parcel's base rent: the Tax
+/// Board's turnover over the last four quarters and the register's health. Unknown tenants pay par.
+pub fn tenant_factor_permille(turnover: u64, health: &str) -> u32 {
+    if health == "distressed" {
+        return 800;
+    }
+    match turnover {
+        0 => 1000,
+        1..=49_999 => 900,
+        50_000..=199_999 => 1000,
+        200_000..=999_999 => 1150,
+        _ => 1300,
+    }
+}
+
+/// The parcel's monthly rent with its tenants: the strongest tenant sets the factor.
+pub fn rent_with_tenants(base: u64, factors_permille: &[u32]) -> u64 {
+    let f = factors_permille.iter().copied().max().unwrap_or(1000) as u64;
+    base * f / 1000
+}
+

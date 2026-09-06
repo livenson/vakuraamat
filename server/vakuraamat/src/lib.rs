@@ -79,6 +79,10 @@ pub struct Tenant {
     pub status: String,
     pub since: String,
     pub arrears: u64,
+    pub sector: String,     // the game's EMTAK group (trade, services, ...), "" when unknown
+    pub employees: u32,     // latest Tax Board quarter
+    pub turnover: u64,      // last four quarters, euros
+    pub health: String,     // sound | watch | distressed
 }
 
 #[table(accessor = player, public)]
@@ -378,12 +382,15 @@ pub fn clear_tenants(ctx: &ReducerContext, tunnus: String) -> Result<(), String>
 }
 
 #[reducer]
-pub fn seed_tenant(ctx: &ReducerContext, tunnus: String, name: String, registry_code: String, legal_form: String, status: String, since: String) -> Result<(), String> {
+pub fn seed_tenant(
+    ctx: &ReducerContext, tunnus: String, name: String, registry_code: String, legal_form: String, status: String, since: String, sector: String,
+    employees: u32, turnover: u64, health: String,
+) -> Result<(), String> {
     require_admin(ctx)?;
     if ctx.db.tenant().iter().any(|t| t.registry_code == registry_code) {
         return Ok(());
     }
-    ctx.db.tenant().insert(Tenant { id: 0, tunnus, name, registry_code, legal_form, status, since, arrears: 0 });
+    ctx.db.tenant().insert(Tenant { id: 0, tunnus, name, registry_code, legal_form, status, since, arrears: 0, sector, employees, turnover, health });
     Ok(())
 }
 
@@ -756,8 +763,9 @@ pub fn tick(ctx: &ReducerContext, _s: TickSchedule) -> Result<(), String> {
             None => continue,
         };
         let bonus: u64 = ctx.db.improvement().tunnus().filter(&par.tunnus).filter_map(|i| ctx.db.structure().id().find(&i.structure_id)).map(|s| s.rent_bonus).sum();
-        let base = par.rent_month + bonus;
         let tenants: Vec<Tenant> = ctx.db.tenant().tunnus().filter(&par.tunnus).collect();
+        let factors: Vec<u32> = tenants.iter().map(|t| rules::tenant_factor_permille(t.turnover, &t.health)).collect();
+        let base = rules::rent_with_tenants(par.rent_month + bonus, &factors);
         let mut paid = 0u64;
         if tenants.is_empty() {
             paid = base;

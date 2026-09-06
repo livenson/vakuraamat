@@ -211,6 +211,21 @@ def validate(site, rep, root=ROOT):
                 rep.err(f"{who}: exact match without a parcel or building")
             if str(t.get("legal_form") or "").startswith("Füüsilisest isikust"):
                 rep.err(f"{who}: sole proprietor (a private person) in tenants.json")
+            # the register's people files are used as structure only: no names, contacts or ids of persons
+            for k in ("eesnimi", "nimi_arinimi", "email", "phone", "isikukood", "board_names", "members"):
+                if k in t:
+                    rep.err(f"{who}: must not store {k}")
+            for k, v in t.items():
+                if isinstance(v, str) and (re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", v) or re.search(r"\+372\s?\d{6,}", v)):
+                    rep.err(f"{who}: {k} looks like a contact ({v[:30]})")
+            for h in t.get("owners") or []:
+                if not re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d{6,}", str(h)):
+                    rep.err(f"{who}: owners must be register hashes, got {str(h)[:20]!r}")
+            if t.get("health") not in (None, "sound", "watch", "distressed"):
+                rep.err(f"{who}: health must be sound, watch or distressed")
+            if t.get("sector") not in (None, "farm", "industry", "construction", "trade", "transport", "hospitality", "media", "finance",
+                                       "property", "services", "public", "culture"):
+                rep.err(f"{who}: unknown sector {t.get('sector')!r}")
         if tenants["tenants"] and not any(t.get("match") == "exact" for t in tenants["tenants"]):
             rep.warn("tenants.json: no tenant matched a parcel or building")
     news = load_json("news.json", ("events",))

@@ -64,6 +64,7 @@ func add_pack(p_pack: String, offset: Vector3 = Vector3.ZERO) -> int:
 			"owner_name": str(u.get("ownership", "")), "for_sale": sellable, "sellable": sellable,
 			"x": float(u.get("x", 0)) + offset.x, "z": float(u.get("z", 0)) + offset.z, "pack": p_pack}
 		added += 1
+	_add_news(p_pack)
 	var tpath := Sites.path_in(p_pack, "tenants.json")
 	if FileAccess.file_exists(tpath):
 		for t in _load_json(tpath).get("tenants", []):
@@ -72,7 +73,9 @@ func add_pack(p_pack: String, offset: Vector3 = Vector3.ZERO) -> int:
 				if rows.any(func(r): return str(r.registry_code) == str(t.registry_code)):
 					continue
 				rows.append({"id": _id(), "tunnus": t.tunnus, "name": str(t.name), "registry_code": str(t.registry_code),
-					"legal_form": str(t.get("legal_form", "")), "status": str(t.get("status", "")), "since": str(t.get("since", "")), "arrears": 0})
+					"legal_form": str(t.get("legal_form", "")), "status": str(t.get("status", "")), "since": str(t.get("since", "")), "arrears": 0,
+					"sector": str(t.get("sector", "") if t.get("sector") != null else ""), "employees": int(t.get("employees", 0) if t.get("employees") != null else 0),
+					"turnover": int(t.get("turnover", 0) if t.get("turnover") != null else 0), "health": str(t.get("health", "") if t.get("health") != null else "")})
 	return added
 
 
@@ -135,7 +138,28 @@ func yield_of(tunnus: String) -> int:
 	var bonus := 0
 	for i in improvements_of(tunnus):
 		bonus += int(structures.get(i.structure_id, {}).get("rent_bonus", 0))
-	return int(p.rent_month) + bonus
+	var factor := 0
+	for t in tenants_of(tunnus):   # the strongest tenant sets the rent (rules::tenant_factor_permille)
+		factor = maxi(factor, tenant_factor_permille(int(t.get("turnover", 0)), str(t.get("health", ""))))
+	if factor == 0:
+		factor = 1000
+	return int((int(p.rent_month) + bonus) * factor / 1000)
+
+
+## Mirror of rules::tenant_factor_permille: the Tax Board's turnover over the last four quarters
+## and the register's health move the rent; unknown tenants pay par.
+static func tenant_factor_permille(turnover: int, health: String) -> int:
+	if health == "distressed":
+		return 800
+	if turnover == 0:
+		return 1000
+	if turnover < 50000:
+		return 900
+	if turnover < 200000:
+		return 1000
+	if turnover < 1000000:
+		return 1150
+	return 1300
 
 
 func bids_for(tunnus: String) -> Array:
@@ -460,6 +484,28 @@ func _transfer(p: Dictionary, buyer: Dictionary, amount: int) -> void:
 		if b.tunnus == p.tunnus and b.status == 0:
 			b.status = 2
 	_event("sale", "Sold %s (%s)" % [p.address, p.tunnus], p.tunnus, int(buyer.id), amount)
+
+
+## The pack's real headlines and notices (sites/<id>/news.json, tools/news_feeder.py --local) as
+## events of the book, newest first, each once.
+func _add_news(p_pack: String) -> void:
+	var path := Sites.path_in(p_pack, "news.json")
+	if not FileAccess.file_exists(path):
+		return
+	var known := {}
+	for e in events:
+		known[str(e.get("id"))] = true
+	var rows: Array = _load_json(path).get("events", [])
+	rows.reverse()   # the file is newest first; appending oldest first keeps the book's order
+	for r in rows:
+		var id := str(r.get("id", ""))
+		if id == "" or known.has(id):
+			continue
+		events.append({"id": id, "month": month, "kind": str(r.get("kind", "news")), "title": str(r.get("title", "")), "source": str(r.get("source", "")),
+			"link": str(r.get("url", "")), "tunnus": str(r.get("tunnus", "")), "actor_id": 0, "amount": 0, "published": str(r.get("published", "")),
+			"at": Time.get_unix_time_from_system()})
+	if events.size() > EVENT_KEEP:
+		events = events.slice(events.size() - EVENT_KEEP)
 
 
 func _event(kind: String, title: String, tunnus: String, actor: int, amount: int) -> Dictionary:

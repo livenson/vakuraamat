@@ -5,9 +5,14 @@ matched to the tile's cadastral units and buildings by address.
     python3 tools/pipeline/fetch_tenants.py --site kvissentali [--stats] [--refresh] [--max-age-days 7]
                                             [--keep-unmatched auto|yes|no] [--include-fie] [--root <workspace>]
 
-Writes sites/<site>/tenants.json: {"attribution", "source", "fetched", "register_date", "ehak", "stats", "tenants": [
+Writes sites/<site>/tenants.json: {"attribution", "source", "sources", "fetched", "register_date", "ehak", "stats", "tenants": [
   {registry_code, name, legal_form, status, status_text, active, since, address, ehak, tunnus|null, building_id|null,
-   match: exact|street|none, via: ads|address|building|farm|null, link}]}.
+   match: exact|street|none, via: ads|address|building|farm|null, link,
+   emtak {code, text, nace, section}|null, sector (farm|industry|construction|trade|transport|hospitality|media|finance|
+   property|services|public|culture)|null, capital, web, employees, turnover (last four quarters, EUR), taxes,
+   employees_hist [[year, n]], quarters [[year, q, turnover, employees]], board_size, shareholders, owner_managed,
+   owners [hashed ids], deleted, report_overdue, health: sound|watch|distressed}]}  (register_extra.py: the general
+   data, the persons and shareholders files as structure only, the Tax Board's quarterly figures).
 Rows are filtered by the settlement codes (EHAK) of the tile's parcels, then matched: the company's ADS address id
 against the Building Register ids of the tile's buildings, then a normalised "street + number" key against the
 parcel and building addresses, then farm names. `street` rows share a street with the tile but their number is
@@ -21,10 +26,12 @@ import argparse, csv, io, json, os, re, sys, time, unicodedata, urllib.request, 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fetch_buildings import point_in_poly  # noqa: E402
+import register_extra  # noqa: E402
 
 CSV_ZIP = "https://avaandmed.ariregister.rik.ee/sites/default/files/avaandmed/ettevotja_rekvisiidid__lihtandmed.csv.zip"
 UA = {"User-Agent": "vakuraamat-pipeline/0.1 (open-source game; polite, cached)"}
 ATTRIBUTION = "Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0)"
+EMTA_ATTRIBUTION = "Tasutud maksud, käive ja töötajate arv: Maksu- ja Tolliamet (avaandmed)"
 LINK = "https://ariregister.rik.ee/est/company/{code}"
 STATUS_TEXT = {"R": "registered", "N": "bankrupt", "L": "in liquidation", "K": "deleted"}
 STREET_TYPES = {"tänav", "tn", "tee", "puiestee", "pst", "maantee", "mnt", "põik", "allee", "väljak", "plats", "tänava"}
@@ -170,7 +177,7 @@ def iso_date(d):
     return f"{m.group(3)}-{m.group(2)}-{m.group(1)}" if m else (d or None)
 
 
-def fetch(site, root=ROOT, stats=False, refresh=False, max_age_days=7, keep_unmatched="auto", include_fie=False):
+def fetch(site, root=ROOT, stats=False, refresh=False, max_age_days=7, keep_unmatched="auto", include_fie=False, enrich=True):
     site_dir = os.path.join(root, "sites", site)
     pd = json.load(open(os.path.join(site_dir, "parcels.json")))
     parcels = pd.get("parcels", [])
@@ -216,14 +223,30 @@ def fetch(site, root=ROOT, stats=False, refresh=False, max_age_days=7, keep_unma
         if c["match"] == "exact":
             st["exact_" + c["via"]] += 1
         st["by_status"][c["status"]] = st["by_status"].get(c["status"], 0) + 1
+    # the register's general data, its board and shareholder structure and the Tax Board's quarters
+    dates = {}
+    if enrich:
+        try:
+            dates = register_extra.enrich(out, root, max_age_days, refresh)
+        except Exception as e:  # noqa: BLE001 - the basic file alone still makes a playable pack
+            log(f"enrichment unavailable ({e})")
+    sectors = {}
+    for c in out:
+        if c.get("sector"):
+            sectors[c["sector"]] = sectors.get(c["sector"], 0) + 1
+    st["sectors"] = sectors
+    st["with_emtak"] = sum(1 for c in out if c.get("emtak"))
+    st["with_tax"] = sum(1 for c in out if c.get("quarters"))
     st["elapsed_s"] = round(time.time() - t0, 1)
-    json.dump({"attribution": ATTRIBUTION, "source": CSV_ZIP, "fetched": time.strftime("%Y-%m-%d"), "register_date": reg_date, "ehak": sorted(ehak),
+    json.dump({"attribution": ATTRIBUTION + ("; " + EMTA_ATTRIBUTION if dates else ""), "source": CSV_ZIP, "sources": dates,
+               "fetched": time.strftime("%Y-%m-%d"), "register_date": reg_date, "ehak": sorted(ehak),
                "stats": st, "tenants": out}, open(os.path.join(site_dir, "tenants.json"), "w"), ensure_ascii=False, indent=0)
     log(f"wrote sites/{site}/tenants.json: {st['kept']} companies ({st['exact']} exact: {st['exact_ads']} ads, {st['exact_address']} address, "
         f"{st['exact_building']} building, {st['exact_farm']} farm; {st['street']} street; {st['none']} none) from {st['in_ehak']} in EHAK {sorted(ehak)}, "
         f"{st['scanned']} scanned in {st['elapsed_s']} s")
     if stats:
         log(f"status: {st['by_status']}  sole proprietors skipped: {st['fie_skipped']}")
+        log(f"sectors: {dict(sorted(sectors.items(), key=lambda kv: -kv[1]))}  with EMTAK: {st['with_emtak']}  with tax quarters: {st['with_tax']}")
         streets_hit = {normalise(c['address'])[0] for c in out if c['match'] == 'exact'}
         log(f"streets in tile: {len(idx['streets'])}, streets with an exact match: {len(streets_hit)}")
         top = sorted(unmatched.items(), key=lambda kv: -kv[1])[:15]
@@ -240,6 +263,7 @@ if __name__ == "__main__":
     ap.add_argument("--max-age-days", type=int, default=7)
     ap.add_argument("--keep-unmatched", choices=["auto", "yes", "no"], default="auto")
     ap.add_argument("--include-fie", action="store_true", help="also keep sole proprietors (they carry a person's name)")
+    ap.add_argument("--no-enrich", action="store_true", help="skip the register's general data, structure and the Tax Board figures")
     a = ap.parse_args()
-    fetch(a.site, a.root, a.stats, a.refresh, a.max_age_days, a.keep_unmatched, a.include_fie)
+    fetch(a.site, a.root, a.stats, a.refresh, a.max_age_days, a.keep_unmatched, a.include_fie, not a.no_enrich)
     sys.exit(0)

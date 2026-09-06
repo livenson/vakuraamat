@@ -201,7 +201,12 @@ func yield_of(tunnus: String) -> int:
 		for s in structures():
 			if s.id == i.structure_id:
 				bonus += int(s.rent_bonus)
-	return int(p.rent_month) + bonus
+	var factor := 0
+	for t in tenants_of(tunnus):   # the strongest tenant sets the rent (rules::tenant_factor_permille)
+		factor = maxi(factor, LocalLedger.tenant_factor_permille(int(t.get("turnover", 0)), str(t.get("health", ""))))
+	if factor == 0:
+		factor = 1000
+	return int((int(p.rent_month) + bonus) * factor / 1000)
 
 
 func events(limit: int = 50, mine_only: bool = false) -> Array:

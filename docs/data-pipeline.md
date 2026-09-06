@@ -21,6 +21,9 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | OpenStreetMap, Overpass `highway=bus_stop` nodes (ODbL) | bus stops, snapped to the nearest ETAK road with a heading | `tools/pipeline/fetch_stops.py` | `sites/<id>/stops.json` (shelters by `RoadNetwork._bus_stops`) |
 | derived from `parcels.json` (optional Maa-amet transaction export) | euro per m² medians by purpose | `tools/pipeline/market.py` | `sites/<id>/market.json` |
 | e-Business Register open data (daily CSV, CC BY 4.0) | companies matched to the tile's addresses | `tools/pipeline/fetch_tenants.py` | `sites/<id>/tenants.json` |
+| e-Business Register general data, persons and shareholders (daily JSON dumps, CC BY 4.0) | EMTAK activity and the game's sector, share capital, web address, annual-report employee counts, deletion date; board and shareholder counts and hashed ids (structure only, no names) | `tools/pipeline/register_extra.py` (slimmed once per download into `data_raw/ariregister/*.slim.jsonl`) | the same rows in `tenants.json` |
+| Tax Board "tasutud maksud" quarterly open data (EMTA) | taxes paid, turnover and employees per company per quarter, the activity sector | `register_extra.py` (`data_raw/emta/`) | `tenants.json`: `employees`, `turnover`, `taxes`, `quarters`, `health` |
+| Ametlikud Teadaanded bankruptcy proceedings | notices naming one of the tile's companies (registry code or name) | `tools/news_feeder.py` | `news.json` events on the company's parcel |
 | Maa-amet in-ADS gazetteer | address and place search | `tools/tile_service.py` (`/geocode`) | menu results |
 | ERR and Postimees RSS, Ametlikud Teadaanded | regional headlines, planning and auction notices | `tools/news_feeder.py` | town database events or `sites/<id>/news.json` |
 | Poly Haven (CC0) | ground and facade PBR textures | `tools/pipeline/fetch_polyhaven.py` | `assets/terrain/textures/`, `assets/textures/buildings/` |

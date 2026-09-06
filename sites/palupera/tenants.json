@@ -1,7 +1,14 @@
 {
-"attribution": "Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0)",
+"attribution": "Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0); Tasutud maksud, käive ja töötajate arv: Maksu- ja Tolliamet (avaandmed)",
 "source": "https://avaandmed.ariregister.rik.ee/sites/default/files/avaandmed/ettevotja_rekvisiidid__lihtandmed.csv.zip",
-"fetched": "2026-09-05",
+"sources": {
+"ettevotja_rekvisiidid__yldandmed.json.zip": "2026-09-06",
+"ettevotja_rekvisiidid__kaardile_kantud_isikud.json.zip": "2026-09-06",
+"ettevotja_rekvisiidid__osanikud.json.zip": "2026-09-06",
+"tasutud_maksud_kaesolev_aasta.csv": "2026-09-06",
+"tasutud_maksud_varasemad_aastad.csv": "2026-09-06"
+},
+"fetched": "2026-09-06",
 "register_date": "2026-09-05",
 "ehak": [
 "1418",
@@ -22,7 +29,20 @@
 "by_status": {
 "R": 31
 },
-"elapsed_s": 0.9
+"sectors": {
+"farm": 10,
+"transport": 2,
+"industry": 1,
+"trade": 2,
+"construction": 4,
+"finance": 1,
+"services": 4,
+"property": 4,
+"culture": 3
+},
+"with_emtak": 31,
+"with_tax": 18,
+"elapsed_s": 3.2
 },
 "tenants": [
 {
@@ -39,7 +59,106 @@
 "building_id": 383792,
 "match": "exact",
 "via": "ads",
-"link": "https://ariregister.rik.ee/est/company/11654064"
+"link": "https://ariregister.rik.ee/est/company/11654064",
+"emtak": {
+"code": "02201",
+"text": "Metsavarumine",
+"nace": "02.20",
+"section": "farm"
+},
+"sector": "farm",
+"capital": 32000.0,
+"web": null,
+"employees": 1,
+"turnover": 29953,
+"taxes": 7471,
+"employees_hist": [
+[
+2020,
+3
+],
+[
+2021,
+2
+],
+[
+2022,
+2
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+],
+[
+2025,
+1
+]
+],
+"quarters": [
+[
+2024,
+3,
+15001,
+1
+],
+[
+2024,
+4,
+45223,
+1
+],
+[
+2025,
+1,
+36746,
+1
+],
+[
+2025,
+2,
+10039,
+1
+],
+[
+2025,
+3,
+6488,
+1
+],
+[
+2025,
+4,
+6476,
+1
+],
+[
+2026,
+1,
+8687,
+1
+],
+[
+2026,
+2,
+8302,
+1
+]
+],
+"board_size": 2,
+"shareholders": 3,
+"owner_managed": true,
+"owners": [
+"077b8adc-c09b-5237-a6d1-3693d9ceaf5e",
+"5d84c324-8432-5157-803d-1f90c1e63d1b",
+"78e0e538-b8ea-54f8-808b-5191108b63aa"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "12099707",
@@ -55,7 +174,55 @@
 "building_id": 378720,
 "match": "exact",
 "via": "ads",
-"link": "https://ariregister.rik.ee/est/company/12099707"
+"link": "https://ariregister.rik.ee/est/company/12099707",
+"emtak": {
+"code": "01611",
+"text": "Taimekasvatuse abitegevused",
+"nace": "01.61",
+"section": "farm"
+},
+"sector": "farm",
+"capital": 2500.0,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": null,
+"employees_hist": [
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"50beffd7-a6b5-51c2-b8b0-0833652e1c9e"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "14410598",
@@ -71,7 +238,56 @@
 "building_id": 430587,
 "match": "exact",
 "via": "ads",
-"link": "https://ariregister.rik.ee/est/company/14410598"
+"link": "https://ariregister.rik.ee/est/company/14410598",
+"emtak": {
+"code": "49321",
+"text": "Taksovedu",
+"nace": "49.32",
+"section": "transport"
+},
+"sector": "transport",
+"capital": 2500.0,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": null,
+"employees_hist": [
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": 2,
+"owner_managed": true,
+"owners": [
+"2faab049-f198-5347-a6cf-84956c585c6d",
+"d8350a08-c1b5-5f81-a0d5-488669052058"
+],
+"deleted": null,
+"report_overdue": true,
+"health": "watch"
 },
 {
 "registry_code": "11044934",
@@ -87,7 +303,104 @@
 "building_id": 378720,
 "match": "exact",
 "via": "ads",
-"link": "https://ariregister.rik.ee/est/company/11044934"
+"link": "https://ariregister.rik.ee/est/company/11044934",
+"emtak": {
+"code": "01421",
+"text": "Muu veislaste ja pühvlikasvatus",
+"nace": "01.42",
+"section": "farm"
+},
+"sector": "farm",
+"capital": 40000.0,
+"web": null,
+"employees": 3,
+"turnover": 100765,
+"taxes": 46094,
+"employees_hist": [
+[
+2020,
+2
+],
+[
+2021,
+2
+],
+[
+2022,
+2
+],
+[
+2023,
+2
+],
+[
+2024,
+2
+],
+[
+2025,
+2
+]
+],
+"quarters": [
+[
+2024,
+3,
+13871,
+3
+],
+[
+2024,
+4,
+14254,
+3
+],
+[
+2025,
+1,
+67655,
+3
+],
+[
+2025,
+2,
+8715,
+3
+],
+[
+2025,
+3,
+11230,
+3
+],
+[
+2025,
+4,
+11400,
+3
+],
+[
+2026,
+1,
+67435,
+3
+],
+[
+2026,
+2,
+10700,
+3
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"50beffd7-a6b5-51c2-b8b0-0833652e1c9e"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "10252274",
@@ -103,7 +416,104 @@
 "building_id": 378720,
 "match": "exact",
 "via": "ads",
-"link": "https://ariregister.rik.ee/est/company/10252274"
+"link": "https://ariregister.rik.ee/est/company/10252274",
+"emtak": {
+"code": "01411",
+"text": "Piimakarjakasvatus",
+"nace": "01.41",
+"section": "farm"
+},
+"sector": "farm",
+"capital": 235000.0,
+"web": null,
+"employees": 15,
+"turnover": 1295280,
+"taxes": 272770,
+"employees_hist": [
+[
+2020,
+8
+],
+[
+2021,
+7
+],
+[
+2022,
+7
+],
+[
+2023,
+6
+],
+[
+2024,
+7
+],
+[
+2025,
+8
+]
+],
+"quarters": [
+[
+2024,
+3,
+243658,
+9
+],
+[
+2024,
+4,
+253260,
+10
+],
+[
+2025,
+1,
+356601,
+12
+],
+[
+2025,
+2,
+318540,
+11
+],
+[
+2025,
+3,
+312339,
+13
+],
+[
+2025,
+4,
+297785,
+13
+],
+[
+2026,
+1,
+372995,
+13
+],
+[
+2026,
+2,
+312161,
+15
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"50beffd7-a6b5-51c2-b8b0-0833652e1c9e"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "14518692",
@@ -119,7 +529,55 @@
 "building_id": 378720,
 "match": "exact",
 "via": "ads",
-"link": "https://ariregister.rik.ee/est/company/14518692"
+"link": "https://ariregister.rik.ee/est/company/14518692",
+"emtak": {
+"code": "01421",
+"text": "Muu veislaste ja pühvlikasvatus",
+"nace": "01.42",
+"section": "farm"
+},
+"sector": "farm",
+"capital": 2500.0,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": null,
+"employees_hist": [
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"2b2112f5-b7b5-5953-aa10-b6c33d8d24cf"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "80582720",
@@ -135,7 +593,84 @@
 "building_id": null,
 "match": "exact",
 "via": "farm",
-"link": "https://ariregister.rik.ee/est/company/80582720"
+"link": "https://ariregister.rik.ee/est/company/80582720",
+"emtak": {
+"code": "01701",
+"text": "Jahindus ja seda teenindavad tegevusalad",
+"nace": "01.70",
+"section": "farm"
+},
+"sector": "farm",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": 130,
+"employees_hist": [
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2022,
+3,
+null,
+null
+],
+[
+2023,
+1,
+null,
+null
+],
+[
+2024,
+2,
+null,
+null
+],
+[
+2025,
+2,
+null,
+null
+],
+[
+2025,
+3,
+null,
+null
+],
+[
+2026,
+2,
+null,
+null
+]
+],
+"board_size": 1,
+"shareholders": 0,
+"owner_managed": false,
+"owners": [
+"a4a83d84-8230-5bc4-a981-73a5f38dcf8d"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "14820161",
@@ -151,7 +686,104 @@
 "building_id": 383792,
 "match": "exact",
 "via": "ads",
-"link": "https://ariregister.rik.ee/est/company/14820161"
+"link": "https://ariregister.rik.ee/est/company/14820161",
+"emtak": {
+"code": "35151",
+"text": "Elektrienergia müük",
+"nace": "35.15",
+"section": "industry"
+},
+"sector": "industry",
+"capital": 2500.0,
+"web": null,
+"employees": 1,
+"turnover": 173577,
+"taxes": 20775,
+"employees_hist": [
+[
+2020,
+1
+],
+[
+2021,
+2
+],
+[
+2022,
+2
+],
+[
+2023,
+2
+],
+[
+2024,
+2
+],
+[
+2025,
+1
+]
+],
+"quarters": [
+[
+2024,
+3,
+38262,
+2
+],
+[
+2024,
+4,
+15799,
+2
+],
+[
+2025,
+1,
+14010,
+1
+],
+[
+2025,
+2,
+20781,
+1
+],
+[
+2025,
+3,
+124395,
+1
+],
+[
+2025,
+4,
+11802,
+1
+],
+[
+2026,
+1,
+19514,
+1
+],
+[
+2026,
+2,
+17866,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"78e0e538-b8ea-54f8-808b-5191108b63aa"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "12276598",
@@ -167,7 +799,104 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/12276598"
+"link": "https://ariregister.rik.ee/est/company/12276598",
+"emtak": {
+"code": "4776",
+"text": "Lillede, taimede, väetiste, lemmikloomade ja lemmikloomatoidu jaemüük",
+"nace": "47.76",
+"section": "trade"
+},
+"sector": "trade",
+"capital": 2500.0,
+"web": null,
+"employees": 7,
+"turnover": 332960,
+"taxes": 114224,
+"employees_hist": [
+[
+2020,
+5
+],
+[
+2021,
+5
+],
+[
+2022,
+5
+],
+[
+2023,
+6
+],
+[
+2024,
+8
+],
+[
+2025,
+8
+]
+],
+"quarters": [
+[
+2024,
+3,
+100167,
+8
+],
+[
+2024,
+4,
+83877,
+8
+],
+[
+2025,
+1,
+65400,
+8
+],
+[
+2025,
+2,
+115980,
+8
+],
+[
+2025,
+3,
+96890,
+8
+],
+[
+2025,
+4,
+77964,
+8
+],
+[
+2026,
+1,
+56066,
+7
+],
+[
+2026,
+2,
+102040,
+7
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"a93e0d89-0c85-599f-aaf7-4a0bfeda1714"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "14660467",
@@ -183,7 +912,104 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/14660467"
+"link": "https://ariregister.rik.ee/est/company/14660467",
+"emtak": {
+"code": "43211",
+"text": "Elektripaigaldustööd",
+"nace": "43.21",
+"section": "construction"
+},
+"sector": "construction",
+"capital": 2500.0,
+"web": null,
+"employees": 5,
+"turnover": 547727,
+"taxes": 129742,
+"employees_hist": [
+[
+2020,
+1
+],
+[
+2021,
+1
+],
+[
+2022,
+2
+],
+[
+2023,
+3
+],
+[
+2024,
+4
+],
+[
+2025,
+5
+]
+],
+"quarters": [
+[
+2024,
+3,
+49566,
+3
+],
+[
+2024,
+4,
+61834,
+4
+],
+[
+2025,
+1,
+79354,
+5
+],
+[
+2025,
+2,
+105356,
+5
+],
+[
+2025,
+3,
+144909,
+4
+],
+[
+2025,
+4,
+259554,
+6
+],
+[
+2026,
+1,
+74065,
+5
+],
+[
+2026,
+2,
+69199,
+5
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"5dca203c-9094-5ea6-b338-027a2a4fe1b7"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "14660591",
@@ -199,7 +1025,58 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/14660591"
+"link": "https://ariregister.rik.ee/est/company/14660591",
+"emtak": {
+"code": "49411",
+"text": "Kaubavedu maanteel",
+"nace": "49.41",
+"section": "transport"
+},
+"sector": "transport",
+"capital": 2500.0,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": 75,
+"employees_hist": [
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+]
+],
+"quarters": [
+[
+2023,
+4,
+null,
+null
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"ec8fe2a5-9143-5828-a16d-a849ce3d196f"
+],
+"deleted": null,
+"report_overdue": true,
+"health": "watch"
 },
 {
 "registry_code": "16511725",
@@ -215,7 +1092,47 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/16511725"
+"link": "https://ariregister.rik.ee/est/company/16511725",
+"emtak": {
+"code": "64211",
+"text": "Valdusfirmade tegevus",
+"nace": "64.21",
+"section": "finance"
+},
+"sector": "finance",
+"capital": 10000.0,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": null,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"d7650356-5bc4-562c-9ec7-ce3920b6e2fa"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "16251388",
@@ -231,7 +1148,100 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/16251388"
+"link": "https://ariregister.rik.ee/est/company/16251388",
+"emtak": {
+"code": "41001",
+"text": "Elamute ja mitteeluhoonete ehitus",
+"nace": "41.00",
+"section": "construction"
+},
+"sector": "construction",
+"capital": 2500.0,
+"web": null,
+"employees": 1,
+"turnover": 14188,
+"taxes": 894,
+"employees_hist": [
+[
+2021,
+0
+],
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+],
+[
+2025,
+0
+]
+],
+"quarters": [
+[
+2024,
+3,
+22663,
+1
+],
+[
+2024,
+4,
+18085,
+1
+],
+[
+2025,
+1,
+17813,
+1
+],
+[
+2025,
+2,
+5075,
+1
+],
+[
+2025,
+3,
+5407,
+1
+],
+[
+2025,
+4,
+4515,
+1
+],
+[
+2026,
+1,
+1554,
+1
+],
+[
+2026,
+2,
+2712,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"5807a020-4a71-57b7-881f-30bde47998b0"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "12558339",
@@ -247,7 +1257,104 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/12558339"
+"link": "https://ariregister.rik.ee/est/company/12558339",
+"emtak": {
+"code": "6920",
+"text": "Arvepidamine, raamatupidamine ja auditeerimine; maksualane nõustamine",
+"nace": "69.20",
+"section": "services"
+},
+"sector": "services",
+"capital": 2500.0,
+"web": null,
+"employees": 2,
+"turnover": null,
+"taxes": 7021,
+"employees_hist": [
+[
+2020,
+2
+],
+[
+2021,
+2
+],
+[
+2022,
+2
+],
+[
+2023,
+2
+],
+[
+2024,
+2
+],
+[
+2025,
+2
+]
+],
+"quarters": [
+[
+2024,
+3,
+null,
+2
+],
+[
+2024,
+4,
+null,
+2
+],
+[
+2025,
+1,
+null,
+2
+],
+[
+2025,
+2,
+null,
+2
+],
+[
+2025,
+3,
+null,
+2
+],
+[
+2025,
+4,
+null,
+2
+],
+[
+2026,
+1,
+null,
+2
+],
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"ffafd8ce-cb9d-5b5d-911e-6ca32ca4f6ed"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "80286921",
@@ -263,7 +1370,56 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/80286921"
+"link": "https://ariregister.rik.ee/est/company/80286921",
+"emtak": {
+"code": "68321",
+"text": "Hoonete ja üürimajade haldus (korteriühistud, elamuühistud, hooneühistud jms)",
+"nace": "68.32",
+"section": "property"
+},
+"sector": "property",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": null,
+"employees_hist": [
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": 0,
+"owner_managed": false,
+"owners": [
+"21e2c82b-ebf6-548d-b041-be2e5b144816",
+"2c0ac913-b618-5a4e-a00b-5018a17fb6dc"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "11350200",
@@ -279,7 +1435,77 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/11350200"
+"link": "https://ariregister.rik.ee/est/company/11350200",
+"emtak": {
+"code": "46511",
+"text": "Arvutite, arvuti välisseadmete ja tarkvara hulgimüük",
+"nace": "46.51",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": null,
+"turnover": 7198,
+"taxes": 399,
+"employees_hist": [],
+"quarters": [
+[
+2024,
+3,
+0,
+null
+],
+[
+2024,
+4,
+2500,
+null
+],
+[
+2025,
+1,
+0,
+null
+],
+[
+2025,
+2,
+300,
+null
+],
+[
+2025,
+3,
+0,
+null
+],
+[
+2025,
+4,
+3270,
+null
+],
+[
+2026,
+1,
+3665,
+null
+],
+[
+2026,
+2,
+263,
+null
+]
+],
+"board_size": 0,
+"shareholders": 0,
+"owner_managed": false,
+"owners": [],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "16799494",
@@ -295,7 +1521,35 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/16799494"
+"link": "https://ariregister.rik.ee/est/company/16799494",
+"emtak": {
+"code": "41001",
+"text": "Elamute ja mitteeluhoonete ehitus",
+"nace": "41.00",
+"section": "construction"
+},
+"sector": "construction",
+"capital": 10.0,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": null,
+"employees_hist": [
+[
+2024,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"bed7077a-88de-587b-8f8f-1d15ff222126"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "16125821",
@@ -311,7 +1565,51 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/16125821"
+"link": "https://ariregister.rik.ee/est/company/16125821",
+"emtak": {
+"code": "68201",
+"text": "Enda või renditud kinnisvara üürileandmine ja käitus",
+"nace": "68.20",
+"section": "property"
+},
+"sector": "property",
+"capital": 2500.0,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": null,
+"employees_hist": [
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"df53cd65-b3fe-55ae-973f-3b2ab36e86f2"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "17565893",
@@ -327,7 +1625,30 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/17565893"
+"link": "https://ariregister.rik.ee/est/company/17565893",
+"emtak": {
+"code": "02401",
+"text": "Metsamajandust abistavad tegevused",
+"nace": "02.40",
+"section": "farm"
+},
+"sector": "farm",
+"capital": 500.0,
+"web": null,
+"employees": null,
+"turnover": null,
+"taxes": null,
+"employees_hist": [],
+"quarters": [],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"794670a0-9aad-5b73-9fd8-fe93a96045e1"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "16821609",
@@ -343,7 +1664,88 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/16821609"
+"link": "https://ariregister.rik.ee/est/company/16821609",
+"emtak": {
+"code": "01421",
+"text": "Muu veislaste ja pühvlikasvatus",
+"nace": "01.42",
+"section": "farm"
+},
+"sector": "farm",
+"capital": 100.0,
+"web": null,
+"employees": 3,
+"turnover": 80967,
+"taxes": 22000,
+"employees_hist": [
+[
+2024,
+1
+],
+[
+2025,
+2
+]
+],
+"quarters": [
+[
+2024,
+3,
+18137,
+1
+],
+[
+2024,
+4,
+34312,
+2
+],
+[
+2025,
+1,
+13702,
+1
+],
+[
+2025,
+2,
+15038,
+1
+],
+[
+2025,
+3,
+23687,
+3
+],
+[
+2025,
+4,
+20690,
+3
+],
+[
+2026,
+1,
+18730,
+3
+],
+[
+2026,
+2,
+17860,
+3
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"c7ab3042-46be-5f87-83f1-bdf7102f1fcc"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "17459338",
@@ -359,7 +1761,30 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/17459338"
+"link": "https://ariregister.rik.ee/est/company/17459338",
+"emtak": {
+"code": "74201",
+"text": "Fotograafia",
+"nace": "74.20",
+"section": "services"
+},
+"sector": "services",
+"capital": 0.01,
+"web": null,
+"employees": null,
+"turnover": null,
+"taxes": null,
+"employees_hist": [],
+"quarters": [],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"1625d571-9130-57f7-a519-06737bd34976"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "80408560",
@@ -375,7 +1800,108 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/80408560"
+"link": "https://ariregister.rik.ee/est/company/80408560",
+"emtak": {
+"code": "94995",
+"text": "Vaba aja veetmise, meelelahutuse, kultuurilise tegevuse või huvialadega seotud ühendused",
+"nace": "94.99",
+"section": "culture"
+},
+"sector": "culture",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": null,
+"taxes": 3272,
+"employees_hist": [
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [
+[
+2024,
+3,
+null,
+1
+],
+[
+2024,
+4,
+null,
+1
+],
+[
+2025,
+1,
+null,
+1
+],
+[
+2025,
+2,
+null,
+1
+],
+[
+2025,
+3,
+null,
+1
+],
+[
+2025,
+4,
+null,
+1
+],
+[
+2026,
+1,
+null,
+1
+],
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 5,
+"shareholders": 0,
+"owner_managed": false,
+"owners": [
+"60da0c0e-49b0-51fe-a408-40bfb4fa5036",
+"824518d1-4a76-51a0-9842-8f2d65fee95d",
+"a93e0d89-0c85-599f-aaf7-4a0bfeda1714",
+"a9ae9804-c321-575f-8806-5b4fd2db1d8c",
+"fb01a677-b5fc-5409-804e-e401c929d8d5"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "14391104",
@@ -391,7 +1917,55 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/14391104"
+"link": "https://ariregister.rik.ee/est/company/14391104",
+"emtak": {
+"code": "90031",
+"text": "Kunstialane loometegevus",
+"nace": "90.03",
+"section": "culture"
+},
+"sector": "culture",
+"capital": 2500.0,
+"web": null,
+"employees": 1,
+"turnover": null,
+"taxes": null,
+"employees_hist": [
+[
+2018,
+1
+],
+[
+2019,
+1
+],
+[
+2020,
+1
+],
+[
+2021,
+1
+],
+[
+2022,
+1
+],
+[
+2023,
+1
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"d948a854-c740-59ca-a136-66bde0ecc5b7"
+],
+"deleted": null,
+"report_overdue": true,
+"health": "watch"
 },
 {
 "registry_code": "16345793",
@@ -407,7 +1981,97 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/16345793"
+"link": "https://ariregister.rik.ee/est/company/16345793",
+"emtak": {
+"code": "68111",
+"text": "Enda kinnisvara ost ja müük",
+"nace": "68.11",
+"section": "property"
+},
+"sector": "property",
+"capital": 10000.0,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": 439,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [
+[
+2023,
+1,
+null,
+null
+],
+[
+2023,
+4,
+null,
+null
+],
+[
+2024,
+2,
+null,
+null
+],
+[
+2024,
+3,
+null,
+null
+],
+[
+2024,
+4,
+null,
+null
+],
+[
+2025,
+1,
+null,
+null
+],
+[
+2025,
+4,
+null,
+null
+],
+[
+2026,
+2,
+null,
+null
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": false,
+"owners": [
+"16511725",
+"d7650356-5bc4-562c-9ec7-ce3920b6e2fa"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "16504464",
@@ -423,7 +2087,43 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/16504464"
+"link": "https://ariregister.rik.ee/est/company/16504464",
+"emtak": {
+"code": "77221",
+"text": "Muude tarbeesemete ja kodumasinate väljaüürimine ja kasutusrent",
+"nace": "77.22",
+"section": "services"
+},
+"sector": "services",
+"capital": 2500.0,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": null,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"9232e299-422a-559b-88c3-fa211797b050"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "16206206",
@@ -439,7 +2139,84 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/16206206"
+"link": "https://ariregister.rik.ee/est/company/16206206",
+"emtak": {
+"code": "41201",
+"text": "Elamute ja mitteeluhoonete ehitus",
+"nace": "41.20",
+"section": "construction"
+},
+"sector": "construction",
+"capital": 2500.0,
+"web": null,
+"employees": 1,
+"turnover": 0,
+"taxes": 0,
+"employees_hist": [
+[
+2021,
+1
+]
+],
+"quarters": [
+[
+2022,
+4,
+12624,
+1
+],
+[
+2023,
+1,
+0,
+1
+],
+[
+2023,
+2,
+0,
+1
+],
+[
+2023,
+3,
+0,
+1
+],
+[
+2023,
+4,
+0,
+1
+],
+[
+2024,
+1,
+0,
+1
+],
+[
+2024,
+2,
+null,
+1
+],
+[
+2024,
+3,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"77766ab1-7673-58f4-a9ae-32b6eacd826e"
+],
+"deleted": null,
+"report_overdue": true,
+"health": "distressed"
 },
 {
 "registry_code": "17479171",
@@ -455,7 +2232,38 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/17479171"
+"link": "https://ariregister.rik.ee/est/company/17479171",
+"emtak": {
+"code": "02201",
+"text": "Metsavarumine",
+"nace": "02.20",
+"section": "farm"
+},
+"sector": "farm",
+"capital": 50.0,
+"web": null,
+"employees": null,
+"turnover": 0,
+"taxes": 0,
+"employees_hist": [],
+"quarters": [
+[
+2026,
+2,
+0,
+null
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": false,
+"owners": [
+"0c0a04be-8b2f-509e-b9bc-2c24a43becd5",
+"42487c3c-ab28-5815-a5bd-14a2edd42144"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "80669036",
@@ -471,7 +2279,32 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/80669036"
+"link": "https://ariregister.rik.ee/est/company/80669036",
+"emtak": {
+"code": "94992",
+"text": "Piirkondlikku/kohalikku elu edendavad ja toetavad ühendused",
+"nace": "94.99",
+"section": "culture"
+},
+"sector": "culture",
+"capital": null,
+"web": null,
+"employees": null,
+"turnover": null,
+"taxes": null,
+"employees_hist": [],
+"quarters": [],
+"board_size": 3,
+"shareholders": 0,
+"owner_managed": false,
+"owners": [
+"5dca203c-9094-5ea6-b338-027a2a4fe1b7",
+"60d92441-cbc6-5d66-874a-efdc76c34bca",
+"b9201727-dc28-5e01-b96f-31add6b6ccd0"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "16550955",
@@ -487,7 +2320,43 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/16550955"
+"link": "https://ariregister.rik.ee/est/company/16550955",
+"emtak": {
+"code": "81211",
+"text": "Hoonete üldpuhastus",
+"nace": "81.21",
+"section": "services"
+},
+"sector": "services",
+"capital": 2500.0,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": null,
+"employees_hist": [
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"7320b7d2-e74e-51c0-a2aa-3e681045a9a5"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "12932720",
@@ -503,7 +2372,104 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/12932720"
+"link": "https://ariregister.rik.ee/est/company/12932720",
+"emtak": {
+"code": "01111",
+"text": "Teravilja- (v.a riis), kaunvilja- ja õlitaimeseemnete kasvatus",
+"nace": "01.11",
+"section": "farm"
+},
+"sector": "farm",
+"capital": 2500.0,
+"web": null,
+"employees": 1,
+"turnover": 75350,
+"taxes": 20537,
+"employees_hist": [
+[
+2020,
+2
+],
+[
+2021,
+2
+],
+[
+2022,
+2
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+],
+[
+2025,
+1
+]
+],
+"quarters": [
+[
+2024,
+3,
+29169,
+1
+],
+[
+2024,
+4,
+1360,
+1
+],
+[
+2025,
+1,
+0,
+1
+],
+[
+2025,
+2,
+0,
+1
+],
+[
+2025,
+3,
+48305,
+1
+],
+[
+2025,
+4,
+12247,
+1
+],
+[
+2026,
+1,
+9532,
+1
+],
+[
+2026,
+2,
+5266,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"9708aa74-00fd-536a-b286-be0882578009"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 },
 {
 "registry_code": "16084594",
@@ -519,7 +2485,100 @@
 "building_id": null,
 "match": "none",
 "via": null,
-"link": "https://ariregister.rik.ee/est/company/16084594"
+"link": "https://ariregister.rik.ee/est/company/16084594",
+"emtak": {
+"code": "68111",
+"text": "Enda kinnisvara ost ja müük",
+"nace": "68.11",
+"section": "property"
+},
+"sector": "property",
+"capital": 2500.0,
+"web": null,
+"employees": 0,
+"turnover": null,
+"taxes": 606,
+"employees_hist": [
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [
+[
+2022,
+4,
+null,
+null
+],
+[
+2023,
+1,
+null,
+null
+],
+[
+2023,
+4,
+null,
+null
+],
+[
+2024,
+3,
+null,
+null
+],
+[
+2024,
+4,
+null,
+null
+],
+[
+2025,
+1,
+null,
+null
+],
+[
+2025,
+4,
+null,
+null
+],
+[
+2026,
+1,
+null,
+null
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"df53cd65-b3fe-55ae-973f-3b2ab36e86f2"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound"
 }
 ]
 }

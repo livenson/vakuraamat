@@ -28,7 +28,8 @@ TARTU_PM = {"id": "tartu_pm", "name": "Tartu Postimees", "url": "https://tartu.p
 LOUNA_PM = {"id": "louna_pm", "name": "Lõuna-Eesti Postimees", "url": "https://lounapostimees.postimees.ee/rss", "area": "county", "terms": "headlines and links only"}
 FEEDS_BY_COUNTY = {"Tartu maakond": [TARTU_PM, LOUNA_PM, ERR], "Valga maakond": [LOUNA_PM, ERR], "Võru maakond": [LOUNA_PM, ERR], "Põlva maakond": [LOUNA_PM, ERR]}
 DEFAULT_FEEDS = [ERR]
-NOTICE_ALLOWED = ("planeeringud", "riigivara")   # planning notices; state property sales and auctions
+NOTICE_ALLOWED = ("planeeringud", "riigivara", "pankrotimenetlus")   # planning; state property; bankruptcy proceedings
+COMPANY_NOTICES = ("pankrotimenetlus",)   # local only when the notice names one of the tile's companies (registry code or name)
 NOTICE_URL = "https://www.ametlikudteadaanded.ee/ee/-/{kind}/xml"
 NS = "{http://www.ametlikudteadaanded.ee/xsd/2014-06-01/teadaanne.xsd}"
 
@@ -55,6 +56,7 @@ def town_config(site, root):
     s = pd.get("summary") or {}
     names = sorted(set((s.get("settlements") or []) + (s.get("municipalities") or [])))
     cfg = {"town": site, "county": s.get("county"), "names": names, "feeds": FEEDS_BY_COUNTY.get(s.get("county"), DEFAULT_FEEDS), "notice_types": list(NOTICE_ALLOWED)}
+    company_index.path = os.path.join(root, "sites", site, "tenants.json")
     ov = os.path.join(site_dir, "news_config.json")
     if os.path.exists(ov):
         cfg.update(json.load(open(ov)))
@@ -104,6 +106,27 @@ def location_keys(parcels, names):
     return stems, settlements
 
 
+def company_index(parcels):
+    """The tile's companies (sites/<id>/tenants.json beside parcels.json): registry codes and lower-case
+    names, each pointing at the company's parcel, so a bankruptcy or liquidation notice finds its plot."""
+    out = {"codes": {}, "names": {}}
+    if not parcels:
+        return out
+    tpath = getattr(company_index, "path", None)
+    if not tpath or not os.path.exists(tpath):
+        return out
+    for t in json.load(open(tpath)).get("tenants", []):
+        if t.get("match") != "exact" or not t.get("tunnus"):
+            continue
+        code = str(t.get("registry_code") or "")
+        if code.isdigit():
+            out["codes"][code] = t["tunnus"]
+        name = (t.get("name") or "").lower().strip()
+        if len(name) > 6:
+            out["names"][name] = t["tunnus"]
+    return out
+
+
 def fetch_notices(kind, names, parcels, municipality_cap=5):
     """Planning notices (`planeeringud`) and state property sales (`riigivara`). Location is free text, so a
     notice is local when an input names one of the tile's streets, farms or settlements; municipal notices
@@ -115,6 +138,7 @@ def fetch_notices(kind, names, parcels, municipality_cap=5):
     full_names = {n.lower() for n in names}
     tunnus_set = {u["tunnus"] for u in parcels if u.get("tunnus")}
     addr_index = {u["address"].lower(): u["tunnus"] for u in parcels if u.get("address") and len(u["address"]) > 5}
+    companies = company_index(parcels)
     for t in root.iter(NS + "teadaanne"):
         number = t.findtext("teate_number") or ""
         url = t.findtext("url") or ""
@@ -134,7 +158,14 @@ def fetch_notices(kind, names, parcels, municipality_cap=5):
         # street names repeat across Estonia: local needs the tile's street or settlement AND the pack's municipality;
         # state property notices list many places, so they need a full settlement name or one of the tile's cadastral numbers
         tunnus_hit = next((tn for tn in tunnus_set if tn in blob), "")
-        if kind == "riigivara":
+        company_hit = next((tn for code, tn in companies["codes"].items() if re.search(r"\b" + code + r"\b", blob)), "")
+        if not company_hit:
+            company_hit = next((tn for name, tn in companies["names"].items() if name in blob), "")
+        if company_hit:
+            tunnus_hit = tunnus_hit or company_hit
+        if kind in COMPANY_NOTICES:
+            local = company_hit != ""
+        elif kind == "riigivara":
             local = tunnus_hit != "" or (key_hit != "" and any(f in blob for f in full_names))
         else:
             local = key_hit != "" and municipal_hit

@@ -210,6 +210,11 @@ def run_job(job):
             fetch_tenants.fetch(sid, root=ws)
         except Exception as e:  # noqa: BLE001 - optional layer
             log(f"{sid}: tenants unavailable ({e})")
+        stage("news (RSS, Ametlikud Teadaanded)", 0.655)
+        try:
+            subprocess.run([sys.executable, os.path.join(ROOT, "tools/news_feeder.py"), "--site", sid, "--root", ws, "--local", "--once"], check=False, timeout=180)
+        except Exception as e:  # noqa: BLE001 - optional layer
+            log(f"{sid}: news unavailable ({e})")
         stage("market snapshot", 0.66)
         try:
             market.derive(sid, root=ws)

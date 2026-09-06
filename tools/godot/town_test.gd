@@ -48,7 +48,9 @@ func _ready() -> void:
 			break
 	_check(up, "server did not answer /v1/ping")
 	var out := []
-	var code := OS.execute("/usr/bin/env", [env, cli, "publish", "-s", SERVER, "-b", root + WASM, "-y", DB], out, true)
+	# --delete-data: the throwaway server keeps its data dir between runs, and a schema change (a new
+	# column) would otherwise refuse the publish as a manual migration
+	var code := OS.execute("/usr/bin/env", [env, cli, "publish", "-s", SERVER, "-b", root + WASM, "-y", "--delete-data", DB], out, true)
 	_check(code == 0, "publish failed: %s" % "\n".join(out))
 	out = []
 	code = OS.execute("/usr/bin/env", [env, "python3", root + "tools/town_admin.py", "seed", "--site", "kvissentali", "--server", SERVER, "--db", DB, "--debug"], out, true)
