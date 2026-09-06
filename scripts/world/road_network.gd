@@ -64,6 +64,102 @@ func _ready() -> void:
 	_bus_stops(terrain)
 
 
+const POSTER_RECT := Rect2(0.793, 0.674, 0.198, 0.317)   # the second advert panel in the town shelter's atlas (UV space)
+const POSTER_REACH := 300.0
+
+## The advert panel of a town shelter shows the nearest registered companies: a poster is rendered
+## in a viewport and painted over the panel's part of the shelter's texture (a copy per shelter).
+## No company within reach: the baked timetable stays.
+func _poster(model: Node3D, at: Vector2) -> void:
+	var pack := Sites.pack_of(self)
+	var found: Array = []   # [distance, name]
+	for u in Parcels.units(pack):
+		var d := Vector2(float(u.get("x", 0.0)), float(u.get("z", 0.0))).distance_to(at)
+		if d > POSTER_REACH:
+			continue
+		for n in Tenants.active_names(pack, str(u.get("tunnus", ""))):
+			found.append([d, n])
+	if found.is_empty():
+		return
+	found.sort_custom(func(a, b): return a[0] < b[0])
+	var names: Array[String] = []
+	for f in found:
+		if not names.has(f[1]):
+			names.append(f[1])
+		if names.size() == 2:
+			break
+	var mi: MeshInstance3D = model.find_children("*", "MeshInstance3D", true, false)[0] if not model.find_children("*", "MeshInstance3D", true, false).is_empty() else null
+	if mi == null or mi.mesh == null or mi.mesh.get_surface_count() == 0:
+		return
+	var mat: Material = mi.mesh.surface_get_material(0)
+	if not (mat is BaseMaterial3D) or (mat as BaseMaterial3D).albedo_texture == null:
+		return
+	var atlas: Image = (mat as BaseMaterial3D).albedo_texture.get_image()
+	if atlas == null:
+		return
+	atlas = atlas.duplicate()
+	if atlas.is_compressed():
+		atlas.decompress()
+	atlas.convert(Image.FORMAT_RGBA8)
+	var px := Rect2i(int(POSTER_RECT.position.x * atlas.get_width()), int(POSTER_RECT.position.y * atlas.get_height()),
+		int(POSTER_RECT.size.x * atlas.get_width()), int(POSTER_RECT.size.y * atlas.get_height()))
+	var poster: Image = await _render_poster(names, px.size)
+	if poster == null:
+		return
+	poster.convert(Image.FORMAT_RGBA8)   # the viewport hands back RGB8; blit_rect wants matching formats
+	poster.flip_x()   # the second panel is the board's reverse face: its UVs run right to left
+	if poster.get_size() != px.size:
+		poster.resize(px.size.x, px.size.y)
+	atlas.blit_rect(poster, Rect2i(Vector2i.ZERO, px.size), px.position)
+	var own: BaseMaterial3D = mat.duplicate()
+	own.albedo_texture = ImageTexture.create_from_image(atlas)
+	if is_instance_valid(mi):
+		mi.set_surface_override_material(0, own)
+
+
+## A poster image: a colour drawn from the first name, the names in white, the place below.
+func _render_poster(names: Array[String], size: Vector2i) -> Image:
+	var vp := SubViewport.new()
+	vp.size = size
+	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
+	vp.transparent_bg = false
+	var bg := ColorRect.new()
+	var hue := float(hash(names[0]) % 360) / 360.0
+	bg.color = Color.from_hsv(hue, 0.55, 0.55)
+	bg.size = size
+	vp.add_child(bg)
+	var band := ColorRect.new()
+	band.color = Color(1, 1, 1, 0.9)
+	band.position = Vector2(0, size.y * 0.76)
+	band.size = Vector2(size.x, size.y * 0.24)
+	vp.add_child(band)
+	var box := VBoxContainer.new()
+	box.position = Vector2(size.x * 0.08, size.y * 0.08)
+	box.size = Vector2(size.x * 0.84, size.y * 0.64)
+	box.add_theme_constant_override("separation", int(size.y * 0.04))
+	vp.add_child(box)
+	for i in names.size():
+		var l := Label.new()
+		l.text = names[i]
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		l.add_theme_font_size_override("font_size", int(size.y * (0.085 if i == 0 else 0.06)))
+		l.add_theme_color_override("font_color", Color.WHITE)
+		box.add_child(l)
+	var place := Label.new()
+	place.text = Sites.display_name(Sites.pack_of(self))
+	place.position = Vector2(size.x * 0.08, size.y * 0.8)
+	place.size = Vector2(size.x * 0.84, size.y * 0.16)
+	place.add_theme_font_size_override("font_size", int(size.y * 0.05))
+	place.add_theme_color_override("font_color", Color(0.15, 0.15, 0.2))
+	vp.add_child(place)
+	add_child(vp)
+	await RenderingServer.frame_post_draw
+	await RenderingServer.frame_post_draw
+	var img: Image = vp.get_texture().get_image()
+	vp.queue_free()
+	return img
+
+
 const STOP_MODELS := {"rural": "res://assets/vendor/sketchfab/bus_stop_rural.glb", "town": "res://assets/vendor/sketchfab/bus_stop_town.glb"}   # Ottto3ds, CC BY
 
 
@@ -106,6 +202,8 @@ func _bus_stops(terrain: Terrain3D) -> void:
 		holder.position = Vector3(at.x, h - global_position.y, at.y)
 		holder.rotation.y = float(st.get("yaw", 0.0))
 		holder.add_child(model)
+		if kind == "town":
+			_poster(model, at)   # the shelter's advert panel: the nearest registered companies
 		var body := StaticBody3D.new()
 		body.collision_layer = 1
 		var shape := CollisionShape3D.new()

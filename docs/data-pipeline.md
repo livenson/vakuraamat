@@ -24,6 +24,7 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | Maa-amet in-ADS gazetteer | address and place search | `tools/tile_service.py` (`/geocode`) | menu results |
 | ERR and Postimees RSS, Ametlikud Teadaanded | regional headlines, planning and auction notices | `tools/news_feeder.py` | town database events or `sites/<id>/news.json` |
 | Poly Haven (CC0) | ground and facade PBR textures | `tools/pipeline/fetch_polyhaven.py` | `assets/terrain/textures/`, `assets/textures/buildings/` |
+| Sketchfab (CC BY, via the MCP server, `make mcp`) and Poly Pizza (CC0 / CC BY) models | cars, street lamps, benches, bus shelters, the spruce and juniper, hay bales, tractor, farm plants; playground, boats, bathroom and stairs | downloaded, split with `tools/blender/split_glb.py`, listed in `assets/vendor/sketchfab/CREDITS.md` | `assets/vendor/sketchfab/`, `assets/vendor/polypizza/`, `assets/models/trees/spruce_src.glb` |
 
 Licences, attribution strings and fetch dates are in `THIRD_PARTY.md`. Endpoints and the per-country
 adapter interface are in `tools/pipeline/sources.py`; only Estonia is implemented.

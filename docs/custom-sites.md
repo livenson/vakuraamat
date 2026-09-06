@@ -239,6 +239,9 @@ trucks), junipers (`assets/vegetation/tree_juniper.tscn`), and the `farm` parcel
 row across each PRIA grassland field on a MAATULUNDUSMAA unit and a tractor by it. Crop cards for
 potato, maize and legume fields are baked from the farm-plants pack with `tools/godot/bake_cards.tscn`
 into `assets/textures/crops/<kind>.png`; kinds without a card keep the procedural texture.
+Bus shelters stand at OpenStreetMap's stops (`stops.json`); the town shelter's advert panel shows the
+nearest registered companies, a poster rendered at runtime (`RoadNetwork._poster`) over the timetable
+baked into its texture by `tools/textures/shelter_board.py`.
 
 `tools/godot/model_preview.tscn -- --dir=res://assets/vendor/polypizza/ --fit=2` renders a vendored
 directory in a row, each model scaled to `--fit` metres.
