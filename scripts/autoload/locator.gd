@@ -6,6 +6,7 @@ extends Node
 signal progress(text: String, fraction: float)
 
 const SETTINGS := "user://settings.cfg"
+const MIN_FREE_BYTES := 1024 * 1024 * 1024   # a pack installs ~150 MB plus its built region data; keep a margin
 const DEFAULT_SERVICE := "http://127.0.0.1:8765"
 const GEOCODER := "https://inaadress.maaamet.ee/inaadress/gazetteer?results=8&features=EHAK,TANAV,KATASTRIYKSUS,EHITISHOONE&address="
 const IP_API := "http://ip-api.com/json/?fields=status,country,countryCode,city,lat,lon"
@@ -47,6 +48,88 @@ func http(url: String, method: int = HTTPClient.METHOD_GET, body: String = "", d
 	if download_to == "":
 		text = (res[3] as PackedByteArray).get_string_from_utf8()
 	return {"code": code, "body": text, "ok": res[0] == HTTPRequest.RESULT_SUCCESS and code >= 200 and code < 300}
+
+
+## What a pack for (x, y) would download, from the service's HEAD requests: {items [{name, bytes,
+## cached}], bytes, download_bytes, rate_bps, seconds_download, seconds_process, free_bytes}; {} if unknown.
+func estimate(x: float, y: float, size: int = 1024) -> Dictionary:
+	var r := await http(service_url() + "/estimate?x=%d&y=%d&size=%d" % [int(x), int(y), size])
+	if not r.ok:
+		return {}
+	var d = JSON.parse_string(r.body)
+	return d if typeof(d) == TYPE_DICTIONARY else {}
+
+
+## The service's own cache: {bytes, packs [{id, bytes}], free_bytes, path}; {} if it does not answer.
+func service_cache() -> Dictionary:
+	var r := await http(service_url() + "/cache")
+	if not r.ok:
+		return {}
+	var d = JSON.parse_string(r.body)
+	return d if typeof(d) == TYPE_DICTIONARY else {}
+
+
+## Free bytes on the disk holding user:// (-1 when unknown).
+static func free_bytes() -> int:
+	var d := DirAccess.open("user://")
+	return d.get_space_left() if d else -1
+
+
+## Bytes under a user:// directory, recursively.
+static func dir_bytes(path: String) -> int:
+	var d := DirAccess.open(path)
+	if d == null:
+		return 0
+	var total := 0
+	d.list_dir_begin()
+	var f := d.get_next()
+	while f != "":
+		if d.current_is_dir():
+			total += dir_bytes(path.path_join(f))
+		else:
+			var fa := FileAccess.open(path.path_join(f), FileAccess.READ)
+			if fa:
+				total += fa.get_length()
+		f = d.get_next()
+	d.list_dir_end()
+	return total
+
+
+## What an installed pack takes: its site files, its tile (engine files and built region data) and
+## the downloaded zip. {site, tile, zip, total} in bytes.
+static func pack_bytes(id: String) -> Dictionary:
+	var tile := str(Sites.manifest_for(id).get("terrain", {}).get("tile", id))
+	var site := dir_bytes(Sites.USER_ROOT + id)
+	var t := dir_bytes(Sites.USER_TILES + tile)
+	var z := 0
+	var fa := FileAccess.open("user://cache/%s.zip" % id, FileAccess.READ)
+	if fa:
+		z = fa.get_length()
+	return {"site": site, "tile": t, "zip": z, "total": site + t + z}
+
+
+## Remove an installed pack (site, tile, zip) to the system trash. Never the active site.
+static func remove_pack(id: String) -> bool:
+	if id == Sites.active or not Sites.is_user_pack(id):
+		return false
+	var tile := str(Sites.manifest_for(id).get("terrain", {}).get("tile", id))
+	for p in [Sites.USER_ROOT + id, Sites.USER_TILES + tile, "user://cache/%s.zip" % id]:
+		var g := ProjectSettings.globalize_path(p)
+		if DirAccess.dir_exists_absolute(g) or FileAccess.file_exists(g):
+			if OS.move_to_trash(g) != OK:
+				push_warning("could not remove " + g)
+	Sites.scan()
+	return true
+
+
+static func fmt_bytes(n: float) -> String:
+	if n >= 1024.0 * 1024.0 * 1024.0:
+		return "%.1f GB" % (n / (1024.0 * 1024.0 * 1024.0))
+	return "%d MB" % int(n / (1024.0 * 1024.0))
+
+
+static func fmt_seconds(n: float) -> String:
+	return ("%d min" % int(ceil(n / 60.0))) if n >= 60.0 else ("%d s" % int(n))
 
 
 ## Packs already generated and cached on the service: [{id, name, x, y, size, eras, seed, blocks}].
@@ -189,10 +272,13 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 	var base := service_url()
 	var error := ""
 	progress.emit(tr("MENU_STAGE_SERVICE"), 0.0)
+	var free := free_bytes()
 	if not await ensure_service():
 		error = tr("MENU_SERVICE_DOWN") % base
 	elif not in_estonia(x, y):
 		error = tr("MENU_OUTSIDE_ESTONIA")
+	elif free >= 0 and free < MIN_FREE_BYTES:
+		error = tr("MENU_LOW_DISK") % [fmt_bytes(free), fmt_bytes(MIN_FREE_BYTES)]
 	var req := {}
 	if error == "":
 		req = {"id": id, "name": name, "x": x, "y": y, "size": size, "eras": eras}
