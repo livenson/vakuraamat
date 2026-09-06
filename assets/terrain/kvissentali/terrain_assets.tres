@@ -111,34 +111,34 @@ last_lod = 0
 last_shadow_lod = 0
 lod0_range = 40.0
 
-[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_bmoi3"]
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_jpqos"]
 name = "meadow"
 albedo_texture = ExtResource("11_jpqos")
 normal_texture = ExtResource("12_ncjol")
 uv_scale = 0.2
 
-[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_mb406"]
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_ncjol"]
 name = "field"
 id = 1
 albedo_texture = ExtResource("13_enml0")
 normal_texture = ExtResource("14_ux3l0")
 uv_scale = 0.25
 
-[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_nqqjl"]
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_enml0"]
 name = "forest_floor"
 id = 2
 albedo_texture = ExtResource("15_4brep")
 normal_texture = ExtResource("16_80uxq")
 uv_scale = 0.3
 
-[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_rjal1"]
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_ux3l0"]
 name = "gravel"
 id = 3
 albedo_texture = ExtResource("17_2ola3")
 normal_texture = ExtResource("18_2couc")
 uv_scale = 0.8
 
-[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_nv2xj"]
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_4brep"]
 name = "soil"
 id = 4
 albedo_texture = ExtResource("15_4brep")
@@ -147,4 +147,4 @@ uv_scale = 0.4
 
 [resource]
 mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_jpqos"), SubResource("Terrain3DMeshAsset_ncjol"), SubResource("Terrain3DMeshAsset_enml0"), SubResource("Terrain3DMeshAsset_ux3l0"), SubResource("Terrain3DMeshAsset_4brep"), SubResource("Terrain3DMeshAsset_80uxq"), SubResource("Terrain3DMeshAsset_2ola3"), SubResource("Terrain3DMeshAsset_2couc"), SubResource("Terrain3DMeshAsset_bmoi3"), SubResource("Terrain3DMeshAsset_mb406")])
-texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_bmoi3"), SubResource("Terrain3DTextureAsset_mb406"), SubResource("Terrain3DTextureAsset_nqqjl"), SubResource("Terrain3DTextureAsset_rjal1"), SubResource("Terrain3DTextureAsset_nv2xj")])
+texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_jpqos"), SubResource("Terrain3DTextureAsset_ncjol"), SubResource("Terrain3DTextureAsset_enml0"), SubResource("Terrain3DTextureAsset_ux3l0"), SubResource("Terrain3DTextureAsset_4brep")])

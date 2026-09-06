@@ -7,7 +7,7 @@ extends Node3D
 const FIGURES := ["res://assets/models/figures/figure_stand.glb", "res://assets/models/figures/figure_holding.glb"]
 const CLOTHES := [Color(0.45, 0.5, 0.62), Color(0.7, 0.35, 0.3), Color(0.33, 0.36, 0.5), Color(0.28, 0.28, 0.3), Color(0.55, 0.45, 0.3), Color(0.8, 0.75, 0.6), Color(0.2, 0.45, 0.35)]
 const CAR_PAINT := [Color(0.85, 0.85, 0.87), Color(0.15, 0.15, 0.17), Color(0.5, 0.52, 0.55), Color(0.55, 0.12, 0.12), Color(0.15, 0.25, 0.5), Color(0.75, 0.6, 0.2)]
-const LANES := {"walker": "side", "bike": "edge", "car": "lane", "cart": "lane"}   # where on the road
+const LANES := {"walker": "side", "bike": "edge", "car": "lane", "cart": "lane", "dog": "side", "cat": "side"}   # where on the road
 
 var kind := "walker"
 var speed := 1.4
@@ -35,13 +35,17 @@ func setup(g: RoadGraph, k: String, e: Dictionary, start_s: float, fwd: bool, se
 	s = start_s
 	forward = fwd
 	rng.seed = seed_value
-	speed = {"walker": rng.randf_range(1.1, 1.7), "bike": rng.randf_range(4.0, 6.0), "car": rng.randf_range(7.0, 12.0), "cart": rng.randf_range(1.6, 2.4)}[kind]
-	allowed = {"walker": ["path", "trail", "street", "road"], "bike": ["path", "street", "road", "trail"], "car": ["street", "road"], "cart": ["road", "street", "trail"]}[kind]
+	speed = {"walker": rng.randf_range(1.1, 1.7), "bike": rng.randf_range(4.0, 6.0), "car": rng.randf_range(7.0, 12.0), "cart": rng.randf_range(1.6, 2.4),
+		"dog": rng.randf_range(1.2, 2.2), "cat": rng.randf_range(0.5, 0.9)}[kind]
+	allowed = {"walker": ["path", "trail", "street", "road"], "bike": ["path", "street", "road", "trail"], "car": ["street", "road"], "cart": ["road", "street", "trail"],
+		"dog": ["path", "trail", "street"], "cat": ["path", "trail"]}[kind]
 	_terrain = GameState.world.terrain if GameState.world else null
 	_lateral_for_edge()
 	match kind:
 		"walker":
 			_body = _make_walker()
+		"dog", "cat":
+			_body = _make_animal(kind)
 		"bike":
 			_body = build_bike(true, rng, CLOTHES[rng.randi() % CLOTHES.size()])
 			for r in _body.find_children("*", "HumanFigure", true, false):
@@ -82,7 +86,7 @@ func gap_ahead(others: Array) -> float:
 func advance(delta: float, others: Array) -> void:
 	var gap := gap_ahead(others)
 	var want := speed
-	var min_gap: float = {"walker": 1.5, "bike": 4.0, "car": 9.0, "cart": 5.0}[kind]
+	var min_gap: float = {"walker": 1.5, "bike": 4.0, "car": 9.0, "cart": 5.0, "dog": 1.2, "cat": 1.0}[kind]
 	if gap < min_gap:
 		want = 0.0
 	elif gap < min_gap * 2.5:
@@ -120,6 +124,10 @@ func _place(delta: float) -> void:
 		else:
 			_body.position.y = absf(sin(_t * 6.0)) * 0.05 * (_speed_now / maxf(speed, 0.1))
 			_body.rotation.z = sin(_t * 6.0) * 0.03
+	elif (kind == "dog" or kind == "cat") and _body:
+		var trot := _speed_now / maxf(speed, 0.1)
+		_body.position.y = absf(sin(_t * 9.0)) * 0.03 * trot   # a trot: quick small bounces
+		_body.rotation.x = sin(_t * 9.0) * 0.04 * trot
 	for w in _wheels:
 		w.rotate_object_local(Vector3.RIGHT, -_speed_now * delta / 0.32)   # roughly a 0.3 m wheel radius
 	if kind == "cyclist" and _rider:
@@ -139,6 +147,25 @@ func _clothes(fig: Node, col: Color) -> void:
 				mat.albedo_color = col
 				mat.roughness = 0.9
 				mi.set_surface_override_material(si, mat)
+
+
+## A dog (pug or beagle, 0.4 m at the shoulder) or a cat (0.3 m): Poly Pizza models, see THIRD_PARTY.md.
+func _make_animal(which: String) -> Node3D:
+	var names: Array = ["pug", "beagle"] if which == "dog" else ["cat"]
+	var path := "res://assets/vendor/polypizza/%s.glb" % names[rng.randi() % names.size()]
+	if not ResourceLoader.exists(path):
+		return _make_walker()
+	var model: Node3D = (load(path) as PackedScene).instantiate()
+	var b: AABB = Interiors._bounds(model)
+	var k := (0.42 if which == "dog" else 0.3) / maxf(b.size.y, 0.001)
+	var holder := Node3D.new()
+	model.scale = Vector3.ONE * k
+	model.position = Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k)
+	var turn := Node3D.new()
+	turn.rotation.y = PI if b.size.z >= b.size.x else PI / 2.0   # the long axis along local Z, nose towards -Z
+	turn.add_child(model)
+	holder.add_child(turn)
+	return holder
 
 
 func _make_walker() -> Node3D:

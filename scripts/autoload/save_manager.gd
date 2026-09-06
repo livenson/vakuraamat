@@ -55,8 +55,14 @@ func load_slot(slot: String = AUTOSAVE) -> bool:
 		push_warning("save %s is from the historical game (version %s); starting fresh" % [slot, data.get("version")])
 		return false
 	var site := str(data.get("site", Sites.active))
-	if site != Sites.active and Sites.available.has(site):
-		Sites.select(site)   # registries reload; the menu normally does this before the world loads
+	if site != Sites.active:
+		if GameState.world != null:
+			# A running world has this site's ground: switching packs under it would put the saved
+			# game's layers on another location's terrain. The menu selects the site before loading.
+			push_warning("save %s is from site %s, not %s: not loaded" % [slot, site, Sites.active])
+			return false
+		if Sites.available.has(site):
+			Sites.select(site)   # registries reload
 	Ledger.from_dict(data.get("ledger", {}))
 	await GameState.from_dict(data.get("game", {}))   # last: loads the layer, moves the player
 	dirty = false

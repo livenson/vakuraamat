@@ -30,7 +30,7 @@ func mix() -> Dictionary:
 		return {"walker": 0.7, "cart": 0.3}
 	if year < 1950:
 		return {"walker": 0.5, "bike": 0.3, "car": 0.08, "cart": 0.12}
-	return {"walker": 0.35, "bike": 0.25, "car": 0.4}
+	return {"walker": 0.3, "bike": 0.22, "car": 0.36, "dog": 0.08, "cat": 0.04}
 
 
 ## 0.15 at night, 1 by day, 1.4 in the commute peaks.
@@ -86,7 +86,8 @@ func _spawn(centre: Vector2) -> void:
 		if roll <= acc:
 			kind = k
 			break
-	var kinds: Array = {"walker": ["path", "trail", "street", "road"], "bike": ["path", "street", "road"], "car": ["street", "road"], "cart": ["road", "street", "trail"]}[kind]
+	var kinds: Array = {"walker": ["path", "trail", "street", "road"], "bike": ["path", "street", "road"], "car": ["street", "road"], "cart": ["road", "street", "trail"],
+		"dog": ["path", "trail", "street"], "cat": ["path", "trail"]}[kind]
 	var candidates := graph.edges_near(centre, spawn_min, spawn_max, kinds)
 	if candidates.is_empty():
 		return

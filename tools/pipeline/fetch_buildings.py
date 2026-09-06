@@ -158,6 +158,26 @@ def point_in_poly(px, pz, poly):
     return inside
 
 
+def roof_colour(poly, ortho):
+    """The roof as the orthophoto shows it: the median of the brighter half of the pixels inside the
+    footprint (shadows and edges fall in the darker half). RGB 0..1, or None when too small."""
+    if ortho is None:
+        return None
+    size = ortho.shape[0]
+    xs = [p[0] for p in poly]; zs = [p[1] for p in poly]
+    vals = []
+    for z in range(max(int(min(zs)), 0), min(int(max(zs)) + 1, size)):
+        for x in range(max(int(min(xs)), 0), min(int(max(xs)) + 1, size)):
+            if point_in_poly(x + 0.5, z + 0.5, poly):
+                vals.append(ortho[z, x])
+    if len(vals) < 4:
+        return None
+    arr = np.array(vals)
+    bright = arr[arr.max(axis=1) >= np.median(arr.max(axis=1))]
+    c = np.median(bright, axis=0)
+    return [round(float(v), 3) for v in c]
+
+
 def canopy_height(poly, canopy):
     """90th percentile of the nDSM inside the polygon: the roof, not the chimney."""
     if canopy is None:
@@ -269,6 +289,14 @@ def fetch(site, root=ROOT, use_ehr=True, use_lod2=True, progress=None):
     canopy = None
     if meta.get("canopy") and os.path.exists(os.path.join(tdir, meta["canopy"]["file"])):
         canopy = np.fromfile(os.path.join(tdir, meta["canopy"]["file"]), dtype="<f4").reshape(size, size)
+    ortho = None
+    ortho_path = os.path.join(tdir, meta.get("texture", "ortho.jpg"))
+    if os.path.exists(ortho_path):
+        try:
+            from extract_features import load_ortho
+            ortho = load_ortho(ortho_path, size)
+        except Exception as e:  # noqa: BLE001 - the colours are a nicety
+            log(f"orthophoto not read for roof colours: {e}")
     feats = fetch_etak(xmin, ymin, xmax, ymax)
     log(f"ETAK: {len(feats)} building polygons in the tile")
     cache = os.path.join(ROOT, "data_raw", "ehr")
@@ -306,6 +334,9 @@ def fetch(site, root=ROOT, use_ehr=True, use_lod2=True, progress=None):
         mats = info.get("materials", {})
         wall_color = pick_color(mats.get("facade") or mats.get("wall_type") or mats.get("structure"), FACADE_COLORS, COLORS[kind])
         roof_color = pick_color(mats.get("roof_cover"), ROOF_COLORS, [k * 0.45 for k in COLORS[kind]])
+        seen = roof_colour(poly, ortho)
+        if seen:   # the photographed roof, with a quarter of the material's colour for the texture's sake
+            roof_color = [round(0.75 * seen[i] + 0.25 * roof_color[i], 3) for i in range(3)]
         etak_id = int(props.get("etak_id") or f.get("id", "0").split(".")[-1] or 0)
         bx = round((min(xs) + max(xs)) / 2, 1); bz = round((min(zs) + max(zs)) / 2, 1)
         model = lod2_faces(lod2[etak_id], xmin, ymax, bx, bz) if etak_id in lod2 else None
