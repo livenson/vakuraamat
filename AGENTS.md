@@ -47,6 +47,10 @@ its design documents in the repo root describe that version.
   with `make tile` / `make trees`. Large stable binaries are in git LFS (`.gitattributes`).
 
 ## Commands
+- Tree models: `assets/models/trees/<name>_src.glb` (vendored) beats the Sapling `<name>.glb`; `make trees`
+  (or `prepare_trees.gd -- --only=<name>` then `bake_impostors.tscn -- --only=<name>`) merges its meshes,
+  prunes stray pieces beside the trunk, brightens the needles and bakes the impostor. `MODEL_HEIGHT` in
+  terrain_builder.gd is the model's own height; instances scale to the canopy height, up to 6x.
 - `make setup` once; `make test` before every commit (validates every pack, boots every pack, dev
   channel, traffic, streaming, the offline ledger and the two-client town test); `make lint`;
   `make export` for a macOS build.

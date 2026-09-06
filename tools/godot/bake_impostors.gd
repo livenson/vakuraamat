@@ -2,7 +2,7 @@
 # elevations into a 4x4 atlas (albedo + alpha), then writes an LOD scene with the full mesh
 # as LOD0 and an impostor quad as LOD1 for Terrain3D's instancer.
 # Needs a window (the dummy renderer cannot render):
-#   godot --path . res://tools/godot/bake_impostors.tscn
+#   godot --path . res://tools/godot/bake_impostors.tscn [-- --only=spruce]
 extends Node
 
 const TREES := ["birch", "pine", "spruce"]
@@ -14,7 +14,13 @@ const OUT := "res://assets/models/trees/"
 
 func _ready() -> void:
 	await get_tree().process_frame
+	var only := ""
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--only="):
+			only = a.trim_prefix("--only=")
 	for name in TREES:
+		if only != "" and name != only:
+			continue
 		await _bake(name)
 	print("[bake] done")
 	get_tree().quit()
