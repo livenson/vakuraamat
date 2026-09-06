@@ -192,11 +192,14 @@ def run_job(job):
             fetch_roads.fetch(sid, root=ws)
         except Exception as e:  # noqa: BLE001 - optional layer
             log(f"{sid}: fetch_roads unavailable ({e})")
-        stage("bus stops (OpenStreetMap)", 0.632)
-        try:
-            fetch_stops.fetch(sid, root=ws)
-        except Exception as e:  # noqa: BLE001 - optional layer
-            log(f"{sid}: fetch_stops unavailable ({e})")
+        # Overpass queues requests for tens of seconds: the stops fetch runs beside the register stages
+        def stops_job():
+            try:
+                fetch_stops.fetch(sid, root=ws)
+            except Exception as e:  # noqa: BLE001 - optional layer
+                log(f"{sid}: fetch_stops unavailable ({e})")
+        stops_thread = threading.Thread(target=stops_job, daemon=True)
+        stops_thread.start()
         stage("fields (PRIA)", 0.635)
         try:
             fetch_fields.fetch(sid, root=ws)
@@ -212,6 +215,11 @@ def run_job(job):
             market.derive(sid, root=ws)
         except Exception as e:  # noqa: BLE001 - optional layer
             log(f"{sid}: market unavailable ({e})")
+        if stops_thread.is_alive():
+            stage("bus stops (OpenStreetMap)", 0.665)
+            stops_thread.join(60)
+            if stops_thread.is_alive():
+                log(f"{sid}: bus stops still queued at Overpass; the pack goes without them")
         stage("buildings, water, boats, anchors", 0.67)
         _, _, anchors = extract_features.extract(sid, root=ws)
         stage("layout", 0.7)

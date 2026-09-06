@@ -34,12 +34,12 @@ def transform(points, s_srs, t_srs):
 
 
 def overpass(south, west, north, east):
-    q = f'[out:json][timeout:60];node["highway"="bus_stop"]({south:.6f},{west:.6f},{north:.6f},{east:.6f});out body;'
+    q = f'[out:json][timeout:25];node["highway"="bus_stop"]({south:.6f},{west:.6f},{north:.6f},{east:.6f});out body;'
     last = None
     for url in OVERPASS:
         try:
             req = urllib.request.Request(url, data=urllib.parse.urlencode({"data": q}).encode(), headers=UA)
-            return json.load(urllib.request.urlopen(req, timeout=90)).get("elements", [])
+            return json.load(urllib.request.urlopen(req, timeout=35)).get("elements", [])   # the public servers queue slots for ~30 s
         except Exception as e:  # noqa: BLE001 - try the mirror
             last = e
     raise RuntimeError(f"Overpass unavailable: {last}")
