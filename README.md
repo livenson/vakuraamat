@@ -55,8 +55,11 @@ flowchart LR
   end
   EHR[Building Register: year, storeys, materials, addresses]
   ARI[e-Business Register CSV: companies by address]
+  PRIA[PRIA field register WFS: fields and declared crops]
+  OSM[OpenStreetMap: bus stops]
   RSS[ERR and Postimees RSS, Ametlikud Teadaanded]
   PH[Poly Haven CC0 textures]
+  SKF[Sketchfab and Poly Pizza CC BY models: cars, lamps, shelters, trees, farm props]
 
   DTM & NDSM & ORTHO --> FT[fetch_tile.py] --> TILE[(assets/terrain/tile: heightmap.r32, canopy.r32, ortho.jpg)]
   TREES --> FTR[fetch_trees.py] --> TJ[(trees.json)]
@@ -64,6 +67,8 @@ flowchart LR
   ETAKR --> FR[fetch_roads.py] --> RJ[(roads.json)]
   KAT --> FP[fetch_parcels.py] --> PJ[(parcels.json)] --> MK[market.py] --> MJ[(market.json)]
   ARI --> FTE[fetch_tenants.py] --> TEJ[(tenants.json)]
+  PRIA --> FF[fetch_fields.py] --> FJ[(fields_2026.json)]
+  OSM & RJ --> FS[fetch_stops.py] --> SJ[(stops.json)]
   PJ & BJ --> FTE
   TILE --> EF[extract_features.py] --> WJ[(water and massing)]
   PH --> PHF[fetch_polyhaven.py] --> TEX[(ground and facade textures)]
@@ -74,7 +79,7 @@ flowchart LR
   PJ & TEJ & MJ --> TA[town_admin.py] --> DB[(SpacetimeDB town)]
   RSS --> NF[news_feeder.py] --> DB
 
-  REG & SCN & TEX --> GAME[Godot: terrain, buildings, interiors, roads, parcels, traffic]
+  REG & SCN & TEX & FJ & SJ & SKF --> GAME[Godot: terrain, buildings, interiors, roads, parcels, traffic, crops, bus stops]
   DB --> LEDGER[Ledger: owners, prices, bids, news] --> GAME
 ```
 
