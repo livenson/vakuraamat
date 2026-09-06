@@ -40,6 +40,10 @@ setup:
 	$(MAKE) import
 	@test -f assets/terrain/$(TILE)/data/terrain3d_00_00.res || echo ">> terrain region data is not in git: run 'make tile' (network, ~10 min)"
 
+mcp:                            # the Sketchfab MCP server for Claude Code (tools/mcp/sketchfab.sh, .mcp.json); token in sketchfab.token
+	test -d tools/mcp/sketchfab-mcp-server || git clone -q https://github.com/gregkop/sketchfab-mcp-server tools/mcp/sketchfab-mcp-server
+	cd tools/mcp/sketchfab-mcp-server && npm install --silent && npm run build --silent
+
 import:
 	$(GODOT) --headless --path . --import >/dev/null 2>&1 || true
 

@@ -145,13 +145,23 @@ func _ready() -> void:
 			get_tree().create_timer(2.0).timeout.connect(ui.debug_open.bind(a.trim_prefix("--open=")))
 
 
+## The report named by --report=, for the first world of this process only: a world entered later
+## from the menu (another location) must not inherit the report's save and position.
 func _report_from_args() -> Dictionary:
+	if GameState.report_replayed:
+		return {}
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--report="):
+			GameState.report_replayed = true
 			var parsed = JSON.parse_string(FileAccess.get_file_as_string(a.trim_prefix("--report=")))
-			if typeof(parsed) == TYPE_DICTIONARY:
-				return parsed
-			push_error("cannot read report " + a)
+			if typeof(parsed) != TYPE_DICTIONARY:
+				push_error("cannot read report " + a)
+				return {}
+			var site := str(parsed.get("site", Sites.active))
+			if site != Sites.active:
+				push_warning("report %s is from site %s, not %s: not replayed" % [parsed.get("id", ""), site, Sites.active])
+				return {}
+			return parsed
 	return {}
 
 

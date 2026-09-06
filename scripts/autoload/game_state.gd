@@ -6,6 +6,7 @@ var eras: Dictionary = {}                 # id -> EraDefinition (one per pack to
 var current_era: String = ""
 var world: Node = null                    # the World scene, if running
 var pending_load := false                 # main menu asked for "Continue"
+var report_replayed := false              # the --report= argument is honoured by the first world only
 var menu_open_locations := false          # pause menu asked the main menu to open the Locations panel
 
 

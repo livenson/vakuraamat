@@ -23,3 +23,8 @@ server/vakuraamat/target/
 # Media headlines snapshot for offline play (regenerate with make news-local)
 sites/*/news.json
 sites/*/news.json.import
+
+# secrets
+sketchfab.token
+# MCP servers cloned and built locally (make mcp)
+tools/mcp/sketchfab-mcp-server/

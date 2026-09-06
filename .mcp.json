@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "sketchfab": {
+      "command": "tools/mcp/sketchfab.sh",
+      "args": []
+    }
+  }
+}
