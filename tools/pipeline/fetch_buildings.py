@@ -290,6 +290,8 @@ def fetch(site, root=ROOT, use_ehr=True, use_lod2=True, progress=None):
         xs = [p[0] for p in poly]; zs = [p[1] for p in poly]
         props = f.get("properties", {})
         code = props.get("ehr_gid")
+        if code and "-" in str(code):
+            code = str(code).split("-")[0]   # ETAK numbers a building's parts "<code>-2"; the register knows the code alone
         info = {}
         if use_ehr and code:
             d = fetch_ehr(code, cache)
