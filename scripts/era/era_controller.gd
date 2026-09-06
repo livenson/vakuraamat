@@ -84,7 +84,13 @@ func _collect_windows() -> void:
 				_window_mats.append(w)
 
 
+static var current_hour := 12.0
+
+
 func set_hour(hour: float) -> void:
+	current_hour = hour
+	for b in get_tree().get_nodes_in_group("neon_open"):
+		b.set_open_hour(hour)
 	var lit := hour < 6.5 or hour > 18.5
 	if lit == _windows_lit:
 		return

@@ -212,5 +212,10 @@ func _sign_buildings(scope: Node = null) -> bool:
 		if names.is_empty():
 			continue
 		b.set_sign("\n".join(names.slice(0, 2)) + ("\n+%d" % (names.size() - 2) if names.size() > 2 else ""))
+		if not b.has_node("Props"):
+			var props := Node3D.new()
+			props.name = "Props"
+			b.add_child(props)
+			b.set_props(Tenants.of(Sites.pack_of(b), b.tunnus).filter(func(t): return str(t.get("status", "")) == "R"))
 		n += 1
 	return true

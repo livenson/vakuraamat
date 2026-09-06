@@ -62,6 +62,7 @@ func _ready() -> void:
 		add_child(mi)
 	_street_lights(terrain)
 	_bus_stops(terrain)
+	_billboards(terrain)
 
 
 const POSTER_RECT := Rect2(0.793, 0.674, 0.198, 0.317)   # the second advert panel in the town shelter's atlas (UV space)
@@ -117,8 +118,8 @@ func _poster(model: Node3D, at: Vector2) -> void:
 		mi.set_surface_override_material(0, own)
 
 
-## A poster image: a colour drawn from the first name, the names in white, the place below.
-func _render_poster(names: Array[String], size: Vector2i) -> Image:
+## A poster image: a colour drawn from the first line, the lines in white, the place below.
+func _render_poster(names: Array[String], size: Vector2i, pack: String = "") -> Image:
 	var vp := SubViewport.new()
 	vp.size = size
 	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
@@ -146,7 +147,7 @@ func _render_poster(names: Array[String], size: Vector2i) -> Image:
 		l.add_theme_color_override("font_color", Color.WHITE)
 		box.add_child(l)
 	var place := Label.new()
-	place.text = Sites.display_name(Sites.pack_of(self))
+	place.text = Sites.display_name(pack if pack != "" else Sites.pack_of(self))
 	place.position = Vector2(size.x * 0.08, size.y * 0.8)
 	place.size = Vector2(size.x * 0.84, size.y * 0.16)
 	place.add_theme_font_size_override("font_size", int(size.y * 0.05))
@@ -158,6 +159,98 @@ func _render_poster(names: Array[String], size: Vector2i) -> Image:
 	var img: Image = vp.get_texture().get_image()
 	vp.queue_free()
 	return img
+
+
+const BILLBOARD_MODEL := "res://assets/vendor/sketchfab/billboard.glb"   # jeffkolada, CC BY
+const BILLBOARD_SPACING := 400.0
+
+
+## Roadside billboards on the roads (not the streets): one every BILLBOARD_SPACING metres, facing
+## the traffic, each with a poster of one of the tile's biggest employers (round-robin).
+func _billboards(terrain: Terrain3D) -> void:
+	if not ResourceLoader.exists(BILLBOARD_MODEL):
+		return
+	var pack := Sites.pack_of(self)
+	var firms: Array = []
+	for u in Parcels.units(pack):
+		for t in Tenants.of(pack, str(u.get("tunnus", ""))):
+			if str(t.get("status", "")) == "R" and t.get("employees") != null and int(t.employees) >= 3:
+				firms.append(t)
+	if firms.is_empty():
+		return
+	firms.sort_custom(func(a, b): return int(a.employees) > int(b.employees))
+	firms = firms.slice(0, 6)
+	var scene: PackedScene = load(BILLBOARD_MODEL)
+	var probe: Node3D = scene.instantiate()
+	var b: AABB = Interiors._bounds(probe)
+	probe.free()
+	var k := 6.0 / maxf(b.size.x, 0.01)   # a 6 m wide board
+	var i := 0
+	var along := BILLBOARD_SPACING * 0.5
+	var acc := 0.0
+	for r in roads:
+		if str(r.get("kind", "road")) != "road":
+			continue
+		var pts := _resample(r.points)
+		var half: float = maxf(float(r.get("width", 3.0)), 1.2) / 2.0
+		for j in range(1, pts.size()):
+			var a: Vector2 = pts[j - 1]
+			var c: Vector2 = pts[j]
+			var seg := a.distance_to(c)
+			while acc + seg >= along:
+				var tt := (along - acc) / maxf(seg, 0.001)
+				var dir := (c - a).normalized()
+				var side := 1.0 if i % 2 == 0 else -1.0
+				var at := a.lerp(c, tt) + Vector2(-dir.y, dir.x) * side * (half + 6.0)
+				var h: float = terrain.data.get_height(to_global(Vector3(at.x, 0.0, at.y)))
+				if not is_nan(h):
+					var model: Node3D = scene.instantiate()
+					model.scale = Vector3.ONE * k
+					model.position = Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k)
+					var holder := Node3D.new()
+					holder.name = "Billboard_%d" % i
+					holder.position = Vector3(at.x, h - global_position.y, at.y)
+					# the panel faces +Z: turn it to look back along the road at the traffic coming this way
+					var face := -dir if side > 0.0 else dir
+					holder.rotation.y = atan2(face.x, face.y) + (PI * 0.25 * side)
+					holder.add_child(model)
+					add_child(holder)
+					_poster_quad(holder, b, k, firms[i % firms.size()], pack)
+					i += 1
+				along += BILLBOARD_SPACING
+			acc += seg
+	if i > 0:
+		var first: Node3D = get_node("Billboard_0")
+		print("[roads] %d billboards for %d firms, first at %s yaw %.0f" % [i, firms.size(), first.position, rad_to_deg(first.rotation.y)])
+
+
+## The poster: a quad just in front of the model's panel (its upper part, the full width).
+func _poster_quad(holder: Node3D, b: AABB, k: float, firm: Dictionary, pack: String) -> void:
+	var w := b.size.x * k
+	var h := b.size.y * k
+	var quad := MeshInstance3D.new()
+	var pm := QuadMesh.new()
+	pm.size = Vector2(w * 0.93, h * 0.36)
+	quad.mesh = pm
+	quad.position = Vector3(0.0, h * 0.775, b.size.z * k * 0.5 + 0.03)
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.9, 0.9, 0.9)
+	mat.roughness = 0.8
+	quad.material_override = mat
+	holder.add_child(quad)
+	var lines: Array[String] = [str(firm.get("name", ""))]
+	if firm.get("emtak") and firm.emtak.get("text"):
+		lines.append(str(firm.emtak.text))
+	elif firm.get("sector"):
+		lines.append(tr("SECTOR_" + str(firm.sector).to_upper()))
+	_paint_poster.call_deferred(mat, lines, Vector2i(768, 300), pack)
+
+
+func _paint_poster(mat: StandardMaterial3D, lines: Array[String], size: Vector2i, pack: String) -> void:
+	var img: Image = await _render_poster(lines, size, pack)
+	if img and is_instance_valid(mat):
+		mat.albedo_texture = ImageTexture.create_from_image(img)
+		mat.albedo_color = Color(1, 1, 1)
 
 
 const STOP_MODELS := {"rural": "res://assets/vendor/sketchfab/bus_stop_rural.glb", "town": "res://assets/vendor/sketchfab/bus_stop_town.glb"}   # Ottto3ds, CC BY

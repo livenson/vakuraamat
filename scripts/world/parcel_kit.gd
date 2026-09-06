@@ -19,7 +19,7 @@ var _colors: Array[Color] = []
 func _ready() -> void:
 	if polygon.size() < 3:
 		return
-	if kit in ["hedge", "fence", "solar", "playground", "court", "park", "farm"]:
+	if kit in ["hedge", "fence", "solar", "playground", "court", "park", "farm", "kiosk"]:
 		# these place every piece on the ground themselves: neither the kit nor its parcel group may be snapped
 		set_meta("no_snap", true)
 		if get_parent():
@@ -33,6 +33,8 @@ func _ready() -> void:
 			_park()
 		"farm":
 			_farm()
+		"kiosk":
+			_kiosk()
 		"hedge":
 			_boundary(0.9, 0.7, Color(0.22, 0.4, 0.18), 1.2, true)
 		"fence":
@@ -280,6 +282,16 @@ func _farm() -> void:
 			var spot := _deepest(fc, Vector2.RIGHT.rotated(rng.randf() * TAU))
 			if _model("tractor", spot + Vector2(6.0, 0.0), 3.6, rng.randf() * TAU, SKETCHFAB):
 				placed_tractor = true
+
+
+## A small commercial plot with a retail tenant: a kiosk (VovaRice, CC BY) at its deepest spot.
+func _kiosk() -> void:
+	var rows: Array = Tenants.of(Sites.pack_of(self), tunnus).filter(func(t): return str(t.get("status", "")) == "R" and str(t.get("sector", "")) == "trade")
+	if rows.is_empty():
+		return
+	var c := _centroid()
+	var spot := _deepest(c, Vector2.RIGHT)
+	_model("kiosk", spot, 7.0, 0.0, SKETCHFAB)
 
 
 ## Park benches: every 35 m along the parcel's long axis, each at the deepest point across the

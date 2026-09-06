@@ -65,6 +65,14 @@
       "kit": null
     },
     {
+      "id": "kiosk",
+      "purpose": [
+        "ARIMAA"
+      ],
+      "max_area": 600,
+      "kit": "kiosk"
+    },
+    {
       "id": "farm",
       "purpose": [
         "MAATULUNDUSMAA"
