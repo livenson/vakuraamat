@@ -105,6 +105,8 @@ func _tri(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3) -> void:
 
 ## LOD2 faces: planar polygons in metres relative to the origin (x east, y up from the base, z south).
 func _faces(faces: Array) -> void:
+	var roof_faces: Array = []       # Array[Vector3] per roof face, for the gap pass
+	var wall_tops: Array = []        # [Vector3 a, Vector3 b] the ground line of each wall face
 	for face in faces:
 		var pts: Array[Vector3] = []
 		for p in face:
@@ -120,6 +122,25 @@ func _faces(faces: Array) -> void:
 		var st := _roof if nrm.y > 0.3 else _walls
 		if st == _walls:
 			_register_face(pts)
+			# the wall's line on the ground: the two vertices farthest apart in xz (gables included)
+			var pa := pts[0]
+			var pb := pts[0]
+			var best := -1.0
+			for i in pts.size():
+				for j in range(i + 1, pts.size()):
+					var dd := Vector2(pts[i].x, pts[i].z).distance_squared_to(Vector2(pts[j].x, pts[j].z))
+					if dd > best:
+						best = dd
+						pa = pts[i]
+						pb = pts[j]
+			var low := INF
+			var high := -INF
+			for q in pts:
+				low = minf(low, q.y)
+				high = maxf(high, q.y)
+			wall_tops.append([pa, pb, low, high])
+		else:
+			roof_faces.append(pts)
 		# triangulate in the plane: drop the dominant axis
 		var proj: PackedVector2Array = PackedVector2Array()
 		var ax := absf(nrm.x)
@@ -143,6 +164,99 @@ func _faces(faces: Array) -> void:
 				_tri(st, a, c, b)
 			else:
 				_tri(st, a, b, c)
+	_close_gaps(roof_faces, wall_tops)
+
+
+## Some Geo3D models are fragments: a whole roof with walls under one corner only (the rest reads as
+## a slab in the air). Every outer roof edge that no wall face reaches gets a wall down to the ground.
+func _close_gaps(roof_faces: Array, wall_tops: Array) -> void:
+	var edges: Array = []   # [a, b, face index]
+	for fi in roof_faces.size():
+		var pts: Array = roof_faces[fi]
+		for i in pts.size():
+			edges.append([pts[i], pts[(i + 1) % pts.size()], fi])
+	var added := 0
+	for e in edges:
+		var a: Vector3 = e[0]
+		var b: Vector3 = e[1]
+		if a.distance_to(b) < 1.5 or minf(a.y, b.y) < 2.5:
+			continue
+		var mid := (a + b) * 0.5
+		var covered := false
+		# wall faces standing along this edge (eaves overhang the wall by a metre or so), taken
+		# together (models split walls into bands): they must reach well below it, a parapet alone
+		# does not hold a roof up
+		var lowest := INF
+		for w in wall_tops:
+			if _dist_xz(mid, w[0], w[1]) < 1.5:
+				lowest = minf(lowest, float(w[2]))
+				if float(w[2]) <= mid.y + 0.5 and float(w[3]) >= mid.y + 1.0:
+					covered = true   # a taller part rises from this edge: an inner edge of a lower roof
+		if lowest <= mid.y - 2.0:
+			covered = true
+		if not covered:
+			# a lower roof lies under this edge (a skylight, a penthouse, a setback): nothing to close
+			for fi in roof_faces.size():
+				if fi == e[2]:
+					continue
+				var face2: Array = roof_faces[fi]
+				var below := false
+				var poly2 := PackedVector2Array()
+				for q in face2:
+					poly2.append(Vector2(q.x, q.z))
+					if q.y < mid.y - 0.3:
+						below = true
+				if below and Geometry2D.is_point_in_polygon(Vector2(mid.x, mid.z) + Vector2(c_out(e, roof_faces)).limit_length(0.3), poly2):
+					covered = true
+					break
+		if not covered:
+			for o in edges:   # an inner edge: another roof face shares it
+				if o[2] != e[2] and _dist_xz(mid, o[0], o[1]) < 0.4 and absf(((o[0] + o[1]) * 0.5).y - mid.y) < 1.5:
+					covered = true
+					break
+		if covered:
+			continue
+		var ga := Vector3(a.x, 0.0, a.z)
+		var gb := Vector3(b.x, 0.0, b.z)
+		# outward: away from the roof face's centre
+		var face: Array = roof_faces[e[2]]
+		var c := Vector3.ZERO
+		for q in face:
+			c += q
+		c /= face.size()
+		var out := Vector3(-(b.z - a.z), 0.0, b.x - a.x)
+		if out.dot(mid - c) < 0.0:
+			var t := a
+			a = b
+			b = t
+			ga = Vector3(a.x, 0.0, a.z)
+			gb = Vector3(b.x, 0.0, b.z)
+		_tri(_walls, ga, gb, b)
+		_tri(_walls, ga, b, a)
+		_register_face([ga, gb, b, a])
+		added += 1
+	if added > 0:
+		print("[building] %s: %d roof edges without walls closed to the ground" % [address if address != "" else str(building_id), added])
+
+
+## The xz direction from an edge's midpoint towards its face's centre.
+static func c_out(e: Array, roof_faces: Array) -> Vector2:
+	var face: Array = roof_faces[e[2]]
+	var c := Vector3.ZERO
+	for q in face:
+		c += q
+	c /= face.size()
+	var mid: Vector3 = (e[0] + e[1]) * 0.5
+	return Vector2(c.x - mid.x, c.z - mid.z)
+
+
+static func _dist_xz(p: Vector3, a: Vector3, b: Vector3) -> float:
+	var p2 := Vector2(p.x, p.z)
+	var a2 := Vector2(a.x, a.z)
+	var b2 := Vector2(b.x, b.z)
+	var ab := b2 - a2
+	var t := clampf((p2 - a2).dot(ab) / maxf(ab.length_squared(), 0.0001), 0.0, 1.0)
+	return p2.distance_to(a2 + ab * t)
 
 
 ## Fallback: the footprint extruded to `height` with a flat roof.
@@ -213,6 +327,7 @@ func _details() -> void:
 			toward.y = 0.0
 			ridge += toward.limit_length(0.6)
 			box.position = Vector3(ridge.x, ridge.y + 0.3, ridge.z)
+			call_deferred("_settle_chimney", box)   # the highest vertex may be a spike or a dormer: drop to the roof there
 		add_child(box)
 	if solar:
 		var panel := CSGBox3D.new()
@@ -526,3 +641,21 @@ func set_exterior_visible(on: bool) -> void:
 	for c in get_children():
 		if c is CSGShape3D:
 			c.visible = on
+
+
+## A chimney placed at the model's highest vertex may hang in the air where the roof is lower:
+## cast down at its spot against this building's collider and sink it half a metre into the roof.
+func _settle_chimney(box: CSGBox3D) -> void:
+	if not is_inside_tree() or _body_node == null or not is_instance_valid(box):
+		return
+	var space := get_world_3d().direct_space_state
+	var from := to_global(box.position + Vector3(0, 30.0, 0))
+	var to := to_global(box.position - Vector3(0, 30.0, 0))
+	var q := PhysicsRayQueryParameters3D.create(from, to, 1)
+	q.collide_with_bodies = true
+	var hit := space.intersect_ray(q)
+	if hit.is_empty() or hit.collider != _body_node:
+		return
+	var local := to_local(hit.position)
+	box.position.y = local.y + box.size.y * 0.5 - 0.5
+
