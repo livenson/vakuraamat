@@ -113,8 +113,9 @@ func _place(delta: float) -> void:
 	var parent := get_parent() as Node3D
 	var gp := parent.to_global(Vector3(p.x, 0.0, p.y)) if parent else Vector3(p.x, 0.0, p.y)
 	var h: float = _terrain.data.get_height(gp) if _terrain else 0.0
-	if is_nan(h):
-		h = global_position.y
+	var streamer = GameState.world.streamer if GameState.world else null
+	if is_nan(h) or (streamer and not streamer.contains(gp)):
+		h = global_position.y - 0.1   # off the built ground (a neighbour tile still importing): keep the height
 	global_position = Vector3(gp.x, h + 0.1, gp.z)
 	if d.length_squared() > 0.0:
 		rotation.y = atan2(-d.x, -d.y)
@@ -415,7 +416,8 @@ const SKETCHFAB_CARS := {"car_sedan": 4.5, "car_wagon": 4.6, "car_hatchback": 4.
 const SKETCHFAB_WEIGHTS := ["car_sedan", "car_sedan", "car_wagon", "car_wagon", "car_hatchback", "car_hatchback", "car_compact", "car_suv", "car_suv",
 	"car_minivan", "car_pickup", "car_lada", "car_lada", "car_coupe", "car_sport", "car_offroad"]
 const KIT_UTILITY := ["van", "delivery", "taxi", "truck"]   # the Kenney kit keeps the working vehicles
-const CAR_FLIP := ["car_lada", "car_suv"]   # exported nose-first the other way round (model_preview shows their front to the camera)
+# Facing +Z after the split (model_preview shows their front): turned round to face -Z like the agents.
+const CAR_FLIP := ["car_lada", "car_suv", "car_compact", "car_coupe", "car_hatchback", "car_minivan", "car_offroad", "car_pickup"]
 
 
 ## A car from the Kenney Car Kit (CC0) when it is installed, else the box car. Pre-1950 cars are a

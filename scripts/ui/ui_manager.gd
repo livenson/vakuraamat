@@ -813,6 +813,7 @@ func _lay_out_map(origin: Vector2, side: float, loc: Vector2i, pack: String, pp:
 				continue   # a neighbour tile's point
 			var text: String = n.label() if n.label() != "" else n.name
 			dots.append({"pos": p, "text": text, "col": DEBUG_COLORS.get(kind, Color.WHITE)})
+	dots = dots.filter(func(d): return d.pos.is_finite())   # an agent mid-teleport has no place on the map
 	dots.sort_custom(func(a, b): return a.pos.distance_squared_to(pp) < b.pos.distance_squared_to(pp))
 	for d in dots:
 		var w := font.get_string_size(d.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x

@@ -65,6 +65,24 @@ def main():
             c = ((lx0 + lx1) / 2, (ly0 + ly1) / 2)
             if x0 <= c[0] <= x1 and y0 <= c[1] <= y1 and lz1 <= z1 + 0.1:
                 chosen.append(o)
+        # undo the pack's arrangement: a car pack places its cars in a circle, each facing outward.
+        # The body's long horizontal axis (2D principal axis of its world vertices) becomes +Y, the
+        # end farther from the pack's origin is taken as the front.
+        import math
+        from mathutils import Matrix
+        body = chosen[0]
+        pts = [body.matrix_world @ v.co for v in body.data.vertices]
+        mx = sum(p.x for p in pts) / len(pts); my = sum(p.y for p in pts) / len(pts)
+        sxx = sum((p.x - mx) ** 2 for p in pts); syy = sum((p.y - my) ** 2 for p in pts); sxy = sum((p.x - mx) * (p.y - my) for p in pts)
+        theta = 0.5 * math.atan2(2 * sxy, sxx - syy)          # direction of the long axis
+        ax = Vector((math.cos(theta), math.sin(theta), 0.0))
+        if ax.dot(Vector((mx, my, 0.0))) < 0:                  # the front points away from the pack centre
+            ax = -ax
+        yaw = math.atan2(ax.x, ax.y)                          # rotation taking ax onto +Y
+        undo = Matrix.Rotation(yaw, 4, "Z")
+        for o in chosen:
+            o.matrix_world = undo @ o.matrix_world
+        bpy.context.view_layer.update()
         # ground and centre the group
         x0, x1, y0, y1, z0, z1 = bounds(chosen)
         cx, cy, zmin = (x0 + x1) / 2, (y0 + y1) / 2, z0
@@ -77,10 +95,12 @@ def main():
             o.select_set(True)
         out = os.path.join(out_dir, name + ".glb")
         bpy.ops.export_scene.gltf(filepath=out, export_format="GLB", use_selection=True, export_apply=True)
-        for o in chosen:   # undo the move so the next group is measured from its own place
+        for o in chosen:   # put the group back so the next group is measured from its own place
             o.location.x += cx
             o.location.y += cy
             o.location.z += zmin
+            o.matrix_world = undo.inverted() @ o.matrix_world
+        bpy.context.view_layer.update()
         log(f"{name}: {len(chosen)} objects -> {out}")
 
 

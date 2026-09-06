@@ -54,6 +54,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("toggle_fly"):
 		flying = not flying
 		velocity = Vector3.ZERO
+		if not flying:
+			_unstick()
 		EventBus.notice.emit(tr("NOTICE_FLY_ON") if flying else tr("NOTICE_FLY_OFF"))
 	elif riding and event.is_action_pressed("interact"):
 		dismount()
@@ -185,3 +187,17 @@ func _physics_process(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, 0.0, speed)
 		velocity.z = move_toward(velocity.z, 0.0, speed)
 	move_and_slide()
+
+
+## Landing from flight inside a roof or wall collider wedges the capsule: lift it until it is free.
+func _unstick() -> void:
+	for _i in 20:
+		if not test_move(global_transform, Vector3(0, -0.02, 0)) or is_on_floor():
+			return
+		var probe := global_transform
+		probe.origin.y += 0.25
+		if not test_move(probe, Vector3.ZERO):
+			global_position.y += 0.25
+			return
+		global_position.y += 0.25
+
