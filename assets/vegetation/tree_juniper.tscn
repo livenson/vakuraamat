@@ -1,6 +1,8 @@
-[gd_scene format=3]
+[gd_scene load_steps=2 format=3]
 
-[ext_resource type="ArrayMesh" path="res://assets/vegetation/tree_juniper_mesh.res" id="1_6ro2d"]
+[ext_resource type="ArrayMesh" path="res://assets/vegetation/tree_juniper_mesh.res" id="1"]
 
-[node name="LOD0" type="MeshInstance3D" unique_id=408692146]
-mesh = ExtResource("1_6ro2d")
+[node name="tree_juniper" type="Node3D"]
+
+[node name="LOD0" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1")

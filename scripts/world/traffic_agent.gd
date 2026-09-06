@@ -404,15 +404,28 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 
 
 const BIKE_MODEL := "res://assets/vendor/polypizza/bicycle.glb"
+const SKETCHFAB := "res://assets/vendor/sketchfab/"
 const CAR_KIT := "res://assets/vendor/kenney_car_kit/glb/"
 const CAR_MODELS := ["sedan", "sedan", "sedan-sports", "hatchback-sports", "hatchback-sports", "suv", "suv-luxury", "van", "delivery", "taxi", "truck"]
 const CAR_SCALE := 1.4   # the kit's sedan is 2.55 x 1.5 x 1.45 m: at 1.4 it is 3.6 m long and 2 m tall, a cartoon car that still fits the street
+# Sketchfab cars (comrade1280's generic pack and a Lada 2107, CC BY; THIRD_PARTY.md): name -> length in metres.
+# Fitted from their bounds, so the pack's cm exports and the Lada's oversized file come out the same.
+const SKETCHFAB_CARS := {"car_sedan": 4.5, "car_wagon": 4.6, "car_hatchback": 4.1, "car_compact": 3.7, "car_coupe": 4.4, "car_minivan": 4.8,
+	"car_sport": 4.4, "car_pickup": 5.2, "car_suv": 4.7, "car_offroad": 4.3, "car_lada": 4.1}
+const SKETCHFAB_WEIGHTS := ["car_sedan", "car_sedan", "car_wagon", "car_wagon", "car_hatchback", "car_hatchback", "car_compact", "car_suv", "car_suv",
+	"car_minivan", "car_pickup", "car_lada", "car_lada", "car_coupe", "car_sport", "car_offroad"]
+const KIT_UTILITY := ["van", "delivery", "taxi", "truck"]   # the Kenney kit keeps the working vehicles
+const CAR_FLIP := ["car_lada", "car_suv"]   # exported nose-first the other way round (model_preview shows their front to the camera)
 
 
 ## A car from the Kenney Car Kit (CC0) when it is installed, else the box car. Pre-1950 cars are a
 ## sedan painted near black; later ones keep the kit's colours with a slight tint for variety.
 func _make_car(year: int) -> Node3D:
-	var name: String = "sedan" if year < 1950 else CAR_MODELS[rng.randi() % CAR_MODELS.size()]
+	if year >= 1950 and rng.randf() < 0.8:
+		var car := _make_sketchfab_car()
+		if car:
+			return car
+	var name: String = "sedan" if year < 1950 else KIT_UTILITY[rng.randi() % KIT_UTILITY.size()]
 	var path := CAR_KIT + name + ".glb"
 	if not ResourceLoader.exists(path):
 		return _make_box_car(year)
@@ -421,9 +434,38 @@ func _make_car(year: int) -> Node3D:
 	model.rotation.y = PI            # the kit's front is +Z; agents face -Z
 	model.scale = Vector3.ONE * CAR_SCALE
 	root.add_child(model)
+	_tint_car(model, year)
+	return root
+
+
+## A Sketchfab car fitted from its bounds to its real length, the long axis along Z, wheels
+## (nodes named Wheel_*) spinning with the agent. Null when the models are not vendored.
+func _make_sketchfab_car() -> Node3D:
+	var name: String = SKETCHFAB_WEIGHTS[rng.randi() % SKETCHFAB_WEIGHTS.size()]
+	var path := SKETCHFAB + name + ".glb"
+	if not ResourceLoader.exists(path):
+		return null
+	var model: Node3D = (load(path) as PackedScene).instantiate()
+	var b: AABB = Interiors._bounds(model)
+	var longest := maxf(b.size.x, b.size.z)
+	if longest < 0.01:
+		return null
+	var k: float = float(SKETCHFAB_CARS[name]) / longest
+	model.scale = Vector3.ONE * k
+	model.position = Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k)
+	var root := Node3D.new()
+	var turn := Node3D.new()
+	turn.rotation.y = (PI / 2.0 if b.size.x > b.size.z else 0.0) + (PI if name in CAR_FLIP else 0.0)   # the pack faces -Z like the agents
+	turn.add_child(model)
+	root.add_child(turn)
+	_tint_car(model, 2026)
+	return root
+
+
+func _tint_car(model: Node3D, year: int) -> void:
 	var tint := Color(0.12, 0.12, 0.13) if year < 1950 else Color(1, 1, 1).lerp(CAR_PAINT[rng.randi() % CAR_PAINT.size()], 0.25)
 	for mi in model.find_children("*", "MeshInstance3D", true, false):
-		if mi.name.begins_with("wheel"):
+		if mi.name.to_lower().begins_with("wheel"):
 			_wheels.append(mi)
 			continue
 		for si in mi.mesh.get_surface_count():
@@ -433,7 +475,6 @@ func _make_car(year: int) -> Node3D:
 				c.albedo_color = c.albedo_color * tint
 				c.roughness = 0.35
 				mi.set_surface_override_material(si, c)
-	return root
 
 
 func _make_box_car(year: int) -> Node3D:

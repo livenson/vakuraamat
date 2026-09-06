@@ -19,7 +19,7 @@ var _colors: Array[Color] = []
 func _ready() -> void:
 	if polygon.size() < 3:
 		return
-	if kit in ["hedge", "fence", "solar", "playground", "court"]:
+	if kit in ["hedge", "fence", "solar", "playground", "court", "park", "farm"]:
 		# these place every piece on the ground themselves: neither the kit nor its parcel group may be snapped
 		set_meta("no_snap", true)
 		if get_parent():
@@ -31,6 +31,8 @@ func _ready() -> void:
 			_court()
 		"park":
 			_park()
+		"farm":
+			_farm()
 		"hedge":
 			_boundary(0.9, 0.7, Color(0.22, 0.4, 0.18), 1.2, true)
 		"fence":
@@ -82,6 +84,7 @@ func _centroid() -> Vector2:
 
 
 const MODELS := "res://assets/vendor/polypizza/"
+const SKETCHFAB := "res://assets/vendor/sketchfab/"   # CC BY models, credited in THIRD_PARTY.md
 
 ## A playground from the Poly Pizza models (see THIRD_PARTY.md): a swing set, a slide and a seesaw
 ## around the centre, a sandpit, a bench; bigger grounds add a jungle gym, monkey bars, a trampoline
@@ -175,8 +178,8 @@ static func _dist_to_segment(p: Vector2, a: Vector2, b: Vector2) -> float:
 
 ## A vendored model on the ground at `at`, scaled so its longest side is `length` metres, turned by
 ## `yaw` about its centre. False when the model is not vendored.
-func _model(name: String, at: Vector2, length: float, yaw: float) -> bool:
-	var path := MODELS + name + ".glb"
+func _model(name: String, at: Vector2, length: float, yaw: float, root: String = MODELS) -> bool:
+	var path := root + name + ".glb"
 	if not ResourceLoader.exists(path):
 		return false
 	var model: Node3D = (load(path) as PackedScene).instantiate()
@@ -219,13 +222,64 @@ func _area() -> float:
 	return a * 0.5
 
 
+## A park bench: the Sketchfab model (pgonarg, CC BY) when it is vendored, else three boxes.
 func _bench(at: Vector3, yaw: float) -> void:
+	if _model("park_bench", Vector2(at.x, at.z), 1.8, yaw, SKETCHFAB):
+		return
+	at.y = _ground(Vector2(at.x, at.z))
 	var wood := Color(0.5, 0.35, 0.2)
 	var b := Basis(Vector3.UP, yaw)
 	_box(at + Vector3(0, 0.45, 0), Vector3(1.8, 0.06, 0.4), wood, yaw)
 	_box(at + Vector3(0, 0.8, 0) + b * Vector3(0, 0, -0.2), Vector3(1.8, 0.4, 0.05), wood, yaw)
 	for dx in [-0.75, 0.75]:
 		_box(at + b * Vector3(dx, 0.22, 0), Vector3(0.08, 0.45, 0.4), Color(0.25, 0.25, 0.25), yaw)
+
+
+## A farmed unit: hay bales in a row across each PRIA grassland field on it and a tractor by the
+## field's edge (Sketchfab models, CC BY). Nothing where the register declares no field (forest).
+func _farm() -> void:
+	var pack := Sites.pack_of(self)
+	var path := Sites.path_in(pack, "fields_2026.json")
+	if not FileAccess.file_exists(path):
+		return
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(tunnus + "farm")
+	var placed_tractor := false
+	for f in parsed.get("fields", []):
+		var poly := PackedVector2Array()   # the field in this kit's local space (the parcel node carries the offset)
+		for c in f.get("polygon", []):
+			var lp := to_local(Vector3(float(c[0]), 0.0, float(c[1])))
+			poly.append(Vector2(lp.x, lp.z))
+		if poly.size() < 3:
+			continue
+		var fc := Vector2.ZERO
+		for q in poly:
+			fc += q
+		fc /= poly.size()
+		if not Geometry2D.is_point_in_polygon(fc, polygon):
+			continue
+		var kind := str(f.get("kind", ""))
+		if kind == "grass":
+			# bales along the field's longest edge, one row 8 m apart, well inside the field
+			var best := 0.0
+			var dir := Vector2.RIGHT
+			for i in poly.size():
+				var e := poly[(i + 1) % poly.size()] - poly[i]
+				if e.length() > best:
+					best = e.length()
+					dir = e.normalized()
+			var n := clampi(int(best / 12.0), 2, 12)
+			for i in n:
+				var at := fc + dir * ((i - (n - 1) * 0.5) * 8.0) + Vector2(-dir.y, dir.x) * rng.randf_range(-3.0, 3.0)
+				if Geometry2D.is_point_in_polygon(at, poly):
+					_model("hay_bales", at, 2.4, atan2(dir.y, dir.x) + rng.randf_range(-0.3, 0.3), SKETCHFAB)
+		if not placed_tractor and kind != "fallow":
+			var spot := _deepest(fc, Vector2.RIGHT.rotated(rng.randf() * TAU))
+			if _model("tractor", spot + Vector2(6.0, 0.0), 3.6, rng.randf() * TAU, SKETCHFAB):
+				placed_tractor = true
 
 
 ## Park benches: every 35 m along the parcel's long axis, each at the deepest point across the
