@@ -259,8 +259,9 @@ def enrich(tenants, root, max_age_days=7, refresh=False, today=None):
     codes = [int(t["registry_code"]) for t in tenants if str(t.get("registry_code") or "").isdigit()]
     if not codes:
         return {}
-    reg_dir = os.path.join(root, "data_raw", "ariregister")
-    tax_dir = os.path.join(root, "data_raw", "emta")
+    import paths
+    reg_dir = paths.raw("ariregister")
+    tax_dir = paths.raw("emta")
     dates = {}
     slims = {}
     for name in (GENERAL, PERSONS, SHAREHOLDERS):

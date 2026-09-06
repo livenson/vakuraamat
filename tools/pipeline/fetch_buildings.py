@@ -10,7 +10,7 @@ Sources (both open data, attribution required):
   * EHR, the Building Register (livekluster.ehr.ee, GET /api/building/v2/buildingdata?ehr_code=):
     first year of use, floors, footprint area, gross volume, name, purpose, status.
   * Maa-amet 3D building models (Geo3D, LOD2 with roof shapes, FileGDB per municipality, read with
-    GDAL): the actual roof geometry, keyed by ETAK id. Downloads are cached in data_raw/lod2/.
+    pyogrio): the actual roof geometry, keyed by ETAK id. Downloads are cached in data_raw/lod2/.
   * The tile's canopy.r32 (nDSM) for the measured height of footprints without a model.
 
 Writes sites/<site>/buildings.json:
@@ -23,7 +23,7 @@ roof colour, heat source and fuel -> chimney, solar electricity -> panels, own w
 A building appears in an era when year <= the era's year; buildings without a year are shown in the
 newest era only (tools/gen_era_scenes.py "footprints" node). EHR answers are cached in data_raw/ehr/.
 """
-import argparse, json, os, shutil, subprocess, sys, time, urllib.parse, urllib.request, zipfile
+import argparse, json, os, shutil, sys, time, urllib.parse, urllib.request, zipfile
 
 import numpy as np
 
@@ -209,10 +209,9 @@ def municipalities(xmin, ymin, xmax, ymax):
 def fetch_lod2(xmin, ymin, xmax, ymax, cache_dir):
     """Maa-amet 3D building models (LOD2, roof shapes) for the tile: {etak_id: feature} with 3D faces.
     Downloads the FileGDB per municipality (cached), reads it with GDAL, clips to the bbox."""
-    if not shutil.which("ogr2ogr"):
-        log("ogr2ogr not found: no LOD2 roofs (brew install gdal)")
-        return {}
     os.makedirs(cache_dir, exist_ok=True)
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import geo
     found = {}
     for name in municipalities(xmin, ymin, xmax, ymax):
         fname = name.replace(" ", "_")
@@ -234,14 +233,12 @@ def fetch_lod2(xmin, ymin, xmax, ymax, cache_dir):
         gdbs = [os.path.join(dp, d) for dp, ds, _ in os.walk(gdb_dir) for d in ds if d.endswith(".gdb")]
         if not gdbs:
             continue
-        out = os.path.join(cache_dir, f"clip_{fname}_{int(xmin)}_{int(ymin)}.geojson")
-        if os.path.exists(out):
-            os.remove(out)
-        subprocess.run(["ogr2ogr", "-q", "-f", "GeoJSON", "-spat", str(xmin), str(ymin), str(xmax), str(ymax), "-dim", "XYZ", out, gdbs[0]],
-                       check=False, capture_output=True)
-        if not os.path.exists(out):
+        try:
+            feats = geo.geojson_features(gdbs[0], (xmin, ymin, xmax, ymax))
+        except Exception as e:  # noqa: BLE001 - a broken download must not stop the register
+            log(f"LOD2 {name}: cannot read {gdbs[0]} ({e})")
             continue
-        for f in json.load(open(out)).get("features", []):
+        for f in feats:
             eid = f.get("properties", {}).get("etak_id")
             if eid is not None:
                 found[int(eid)] = f
@@ -299,8 +296,9 @@ def fetch(site, root=ROOT, use_ehr=True, use_lod2=True, progress=None):
             log(f"orthophoto not read for roof colours: {e}")
     feats = fetch_etak(xmin, ymin, xmax, ymax)
     log(f"ETAK: {len(feats)} building polygons in the tile")
-    cache = os.path.join(ROOT, "data_raw", "ehr")
-    lod2 = fetch_lod2(xmin, ymin, xmax, ymax, os.path.join(ROOT, "data_raw", "lod2")) if use_lod2 else {}
+    import paths
+    cache = paths.raw("ehr")
+    lod2 = fetch_lod2(xmin, ymin, xmax, ymax, paths.raw("lod2")) if use_lod2 else {}
     out = []
     with_ehr = with_year = with_lod2 = 0
     for i, f in enumerate(feats):

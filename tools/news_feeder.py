@@ -21,6 +21,9 @@ from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
+import paths  # noqa: E402
+ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar
 UA = {"User-Agent": "vakuraamat-news/0.1 (open-source game; headlines and links only)"}
 DEFAULT_SERVER = "http://127.0.0.1:3300"
 ERR = {"id": "err", "name": "ERR", "url": "https://www.err.ee/rss", "category": "Eesti", "area": "country", "terms": "ERR: RSS free to embed"}
@@ -201,7 +204,9 @@ def fetch_notices(kind, names, parcels, municipality_cap=5):
 
 
 def state_path(root, town):
-    d = os.path.join(root, "data_raw", "news"); os.makedirs(d, exist_ok=True)
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "pipeline"))
+    import paths
+    d = paths.raw("news")
     return os.path.join(d, f"{town}.json")
 
 
@@ -286,7 +291,7 @@ def run(a):
     json.dump(st, open(sp, "w"))
 
 
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--site", default="kvissentali")
     ap.add_argument("--db", default=None, help="town database name (default: tools/town_admin.py name)")
@@ -300,7 +305,7 @@ def main():
     ap.add_argument("--no-notices", action="store_true")
     ap.add_argument("--no-rss", action="store_true")
     ap.add_argument("--max-per-run", type=int, default=40)
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
     if a.db is None and not a.local and not a.dry_run:
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from town_admin import town_name  # noqa: E402

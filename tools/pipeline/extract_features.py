@@ -9,9 +9,9 @@ Outputs (sites/<site>/, names from site.json "buildings" / "water"):
                       orthophoto (roofs), as bounding boxes in tile metres; the 2026 village massing
     water_*.json      [{area, x, z, w, d, level, color}]  flat, dark, treeless patches of the laser DTM
 Both are starting points for the author: delete, merge or move entries by hand.
-Needs numpy and the GDAL command line (gdal_translate) for the JPEG.
+Needs numpy and Pillow.
 """
-import argparse, json, math, os, subprocess, sys, tempfile
+import argparse, json, math, os, sys
 from collections import deque
 
 import numpy as np
@@ -24,14 +24,10 @@ def log(msg):
 
 
 def load_ortho(path, size):
-    """Orthophoto resampled to one texel per metre as float RGB in 0..1 (via GDAL, band-sequential)."""
-    with tempfile.TemporaryDirectory() as td:
-        raw = os.path.join(td, "ortho.raw")
-        subprocess.run(["gdal_translate", "-q", "-of", "ENVI", "-co", "INTERLEAVE=BIP", "-ot", "Byte", "-outsize", str(size), str(size), "-r", "average", path, raw], check=True)
-        data = np.fromfile(raw, dtype=np.uint8)
-    if data.size != 3 * size * size:
-        sys.exit(f"unexpected orthophoto raw size {data.size}")
-    return data.reshape(size, size, 3).astype(np.float32) / 255.0   # BIP: r, g, b per pixel
+    """Orthophoto resampled (box average) to one texel per metre as float RGB in 0..1."""
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import geo
+    return geo.load_image_rgb(path, size)
 
 
 def components(mask, min_area):

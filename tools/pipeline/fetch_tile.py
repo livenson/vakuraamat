@@ -15,7 +15,7 @@ Fetches a 1 m DTM sheet and a matching orthophoto for a square area of interest
 Step 2 (tools/godot/import_terrain.gd) turns these into Terrain3D region files.
 
 Only needs python3 (stdlib), curl-free (urllib), and the GDAL command line tools
-(`brew install gdal`). QGIS is not required.
+(rasterio, pyogrio, shapely and pyproj wheels; no GDAL install). QGIS is not required.
 
 Examples:
     python3 tools/pipeline/fetch_tile.py --site kvissentali            # centre, size, tile and era maps from sites/<site>/site.json
@@ -25,7 +25,7 @@ Examples:
 Era ground maps come from the Maa-amet historical WMS (kaart.maaamet.ee/wms/ajalooline, EPSG:3301):
     --era-map kk1940:era_1938_cadastral.png      schematic cadastral map 1930-1944
     --era-map yheverstakaart:era_1798_verst.png  one-verst map 1894-1922
-Sheets: an AOI that crosses 1:10 000 sheet borders is mosaicked with gdalbuildvrt.
+Sheets: an AOI that crosses 1:10 000 sheet borders is mosaicked (rasterio.merge).
 
 Sheet numbers can be looked up from a point automatically (downloads the
 1:10 000 map sheet grid once into data_raw/).
@@ -37,7 +37,6 @@ import time
 import os
 import re
 import shutil
-import subprocess
 import sys
 import urllib.parse
 import urllib.request
@@ -53,19 +52,23 @@ WMS_MAX_PX = 4096
 ATTRIBUTION = "Map data: Maa- ja Ruumiamet (Estonian Land and Spatial Development Board), {year}"
 
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import geo  # noqa: E402
+
+PROGRESS = None   # the tile service sets a callback(frac, text) when it runs this in-process
+
+
 def log(msg):
     print(f"[fetch_tile] {msg}", flush=True)
 
 
 def progress(frac, text):
-    """A line the tile service turns into the job's stage: `[progress] <0..1> <text>`."""
-    print(f"[progress] {frac:.3f} {text}", flush=True)
-
-
-def run(cmd, quiet=False):
-    if not quiet:
-        log("$ " + " ".join(str(c) for c in cmd))
-    return subprocess.run([str(c) for c in cmd], check=True, capture_output=True, text=True).stdout
+    """The job's stage: a callback when the tile service runs the fetch in-process, else a line
+    `[progress] <0..1> <text>` on stdout."""
+    if PROGRESS:
+        PROGRESS(frac, text)
+    else:
+        print(f"[progress] {frac:.3f} {text}", flush=True)
 
 
 def download(url, dest, post=None, label=None, span=None):
@@ -108,11 +111,10 @@ def sheet_for_point(x, y, raw_dir):
         z = download(GRID_ZIP, os.path.join(raw_dir, "epk10T_SHP.zip"))
         with zipfile.ZipFile(z) as zf:
             zf.extractall(grid_dir)
-    out = run(["ogrinfo", "-al", "-geom=NO", "-spat", x, y, x + 0.001, y + 0.001, shp], quiet=True)
-    m = re.search(r"NR \(Integer\) = (\d+)", out)
-    if not m:
+    nums = geo.sheet_numbers(shp, (x, y, x + 0.001, y + 0.001))
+    if not nums:
         sys.exit(f"no map sheet found for point {x},{y}")
-    return m.group(1)
+    return nums[0]
 
 
 def geoportal_links(sheet, kind):
@@ -150,8 +152,7 @@ def sheets_2000_for_bbox(xmin, ymin, xmax, ymax, raw_dir):
         z = download(GRID2T_ZIP, os.path.join(raw_dir, "epk2T_SHP.zip"))
         with zipfile.ZipFile(z) as zf:
             zf.extractall(grid_dir)
-    out = run(["ogrinfo", "-al", "-geom=NO", "-spat", xmin + 1, ymin + 1, xmax - 1, ymax - 1, shp], quiet=True)
-    return sorted(set(re.findall(r"\bNR \(Integer\) = (\d+)", out)))
+    return geo.sheet_numbers(shp, (xmin + 1, ymin + 1, xmax - 1, ymax - 1))
 
 
 def fetch_canopy(a, raw_dir, out_dir, xmin, ymin, xmax, ymax):
@@ -175,16 +176,12 @@ def fetch_canopy(a, raw_dir, out_dir, xmin, ymin, xmax, ymax):
         name = urllib.parse.parse_qs(urllib.parse.urlparse(links[-1]).query)["f"][0]
         tifs.append(download(links[-1], os.path.join(raw_dir, name)))
         source = "chm (1:20000 sheet %s, %s)" % (sheet20, name)
-    vrt = os.path.join(raw_dir, f"{a.name}_canopy_src.vrt")
-    run(["gdalbuildvrt", "-q", vrt] + tifs)
     clipped = os.path.join(raw_dir, f"{a.name}_canopy_{a.size}m.tif")
-    # -te/-tr force exactly the heightmap grid whatever the source resolution; NoData -> 0 (no vegetation)
-    run(["gdalwarp", "-q", "-overwrite", "-te", xmin, ymin, xmax, ymax, "-tr", 1, 1, "-r", "bilinear",
-         "-dstnodata", "0", "-ot", "Float32", vrt, clipped])
+    # exactly the heightmap grid whatever the source resolution (bilinear); NoData -> 0 (no vegetation)
+    data, zmax = geo.warp_canopy(tifs, (xmin, ymin, xmax, ymax), clipped)
     raw_out = os.path.join(raw_dir, f"{a.name}_canopy.r32")
-    run(["gdal_translate", "-q", "-of", "ENVI", "-ot", "Float32", clipped, raw_out])
+    geo.write_r32(data, raw_out)
     shutil.copyfile(raw_out, os.path.join(out_dir, "canopy.r32"))
-    zmin, zmax, _ = gdal_stats(clipped)
     log(f"canopy layer from {source}: 0..{zmax:.1f} m")
     return {"file": "canopy.r32", "source": source, "max_height": round(zmax, 2),
             "format": "float32 little-endian, row-major, row 0 = north; metres above ground; 0 = nothing"}
@@ -216,19 +213,10 @@ def fetch_dem(xmin, ymin, xmax, ymax, out_r32, raw_dir, name="tile"):
         url = dtm_download_url(sh)
         fname = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)["f"][0]
         paths.append(download(url, os.path.join(raw_dir, fname)))
-    src = paths[0]
-    if len(paths) > 1:
-        src = os.path.join(raw_dir, f"{name}_dtm_src.vrt")
-        run(["gdalbuildvrt", "-q", src] + paths)
     clipped = os.path.join(raw_dir, f"{name}_dtm_{int(xmax - xmin)}m.tif")
-    run(["gdal_translate", "-q", "-projwin", xmin, ymax, xmax, ymin, src, clipped])
-    zmin, zmax, nodata = gdal_stats(clipped)
-    if nodata is not None and shutil.which("gdal_fillnodata"):
-        run(["gdal_fillnodata", "-q", clipped, clipped + ".filled.tif"])
-        os.replace(clipped + ".filled.tif", clipped)
-        zmin, zmax, _ = gdal_stats(clipped)
+    data, zmin, zmax = geo.clip_dem(paths, (xmin, ymin, xmax, ymax), clipped)   # mosaicked, NoData filled
     raw_out = os.path.join(raw_dir, f"{name}_heightmap.r32")
-    run(["gdal_translate", "-q", "-of", "ENVI", "-ot", "Float32", clipped, raw_out])
+    geo.write_r32(data, raw_out)
     shutil.copyfile(raw_out, out_r32)
     return zmin, zmax, sheets
 
@@ -248,15 +236,7 @@ def fetch_ortho(xmin, ymin, xmax, ymax, out_jpg, px):
     return out_jpg
 
 
-def gdal_stats(path):
-    info = run(["gdalinfo", "-stats", path], quiet=True)
-    zmin = float(re.search(r"STATISTICS_MINIMUM=([-\d.]+)", info).group(1))
-    zmax = float(re.search(r"STATISTICS_MAXIMUM=([-\d.]+)", info).group(1))
-    nodata = re.search(r"NoData Value=([-\d.]+)", info)
-    return zmin, zmax, float(nodata.group(1)) if nodata else None
-
-
-def main():
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--site", help="read tile name, centre, size and era maps from sites/<site>/site.json")
     ap.add_argument("--name", help="tile name, becomes assets/terrain/<name>/")
@@ -273,7 +253,7 @@ def main():
     ap.add_argument("--project", default=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
                     help="project root (default: repo root)")
     ap.add_argument("--raw-dir", help="download cache (default: <project>/data_raw)")
-    a = ap.parse_args()
+    a = ap.parse_args(argv)
     era_maps = {}
     for em in a.era_map:
         layer, _, fname = em.partition(":")
@@ -339,25 +319,15 @@ def main():
     progress(0.5, "clipping the ground model")
     dtm_url = dtm_urls[0]
     dtm_name = ",".join(os.path.basename(p) for p in dtm_paths)
-    dtm_path = dtm_paths[0]
-    if len(dtm_paths) > 1:
-        dtm_path = os.path.join(raw_dir, f"{a.name}_dtm_src.vrt")
-        run(["gdalbuildvrt", "-q", dtm_path] + dtm_paths)
-
     clipped = os.path.join(raw_dir, f"{a.name}_dtm_{a.size}m.tif")
-    run(["gdal_translate", "-q", "-projwin", xmin, ymax, xmax, ymin, dtm_path, clipped])
-    zmin, zmax, nodata = gdal_stats(clipped)
-    if nodata is not None and shutil.which("gdal_fillnodata"):
-        # Water bodies etc. may be NoData; interpolate across them so the mesh has no holes.
-        run(["gdal_fillnodata", "-q", clipped, clipped + ".filled.tif"])
-        os.replace(clipped + ".filled.tif", clipped)
-        zmin, zmax, _ = gdal_stats(clipped)
+    # the sheets mosaicked and clipped; water bodies etc. may be NoData: interpolated across so the mesh has no holes
+    data, zmin, zmax = geo.clip_dem(dtm_paths, (xmin, ymin, xmax, ymax), clipped)
     log(f"height range {zmin:.2f}..{zmax:.2f} m")
 
     # Raw float32: Godot reads it with Image.create_from_data(FORMAT_RF) - no codec surprises.
     # (Godot's PNG loader drops 16-bit to 8-bit and its EXR loader rejects GDAL's channel naming.)
     raw_out = os.path.join(raw_dir, f"{a.name}_heightmap.r32")
-    run(["gdal_translate", "-q", "-of", "ENVI", "-ot", "Float32", clipped, raw_out])
+    geo.write_r32(data, raw_out)
     shutil.copyfile(raw_out, os.path.join(out_dir, "heightmap.r32"))
     expected = a.size * a.size * 4
     got = os.path.getsize(os.path.join(out_dir, "heightmap.r32"))

@@ -12,7 +12,7 @@ Writes assets/terrain/<tile>/trees.json: {"source", "count", "trees": [[x, z, he
 (tile metres, x east, z south; type 1 = conifer, 0 = deciduous). Downloads and the CSV dump of each
 municipality are cached in data_raw/trees/.
 """
-import argparse, csv, html, json, os, re, shutil, subprocess, sys, time, urllib.parse, urllib.request, zipfile
+import argparse, csv, html, json, os, re, shutil, sys, time, urllib.parse, urllib.request, zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -62,8 +62,9 @@ def points_csv(name, code, cache_dir):
     gpkgs = [os.path.join(dp, f) for dp, _, fs in os.walk(d) for f in fs if f.endswith(".gpkg")]
     if not gpkgs:
         return None
-    # -spat on this GeoPackage returns nothing (axis-order quirk); dump everything once and filter here
-    subprocess.run(["ogr2ogr", "-q", "-f", "CSV", "-lco", "GEOMETRY=AS_XY", csv_path, gpkgs[0], "yksikpuud_keskpunkt"], check=True)
+    # a bbox filter on this GeoPackage returns nothing (axis-order quirk); dump everything once and filter here
+    import geo
+    geo.points_to_csv(gpkgs[0], "yksikpuud_keskpunkt", csv_path, None)
     return csv_path
 
 
@@ -74,10 +75,8 @@ def fetch(site, root=ROOT):
     tdir = os.path.join(root, "assets/terrain", tile)
     meta = json.load(open(os.path.join(tdir, "terrain_meta.json")))
     xmin, ymin, xmax, ymax = meta["xmin"], meta["ymin"], meta["xmax"], meta["ymax"]
-    if not shutil.which("ogr2ogr"):
-        log("ogr2ogr not found (brew install gdal); no measured trees")
-        return []
-    cache = os.path.join(ROOT, "data_raw", "trees")
+    import paths
+    cache = paths.raw("trees")
     codes = municipality_codes(cache)
     trees = []
     sources = []

@@ -45,6 +45,9 @@ PRIMITIVES
 import argparse, json, math, os, random, sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
+import paths  # noqa: E402
+ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar
 DARKWOOD = (0.30, 0.22, 0.14)
 SKIRT = (0.42, 0.38, 0.32)
 

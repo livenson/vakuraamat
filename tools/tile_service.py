@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Local tile service: turns a point in Estonia into a playable site pack plus its terrain tile.
 
-    python3 tools/tile_service.py [--port 8765] [--workspace data_raw/service]
+    python3 tools/tile_service.py [--port 8765] [--workspace data_raw/service] [--raw-dir data_raw]
 
 The game (scripts/autoload/locator.gd) talks to it:
     GET  /health                     -> {"ok": true}
@@ -16,24 +16,29 @@ The game (scripts/autoload/locator.gd) talks to it:
     GET  /packs                      -> [{"id","name","x","y","size","eras","seed","blocks"}]  packs ready in the cache
     GET  /download?id=<id>           -> zip with site/<pack files> and tile/<engine files>
 A job runs the same tools as `make site` + `make tile`, in a workspace outside the repo, with the
-download cache shared (data_raw/). Needs python3, numpy and GDAL.
+download cache shared (data_raw/, or --raw-dir). Needs python3 with numpy, Pillow, rasterio, pyogrio, shapely and pyproj;
+the same script frozen with tools/service/build.sh ships beside the exported game as the tile_service sidecar.
 Nothing here is exposed beyond the loopback interface unless you bind it so.
 """
-import argparse, time, json, os, re, shutil, subprocess, sys, threading, traceback, urllib.parse, urllib.request, zipfile
+import argparse, time, json, os, re, shutil, sys, threading, traceback, urllib.parse, urllib.request, zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "tools")); sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
+HERE = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, HERE); sys.path.insert(0, os.path.join(HERE, "pipeline"))
+import paths  # noqa: E402
+ROOT = paths.ROOT   # the repository, or the bundle directory of the frozen sidecar (tools/service/build.sh)
 import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads, fetch_stops, fetch_tenants, fetch_fields, market  # noqa: E402
-
-import fetch_tile  # noqa: E402
-STATS_PATH = os.path.join(ROOT, "data_raw", "service_stats.json")
+import fetch_tile, news_feeder, validate_site  # noqa: E402
 MIN_FREE_BYTES = 2 * 1024 ** 3   # a job needs raw sheets, the workspace and the zip: refuse under 2 GB
 ORTHO_BYTES = 6 * 1024 ** 2      # the WMS orthophoto JPEG (4096 px) and the small historical maps
 GEOCODER = "https://inaadress.maaamet.ee/inaadress/gazetteer?results=8&features=EHAK,TANAV,KATASTRIYKSUS,EHITISHOONE&address="
 JOBS = {}
 LOCK = threading.Lock()
-WORKSPACE = os.path.join(ROOT, "data_raw", "service")
+WORKSPACE = os.path.join(paths.raw_root(), "service")   # data_raw/service in the repo; the game's user directory for the sidecar
+
+
+def stats_path():
+    return os.path.join(paths.raw_root(), "service_stats.json")
 
 
 def log(msg):
@@ -60,14 +65,14 @@ def geocode(q):
 
 def load_stats():
     try:
-        return json.load(open(STATS_PATH))
+        return json.load(open(stats_path()))
     except (OSError, ValueError):
         return {"rate_bps": 0.0, "jobs": []}
 
 
 def save_stats(st):
-    os.makedirs(os.path.dirname(STATS_PATH), exist_ok=True)
-    json.dump(st, open(STATS_PATH, "w"))
+    os.makedirs(os.path.dirname(stats_path()), exist_ok=True)
+    json.dump(st, open(stats_path(), "w"))
 
 
 def note_rate(text):
@@ -94,7 +99,7 @@ def head_size(url):
 def estimate(x, y, size):
     """What a pack for (x, y) downloads: the DTM sheets of the tile's corners, the 1:2000 nDSM sheets,
     the orthophoto; each with its size (HEAD) and whether data_raw already holds it."""
-    raw_dir = os.path.join(ROOT, "data_raw")
+    raw_dir = paths.raw_root()
     half = size / 2
     xmin, ymin, xmax, ymax = x - half, y - half, x + half, y + half
     items = []
@@ -159,19 +164,15 @@ def run_job(job):
         new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid, template="palupera",
                           force=True, root=ws, template_root=ROOT, texture_mode="path", seed=job.get("seed"), block_ids=job.get("blocks"))
         stage("Maa-amet data", 0.1)
-        # the fetcher reports its steps as "[progress] <0..1> <text>" lines: they become the stage
-        proc = subprocess.Popen([sys.executable, os.path.join(ROOT, "tools/pipeline/fetch_tile.py"), "--project", ws, "--site", sid,
-                                 "--raw-dir", os.path.join(ROOT, "data_raw")], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-        for line in proc.stdout:
-            line = line.rstrip("\n")
-            if line.startswith("[progress] "):
-                _, frac, text = line.split(" ", 2)
-                stage("Maa-amet: " + text, 0.1 + 0.35 * float(frac))
-                note_rate(text)
-            elif line:
-                print(line, flush=True)
-        if proc.wait() != 0:
-            raise RuntimeError("fetch_tile.py failed")
+
+        def on_progress(frac, text):   # the fetcher's steps become the job's stage
+            stage("Maa-amet: " + text, 0.1 + 0.35 * float(frac))
+            note_rate(text)
+        fetch_tile.PROGRESS = on_progress
+        try:
+            fetch_tile.main(["--project", ws, "--site", sid, "--raw-dir", paths.raw_root()])
+        finally:
+            fetch_tile.PROGRESS = None
         stage("measured trees", 0.46)
         try:
             fetch_trees.fetch(sid, root=ws)
@@ -212,7 +213,7 @@ def run_job(job):
             log(f"{sid}: tenants unavailable ({e})")
         stage("news (RSS, Ametlikud Teadaanded)", 0.655)
         try:
-            subprocess.run([sys.executable, os.path.join(ROOT, "tools/news_feeder.py"), "--site", sid, "--root", ws, "--local", "--once"], check=False, timeout=180)
+            news_feeder.main(["--site", sid, "--root", ws, "--local", "--once"])
         except Exception as e:  # noqa: BLE001 - optional layer
             log(f"{sid}: news unavailable ({e})")
         stage("market snapshot", 0.66)
@@ -236,7 +237,12 @@ def run_job(job):
         if not gen_era_scenes.generate(sid, root=ws):
             raise RuntimeError("scene generation reported problems")
         stage("validation", 0.85)
-        subprocess.run([sys.executable, os.path.join(ROOT, "tools/validate_site.py"), "--site", sid, "--root", ws], check=True)
+        rep = validate_site.Report()
+        validate_site.validate(sid, rep, ws)
+        for w in rep.warnings:
+            log(f"{sid}: validation warning: {w}")
+        if rep.errors:
+            raise RuntimeError("validation: " + "; ".join(rep.errors[:5]))
         stage("packing", 0.9)
         zpath = os.path.join(WORKSPACE, sid + ".zip")
         with zipfile.ZipFile(zpath + ".part", "w", zipfile.ZIP_DEFLATED) as z:
@@ -257,10 +263,10 @@ def run_job(job):
             job.update(stage="ready", progress=1.0, done=True, zip=zpath)
         note_job(time.time() - started)
         log(f"{sid}: ready ({os.path.getsize(zpath) / 1e6:.1f} MB, {time.time() - started:.0f} s)")
-    except Exception as e:  # noqa: BLE001 - report anything to the client
+    except (Exception, SystemExit) as e:  # noqa: BLE001 - report anything to the client (the tools sys.exit on bad input)
         traceback.print_exc()
         with LOCK:
-            job.update(stage="failed", done=True, error=str(e))
+            job.update(stage="failed", done=True, error=str(e) or "failed")
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -364,14 +370,47 @@ class Handler(BaseHTTPRequestHandler):
         return self._json(202, {"id": sid, "stage": "queued"})
 
 
+def parent_alive(pid):
+    if os.name == "nt":
+        import ctypes
+        h = ctypes.windll.kernel32.OpenProcess(0x00100000, False, pid)   # SYNCHRONIZE
+        if not h:
+            return False
+        gone = ctypes.windll.kernel32.WaitForSingleObject(h, 0) == 0
+        ctypes.windll.kernel32.CloseHandle(h)
+        return not gone
+    try:
+        os.kill(pid, 0)
+        return True
+    except ProcessLookupError:
+        return False
+    except PermissionError:
+        return True
+
+
+def watch_parent(pid):
+    """A sidecar started by the game ends with it: the game cannot kill a PyInstaller child through
+    its bootloader, so the service polls the game's pid and exits when it is gone."""
+    while parent_alive(pid):
+        time.sleep(2.0)
+    log(f"parent {pid} gone, exiting")
+    os._exit(0)
+
+
 def main():
     global WORKSPACE
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--port", type=int, default=8765)
     ap.add_argument("--bind", default="127.0.0.1")
-    ap.add_argument("--workspace", default=WORKSPACE)
+    ap.add_argument("--workspace", default=None, help="generated packs (default: <raw dir>/service)")
+    ap.add_argument("--raw-dir", default=None, help="download cache shared by every job (default: data_raw/ in the repo, or VAKURAAMAT_RAW_DIR)")
+    ap.add_argument("--parent-pid", type=int, default=0, help="exit when this process is gone (the game that started the sidecar)")
     a = ap.parse_args()
-    WORKSPACE = a.workspace
+    if a.parent_pid:
+        threading.Thread(target=watch_parent, args=(a.parent_pid,), daemon=True).start()
+    if a.raw_dir:
+        os.environ["VAKURAAMAT_RAW_DIR"] = os.path.abspath(a.raw_dir)
+    WORKSPACE = os.path.abspath(a.workspace) if a.workspace else os.path.join(paths.raw_root(), "service")
     os.makedirs(WORKSPACE, exist_ok=True)
     open(os.path.join(WORKSPACE, ".gdignore"), "a").close()
     srv = ThreadingHTTPServer((a.bind, a.port), Handler)

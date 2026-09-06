@@ -10,6 +10,8 @@ content (writing, models, textures), with the data attribution below carried in 
 
 | Component | Version / date | Where | Licence | Obligations | OSS release |
 |---|---|---|---|---|---|
+| rasterio, pyogrio, shapely, pyproj, numpy, Pillow (Python wheels; `tools/service/requirements.txt`) | rasterio 1.5, pyogrio 0.13, shapely 2.1, pyproj 3.8 (2026-09-06) | `.venv-service`, frozen into the tile-service sidecar | BSD-3 (rasterio, shapely, numpy), MIT (pyogrio, pyproj), MIT-CMU (Pillow); the wheels carry GDAL and PROJ (MIT) and their bundled libraries (GEOS LGPL-2.1, libtiff, libpng, sqlite…) | keep the licence texts the wheels ship (PyInstaller collects them into the sidecar); the sidecar is a separate executable, so the LGPL parts stay dynamically linked inside it | yes |
+| PyInstaller | 6.22 | `tools/service/build.sh` (build tool only) | GPL-2.0 with the bootloader exception: frozen programs keep their own licence | none for the sidecar | yes |
 | Godot Engine | 4.7.2 | engine | MIT | keep the engine licence text in the exported app (Godot does this) | yes |
 | Terrain3D (TokisanGames) | 1.0.2-stable, 2026-05-19 | `addons/terrain_3d` | MIT | keep `addons/terrain_3d/LICENSE.txt` | yes |
 | Sky3D (TokisanGames, J. Cuéllar) | 2.1.0, 2026-05-19 | `addons/sky_3d` | MIT; third-party textures listed in `addons/sky_3d/ThirdParty.md` | keep both files; check ThirdParty.md before redistributing the milky-way/moon textures | yes (check textures) |

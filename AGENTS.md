@@ -78,6 +78,10 @@ its design documents in the repo root describe that version.
 - Poly Pizza downloads cannot be scripted (403 on the file host); the user saves the glb by hand into
   `assets/vendor/polypizza/<name>.glb`, then add a THIRD_PARTY.md row (Kenney and Quaternius there are
   CC0, "Poly by Google" is CC BY 3.0). Scale every vendored model from its bounds (`Interiors._bounds`).
+- The pipeline's Python is `.venv-service/bin/python` (`make setup`; rasterio, pyogrio, shapely, pyproj
+  wheels, no system GDAL); `make` targets, `tools/play.sh` and the game's launcher pick it up. Raster and
+  vector work goes through `tools/pipeline/geo.py`; caches through `paths.raw(<name>)`. `make service`
+  freezes the tile service into a sidecar that CI ships beside every build.
 - Company data: `tenants.json` keeps the register's people files as structure only (`board_size`,
   `shareholders`, `owners` = hashed ids for links). Never print an `owners` entry, never add names,
   e-mails or phones; `make validate` rejects them.

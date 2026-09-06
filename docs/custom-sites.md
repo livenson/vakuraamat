@@ -56,7 +56,7 @@ The **New location...** button in the main menu takes an address, a place name, 
 for a pack:
 
 ```sh
-make tile-service          # python3 tools/tile_service.py, loopback port 8765; needs GDAL, numpy, node (tools/play.sh starts it for you)
+make tile-service          # tools/tile_service.py on the loopback port 8765 (the venv's Python; tools/play.sh and the game start it for you)
 ```
 
 The service runs the same steps as `make site` + `make tile` in a workspace under `data_raw/service/`
@@ -166,7 +166,7 @@ or `--failed` for the sheet).
 - **ETAK** (the topographic database, WFS) gives every building polygon in the tile and its type;
 - the **Building Register (EHR)** adds, per building code, the first year of use, floors, footprint
   area, volume, purpose and status;
-- **Maa-amet Geo3D LOD2** adds the actual roof geometry (FileGDB per municipality, read with GDAL;
+- **Maa-amet Geo3D LOD2** adds the actual roof geometry (FileGDB per municipality, read with pyogrio;
   the municipality comes from the address gazetteer);
 - the tile's **nDSM** gives a measured height where the model is missing.
 

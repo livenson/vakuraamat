@@ -28,3 +28,9 @@ sketchfab.token
 tools/mcp/sketchfab-mcp-server/
 # Sketchfab candidates under review (tools/mcp/sketchfab.sh), not vendored
 assets/vendor/_review/
+
+# the tile-service sidecar build (tools/service/build.sh)
+.venv-service/
+dist/
+build/
+__pycache__/
