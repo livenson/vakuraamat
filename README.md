@@ -24,6 +24,11 @@ Business Register open data with Godot 4.7, GDScript, Terrain3D and SpacetimeDB.
   each other walk; without it the same rules run in your own book.
 - **Walk in:** every real building has a door; inside is generated from its footprint and register
   data (storeys, rooms, stairs, window rhythm) and furnished by use.
+- **Know your tenants:** every company carries what the Business Register and the Tax Board publish:
+  activity, staff, turnover, taxes, board and owner structure, a health flag. The map (M) colours the
+  plots by sector, employees, health, founding year or shared owners; the book has a Companies page;
+  shops hang their signs and neon by the door, billboards advertise the biggest employers, and a
+  strong tenant pays more rent.
 - **Anywhere in Estonia:** *Locations* in the menu turns an address into a playable square kilometre
   in a couple of minutes, and the neighbouring tiles stream in as you walk.
 
@@ -113,5 +118,6 @@ the same for any point from inside the game. A town is a SpacetimeDB database se
 ## Licence of the data
 
 Maa-amet open data, free for commercial use with attribution ("Map data: Maa- ja Ruumiamet, 2026",
-also in every `terrain_meta.json`); companies from the e-Business Register open data (CC BY 4.0).
+also in every `terrain_meta.json`); companies from the e-Business Register open data (CC BY 4.0) and
+the Tax Board's quarterly figures; bus stops from OpenStreetMap (ODbL); farmed fields from PRIA.
 Everything vendored is listed in `THIRD_PARTY.md`.
