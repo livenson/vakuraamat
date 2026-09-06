@@ -218,6 +218,8 @@ Interaction components after Cogito's patterns (MIT, credited in `THIRD_PARTY.md
 - `LightSwitch`: the shade under every interior lamp; E turns that lamp off and on.
 - `Carryable`: cardboard boxes in storage rooms, halls and workshops are rigid bodies you pick up
   with E, carry in front of you and put down with E again (they drop if they get stuck).
+- `BuildingInfo`: any wall of a real building answers to the crosshair with the register's use, year
+  and storeys; E opens the register sheet. Laser-massing shapes say they are not in the register.
 - `Readable`: the notice board beside the entrance opens a page of the book with the building's
   register row, its tenants and its plot's owner (`UiManager.show_sheet`).
 

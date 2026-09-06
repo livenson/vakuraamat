@@ -252,7 +252,9 @@ func _build(b: FootprintBuilding) -> Node3D:
 			var gap := -1.0
 			if k == 0 and i == door_edge:
 				gap = _project_u(door_pt, a, c)
-			_wall(root, a, c, y0, y1, wall_mat, b.kind, gap, float(f.width) + 0.3)
+			_wall(root, a, c, y0, y1, wall_mat, b.kind, gap, float(f.width) + 0.12)
+			if gap >= 0.0:
+				_door_frame(root, a, c, gap, float(f.width) + 0.12, y0, b.kind)
 		_partition_walls(root, walls, y0, y1, accent_mat, b.kind)
 		if k == 0:
 			_notice_board(root, b, poly, door_edge, door_pt, y0)
@@ -572,6 +574,28 @@ func _slab(root: Node3D, poly: PackedVector2Array, y: float, mat: Material, up: 
 		cs.shape = shape
 		body.add_child(cs)
 		root.add_child(body)
+
+
+## Jambs and a head round the entrance gap in the inner wall, so the leaf hangs in a frame.
+func _door_frame(root: Node3D, a: Vector2, c: Vector2, u: float, width: float, y0: float, kind: String) -> void:
+	var dir := (c - a).normalized()
+	var yaw := -atan2(dir.y, dir.x)
+	var h := 2.1 if kind == "dwelling" else 2.4
+	var trim := StandardMaterial3D.new()
+	trim.albedo_color = Color(0.93, 0.91, 0.86)
+	for part in [[Vector3(0.08, h + 0.08, 0.14), Vector2(u - width * 0.5 - 0.04, y0 + (h + 0.08) * 0.5)],
+			[Vector3(0.08, h + 0.08, 0.14), Vector2(u + width * 0.5 + 0.04, y0 + (h + 0.08) * 0.5)],
+			[Vector3(width + 0.16, 0.08, 0.14), Vector2(u, y0 + h + 0.04)]]:
+		var mi := MeshInstance3D.new()
+		var box := BoxMesh.new()
+		box.size = part[0] as Vector3
+		mi.mesh = box
+		mi.material_override = trim
+		var off: Vector2 = part[1]
+		var at: Vector2 = a + dir * off.x
+		mi.position = Vector3(at.x, off.y, at.y)
+		mi.rotation.y = yaw
+		root.add_child(mi)
 
 
 ## Painted casing round a window opening ([u0, u1, ylo, yhi] along the wall from `a`) and a sill
@@ -1083,7 +1107,7 @@ func _fit(w: Dictionary, size: Vector3, along: float = -1.0) -> Dictionary:
 		u = gaps[0][0] + half
 	w.taken.append([u - half, u + half])
 	w.taken.sort_custom(func(x, y): return x[0] < y[0])
-	return {"at": w.a + w.dir * u + w.inward * (size.z * 0.5 + 0.3), "dir": w.dir, "inward": w.inward, "y": w.get("y", 0.0)}
+	return {"at": w.a + w.dir * u + w.inward * (size.z * 0.5 + 0.08), "dir": w.dir, "inward": w.inward, "y": w.get("y", 0.0)}
 
 
 ## Put a piece down at `spot` ({at, dir, y, grouped}) unless it is outside the room, within CLEAR
@@ -1112,6 +1136,7 @@ func _place(room: Dictionary, name: String, spot: Dictionary) -> bool:
 	var dir: Vector2 = spot.dir
 	node.rotation.y = -atan2(dir.y, dir.x) + PI + (PI if bool(spot.get("facing_back", false)) else 0.0)   # back to the wall
 	node.set_meta("piece", true)
+	node.set_meta("model", name)
 	room.root.add_child(node)
 	if size.y > 0.05:
 		room.placed.append([at, r])
@@ -1144,7 +1169,8 @@ func _piece(model: String, size: Vector3, color: Color) -> Node3D:
 				k = size.x / bounds.size.x   # a rug: by width
 			var wrap := Node3D.new()
 			n.scale = Vector3(k, k, k)
-			n.position.y = -bounds.position.y * k
+			# centred on its footprint and standing on the floor: the exports put the origin anywhere
+			n.position = Vector3(-(bounds.position.x + bounds.size.x * 0.5) * k, -bounds.position.y * k, -(bounds.position.z + bounds.size.z * 0.5) * k)
 			wrap.add_child(n)
 			return wrap
 		return n
@@ -1284,21 +1310,21 @@ func _notice_board(root: Node3D, b: FootprintBuilding, poly: PackedVector2Array,
 	paper.material_override = pmat
 	paper.position = Vector3(0, 0, 0.02)
 	board.add_child(paper)
-	board.setup(tr("UI_NOTICE_BOARD"), _register_sheet(b), Vector3(0.9, 0.7, 0.2))
+	board.setup(tr("UI_NOTICE_BOARD"), register_sheet(b), Vector3(0.9, 0.7, 0.2))
 	root.add_child(board)
 
 
 ## What the registers say about a building, as a page: the register row, the tenants, the plot.
-func _register_sheet(b: FootprintBuilding) -> String:
+static func register_sheet(b: FootprintBuilding) -> String:
 	var lines: Array[String] = []
-	lines.append(tr("UI_SHEET_REGISTER") % (b.address if b.address != "" else str(b.building_id)))
+	lines.append(TranslationServer.translate("UI_SHEET_REGISTER") % (b.address if b.address != "" else str(b.building_id)))
 	var bits: Array[String] = []
 	if b.purpose != "":
 		bits.append(b.purpose)
 	if b.year > 0:
 		bits.append(str(b.year))
 	var st := b.storeys()
-	bits.append(tr("UI_FLOORS") % int(st.floors))
+	bits.append(TranslationServer.translate("UI_FLOORS") % int(st.floors))
 	if b.facade != "":
 		bits.append(b.facade)
 	if b.roof_cover != "":
@@ -1307,16 +1333,16 @@ func _register_sheet(b: FootprintBuilding) -> String:
 	if b.ehr != "":
 		lines.append("EHR " + b.ehr)
 	lines.append("")
-	lines.append(tr("UI_SHEET_TENANTS"))
+	lines.append(TranslationServer.translate("UI_SHEET_TENANTS"))
 	var names: Array = Tenants.active_names(Sites.pack_of(b), b.tunnus)
 	if names.is_empty():
-		lines.append(tr("UI_SHEET_NO_TENANTS"))
+		lines.append(TranslationServer.translate("UI_SHEET_NO_TENANTS"))
 	for n in names:
 		lines.append("  " + str(n))
 	var p := Ledger.parcel(b.tunnus)
 	if not p.is_empty():
 		lines.append("")
-		lines.append(tr("UI_SHEET_OWNER") % [b.tunnus, str(p.get("owner_name", ""))])
+		lines.append(TranslationServer.translate("UI_SHEET_OWNER") % [b.tunnus, str(p.get("owner_name", ""))])
 	return "\n".join(lines)
 
 
