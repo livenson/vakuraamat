@@ -137,16 +137,9 @@ static func _mesh(kind: String) -> ArrayMesh:
 			st.set_uv(uvs[idx])
 			st.add_vertex(quad[idx])
 	var mesh := st.commit()
-	var mat := StandardMaterial3D.new()
-	mat.albedo_texture = _texture(plant)
-	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA_SCISSOR
-	mat.alpha_scissor_threshold = 0.5
-	mat.cull_mode = BaseMaterial3D.CULL_DISABLED
-	mat.vertex_color_use_as_albedo = true
-	mat.roughness = 0.9
-	mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mat.backlight = Color(0.5, 0.5, 0.4)   # thin plants let light through: no black backs
-	mat.disable_receive_shadows = true
+	var mat := ShaderMaterial.new()
+	mat.shader = load("res://assets/shaders/crop.gdshader")
+	mat.set_shader_parameter("tex", _texture(plant))
 	mesh.surface_set_material(0, mat)
 	_meshes[kind] = mesh
 	return mesh
