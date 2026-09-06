@@ -385,6 +385,7 @@ func _push_out_of_buildings(layer: Node) -> void:
 ## `root` is the world for the active pack, a streamed tile's offset root for a neighbour. Each pond
 ## carves its basin into the terrain and keeps its fish (Pond).
 func place_water(pack: String, root: Node3D) -> void:
+	Crops.place(pack, root, terrain)   # farmed fields (fields_2026.json) get their crops with the water
 	var rel := str(Sites.manifest_for(pack).get("water", ""))
 	if rel == "" or not FileAccess.file_exists(Sites.path_in(pack, rel)):
 		return

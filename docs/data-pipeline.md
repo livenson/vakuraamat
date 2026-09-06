@@ -17,6 +17,7 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | Maa-amet Geo3D LOD2 buildings | roof and wall faces | `fetch_buildings.py` | `sites/<id>/buildings.json` (`lod2`) |
 | ETAK roads, WFS `etak:e_501_tee_j` | streets, roads, paths, trails with width, surface, name | `tools/pipeline/fetch_roads.py` | `sites/<id>/roads.json` |
 | Maa-amet cadastre, WFS `kataster:ky_kehtiv` | cadastral units: number, address, purpose, area, ownership, polygon, the 2022 taxation value | `tools/pipeline/fetch_parcels.py` | `sites/<id>/parcels.json` |
+| PRIA field register, WFS `pria_avalik:pria_pollud` and `pria_massiivid` on kls.pria.ee | farmed fields: polygon, the crop declared for this year's area aid | `tools/pipeline/fetch_fields.py` | `sites/<id>/fields_2026.json` (crops planted by `scripts/world/crops.gd`) |
 | derived from `parcels.json` (optional Maa-amet transaction export) | euro per m² medians by purpose | `tools/pipeline/market.py` | `sites/<id>/market.json` |
 | e-Business Register open data (daily CSV, CC BY 4.0) | companies matched to the tile's addresses | `tools/pipeline/fetch_tenants.py` | `sites/<id>/tenants.json` |
 | Maa-amet in-ADS gazetteer | address and place search | `tools/tile_service.py` (`/geocode`) | menu results |
@@ -62,6 +63,7 @@ the menu and packs the result as a zip the game installs under `user://`.
 | `buildings.json` | `scripts/world/footprint_building.gd` (walls, roofs, windows, chimneys), `scripts/world/interiors.gd` (rooms, furniture), the debug map (house numbers) |
 | `roads.json` | `scripts/world/road_network.gd` (ribbons, kerbs, street lights), the traffic graph, the debug map (street names) |
 | `parcels.json`, `market.json` | `scripts/world/parcel_kit.gd`, `scripts/world/parcel_marks.gd`, the ledger (`scripts/ledger/`), the K overlay |
+| `fields_2026.json` | `scripts/world/crops.gd`: rows of cereal, rape, potato, legume or maize plants on each declared field; grassland and fallow stay as the ground shows them |
 | `tenants.json` | `scripts/world/tenants.gd`, name plates, interiors (use of a building), the ledger |
 | `news.json` or the town database | `scripts/ui/news_panel.gd` |
 | `scenes/era_2026.tscn` | `scripts/era/era_controller.gd` |

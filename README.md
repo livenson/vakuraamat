@@ -99,8 +99,10 @@ the same for any point from inside the game. A town is a SpacetimeDB database se
 - [docs/data-pipeline.md](docs/data-pipeline.md): sources, requirements, make targets, terrain
   pipeline, world mapping, quirks and the repository layout.
 - [docs/tv-streaming.md](docs/tv-streaming.md): playing on an Android TV over the home network.
-- Design notes: `vakuraamat-implementation-plan.md`, `vakuraamat-maaamet-data-pipeline.md`. The
-  historical three-era game lives on at the tag `v0.9-historical`.
+- [docs/maaamet-data-reference.md](docs/maaamet-data-reference.md): what Maa-amet publishes and how
+  each dataset is converted; [docs/visual-upgrade-plan.md](docs/visual-upgrade-plan.md): rendering steps and their status.
+- [docs/history/](docs/history/): the design, plan and language notes of the historical three-era game,
+  which lives on at the tag `v0.9-historical`.
 
 ## Licence of the data
 

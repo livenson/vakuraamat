@@ -5,7 +5,7 @@
 > town ledger; the current rules are in `AGENTS.md`, `README.md` and `docs/custom-sites.md`.
 
 
-**Purpose of this document:** the creative design for the Phase 1 vertical slice, complementing `vakuraamat-implementation-plan.md` (the code/architecture plan) and `vakuraamat-maaamet-data-pipeline.md` (the data plan). Where the implementation plan says "5 consequence points, 2–4 artifacts, 3 eras," this document says *which* ones, and why.
+**Purpose of this document:** the creative design for the Phase 1 vertical slice, complementing `implementation-plan.md` (the code/architecture plan) and `../maaamet-data-reference.md` (the data plan). Where the implementation plan says "5 consequence points, 2–4 artifacts, 3 eras," this document says *which* ones, and why.
 
 Everything here is scoped strictly to Phase 1. Farming, hunting, trading, and manor expansion are deliberately absent — they arrive in Phases 2–5 and must not leak into this slice.
 
@@ -102,7 +102,7 @@ A heavier alternative exists — **1949**, the collectivization and deportation 
 
 **The manor: Tõrvamäe mõis** (German: *Törwenhof*). "Tar hill" — a plausible South Estonian toponym (tar-burning was a real peasant trade in the region) with no known historical manor of that name. The German form is what the 1798 register would use; the Estonian form is what everyone says.
 
-**The family: Kaseoja.** In 1798 peasants had no surnames — Mart is simply *Kaseoja Mart*, "Mart of Kaseoja (birch-brook) farm." When Livonian peasants were given surnames in 1823–26, the steward registered the family under the German form of the farm name, **Birkenbach**. In 1937, in the middle of the national name-Estonianization campaign, Aino and Juhan change it back to **Kaseoja** — not inventing a name but reclaiming the one the land already had. The register the player carries shows all three states. This is what CP1 turns on: the surveyor's land-reform files say Birkenbach, the family says Kaseoja, and only the 1798 page proves they were always the same. See `vakuraamat-language-notes.md` section 3.3. Verify the name isn't a prominent living family in the area and that the Birkenbach→Kaseoja pair isn't a real documented change.
+**The family: Kaseoja.** In 1798 peasants had no surnames — Mart is simply *Kaseoja Mart*, "Mart of Kaseoja (birch-brook) farm." When Livonian peasants were given surnames in 1823–26, the steward registered the family under the German form of the farm name, **Birkenbach**. In 1937, in the middle of the national name-Estonianization campaign, Aino and Juhan change it back to **Kaseoja** — not inventing a name but reclaiming the one the land already had. The register the player carries shows all three states. This is what CP1 turns on: the surveyor's land-reform files say Birkenbach, the family says Kaseoja, and only the 1798 page proves they were always the same. See `language-notes.md` section 3.3. Verify the name isn't a prominent living family in the area and that the Birkenbach→Kaseoja pair isn't a real documented change.
 
 - **The player** — unnamed, first-person. Examine-text has a voice: dry, observant, a little self-deprecating, quick to notice craft ("someone re-hung this door twice; the second time they got the hinges right"). Never sarcastic about the people. Never narrates feelings directly — the player supplies those.
 - **Leida Kaseoja** (2026) — the elderly neighbor, ninety-one and entirely undiminished, sharp and funny. She was a small child here in 1938. She is the slice's emotional anchor and the recipient of the final artifact.

@@ -25,9 +25,9 @@ const MATERIALS := [
 const MODEL_HEIGHT := {"tree_birch": 18.8, "tree_pine": 20.7, "tree_spruce": 22.2, "tree_juniper": 7.8, "tree_juniper_dead": 5.6}
 const RULES := [
 	{"scene": "tree_pine", "ids": [2], "height": Vector2(13.0, 40.0), "per_100m2": 1.6, "scale": Vector2(0.9, 1.1), "range": 1200.0, "lod": [110.0, 1200.0], "shadows": true},
-	{"scene": "tree_spruce", "ids": [2], "height": Vector2(11.0, 40.0), "per_100m2": 1.3, "scale": Vector2(0.9, 1.1), "range": 1200.0, "lod": [110.0, 1200.0], "shadows": true},
+	{"scene": "tree_spruce", "ids": [2], "height": Vector2(3.0, 40.0), "per_100m2": 1.3, "scale": Vector2(0.9, 1.1), "range": 1200.0, "lod": [110.0, 1200.0], "shadows": true},
 	{"scene": "tree_birch", "ids": [2], "height": Vector2(6.0, 18.0), "per_100m2": 1.4, "scale": Vector2(0.85, 1.15), "range": 1200.0, "lod": [110.0, 1200.0], "shadows": true},
-	{"scene": "tree_juniper", "ids": [2], "height": Vector2(3.0, 8.0), "per_100m2": 1.0, "scale": Vector2(0.85, 1.15), "range": 500.0, "shadows": true},
+	{"scene": "tree_juniper", "ids": [2], "height": Vector2(3.0, 8.0), "per_100m2": 0.25, "scale": Vector2(0.85, 1.15), "range": 500.0, "shadows": true},
 	{"scene": "tree_juniper_dead", "ids": [2], "height": Vector2(3.0, 40.0), "per_100m2": 0.08, "scale": Vector2(0.85, 1.15), "range": 400.0, "shadows": true},
 	{"scene": "bush_jello", "ids": [2], "height": Vector2(0.8, 3.0), "per_100m2": 3.0, "scale": Vector2(0.8, 1.6), "range": 250.0, "shadows": true},
 	{"scene": "bush_brush", "ids": [0, 2], "height": Vector2(0.0, 3.0), "per_100m2": 0.5, "scale": Vector2(0.8, 1.6), "range": 150.0, "shadows": false},
@@ -435,8 +435,10 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 					var pos := Vector3(x + rng.randf(), 0.0, y + rng.randf()) + origin
 					pos.y = terrain.data.get_height(pos)
 					var s: float = rng.randf_range(r.scale.x, r.scale.y)
-					if canopy and MODEL_HEIGHT.has(r.scene) and h > 0.0:
-						s *= clampf(h / MODEL_HEIGHT[r.scene], 0.5, 3.0)
+					if r.scene.begins_with("tree_juniper"):
+						s *= 0.45   # the sprawling juniper model reads as a fallen tree at full size: keep it a bush
+					elif canopy and MODEL_HEIGHT.has(r.scene) and h > 0.0:
+						s *= clampf(h / MODEL_HEIGHT[r.scene], 0.2, 3.0)   # low canopy: young trees, not bushes
 					var basis := Basis(Vector3.UP, rng.randf() * TAU).scaled(Vector3.ONE * s)
 					batches[i].append(Transform3D(basis, pos))
 					var v: float = rng.randf_range(0.72, 1.08)
