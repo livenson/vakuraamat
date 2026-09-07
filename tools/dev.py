@@ -9,6 +9,7 @@
     python3 tools/dev.py restart                    # the game saves a report and relaunches itself there
     python3 tools/dev.py quit
     python3 tools/dev.py codes                      # toggle the K codes overlay
+    python3 tools/dev.py stats                      # frame counters: process/physics ms, draw calls, memory
     python3 tools/dev.py teleport <x> <z> [yaw_deg]
     python3 tools/dev.py era <era_id>
     python3 tools/dev.py screenshot </abs/path.png>
@@ -156,6 +157,8 @@ def main(argv):
         send({"screenshot": os.path.abspath(args[0])})
     elif cmd == "note":
         send({"note": " ".join(args)})
+    elif cmd == "stats":
+        send({"stats": True})
     else:
         print(__doc__); return 1
     return 0

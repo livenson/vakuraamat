@@ -5,7 +5,7 @@
 # same spot where it does not.
 #   {"reload": ["res://scripts/ui/ui_manager.gd", "res://sites/x/scenes/era_2026.tscn", "res://sites/x/strings.csv"]}
 #   {"restart": true}   {"teleport": [x, z, yaw_deg]}   {"era": "era_1938"}   {"screenshot": "/abs.png"}
-#   {"report": "note"}  {"note": "printed to the log"}  {"quit": true}
+#   {"report": "note"}  {"note": "printed to the log"}  {"stats": true}  {"quit": true}
 extends Node
 
 const DIR := "user://dev/"
@@ -96,6 +96,8 @@ func execute(cmd: Dictionary) -> Array:
 		out.append("codes %s" % ("on" if world.ui.codes_on else "off"))
 	if cmd.has("report") and world:
 		out.append("report " + Reporter.capture(str(cmd.report), world))
+	if cmd.has("stats"):
+		out.append(stats_line())
 	if cmd.has("quit"):
 		_result("quit")
 		get_tree().quit()
@@ -110,6 +112,22 @@ func execute(cmd: Dictionary) -> Array:
 		return out
 	_result(" ; ".join(out) if not out.is_empty() else "nothing to do: " + JSON.stringify(cmd))
 	return out
+
+
+## One line of the engine's frame counters: where the time goes (process = scripts and nodes,
+## physics, the render server) and how much the scene asks of the renderer per frame.
+static func stats_line() -> String:
+	var P := Performance
+	return ("fps %d | frame %.1f ms: process %.1f physics %.1f navigation %.1f | draw calls %d objects %d primitives %d | "
+		+ "nodes %d orphans %d | static mem %.0f MB video mem %.0f MB (textures %.0f buffers %.0f) | objects %d resources %d") % [
+		Engine.get_frames_per_second(),
+		1000.0 / maxf(Engine.get_frames_per_second(), 1.0),
+		P.get_monitor(P.TIME_PROCESS) * 1000.0, P.get_monitor(P.TIME_PHYSICS_PROCESS) * 1000.0, P.get_monitor(P.TIME_NAVIGATION_PROCESS) * 1000.0,
+		int(P.get_monitor(P.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)), int(P.get_monitor(P.RENDER_TOTAL_OBJECTS_IN_FRAME)), int(P.get_monitor(P.RENDER_TOTAL_PRIMITIVES_IN_FRAME)),
+		int(P.get_monitor(P.OBJECT_NODE_COUNT)), int(P.get_monitor(P.OBJECT_ORPHAN_NODE_COUNT)),
+		P.get_monitor(P.MEMORY_STATIC) / 1048576.0, P.get_monitor(P.RENDER_VIDEO_MEM_USED) / 1048576.0,
+		P.get_monitor(P.RENDER_TEXTURE_MEM_USED) / 1048576.0, P.get_monitor(P.RENDER_BUFFER_MEM_USED) / 1048576.0,
+		int(P.get_monitor(P.OBJECT_COUNT)), int(P.get_monitor(P.OBJECT_RESOURCE_COUNT))]
 
 
 ## Reload one resource in the running game. Scripts re-read their source and keep instance state;
