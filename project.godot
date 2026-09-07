@@ -22,6 +22,7 @@ config/icon="res://assets/branding/icon.png"
 
 [autoload]
 
+PerfLog="*res://scripts/autoload/perf_log.gd"
 EventBus="*res://scripts/autoload/event_bus.gd"
 Sites="*res://scripts/autoload/sites.gd"
 Locator="*res://scripts/autoload/locator.gd"

@@ -78,6 +78,17 @@ In Claude Code, `/debug-game [site | report-id]` (project skill in `.claude/skil
 game from the session, starts the three watches (report feed, engine errors, channel results) and
 follows the react-fix-reload-verify protocol above.
 
+## Performance log
+
+Every session, release builds included, writes `<userdir>/logs/perf.log` (the `PerfLog` autoload;
+`--no-perf-log` turns it off). One line a second: fps, average and worst frame ms, process and
+physics ms, draw calls, objects, nodes, memory, the player's position and mode (walk or fly), the
+tile streamer's status. Any frame over 100 ms adds a `SPIKE` line with the marks systems left in
+that frame (`PerfLog.mark("...")`: tile load, ready and unload, the era scene of a neighbour, the
+era switch, the terrain builder's stages, the interiors' door pass), so the line names what ran while
+the game stood still. `python3 tools/dev.py perf` prints the spikes with the second before each;
+`perf all` the whole file. Add a mark wherever a new heavy step joins the frame.
+
 ## Limits
 
 Godot's own "Synchronize Script Changes" only works for games launched from the editor, so this

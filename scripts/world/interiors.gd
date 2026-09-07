@@ -55,6 +55,7 @@ func attach_doors(scope: Node = null) -> void:
 	var layer: Node = scope if scope else (world.get_node("EraLayers").get_node_or_null(GameState.current_era) if world else null)
 	if layer == null or not is_instance_valid(layer):
 		return
+	PerfLog.mark("interiors attach_doors")
 	var n := 0
 	for b in layer.find_children("*", "FootprintBuilding", true, false):
 		if b.has_meta("door") or b.kind == "outbuilding" or b.height < 2.4 or _area(b.polygon) < 18.0:

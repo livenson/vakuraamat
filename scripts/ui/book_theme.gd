@@ -89,6 +89,8 @@ static func theme() -> Theme:
 	th.set_stylebox("normal", "RowButton", row)
 	var row_h := _flat(PAGE_DARK, FADED, 0, 0, 12, 12)
 	row_h.border_width_bottom = 1
+	row_h.border_width_left = 3
+	row_h.border_color = BLUE
 	th.set_stylebox("hover", "RowButton", row_h)
 	th.set_stylebox("pressed", "RowButton", row_h)
 	th.set_stylebox("focus", "RowButton", row_h)
@@ -219,6 +221,12 @@ static func rule(parent: Node) -> HSeparator:
 	var h := HSeparator.new()
 	parent.add_child(h)
 	return h
+
+
+## Every button in the book is a hand-cursor target; call once per created button.
+static func hand(b: Control) -> Control:
+	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	return b
 
 
 static func _flat(fill: Color, border: Color = Color.TRANSPARENT, width: int = 0, radius: int = 0, mx: int = 0, my: int = 0) -> StyleBoxFlat:

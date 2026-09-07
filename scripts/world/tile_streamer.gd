@@ -186,6 +186,7 @@ func loading_status() -> String:
 func _load(loc: Vector2i) -> void:
 	var t: Dictionary = tiles[loc]
 	var pack: String = t.pack
+	PerfLog.mark("tile load %s at %s" % [pack, loc])
 	var tile_dir := Sites.tile_dir_of(pack)
 	var terrain: Terrain3D = world.terrain
 	if not terrain.data.has_region(loc):
@@ -226,6 +227,7 @@ func _load(loc: Vector2i) -> void:
 	t.state = "ready"
 	_hide_haze(loc)
 	print("[Tiles] %s ready at %s" % [pack, loc])
+	PerfLog.mark("tile ready %s" % pack)
 	Ledger.add_pack(pack, offset_of(loc))
 	tile_ready.emit(loc, root)
 	if _hold != Vector3.INF and tile_of(_hold) == loc:
@@ -258,6 +260,7 @@ func _set_tile_era(loc: Vector2i, era_id: String) -> void:
 	var scene: PackedScene = ResourceLoader.load(path, "PackedScene")
 	if scene == null:
 		return
+	PerfLog.mark("tile era scene %s" % loc)
 	var node: Node3D = scene.instantiate()
 	for c in node.get_children():
 		if not (c.name in AMBIENT):
@@ -318,6 +321,7 @@ func _hide_haze(loc: Vector2i) -> void:
 
 func _unload(loc: Vector2i) -> void:
 	var t: Dictionary = tiles[loc]
+	PerfLog.mark("tile unload %s" % t.pack)
 	tile_unloaded.emit(loc)
 	if t.get("root"):
 		t.root.queue_free()

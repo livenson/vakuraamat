@@ -46,6 +46,7 @@ func switch_era(era_id: String) -> void:
 	var from := current_era
 	EventBus.era_change_started.emit(from, era_id)
 	current_era = era_id
+	PerfLog.mark("era switch %s -> %s" % [from, era_id])
 	if world:
 		await world.apply_era(era(era_id), true)
 	EventBus.era_changed.emit(era_id)

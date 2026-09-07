@@ -132,6 +132,7 @@ func _book_line(summary: Dictionary) -> String:
 ## A ruled ledger entry: the action on the left, its detail in the right column.
 func _entry(key: String, detail: String, cb: Callable) -> Button:
 	var b := Button.new()
+	BookTheme.hand(b)
 	b.theme_type_variation = "RowButton"
 	b.text = tr(key)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
@@ -157,6 +158,7 @@ func _start_new_game(site_id: String = "") -> void:
 
 func _button(key: String, cb: Callable) -> void:
 	var b := Button.new()
+	BookTheme.hand(b)
 	b.text = tr(key)
 	b.pressed.connect(cb)
 	box.add_child(b)
@@ -299,6 +301,7 @@ func _build_locations_panel() -> void:
 	_status = BookTheme.label("", "DetailLabel", box)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var back := Button.new()
+	BookTheme.hand(back)
 	back.text = tr("MENU_BACK")
 	back.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	back.pressed.connect(_build)
@@ -331,6 +334,7 @@ func _row(list: VBoxContainer, name: String, detail: String) -> HBoxContainer:
 
 func _row_button(row: HBoxContainer, key: String, cb: Callable) -> void:
 	var b := Button.new()
+	BookTheme.hand(b)
 	b.text = tr(key)
 	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	if key in ["MENU_PLAY", "UI_CONTINUE_GAME", "MENU_INSTALL_PLAY"]:
@@ -341,6 +345,7 @@ func _row_button(row: HBoxContainer, key: String, cb: Callable) -> void:
 
 func _small(parent: Node, key: String, cb: Callable) -> void:
 	var b := Button.new()
+	BookTheme.hand(b)
 	b.text = tr(key)
 	b.pressed.connect(cb)
 	parent.add_child(b)
@@ -380,6 +385,7 @@ func _show_results(results: Array) -> void:
 		return
 	for r in results.slice(0, 6):
 		var b := Button.new()
+	BookTheme.hand(b)
 		b.theme_type_variation = "TextButton"
 		b.text = "%s   (%d, %d)" % [r.name, r.x, r.y]
 		b.pressed.connect(func():
@@ -501,6 +507,7 @@ static func _is_tile_pack(id: String) -> bool:
 ## Remove asks twice: the first press turns the button into "Really remove".
 func _remove_button(row: HBoxContainer, ids: Array, key: String = "MENU_DELETE") -> void:
 	var b := Button.new()
+	BookTheme.hand(b)
 	b.text = tr(key)
 	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	b.set_meta("armed", false)
@@ -589,6 +596,7 @@ func _progress_sheet(name: String) -> Control:
 	error.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	error.visible = false
 	var close := Button.new()
+	BookTheme.hand(close)
 	close.text = tr("UI_CLOSE")
 	close.size_flags_horizontal = Control.SIZE_SHRINK_END
 	close.visible = false

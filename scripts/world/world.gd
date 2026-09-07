@@ -28,6 +28,16 @@ func _ready() -> void:
 	GameState.world = self
 	var tile_dir := Sites.tile_dir()
 	fade.color.a = 1.0
+	var loading := Label.new()
+	loading.name = "Loading"
+	loading.text = tr("UI_LOADING_WORLD") % Sites.display_name(Sites.active)
+	loading.set_anchors_preset(Control.PRESET_CENTER)
+	loading.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	loading.grow_vertical = Control.GROW_DIRECTION_BOTH
+	loading.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	loading.add_theme_font_size_override("font_size", 28)
+	loading.add_theme_color_override("font_color", Color(0.85, 0.68, 0.25))
+	fade.add_child(loading)
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--screenshot="):
 			player.input_enabled = false   # deterministic captures: no mouse motion while the ground builds
@@ -73,6 +83,7 @@ func _ready() -> void:
 		if not GameState.current_era:
 			await GameState.switch_era(str(report.get("era", "")))
 		print("[world] replaying report %s" % report.get("id", ""))
+	loading.queue_free()
 	var tw := create_tween()
 	tw.tween_property(fade, "color:a", 0.0, FADE_TIME)
 	_ready_done = true

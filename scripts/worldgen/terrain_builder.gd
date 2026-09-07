@@ -61,6 +61,7 @@ static func has_region_data(tile_dir: String) -> bool:
 
 
 func _tick(stage: String, f: float) -> void:
+	PerfLog.mark("terrain %s %d%%" % [stage, int(f * 100)])
 	progress.emit(stage, f)
 	if yielding and tree:
 		await tree.process_frame

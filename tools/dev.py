@@ -10,6 +10,8 @@
     python3 tools/dev.py quit
     python3 tools/dev.py codes                      # toggle the K codes overlay
     python3 tools/dev.py stats                      # frame counters: process/physics ms, draw calls, memory
+    python3 tools/dev.py perf [all]                 # the session's performance log: the spikes (frames over 100 ms)
+                                                    # with what ran in them; "all" prints every line
     python3 tools/dev.py teleport <x> <z> [yaw_deg]
     python3 tools/dev.py era <era_id>
     python3 tools/dev.py screenshot </abs/path.png>
@@ -56,6 +58,34 @@ def instances():
 
 
 TARGET = {"pid": None, "all": False}
+
+
+def perf(args):
+    """Print user://logs/perf.log (PerfLog autoload, written in release builds too): by default the
+    header and the SPIKE lines with the second before each, "all" for the whole file."""
+    path = os.path.join(user_dir(), "logs", "perf.log")
+    if not os.path.exists(path):
+        print("no perf log at", path)
+        return
+    lines = open(path, encoding="utf-8").read().splitlines()
+    if args and args[0] == "all":
+        print("\n".join(lines))
+        return
+    prev = ""
+    shown = set()
+    for i, l in enumerate(lines):
+        if l.startswith("#"):
+            print(l)
+        elif " SPIKE " in l:
+            if i - 1 not in shown and prev:
+                print("   " + prev)
+                shown.add(i - 1)
+            print(l)
+            shown.add(i)
+        if " fps " in l and not l.startswith("#"):
+            prev = l
+    spikes = sum(1 for l in lines if " SPIKE " in l)
+    print("%d lines, %d spikes  (%s)" % (len(lines), spikes, path))
 
 
 def send(cmd):
@@ -159,6 +189,8 @@ def main(argv):
         send({"note": " ".join(args)})
     elif cmd == "stats":
         send({"stats": True})
+    elif cmd == "perf":
+        perf(args)
     else:
         print(__doc__); return 1
     return 0
