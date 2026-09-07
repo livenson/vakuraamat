@@ -16,6 +16,8 @@ class_name TileStreamer
 extends Node3D
 
 const AMBIENT := ["Buildings", "Roads", "Parcels", "Traffic", "Village"]
+const STAGGERED := ["Buildings", "Parcels"]   # groups whose members enter the tree a few ms a frame
+const FILL_BUDGET_USEC := 8000                 # per frame, for the staggered members (each builds its mesh and collision in _ready)
 
 signal tile_ready(loc: Vector2i, root: Node3D)     # after _load, and again when set_era re-instances a tile's Era
 signal tile_unloaded(loc: Vector2i)                 # before the root is freed; tiles[loc].root is still valid
@@ -118,9 +120,12 @@ func _update(pos: Vector3) -> void:
 			var d := ((Vector2(loc.x, loc.y) * size + half) - p2).abs() - half
 			if Vector2(maxf(d.x, 0.0), maxf(d.y, 0.0)).length() <= prefetch:
 				_ensure(loc)
+	if _loading:
+		return   # unloads wait for the tile that is arriving; the next tick sees them again
 	for loc in tiles.keys():
 		if loc != Vector2i.ZERO and is_ready(loc) and maxi(absi(loc.x - here.x), absi(loc.y - here.y)) > 1:
 			_unload(loc)
+			return   # one region removal per tick
 
 
 func _ensure(loc: Vector2i) -> void:
@@ -183,7 +188,23 @@ func loading_status() -> String:
 	return ""
 
 
+## Tiles arrive one at a time, each heavy step in its own frame (Terrain3D's region add and remove
+## rebuild the map arrays of every loaded region: 100-600 ms each; two tiles in one frame made a
+## five-second stall).
+var _loading := false
+
+
 func _load(loc: Vector2i) -> void:
+	while _loading:
+		await get_tree().process_frame
+		if not tiles.has(loc) or tiles[loc].get("state") != "loading":
+			return
+	_loading = true
+	await _load_now(loc)
+	_loading = false
+
+
+func _load_now(loc: Vector2i) -> void:
 	var t: Dictionary = tiles[loc]
 	var pack: String = t.pack
 	PerfLog.mark("tile load %s at %s" % [pack, loc])
@@ -191,10 +212,14 @@ func _load(loc: Vector2i) -> void:
 	var terrain: Terrain3D = world.terrain
 	if not terrain.data.has_region(loc):
 		if TerrainBuilder.has_region_data(tile_dir):
+			var t_load := Time.get_ticks_msec()
 			var r: Terrain3DRegion = ResourceLoader.load(tile_dir + "/data/terrain3d_00_00.res", "", ResourceLoader.CACHE_MODE_IGNORE)
+			PerfLog.mark("region file %d ms" % (Time.get_ticks_msec() - t_load))
 			if r:
 				r.set_location(loc)
+				t_load = Time.get_ticks_msec()
 				terrain.data.add_region(r, true)
+				PerfLog.mark("add_region %d ms" % (Time.get_ticks_msec() - t_load))
 		elif TerrainBuilder.has_inputs(tile_dir):
 			var b := TerrainBuilder.new()
 			b.yielding = true
@@ -204,12 +229,15 @@ func _load(loc: Vector2i) -> void:
 			if await b.import(terrain, tile_dir, layout, -1.0, loc):
 				var mask := TerrainBuilder.footprint_mask(Sites.path_in(pack, "buildings.json"), terrain.region_size, TerrainBuilder.road_mask(Sites.path_in(pack, "roads.json"), terrain.region_size))
 				await b.scatter(terrain, tile_dir, layout.get("exclusions", []) + TerrainBuilder.water_exclusions(Sites.path_in(pack, str(Sites.manifest_for(pack).get("water", "")))), 1798, [], loc, mask)
+		await get_tree().process_frame   # the region add had its frame
 		if not tiles.has(loc) or tiles[loc] != t:
 			return   # unloaded meanwhile
 		if not terrain.data.has_region(loc):
 			_fail(loc, "no terrain data in " + tile_dir)
 			return
+		var t_range := Time.get_ticks_msec()
 		terrain.data.calc_height_range(true)
+		PerfLog.mark("height range %d ms" % (Time.get_ticks_msec() - t_range))
 	var probe: float = terrain.data.get_height(offset_of(loc) + Vector3(size * 0.5, 0.0, size * 0.5))
 	if is_nan(probe):
 		# the region is registered but answers no heights: never place a layer over a void
@@ -222,18 +250,29 @@ func _load(loc: Vector2i) -> void:
 	root.set_meta("pack_id", pack)
 	add_child(root)
 	t.root = root
+	var t_step := Time.get_ticks_msec()
 	world.place_water(pack, root)
-	_set_tile_era(loc, GameState.current_era)
+	PerfLog.mark("water %d ms" % (Time.get_ticks_msec() - t_step))
+	# The ground stands: the player may enter while the buildings and parcels fill in over the next
+	# frames; the door pass (tile_ready) waits for them.
 	t.state = "ready"
 	_hide_haze(loc)
 	print("[Tiles] %s ready at %s" % [pack, loc])
 	PerfLog.mark("tile ready %s" % pack)
+	t_step = Time.get_ticks_msec()
 	Ledger.add_pack(pack, offset_of(loc))
-	tile_ready.emit(loc, root)
+	PerfLog.mark("add_pack %d ms" % (Time.get_ticks_msec() - t_step))
 	if _hold != Vector3.INF and tile_of(_hold) == loc:
 		world._snap(world.player, 1.0)
 		_hold = Vector3.INF
 		EventBus.notice.emit(tr("NOTICE_TILE_READY"))
+	await get_tree().process_frame   # the pack's ledger and water had theirs; the scene gets its own
+	if not tiles.has(loc) or tiles[loc] != t:
+		return
+	await _set_tile_era(loc, GameState.current_era)
+	if not tiles.has(loc) or tiles[loc] != t:
+		return   # unloaded while filling
+	tile_ready.emit(loc, root)
 
 
 func _layout_of(pack: String) -> Dictionary:
@@ -257,17 +296,59 @@ func _set_tile_era(loc: Vector2i, era_id: String) -> void:
 	var path := Sites.path_in(t.pack, "scenes/%s.tscn" % era_id)
 	if not ResourceLoader.exists(path):
 		return
-	var scene: PackedScene = ResourceLoader.load(path, "PackedScene")
+	# The pack's scene is a text file with hundreds of nodes: parsed on a loader thread, polled here
+	var t_scene := Time.get_ticks_msec()
+	var scene: PackedScene = null
+	if ResourceLoader.has_cached(path):
+		scene = ResourceLoader.load(path, "PackedScene")
+	elif ResourceLoader.load_threaded_request(path, "PackedScene") == OK:
+		while true:
+			var st := ResourceLoader.load_threaded_get_status(path)
+			if st == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+				await get_tree().process_frame
+				continue
+			if st == ResourceLoader.THREAD_LOAD_LOADED:
+				scene = ResourceLoader.load_threaded_get(path)
+			break
+		if not is_instance_valid(root) or not root.is_inside_tree() or root.get_node_or_null("Era") != null:
+			return   # unloaded, or another era arrived, while the scene parsed
 	if scene == null:
 		return
-	PerfLog.mark("tile era scene %s" % loc)
+	PerfLog.mark("tile era scene %s: parsed in %d ms" % [loc, Time.get_ticks_msec() - t_scene])
+	t_scene = Time.get_ticks_msec()
 	var node: Node3D = scene.instantiate()
+	PerfLog.mark("instantiate %d ms" % (Time.get_ticks_msec() - t_scene))
 	for c in node.get_children():
 		if not (c.name in AMBIENT):
 			node.remove_child(c)
 			c.free()
 	node.name = "Era"
+	# The heavy groups enter empty; their members are added back a few milliseconds a frame, so a
+	# city tile (hundreds of buildings, each building its mesh and collision in _ready) no longer
+	# costs one two-second frame and a stalled GPU fence.
+	var pending: Array = []   # [group, member]
+	for group in node.get_children():
+		if group.name in STAGGERED:
+			for m in group.get_children():
+				group.remove_child(m)
+				pending.append([group, m])
 	root.add_child(node)
+	var t0 := Time.get_ticks_usec()
+	for i in pending.size():
+		if not is_instance_valid(node) or not node.is_inside_tree():
+			for j in range(i, pending.size()):
+				pending[j][1].free()   # the tile was unloaded meanwhile
+			return
+		var t_m := Time.get_ticks_usec()
+		pending[i][0].add_child(pending[i][1])
+		if Time.get_ticks_usec() - t_m > 25000:
+			PerfLog.mark("slow member %s/%s %d ms" % [pending[i][0].name, pending[i][1].name, (Time.get_ticks_usec() - t_m) / 1000])
+		if Time.get_ticks_usec() - t0 > FILL_BUDGET_USEC:
+			await get_tree().process_frame
+			t0 = Time.get_ticks_usec()
+	if not is_instance_valid(node) or not node.is_inside_tree():
+		return
+	PerfLog.mark("tile era filled %s (%d members)" % [loc, pending.size()])
 	if node is EraController:
 		node.activate()
 
@@ -325,7 +406,9 @@ func _unload(loc: Vector2i) -> void:
 	tile_unloaded.emit(loc)
 	if t.get("root"):
 		t.root.queue_free()
+	var t_rm := Time.get_ticks_msec()
 	world.terrain.data.remove_regionl(loc, true)
+	PerfLog.mark("remove_region %d ms" % (Time.get_ticks_msec() - t_rm))
 	tiles.erase(loc)
 	print("[Tiles] %s unloaded from %s" % [t.pack, loc])
 

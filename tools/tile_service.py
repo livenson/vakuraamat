@@ -21,6 +21,11 @@ the same script frozen with tools/service/build.sh ships beside the exported gam
 Nothing here is exposed beyond the loopback interface unless you bind it so.
 """
 import argparse, time, json, os, re, shutil, sys, threading, traceback, urllib.parse, urllib.request, zipfile
+
+# The service shares the machine with a running game: the pipeline's numeric libraries stay on a
+# couple of threads (set before numpy loads) and the process runs at a lower priority (main()).
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "GDAL_NUM_THREADS"):
+    os.environ.setdefault(_v, "2")
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -406,6 +411,10 @@ def main():
     ap.add_argument("--raw-dir", default=None, help="download cache shared by every job (default: data_raw/ in the repo, or VAKURAAMAT_RAW_DIR)")
     ap.add_argument("--parent-pid", type=int, default=0, help="exit when this process is gone (the game that started the sidecar)")
     a = ap.parse_args()
+    try:
+        os.nice(10)   # the game's frames come first; not on Windows
+    except (AttributeError, OSError):
+        pass
     if a.parent_pid:
         threading.Thread(target=watch_parent, args=(a.parent_pid,), daemon=True).start()
     if a.raw_dir:

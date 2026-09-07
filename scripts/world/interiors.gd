@@ -6,6 +6,7 @@
 class_name Interiors
 extends Node3D
 
+const DOOR_BUDGET_USEC := 6000   # per frame in attach_doors
 const WALL := 0.25          # inner wall inset from the footprint
 const SLAB := 0.12
 const MAX_FLOORS := 4
@@ -57,8 +58,14 @@ func attach_doors(scope: Node = null) -> void:
 		return
 	PerfLog.mark("interiors attach_doors")
 	var n := 0
+	var t0 := Time.get_ticks_usec()
 	for b in layer.find_children("*", "FootprintBuilding", true, false):
-		if b.has_meta("door") or b.kind == "outbuilding" or b.height < 2.4 or _area(b.polygon) < 18.0:
+		if Time.get_ticks_usec() - t0 > DOOR_BUDGET_USEC:
+			await get_tree().process_frame   # a streamed city tile has hundreds of doors: a few ms a frame
+			t0 = Time.get_ticks_usec()
+			if not is_instance_valid(layer):
+				return
+		if not is_instance_valid(b) or b.has_meta("door") or b.kind == "outbuilding" or b.height < 2.4 or _area(b.polygon) < 18.0:
 			continue
 		var f: Dictionary = b.door_frame()
 		if f.is_empty():

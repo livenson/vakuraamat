@@ -436,6 +436,8 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 				if rng.randf() < r.per_100m2 / 100.0:
 					var pos := Vector3(x + rng.randf(), 0.0, y + rng.randf()) + origin
 					pos.y = terrain.data.get_height(pos)
+					if is_nan(pos.y):
+						continue   # a texel outside any region (a streamed edge): a NaN instance breaks the renderer's sorting
 					var s: float = rng.randf_range(r.scale.x, r.scale.y)
 					if canopy and MODEL_HEIGHT.has(r.scene) and h > 0.0:
 						s *= clampf(h / MODEL_HEIGHT[r.scene], 0.2, 6.0)   # low canopy: young trees, not bushes

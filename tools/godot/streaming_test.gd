@@ -43,12 +43,16 @@ func _ready() -> void:
 	await get_tree().create_timer(0.3).timeout
 	_check(world.player.global_position.x < 1024.0, "player left the map while nothing was loaded (x %.1f)" % world.player.global_position.x)
 	# 2. streaming on: the neighbour is installed, so it loads without the service
+	# "ready" means the ground stands; the buildings fill in over the next frames and tile_ready
+	# follows once they are all in and snapped
+	var filled := {}
+	st.tile_ready.connect(func(loc: Vector2i, _root: Node3D): filled[loc] = true)
 	st.enabled = true
 	var waited := 0.0
-	while st.state_of(Vector2i(1, 0)) != "ready" and waited < 90.0:
+	while not filled.has(Vector2i(1, 0)) and waited < 90.0:
 		await get_tree().create_timer(0.5).timeout
 		waited += 0.5
-	_check(st.state_of(Vector2i(1, 0)) == "ready", "tile (1,0) not ready after %.0f s (state %s)" % [waited, st.state_of(Vector2i(1, 0))])
+	_check(st.state_of(Vector2i(1, 0)) == "ready" and filled.has(Vector2i(1, 0)), "tile (1,0) not ready after %.0f s (state %s)" % [waited, st.state_of(Vector2i(1, 0))])
 	print("[stream] tile (1,0) ready after %.1f s" % waited)
 	_check(world.terrain.data.has_region(Vector2i(1, 0)), "no terrain region at (1,0)")
 	var h: float = world.terrain.data.get_height(Vector3(1500, 0, 512))
