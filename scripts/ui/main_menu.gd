@@ -385,7 +385,7 @@ func _show_results(results: Array) -> void:
 		return
 	for r in results.slice(0, 6):
 		var b := Button.new()
-	BookTheme.hand(b)
+		BookTheme.hand(b)
 		b.theme_type_variation = "TextButton"
 		b.text = "%s   (%d, %d)" % [r.name, r.x, r.y]
 		b.pressed.connect(func():
