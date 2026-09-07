@@ -39,6 +39,7 @@ const RULES := [
 var yielding := false          # await a frame every yield_rows rows (runtime use)
 var tree: SceneTree = null     # needed when yielding
 var yield_rows := 32           # smaller while streaming a neighbour tile behind a running game
+const ADD_SLICE := 20000       # instances per Terrain3DInstancer.add_transforms call (see scatter)
 const YIELD_ROWS := 32
 
 
@@ -444,11 +445,22 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 		if y % yield_rows == 0:
 			await _tick("vegetation", 0.6 + 0.35 * y / size)
 	var counts := []
+	var last := RULES.size() - 1
+	while last > 0 and batches[last].is_empty():
+		last -= 1
 	for i in RULES.size():
-		if batches[i].size() > 0:
-			terrain.instancer.add_transforms(i, batches[i], colors[i], i == RULES.size() - 1)
-		counts.append(batches[i].size())
-		print("[terrain_builder] %-18s %6d instances" % [RULES[i].scene, batches[i].size()])
+		# The instancer's cost per call grows much faster than the batch (241k grass cards took
+		# 7.4 s in one call, 32k tufts 0.12 s), so a big batch goes in slices; only the last slice
+		# asks for the rebuild, and a frame between slices keeps the progress overlay alive.
+		var n: int = batches[i].size()
+		var t0 := Time.get_ticks_msec()
+		for start in range(0, n, ADD_SLICE):
+			var end := mini(start + ADD_SLICE, n)
+			terrain.instancer.add_transforms(i, batches[i].slice(start, end), colors[i].slice(start, end), i == last and end == n)
+			if yielding and end < n:
+				await _tick("vegetation", 0.95)
+		counts.append(n)
+		print("[terrain_builder] %-18s %6d instances (%d ms)" % [RULES[i].scene, n, Time.get_ticks_msec() - t0])
 	if loc != Vector2i.ZERO:
 		save_region_as_origin(terrain, loc, tile_dir)
 		await _tick("done", 1.0)
