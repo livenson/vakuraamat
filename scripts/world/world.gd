@@ -137,6 +137,8 @@ func _ready() -> void:
 				if bits.size() > 1 and err == "":
 					err = await Ledger.build(bits[0], bits[1])
 				print("[world] --own %s: %s" % [a, "ok" if err == "" else err]))
+		elif a == "--fly":
+			player.flying = true   # checks of the survey view (the interactor's long reach, the outline)
 		elif a.begins_with("--hour="):
 			if sky and sky.tod:
 				sky.tod.current_time = float(a.trim_prefix("--hour="))

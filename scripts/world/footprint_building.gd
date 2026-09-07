@@ -124,6 +124,7 @@ func _apply(job: BuildJob) -> void:
 		shape.shape = concave
 		body.add_child(shape)
 		add_child(body)
+	_hull_arrays = [job.arrays[0], job.arrays[1]]   # walls and roof: the outline's hull (set_highlight)
 	is_built = true
 	# the era lit its windows before this mesh existed: hand it this one
 	var p: Node = get_parent()
@@ -871,9 +872,51 @@ func storeys() -> Dictionary:
 
 
 ## Hide the exterior while the player is inside (its collider too), and back.
+## The crosshair's highlight: a translucent blue overlay pass on the walls and roof, so the picked
+## building reads as picked from any distance (an outline rim is pixels wide from the air).
+static var _highlight_mat: StandardMaterial3D
+var _hull_arrays: Array = []   # walls and roof arrays, kept for the overlay's mesh
+var _outline: MeshInstance3D
+
+
+func set_highlight(on: bool) -> void:
+	if not on:
+		if _outline:
+			_outline.visible = false
+		return
+	if _mesh_node == null:
+		return
+	if _outline == null:
+		if _highlight_mat == null:
+			_highlight_mat = StandardMaterial3D.new()
+			_highlight_mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			_highlight_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			_highlight_mat.albedo_color = Color(0.25, 0.5, 0.9, 0.22)
+			_highlight_mat.cull_mode = BaseMaterial3D.CULL_DISABLED   # the walls are double-sided with mixed winding
+			_highlight_mat.render_priority = 1
+			_highlight_mat.grow = true
+			_highlight_mat.grow_amount = -0.08   # a hand's width off the walls (their normals point in), else the depth test drops it
+		var hull := ArrayMesh.new()
+		for arr in _hull_arrays:
+			if not arr.is_empty() and arr[Mesh.ARRAY_VERTEX] != null:
+				hull.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+		if hull.get_surface_count() == 0:
+			return
+		_outline = MeshInstance3D.new()
+		_outline.name = "Highlight"
+		_outline.mesh = hull
+		_outline.material_override = _highlight_mat
+		_outline.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		_outline.gi_mode = GeometryInstance3D.GI_MODE_DISABLED
+		add_child(_outline)
+	_outline.visible = _mesh_node.visible
+
+
 func set_exterior_visible(on: bool) -> void:
 	if _mesh_node:
 		_mesh_node.visible = on
+	if _outline and not on:
+		_outline.visible = false
 	if _body_node:
 		_body_node.collision_layer = 1 if on else 0
 	for c in get_children():
