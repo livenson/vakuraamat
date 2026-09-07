@@ -104,14 +104,33 @@ jobs:
     needs: export
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # the tag's message and the commits since the previous tag make the notes
       - uses: actions/download-artifact@v4
         with:
           path: dist
+      - name: "Release notes: the tag's message, the commits since the previous tag, how to run"
+        shell: bash
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          prev=$(git describe --tags --abbrev=0 "${tag}^" 2>/dev/null || true)
+          {
+            git tag -l --format='%(contents)' "$tag"
+            echo
+            if [ -n "$prev" ]; then
+              echo "## Commits since $prev"
+              echo
+              git log --format='- %s' "$prev..$tag" | sed -E 's/^(- [^.:;]{0,160}[^ ]).*/\1/'
+              echo
+            fi
+            echo "## Builds"
+            echo
+            echo "Playable builds with the shipped packs and the tile-service sidecar (any address in Estonia becomes a world from the Locations page). macOS: the app is not notarised; after unzipping run \`xattr -dr com.apple.quarantine Vakuraamat.app\` once, or right-click and Open."
+          } > notes.md
+          cat notes.md
       - name: Attach the builds to the release
         uses: softprops/action-gh-release@v2
         with:
           files: dist/**/*.zip
-          body: |
-            Playable builds with the shipped packs and the tile-service sidecar (any address in Estonia
-            becomes a world from the Locations page). macOS: the app is not notarised; after unzipping run
-            `xattr -dr com.apple.quarantine Vakuraamat.app` once, or right-click and Open.
+          body_path: notes.md
