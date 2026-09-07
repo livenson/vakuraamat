@@ -247,6 +247,7 @@ func apply_era(era: EraDefinition, first_visit: bool) -> void:
 	var node: EraController = _era_nodes.get(era.id)
 	if node == null:
 		node = load(era.scene_path).instantiate()
+		TileStreamer.trim_to_tile(node, float(terrain.region_size))
 		layers.add_child(node)
 		_era_nodes[era.id] = node
 	node.activate()

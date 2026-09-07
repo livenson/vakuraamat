@@ -66,22 +66,32 @@ func _snap_list(nodes: Array, terrain: Terrain3D) -> void:
 
 
 ## Window panes: reflective glass by day, warm glow after dark (called by the world with the hour).
+var windows_collected := false
+
+
 func _collect_windows() -> void:
+	windows_collected = true
 	for mi in find_children("*", "MeshInstance3D", true, false):
-		if mi.mesh == null:
-			continue
-		for si in mi.mesh.get_surface_count():
-			var m: Material = mi.mesh.surface_get_material(si)
-			if m is StandardMaterial3D and m.resource_name == "Window":
-				var w: StandardMaterial3D = m.duplicate()
-				w.roughness = 0.06
-				w.metallic = 0.2
-				w.metallic_specular = 0.9
-				w.emission_enabled = true
-				w.emission = Color(1.0, 0.72, 0.4)
-				w.emission_energy_multiplier = 0.0
-				mi.set_surface_override_material(si, w)
-				_window_mats.append(w)
+		register_windows(mi)
+
+
+## A mesh's "Window" surfaces get the lit material; buildings built after the collection (their
+## geometry comes from a worker thread) call this when their mesh stands.
+func register_windows(mi: MeshInstance3D) -> void:
+	if mi.mesh == null:
+		return
+	for si in mi.mesh.get_surface_count():
+		var m: Material = mi.mesh.surface_get_material(si)
+		if m is StandardMaterial3D and m.resource_name == "Window":
+			var w: StandardMaterial3D = m.duplicate()
+			w.roughness = 0.06
+			w.metallic = 0.2
+			w.metallic_specular = 0.9
+			w.emission_enabled = true
+			w.emission = Color(1.0, 0.72, 0.4)
+			w.emission_energy_multiplier = _window_mats[0].emission_energy_multiplier if not _window_mats.is_empty() else 0.0
+			mi.set_surface_override_material(si, w)
+			_window_mats.append(w)
 
 
 static var current_hour := 12.0

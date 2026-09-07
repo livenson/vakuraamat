@@ -281,6 +281,25 @@ func _layout_of(pack: String) -> Dictionary:
 	return parsed if typeof(parsed) == TYPE_DICTIONARY else {}
 
 
+## A pack's scene carries the buildings and parcels that straddle its edge (40-70 per city tile);
+## the neighbour carries the same ones. Each belongs to the tile that holds its origin, so a
+## scene shows only those: two exteriors of one house left its windows opaque from inside.
+static func trim_to_tile(era_node: Node, tile_size: float) -> int:
+	var dropped := 0
+	for group_name in STAGGERED:
+		var group: Node = era_node.get_node_or_null(group_name)
+		if group == null:
+			continue
+		for m in group.get_children():
+			if m is Node3D:
+				var p: Vector3 = m.position
+				if p.x < 0.0 or p.x >= tile_size or p.z < 0.0 or p.z >= tile_size:
+					group.remove_child(m)
+					m.free()
+					dropped += 1
+	return dropped
+
+
 ## The era's ambient nodes from the pack's generated scene; story nodes are dropped before _ready.
 func _set_tile_era(loc: Vector2i, era_id: String) -> void:
 	var t: Dictionary = tiles.get(loc, {})
@@ -326,6 +345,7 @@ func _set_tile_era(loc: Vector2i, era_id: String) -> void:
 	# The heavy groups enter empty; their members are added back a few milliseconds a frame, so a
 	# city tile (hundreds of buildings, each building its mesh and collision in _ready) no longer
 	# costs one two-second frame and a stalled GPU fence.
+	trim_to_tile(node, size)
 	var pending: Array = []   # [group, member]
 	for group in node.get_children():
 		if group.name in STAGGERED:

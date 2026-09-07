@@ -67,18 +67,27 @@ func attach_doors(scope: Node = null) -> void:
 				return
 		if not is_instance_valid(b) or b.has_meta("door") or b.kind == "outbuilding" or b.height < 2.4 or _area(b.polygon) < 18.0:
 			continue
-		var f: Dictionary = b.door_frame()
-		if f.is_empty():
-			continue
-		var door := BuildingDoor.new()
-		door.name = "Door"
-		b.add_child(door)
-		door.setup(b, f)
 		b.set_meta("door", true)
-		_doors.append(door)
-		n += 1
+		if b.is_built:
+			_attach_door(b)
+			n += 1
+		else:
+			b.built.connect(_attach_door.bind(b), CONNECT_ONE_SHOT)   # its geometry is still on a worker thread
 	if n > 0:
 		print("[interiors] %d doors" % n)
+
+
+func _attach_door(b: FootprintBuilding) -> void:
+	if not is_instance_valid(b) or not b.is_inside_tree():
+		return
+	var f: Dictionary = b.door_frame()
+	if f.is_empty():
+		return
+	var door := BuildingDoor.new()
+	door.name = "Door"
+	b.add_child(door)
+	door.setup(b, f)
+	_doors.append(door)
 
 
 ## A tile leaves: forget its doors and interiors; step out if the player was inside one of them.

@@ -23,8 +23,6 @@ extends Node3D
 @export var tunnus := ""                                          # cadastral unit the register links it to
 
 const TEX := "res://assets/textures/buildings/"
-var _windows := SurfaceTool.new()
-var _trim := SurfaceTool.new()
 var _wall_faces: Array = []   # {pts: Array[Vector3], n: Vector3, t: Vector3, umin, umax, ymin, ymax}
 
 static var _models: Dictionary = {}   # source path -> {id -> lod2 dict}
@@ -33,52 +31,512 @@ var _mesh_node: MeshInstance3D
 var _body_node: StaticBody3D
 
 
-var _walls := SurfaceTool.new()
-var _roof := SurfaceTool.new()
+
+
+## The geometry is built off the main thread: _ready samples the ground under the walls (the
+## terrain is main-thread only), hands a BuildJob to the WorkerThreadPool, and _apply puts the
+## finished arrays into a mesh and a collider when the job reports back. A city tile's 500
+## buildings cost the frame a few milliseconds each instead of 25-170 ms; `built` fires when the
+## mesh stands (doors, signs and the era's window lighting wait for it). Headless runs and
+## `threaded = false` build inline.
+signal built
+static var threaded := true
+var is_built := false
+var _job: BuildJob
 
 
 func _ready() -> void:
-	_walls.begin(Mesh.PRIMITIVE_TRIANGLES)
-	_roof.begin(Mesh.PRIMITIVE_TRIANGLES)
-	_windows.begin(Mesh.PRIMITIVE_TRIANGLES)
-	_trim.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var model := _model()
-	if model.is_empty():
-		if polygon.size() < 3:
-			return
-		_extrude()
+	if polygon.size() < 3 and _model().is_empty():
+		return
+	var job := BuildJob.new()
+	job.owner = weakref(self)
+	job.polygon = polygon
+	job.height = height
+	job.skirt = skirt
+	job.kind = kind
+	job.floors = floors
+	job.address = address
+	job.building_id = building_id
+	job.model = _model()
+	job.grounds = _sample_grounds(job.model)
+	_job = job
+	if threaded and DisplayServer.get_name() != "headless":
+		WorkerThreadPool.add_task(job.run, false, "building " + name)
 	else:
-		_faces(model.faces)
-	_skirt()
-	if kind != "ruin":
-		_openings()
-	_walls.generate_normals()
-	_roof.generate_normals()
-	_windows.generate_normals()
-	_trim.generate_normals()
-	var mesh: ArrayMesh = _walls.commit()
-	mesh = _roof.commit(mesh)
-	mesh = _windows.commit(mesh)
-	mesh = _trim.commit(mesh)
-	# surfaces: 0 walls, 1 roof, 2 windows (named "Window": EraController lights them after dark), 3 trim
+		job.run()
+
+
+## Terrain heights under every point the openings pass asks about (_ground_on samples the wall
+## corners and one midpoint per face), keyed by the local xz the job will compute.
+func _sample_grounds(model: Dictionary) -> Dictionary:
+	var world: Node = GameState.world
+	if world == null or not ("terrain" in world) or world.terrain == null or world.terrain.data == null:
+		return {}
+	var pts: Array = []
+	for p in polygon:
+		pts.append(Vector2(p.x, p.y))
+	var n := polygon.size()
+	for i in n:
+		pts.append((polygon[i] + polygon[(i + 1) % n]) * 0.5)
+	if not model.is_empty():
+		for face in model.get("faces", []):
+			var fp: Array = []
+			for v in face:
+				fp.append(Vector2(float(v[0]), float(v[2])))
+			pts.append_array(fp)
+			if fp.size() >= 2:
+				pts.append((fp[0] + fp[fp.size() / 2]) * 0.5)
+	var out := {}
+	for q in pts:
+		var key: Vector2 = q
+		if not out.has(key):
+			out[key] = world.terrain.data.get_height(to_global(Vector3(key.x, 0.0, key.y)))
+	return out
+
+
+## Called on the main thread when the job is done: the mesh, its materials and the collider.
+func _apply(job: BuildJob) -> void:
+	if job != _job or not is_inside_tree():
+		return
+	_job = null
+	_wall_faces = job.wall_faces
+	var mesh := ArrayMesh.new()
+	# surfaces: walls, roof, windows (material named "Window": EraController lights them after dark), trim
 	var mats := [_wall_material(), _roof_material(), _window_material(), _trim_material()]
-	for i in mesh.get_surface_count():
-		mesh.surface_set_material(i, mats[i] if i < mats.size() else mats[0])
+	for i in job.arrays.size():
+		var arr: Array = job.arrays[i]
+		if arr.is_empty() or arr[Mesh.ARRAY_VERTEX] == null or (arr[Mesh.ARRAY_VERTEX] as PackedVector3Array).is_empty():
+			continue
+		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arr)
+		mesh.surface_set_material(mesh.get_surface_count() - 1, mats[i])
 	var mi := MeshInstance3D.new()
 	_mesh_node = mi
 	mi.mesh = mesh
 	add_child(mi)
-	var body := StaticBody3D.new()
-	_body_node = body
-	body.collision_layer = 1
-	body.collision_mask = 0
-	var shape := CollisionShape3D.new()
-	# walls and roof only: sills, casings and trim in the collider snagged a player walking along a wall
-	var solid: ArrayMesh = _walls.commit()
-	solid = _roof.commit(solid)
-	shape.shape = solid.create_trimesh_shape()
-	body.add_child(shape)
-	add_child(body)
+	if not job.solid.is_empty():
+		var body := StaticBody3D.new()
+		_body_node = body
+		body.collision_layer = 1
+		body.collision_mask = 0
+		var shape := CollisionShape3D.new()
+		var concave := ConcavePolygonShape3D.new()
+		concave.set_faces(job.solid)   # walls and roof only: sills, casings and trim snagged a player walking along a wall
+		shape.shape = concave
+		body.add_child(shape)
+		add_child(body)
+	is_built = true
+	# the era lit its windows before this mesh existed: hand it this one
+	var p: Node = get_parent()
+	while p and not (p is EraController):
+		p = p.get_parent()
+	if p and p.windows_collected:
+		p.register_windows(mi)
+	built.emit()
+
+
+## The geometry of one building, computed on a worker thread from copies of the node's inputs.
+class BuildJob:
+	extends RefCounted
+	var owner: WeakRef
+	var polygon: PackedVector2Array
+	var height := 5.0
+	var skirt := 3.0
+	var kind := "dwelling"
+	var floors := 0
+	var address := ""
+	var building_id := 0
+	var model: Dictionary = {}
+	var grounds: Dictionary = {}      # local xz -> terrain height (NaN off the map)
+	var wall_faces: Array = []
+	var arrays: Array = []            # per surface: walls, roof, windows, trim (empty Array when unused)
+	var solid := PackedVector3Array() # collider triangles: walls and roof
+	var _walls := SurfaceTool.new()
+	var _roof := SurfaceTool.new()
+	var _windows := SurfaceTool.new()
+	var _trim := SurfaceTool.new()
+
+	func run() -> void:
+		_walls.begin(Mesh.PRIMITIVE_TRIANGLES)
+		_roof.begin(Mesh.PRIMITIVE_TRIANGLES)
+		_windows.begin(Mesh.PRIMITIVE_TRIANGLES)
+		_trim.begin(Mesh.PRIMITIVE_TRIANGLES)
+		if model.is_empty():
+			if polygon.size() >= 3:
+				_extrude()
+		else:
+			_faces(model.faces)
+		_skirt()
+		if kind != "ruin":
+			_openings()
+		for st in [_walls, _roof, _windows, _trim]:
+			st.generate_normals()
+			var arr: Array = st.commit_to_arrays()
+			arrays.append(arr if arr.size() > Mesh.ARRAY_VERTEX and arr[Mesh.ARRAY_VERTEX] != null else [])
+		for i in [0, 1]:
+			if not arrays[i].is_empty():
+				solid.append_array(arrays[i][Mesh.ARRAY_VERTEX])
+		call_deferred("_done")
+
+	func _done() -> void:
+		var node = owner.get_ref()
+		if node and is_instance_valid(node):
+			node._apply(self)
+
+	func _ground_at(xz: Vector2) -> float:
+		return float(grounds.get(xz, NAN))
+
+	func _tri(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3) -> void:
+		for v in [a, b, c]:
+			st.add_vertex(v)
+
+
+
+	## LOD2 faces: planar polygons in metres relative to the origin (x east, y up from the base, z south).
+	func _faces(faces: Array) -> void:
+		var roof_faces: Array = []       # Array[Vector3] per roof face, for the gap pass
+		var wall_tops: Array = []        # [Vector3 a, Vector3 b] the ground line of each wall face
+		for face in faces:
+			var pts: Array[Vector3] = []
+			for p in face:
+				pts.append(Vector3(float(p[0]), float(p[1]), float(p[2])))
+			if pts.size() < 3:
+				continue
+			var nrm := Vector3.ZERO
+			for i in pts.size():
+				nrm += pts[i].cross(pts[(i + 1) % pts.size()])   # Newell's method
+			nrm = nrm.normalized()
+			if nrm.y < -0.5:
+				continue   # floor: never seen
+			var st := _roof if nrm.y > 0.3 else _walls
+			if st == _walls:
+				_register_face(pts)
+				# the wall's line on the ground: the two vertices farthest apart in xz (gables included)
+				var pa := pts[0]
+				var pb := pts[0]
+				var best := -1.0
+				for i in pts.size():
+					for j in range(i + 1, pts.size()):
+						var dd := Vector2(pts[i].x, pts[i].z).distance_squared_to(Vector2(pts[j].x, pts[j].z))
+						if dd > best:
+							best = dd
+							pa = pts[i]
+							pb = pts[j]
+				var low := INF
+				var high := -INF
+				for q in pts:
+					low = minf(low, q.y)
+					high = maxf(high, q.y)
+				wall_tops.append([pa, pb, low, high])
+			else:
+				roof_faces.append(pts)
+			# triangulate in the plane: drop the dominant axis
+			var proj: PackedVector2Array = PackedVector2Array()
+			var ax := absf(nrm.x)
+			var ay := absf(nrm.y)
+			var az := absf(nrm.z)
+			for p in pts:
+				if ay >= ax and ay >= az:
+					proj.append(Vector2(p.x, p.z))
+				elif ax >= az:
+					proj.append(Vector2(p.y, p.z))
+				else:
+					proj.append(Vector2(p.x, p.y))
+			var idx := Geometry2D.triangulate_polygon(proj)
+			if idx.is_empty():
+				continue
+			for i in range(0, idx.size(), 3):
+				var a := pts[idx[i]]
+				var b := pts[idx[i + 1]]
+				var c := pts[idx[i + 2]]
+				if (b - a).cross(c - a).dot(nrm) < 0.0:
+					_tri(st, a, c, b)
+				else:
+					_tri(st, a, b, c)
+		_close_gaps(roof_faces, wall_tops)
+
+
+
+	## Some Geo3D models are fragments: a whole roof with walls under one corner only (the rest reads as
+	## a slab in the air). Every outer roof edge that no wall face reaches gets a wall down to the ground.
+	func _close_gaps(roof_faces: Array, wall_tops: Array) -> void:
+		var edges: Array = []   # [a, b, face index]
+		for fi in roof_faces.size():
+			var pts: Array = roof_faces[fi]
+			for i in pts.size():
+				edges.append([pts[i], pts[(i + 1) % pts.size()], fi])
+		var added := 0
+		for e in edges:
+			var a: Vector3 = e[0]
+			var b: Vector3 = e[1]
+			if a.distance_to(b) < 1.5 or minf(a.y, b.y) < 2.5:
+				continue
+			var mid := (a + b) * 0.5
+			var covered := false
+			# wall faces standing along this edge (eaves overhang the wall by a metre or so), taken
+			# together (models split walls into bands): they must reach well below it, a parapet alone
+			# does not hold a roof up
+			var lowest := INF
+			for w in wall_tops:
+				if _dist_xz(mid, w[0], w[1]) < 1.5:
+					lowest = minf(lowest, float(w[2]))
+					if float(w[2]) <= mid.y + 0.5 and float(w[3]) >= mid.y + 1.0:
+						covered = true   # a taller part rises from this edge: an inner edge of a lower roof
+			if lowest <= mid.y - 2.0:
+				covered = true
+			if not covered:
+				# a lower roof lies under this edge (a skylight, a penthouse, a setback): nothing to close
+				for fi in roof_faces.size():
+					if fi == e[2]:
+						continue
+					var face2: Array = roof_faces[fi]
+					var below := false
+					var poly2 := PackedVector2Array()
+					for q in face2:
+						poly2.append(Vector2(q.x, q.z))
+						if q.y < mid.y - 0.3:
+							below = true
+					if below and Geometry2D.is_point_in_polygon(Vector2(mid.x, mid.z) + Vector2(c_out(e, roof_faces)).limit_length(0.3), poly2):
+						covered = true
+						break
+			if not covered:
+				for o in edges:   # an inner edge: another roof face shares it
+					if o[2] != e[2] and _dist_xz(mid, o[0], o[1]) < 0.4 and absf(((o[0] + o[1]) * 0.5).y - mid.y) < 1.5:
+						covered = true
+						break
+			if covered:
+				continue
+			var ga := Vector3(a.x, 0.0, a.z)
+			var gb := Vector3(b.x, 0.0, b.z)
+			# outward: away from the roof face's centre
+			var face: Array = roof_faces[e[2]]
+			var c := Vector3.ZERO
+			for q in face:
+				c += q
+			c /= face.size()
+			var out := Vector3(-(b.z - a.z), 0.0, b.x - a.x)
+			if out.dot(mid - c) < 0.0:
+				var t := a
+				a = b
+				b = t
+				ga = Vector3(a.x, 0.0, a.z)
+				gb = Vector3(b.x, 0.0, b.z)
+			_tri(_walls, ga, gb, b)
+			_tri(_walls, ga, b, a)
+			_register_face([ga, gb, b, a])
+			added += 1
+		if added > 0:
+			print("[building] %s: %d roof edges without walls closed to the ground" % [address if address != "" else str(building_id), added])
+
+
+
+	## The xz direction from an edge's midpoint towards its face's centre.
+	static func c_out(e: Array, roof_faces: Array) -> Vector2:
+		var face: Array = roof_faces[e[2]]
+		var c := Vector3.ZERO
+		for q in face:
+			c += q
+		c /= face.size()
+		var mid: Vector3 = (e[0] + e[1]) * 0.5
+		return Vector2(c.x - mid.x, c.z - mid.z)
+
+
+
+	static func _dist_xz(p: Vector3, a: Vector3, b: Vector3) -> float:
+		var p2 := Vector2(p.x, p.z)
+		var a2 := Vector2(a.x, a.z)
+		var b2 := Vector2(b.x, b.z)
+		var ab := b2 - a2
+		var t := clampf((p2 - a2).dot(ab) / maxf(ab.length_squared(), 0.0001), 0.0, 1.0)
+		return p2.distance_to(a2 + ab * t)
+
+
+
+	## Fallback: the footprint extruded to `height` with a flat roof.
+	func _extrude() -> void:
+		var n := polygon.size()
+		for i in n:
+			var a := polygon[i]
+			var b := polygon[(i + 1) % n]
+			_tri(_walls, Vector3(a.x, 0, a.y), Vector3(b.x, 0, b.y), Vector3(b.x, height, b.y))
+			_tri(_walls, Vector3(a.x, 0, a.y), Vector3(b.x, height, b.y), Vector3(a.x, height, a.y))
+			_register_face([Vector3(a.x, 0, a.y), Vector3(b.x, 0, b.y), Vector3(b.x, height, b.y), Vector3(a.x, height, a.y)])
+		var tris := Geometry2D.triangulate_polygon(polygon)
+		for i in range(0, tris.size(), 3):
+			var p0 := polygon[tris[i]]
+			var p1 := polygon[tris[i + 1]]
+			var p2 := polygon[tris[i + 2]]
+			_tri(_roof, Vector3(p0.x, height, p0.y), Vector3(p2.x, height, p2.y), Vector3(p1.x, height, p1.y))
+
+
+
+	## Walls from the base down into the ground, so a sloping site shows no gap under the model.
+	func _skirt() -> void:
+		if polygon.size() < 3 or skirt <= 0.0:
+			return
+		var n := polygon.size()
+		for i in n:
+			var a := polygon[i]
+			var b := polygon[(i + 1) % n]
+			_tri(_walls, Vector3(a.x, -skirt, a.y), Vector3(b.x, -skirt, b.y), Vector3(b.x, 0.05, b.y))
+			_tri(_walls, Vector3(a.x, -skirt, a.y), Vector3(b.x, 0.05, b.y), Vector3(a.x, 0.05, a.y))
+
+
+
+	func _register_face(pts: Array) -> void:
+		"""Remember a vertical wall face for the openings pass."""
+		var nrm := Vector3.ZERO
+		for i in pts.size():
+			nrm += (pts[i] as Vector3).cross(pts[(i + 1) % pts.size()])
+		nrm = nrm.normalized()
+		if absf(nrm.y) > 0.3 or nrm.length() < 0.5:
+			return
+		var t := nrm.cross(Vector3.UP).normalized()
+		var umin := INF
+		var umax := -INF
+		var ymin := INF
+		var ymax := -INF
+		for p in pts:
+			var u: float = (p as Vector3).dot(t)
+			umin = minf(umin, u)
+			umax = maxf(umax, u)
+			ymin = minf(ymin, p.y)
+			ymax = maxf(ymax, p.y)
+		wall_faces.append({"pts": pts, "n": nrm, "t": t, "umin": umin, "umax": umax, "ymin": ymin, "ymax": ymax})
+
+
+
+	## Whether a w x h opening centred at (u, y) lies within the face polygon (gable ends are pentagons).
+	func _fits_face(f: Dictionary, u: float, y: float, w: float, h: float) -> bool:
+		var outline := PackedVector2Array()
+		for p in f.pts:
+			outline.append(Vector2((p as Vector3).dot(f.t), (p as Vector3).y))
+		if outline.size() < 3:
+			return true
+		for corner in [Vector2(u - w / 2.0, y - h / 2.0), Vector2(u + w / 2.0, y - h / 2.0), Vector2(u + w / 2.0, y + h / 2.0), Vector2(u - w / 2.0, y + h / 2.0)]:
+			if not Geometry2D.is_point_in_polygon(corner, outline):
+				return false
+		return true
+
+
+
+	func _quad_on_face(st: SurfaceTool, f: Dictionary, u: float, y: float, w: float, h: float, out: float) -> void:
+		var a: Vector3 = f.pts[0]
+		var base: Vector3 = a + f.t * (u - a.dot(f.t)) + Vector3.UP * (y - a.y) + f.n * out
+		var du: Vector3 = f.t * (w / 2.0)
+		var dy: Vector3 = Vector3.UP * (h / 2.0)
+		var p0 := base - du - dy
+		var p1 := base + du - dy
+		var p2 := base + du + dy
+		var p3 := base - du + dy
+		_tri(st, p0, p1, p2)
+		_tri(st, p0, p2, p3)
+		_tri(st, p0, p2, p1)   # both sides, so the normal sign of the face does not matter
+		_tri(st, p0, p3, p2)
+
+
+
+	## Windows in rows per floor and a door on the longest wall; sizes and spacing by building kind.
+	func _openings() -> void:
+		if wall_faces.is_empty():
+			return
+		var eave := _eave()
+		if eave < 2.2:
+			return
+		var n_floors := floors if floors > 0 else maxi(1, int(round(eave / 3.0)))
+		n_floors = mini(n_floors, int(eave / 2.4))
+		var fh := eave / maxf(n_floors, 1)
+		var win_w := 1.1 if kind == "dwelling" else 0.8
+		var win_h := minf(1.35, fh * 0.45) if kind == "dwelling" else 0.6
+		var spacing := 2.8 if kind == "dwelling" else 5.0
+		var longest: Dictionary = {}
+		for f in wall_faces:
+			if longest.is_empty() or (float(f.umax) - float(f.umin)) > (float(longest.umax) - float(longest.umin)):
+				longest = f
+		for f in wall_faces:
+			var width: float = float(f.umax) - float(f.umin)
+			if width < 2.4:
+				continue
+			var cols := int((width - 1.6) / spacing)
+			if cols < 1:
+				cols = 1
+			var step := width / (cols + 1)
+			var base: float = maxf(float(f.ymin), _ground_on(f))
+			for k in n_floors:
+				var y: float = base + k * fh + (0.9 if kind == "dwelling" else 1.3) + win_h / 2.0
+				if y + win_h / 2.0 > float(f.ymax) - 0.2:
+					continue
+				for c in cols:
+					var u: float = float(f.umin) + step * (c + 1)
+					if f == longest and k == 0 and c == cols / 2:
+						continue   # the door goes here
+					if not _fits_face(f, u, y, win_w + 0.3, win_h + 0.3):
+						continue   # under the slope of a gable: the face is a pentagon there
+					_quad_on_face(_trim, f, u, y, win_w + 0.16, win_h + 0.16, 0.02)
+					_quad_on_face(_windows, f, u, y, win_w, win_h, 0.04)
+		if not longest.is_empty():
+			var door_w := 1.0 if kind == "dwelling" else 2.4
+			var door_h := 2.1 if kind == "dwelling" else 2.4
+			var lw: float = float(longest.umax) - float(longest.umin)
+			var cols := maxi(1, int((lw - 1.6) / spacing))
+			var u: float = float(longest.umin) + lw / (cols + 1) * (cols / 2 + 1)
+			var y0: float = maxf(float(longest.ymin), _ground_on(longest)) + door_h / 2.0
+			_quad_on_face(_trim, longest, u, y0, door_w + 0.16, door_h + 0.1, 0.02)
+			var door := _windows if kind != "dwelling" else _trim
+			_quad_on_face(door, longest, u, y0, door_w, door_h, 0.05)
+
+
+
+	## The ground along a wall face, relative to the building's origin (the model stands on its lowest
+	## corner, so on a slope the uphill walls start below grade): the highest terrain sample under it.
+	func _ground_on(f: Dictionary) -> float:
+		if grounds.is_empty():
+			return 0.0
+		# relative to the lowest corner of the footprint, where the model stands (the node may not be
+		# snapped to the ground yet, so its own y is no reference)
+		var origin := INF
+		for p in polygon:
+			var hp: float = _ground_at(Vector2(p.x, p.y))
+			if not is_nan(hp):
+				origin = minf(origin, hp)
+		if origin == INF:
+			return 0.0
+		var g := 0.0
+		var pts: Array = f.get("pts", [])
+		var samples: Array = pts.duplicate()
+		if pts.size() >= 2:
+			samples.append((Vector3(pts[0]) + Vector3(pts[pts.size() / 2])) * 0.5)
+		for p in samples:
+			var h: float = _ground_at(Vector2(p.x, p.z))
+			if not is_nan(h):
+				g = maxf(g, minf(h - origin, 2.0))
+		return g
+
+
+
+	## The eave: the top of the longest wall face (a porch or a low wing must not pull it down), else
+	## the register height.
+	func _eave() -> float:
+		var best := -1.0
+		var eave := height
+		for f in wall_faces:
+			var w: float = float(f.umax) - float(f.umin)
+			if w > best:
+				best = w
+				eave = float(f.ymax)
+		return eave
+
+
+## The eave: the top of the longest wall face (a porch or a low wing must not pull it down), else
+## the register height.
+func _eave() -> float:
+	var best := -1.0
+	var eave := height
+	for f in _wall_faces:
+		var w: float = float(f.umax) - float(f.umin)
+		if w > best:
+			best = w
+			eave = float(f.ymax)
+	return eave
 
 
 ## The LOD2 model for this building from the pack's buildings.json (parsed once per pack).
@@ -96,196 +554,6 @@ func _model() -> Dictionary:
 				table[int(b.id)] = b.lod2
 		_models[path] = table
 	return _models[path].get(building_id, {})
-
-
-func _tri(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3) -> void:
-	for v in [a, b, c]:
-		st.add_vertex(v)
-
-
-## LOD2 faces: planar polygons in metres relative to the origin (x east, y up from the base, z south).
-func _faces(faces: Array) -> void:
-	var roof_faces: Array = []       # Array[Vector3] per roof face, for the gap pass
-	var wall_tops: Array = []        # [Vector3 a, Vector3 b] the ground line of each wall face
-	for face in faces:
-		var pts: Array[Vector3] = []
-		for p in face:
-			pts.append(Vector3(float(p[0]), float(p[1]), float(p[2])))
-		if pts.size() < 3:
-			continue
-		var nrm := Vector3.ZERO
-		for i in pts.size():
-			nrm += pts[i].cross(pts[(i + 1) % pts.size()])   # Newell's method
-		nrm = nrm.normalized()
-		if nrm.y < -0.5:
-			continue   # floor: never seen
-		var st := _roof if nrm.y > 0.3 else _walls
-		if st == _walls:
-			_register_face(pts)
-			# the wall's line on the ground: the two vertices farthest apart in xz (gables included)
-			var pa := pts[0]
-			var pb := pts[0]
-			var best := -1.0
-			for i in pts.size():
-				for j in range(i + 1, pts.size()):
-					var dd := Vector2(pts[i].x, pts[i].z).distance_squared_to(Vector2(pts[j].x, pts[j].z))
-					if dd > best:
-						best = dd
-						pa = pts[i]
-						pb = pts[j]
-			var low := INF
-			var high := -INF
-			for q in pts:
-				low = minf(low, q.y)
-				high = maxf(high, q.y)
-			wall_tops.append([pa, pb, low, high])
-		else:
-			roof_faces.append(pts)
-		# triangulate in the plane: drop the dominant axis
-		var proj: PackedVector2Array = PackedVector2Array()
-		var ax := absf(nrm.x)
-		var ay := absf(nrm.y)
-		var az := absf(nrm.z)
-		for p in pts:
-			if ay >= ax and ay >= az:
-				proj.append(Vector2(p.x, p.z))
-			elif ax >= az:
-				proj.append(Vector2(p.y, p.z))
-			else:
-				proj.append(Vector2(p.x, p.y))
-		var idx := Geometry2D.triangulate_polygon(proj)
-		if idx.is_empty():
-			continue
-		for i in range(0, idx.size(), 3):
-			var a := pts[idx[i]]
-			var b := pts[idx[i + 1]]
-			var c := pts[idx[i + 2]]
-			if (b - a).cross(c - a).dot(nrm) < 0.0:
-				_tri(st, a, c, b)
-			else:
-				_tri(st, a, b, c)
-	_close_gaps(roof_faces, wall_tops)
-
-
-## Some Geo3D models are fragments: a whole roof with walls under one corner only (the rest reads as
-## a slab in the air). Every outer roof edge that no wall face reaches gets a wall down to the ground.
-func _close_gaps(roof_faces: Array, wall_tops: Array) -> void:
-	var edges: Array = []   # [a, b, face index]
-	for fi in roof_faces.size():
-		var pts: Array = roof_faces[fi]
-		for i in pts.size():
-			edges.append([pts[i], pts[(i + 1) % pts.size()], fi])
-	var added := 0
-	for e in edges:
-		var a: Vector3 = e[0]
-		var b: Vector3 = e[1]
-		if a.distance_to(b) < 1.5 or minf(a.y, b.y) < 2.5:
-			continue
-		var mid := (a + b) * 0.5
-		var covered := false
-		# wall faces standing along this edge (eaves overhang the wall by a metre or so), taken
-		# together (models split walls into bands): they must reach well below it, a parapet alone
-		# does not hold a roof up
-		var lowest := INF
-		for w in wall_tops:
-			if _dist_xz(mid, w[0], w[1]) < 1.5:
-				lowest = minf(lowest, float(w[2]))
-				if float(w[2]) <= mid.y + 0.5 and float(w[3]) >= mid.y + 1.0:
-					covered = true   # a taller part rises from this edge: an inner edge of a lower roof
-		if lowest <= mid.y - 2.0:
-			covered = true
-		if not covered:
-			# a lower roof lies under this edge (a skylight, a penthouse, a setback): nothing to close
-			for fi in roof_faces.size():
-				if fi == e[2]:
-					continue
-				var face2: Array = roof_faces[fi]
-				var below := false
-				var poly2 := PackedVector2Array()
-				for q in face2:
-					poly2.append(Vector2(q.x, q.z))
-					if q.y < mid.y - 0.3:
-						below = true
-				if below and Geometry2D.is_point_in_polygon(Vector2(mid.x, mid.z) + Vector2(c_out(e, roof_faces)).limit_length(0.3), poly2):
-					covered = true
-					break
-		if not covered:
-			for o in edges:   # an inner edge: another roof face shares it
-				if o[2] != e[2] and _dist_xz(mid, o[0], o[1]) < 0.4 and absf(((o[0] + o[1]) * 0.5).y - mid.y) < 1.5:
-					covered = true
-					break
-		if covered:
-			continue
-		var ga := Vector3(a.x, 0.0, a.z)
-		var gb := Vector3(b.x, 0.0, b.z)
-		# outward: away from the roof face's centre
-		var face: Array = roof_faces[e[2]]
-		var c := Vector3.ZERO
-		for q in face:
-			c += q
-		c /= face.size()
-		var out := Vector3(-(b.z - a.z), 0.0, b.x - a.x)
-		if out.dot(mid - c) < 0.0:
-			var t := a
-			a = b
-			b = t
-			ga = Vector3(a.x, 0.0, a.z)
-			gb = Vector3(b.x, 0.0, b.z)
-		_tri(_walls, ga, gb, b)
-		_tri(_walls, ga, b, a)
-		_register_face([ga, gb, b, a])
-		added += 1
-	if added > 0:
-		print("[building] %s: %d roof edges without walls closed to the ground" % [address if address != "" else str(building_id), added])
-
-
-## The xz direction from an edge's midpoint towards its face's centre.
-static func c_out(e: Array, roof_faces: Array) -> Vector2:
-	var face: Array = roof_faces[e[2]]
-	var c := Vector3.ZERO
-	for q in face:
-		c += q
-	c /= face.size()
-	var mid: Vector3 = (e[0] + e[1]) * 0.5
-	return Vector2(c.x - mid.x, c.z - mid.z)
-
-
-static func _dist_xz(p: Vector3, a: Vector3, b: Vector3) -> float:
-	var p2 := Vector2(p.x, p.z)
-	var a2 := Vector2(a.x, a.z)
-	var b2 := Vector2(b.x, b.z)
-	var ab := b2 - a2
-	var t := clampf((p2 - a2).dot(ab) / maxf(ab.length_squared(), 0.0001), 0.0, 1.0)
-	return p2.distance_to(a2 + ab * t)
-
-
-## Fallback: the footprint extruded to `height` with a flat roof.
-func _extrude() -> void:
-	var n := polygon.size()
-	for i in n:
-		var a := polygon[i]
-		var b := polygon[(i + 1) % n]
-		_tri(_walls, Vector3(a.x, 0, a.y), Vector3(b.x, 0, b.y), Vector3(b.x, height, b.y))
-		_tri(_walls, Vector3(a.x, 0, a.y), Vector3(b.x, height, b.y), Vector3(a.x, height, a.y))
-		_register_face([Vector3(a.x, 0, a.y), Vector3(b.x, 0, b.y), Vector3(b.x, height, b.y), Vector3(a.x, height, a.y)])
-	var tris := Geometry2D.triangulate_polygon(polygon)
-	for i in range(0, tris.size(), 3):
-		var p0 := polygon[tris[i]]
-		var p1 := polygon[tris[i + 1]]
-		var p2 := polygon[tris[i + 2]]
-		_tri(_roof, Vector3(p0.x, height, p0.y), Vector3(p2.x, height, p2.y), Vector3(p1.x, height, p1.y))
-
-
-## Walls from the base down into the ground, so a sloping site shows no gap under the model.
-func _skirt() -> void:
-	if polygon.size() < 3 or skirt <= 0.0:
-		return
-	var n := polygon.size()
-	for i in n:
-		var a := polygon[i]
-		var b := polygon[(i + 1) % n]
-		_tri(_walls, Vector3(a.x, -skirt, a.y), Vector3(b.x, -skirt, b.y), Vector3(b.x, 0.05, b.y))
-		_tri(_walls, Vector3(a.x, -skirt, a.y), Vector3(b.x, 0.05, b.y), Vector3(a.x, 0.05, a.y))
 
 
 # ---------------------------------------------------------------- register-driven details
@@ -444,106 +712,6 @@ func _trim_material() -> StandardMaterial3D:
 
 
 # ---------------------------------------------------------------- windows and doors
-func _register_face(pts: Array) -> void:
-	"""Remember a vertical wall face for the openings pass."""
-	var nrm := Vector3.ZERO
-	for i in pts.size():
-		nrm += (pts[i] as Vector3).cross(pts[(i + 1) % pts.size()])
-	nrm = nrm.normalized()
-	if absf(nrm.y) > 0.3 or nrm.length() < 0.5:
-		return
-	var t := nrm.cross(Vector3.UP).normalized()
-	var umin := INF
-	var umax := -INF
-	var ymin := INF
-	var ymax := -INF
-	for p in pts:
-		var u: float = (p as Vector3).dot(t)
-		umin = minf(umin, u)
-		umax = maxf(umax, u)
-		ymin = minf(ymin, p.y)
-		ymax = maxf(ymax, p.y)
-	_wall_faces.append({"pts": pts, "n": nrm, "t": t, "umin": umin, "umax": umax, "ymin": ymin, "ymax": ymax})
-
-
-## Whether a w x h opening centred at (u, y) lies within the face polygon (gable ends are pentagons).
-func _fits_face(f: Dictionary, u: float, y: float, w: float, h: float) -> bool:
-	var outline := PackedVector2Array()
-	for p in f.pts:
-		outline.append(Vector2((p as Vector3).dot(f.t), (p as Vector3).y))
-	if outline.size() < 3:
-		return true
-	for corner in [Vector2(u - w / 2.0, y - h / 2.0), Vector2(u + w / 2.0, y - h / 2.0), Vector2(u + w / 2.0, y + h / 2.0), Vector2(u - w / 2.0, y + h / 2.0)]:
-		if not Geometry2D.is_point_in_polygon(corner, outline):
-			return false
-	return true
-
-
-func _quad_on_face(st: SurfaceTool, f: Dictionary, u: float, y: float, w: float, h: float, out: float) -> void:
-	var a: Vector3 = f.pts[0]
-	var base: Vector3 = a + f.t * (u - a.dot(f.t)) + Vector3.UP * (y - a.y) + f.n * out
-	var du: Vector3 = f.t * (w / 2.0)
-	var dy: Vector3 = Vector3.UP * (h / 2.0)
-	var p0 := base - du - dy
-	var p1 := base + du - dy
-	var p2 := base + du + dy
-	var p3 := base - du + dy
-	_tri(st, p0, p1, p2)
-	_tri(st, p0, p2, p3)
-	_tri(st, p0, p2, p1)   # both sides, so the normal sign of the face does not matter
-	_tri(st, p0, p3, p2)
-
-
-## Windows in rows per floor and a door on the longest wall; sizes and spacing by building kind.
-func _openings() -> void:
-	if _wall_faces.is_empty():
-		return
-	var eave := _eave()
-	if eave < 2.2:
-		return
-	var n_floors := floors if floors > 0 else maxi(1, int(round(eave / 3.0)))
-	n_floors = mini(n_floors, int(eave / 2.4))
-	var fh := eave / maxf(n_floors, 1)
-	var win_w := 1.1 if kind == "dwelling" else 0.8
-	var win_h := minf(1.35, fh * 0.45) if kind == "dwelling" else 0.6
-	var spacing := 2.8 if kind == "dwelling" else 5.0
-	var longest: Dictionary = {}
-	for f in _wall_faces:
-		if longest.is_empty() or (float(f.umax) - float(f.umin)) > (float(longest.umax) - float(longest.umin)):
-			longest = f
-	for f in _wall_faces:
-		var width: float = float(f.umax) - float(f.umin)
-		if width < 2.4:
-			continue
-		var cols := int((width - 1.6) / spacing)
-		if cols < 1:
-			cols = 1
-		var step := width / (cols + 1)
-		var base: float = maxf(float(f.ymin), _ground_on(f))
-		for k in n_floors:
-			var y: float = base + k * fh + (0.9 if kind == "dwelling" else 1.3) + win_h / 2.0
-			if y + win_h / 2.0 > float(f.ymax) - 0.2:
-				continue
-			for c in cols:
-				var u: float = float(f.umin) + step * (c + 1)
-				if f == longest and k == 0 and c == cols / 2:
-					continue   # the door goes here
-				if not _fits_face(f, u, y, win_w + 0.3, win_h + 0.3):
-					continue   # under the slope of a gable: the face is a pentagon there
-				_quad_on_face(_trim, f, u, y, win_w + 0.16, win_h + 0.16, 0.02)
-				_quad_on_face(_windows, f, u, y, win_w, win_h, 0.04)
-	if not longest.is_empty():
-		var door_w := 1.0 if kind == "dwelling" else 2.4
-		var door_h := 2.1 if kind == "dwelling" else 2.4
-		var lw: float = float(longest.umax) - float(longest.umin)
-		var cols := maxi(1, int((lw - 1.6) / spacing))
-		var u: float = float(longest.umin) + lw / (cols + 1) * (cols / 2 + 1)
-		var y0: float = maxf(float(longest.ymin), _ground_on(longest)) + door_h / 2.0
-		_quad_on_face(_trim, longest, u, y0, door_w + 0.16, door_h + 0.1, 0.02)
-		var door := _windows if kind != "dwelling" else _trim
-		_quad_on_face(door, longest, u, y0, door_w, door_h, 0.05)
-
-
 ## A name plate above the building: the tenants of its cadastral unit (empty text removes it).
 func set_sign(text: String) -> void:
 	if text == "":
@@ -551,6 +719,8 @@ func set_sign(text: String) -> void:
 			_sign.queue_free()
 			_sign = null
 		return
+	if not is_built:
+		await built   # the plate hangs off the door frame, which the build defines
 	if _sign == null:
 		_sign = Label3D.new()
 		_sign.billboard = BaseMaterial3D.BILLBOARD_ENABLED
@@ -578,6 +748,8 @@ func set_props(rows: Array) -> void:
 	var dom: Dictionary = MapPalette.dominant(rows)
 	if dom.is_empty():
 		return
+	if not is_built:
+		await built
 	var f := door_frame()
 	if f.is_empty():
 		return
@@ -685,46 +857,6 @@ func door_frame() -> Dictionary:
 	var pos: Vector3 = a + longest.t * (u - a.dot(longest.t)) + Vector3.UP * (float(longest.ymin) - a.y)
 	return {"pos": pos, "n": longest.n, "t": longest.t, "width": 1.0 if kind == "dwelling" else 2.4, "height": 2.1 if kind == "dwelling" else 2.4,
 		"ymin": float(longest.ymin), "eave": float(longest.ymax)}
-
-
-## The ground along a wall face, relative to the building's origin (the model stands on its lowest
-## corner, so on a slope the uphill walls start below grade): the highest terrain sample under it.
-func _ground_on(f: Dictionary) -> float:
-	var world: Node = GameState.world
-	if world == null or not ("terrain" in world) or world.terrain == null or world.terrain.data == null:
-		return 0.0
-	# relative to the lowest corner of the footprint, where the model stands (the node may not be
-	# snapped to the ground yet, so its own y is no reference)
-	var origin := INF
-	for p in polygon:
-		var hp: float = world.terrain.data.get_height(to_global(Vector3(p.x, 0.0, p.y)))
-		if not is_nan(hp):
-			origin = minf(origin, hp)
-	if origin == INF:
-		return 0.0
-	var g := 0.0
-	var pts: Array = f.get("pts", [])
-	var samples: Array = pts.duplicate()
-	if pts.size() >= 2:
-		samples.append((Vector3(pts[0]) + Vector3(pts[pts.size() / 2])) * 0.5)
-	for p in samples:
-		var h: float = world.terrain.data.get_height(to_global(Vector3(p.x, 0.0, p.z)))
-		if not is_nan(h):
-			g = maxf(g, minf(h - origin, 2.0))
-	return g
-
-
-## The eave: the top of the longest wall face (a porch or a low wing must not pull it down), else
-## the register height.
-func _eave() -> float:
-	var best := -1.0
-	var eave := height
-	for f in _wall_faces:
-		var w: float = float(f.umax) - float(f.umin)
-		if w > best:
-			best = w
-			eave = float(f.ymax)
-	return eave
 
 
 ## Eave height and floor count the openings use (the interior follows the same rhythm).
