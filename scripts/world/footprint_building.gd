@@ -698,9 +698,12 @@ func _roof_material() -> StandardMaterial3D:
 func _window_material() -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
 	m.resource_name = "Window"
-	m.albedo_color = Color(0.1, 0.13, 0.17)
-	m.metallic = 0.3
-	m.roughness = 0.12
+	# glass: a dark tint under a mirror-like surface, so a pane shows the sky and the street
+	# instead of a black rectangle (there is no room behind it until the player steps in)
+	m.albedo_color = Color(0.08, 0.1, 0.13)
+	m.metallic = 0.9
+	m.metallic_specular = 1.0
+	m.roughness = 0.05
 	return m
 
 

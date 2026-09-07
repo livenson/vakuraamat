@@ -331,6 +331,14 @@ func _configure_sky() -> void:
 	tod.day = int(date[2])
 	tod.minutes_per_day = 150.0   # a full day in 2.5 real hours; the slice is ~80 min
 	tod.game_time_enabled = true
+	if sky.sun:
+		# the sun's shadow: blended cascades and a normal bias against the swimming and the striping
+		# on walls that a moving camera shows with the default (unblended, unbiased) settings
+		sky.sun.directional_shadow_blend_splits = true
+		sky.sun.directional_shadow_max_distance = 400.0
+		sky.sun.shadow_bias = 0.04
+		sky.sun.shadow_normal_bias = 2.5
+		sky.sun.light_angular_distance = 0.5
 	_configure_environment()
 
 

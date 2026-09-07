@@ -83,10 +83,7 @@ func register_windows(mi: MeshInstance3D) -> void:
 	for si in mi.mesh.get_surface_count():
 		var m: Material = mi.mesh.surface_get_material(si)
 		if m is StandardMaterial3D and m.resource_name == "Window":
-			var w: StandardMaterial3D = m.duplicate()
-			w.roughness = 0.06
-			w.metallic = 0.2
-			w.metallic_specular = 0.9
+			var w: StandardMaterial3D = m.duplicate()   # keeps the glass look (FootprintBuilding._window_material)
 			w.emission_enabled = true
 			w.emission = Color(1.0, 0.72, 0.4)
 			w.emission_energy_multiplier = _window_mats[0].emission_energy_multiplier if not _window_mats.is_empty() else 0.0
