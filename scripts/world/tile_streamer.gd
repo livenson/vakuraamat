@@ -312,29 +312,39 @@ func _set_tile_era(loc: Vector2i, era_id: String) -> void:
 		old.queue_free()
 	if era_id == "":
 		return
-	var path := Sites.path_in(t.pack, "scenes/%s.tscn" % era_id)
+	var scene: PackedScene = await _era_scene(root, str(t.pack), era_id)
+	if scene != null:
+		await _fill_era(root, scene, loc)
+
+
+## The pack's era scene, a text file with hundreds of nodes: parsed on a loader thread and polled
+## here. Null when the pack has no such era, or the tile went away while the scene parsed.
+func _era_scene(root: Node3D, pack: String, era_id: String) -> PackedScene:
+	var path := Sites.path_in(pack, "scenes/%s.tscn" % era_id)
 	if not ResourceLoader.exists(path):
-		return
-	# The pack's scene is a text file with hundreds of nodes: parsed on a loader thread, polled here
+		return null
 	var t_scene := Time.get_ticks_msec()
 	var scene: PackedScene = null
 	if ResourceLoader.has_cached(path):
 		scene = ResourceLoader.load(path, "PackedScene")
 	elif ResourceLoader.load_threaded_request(path, "PackedScene") == OK:
-		while true:
-			var st := ResourceLoader.load_threaded_get_status(path)
-			if st == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
-				await get_tree().process_frame
-				continue
-			if st == ResourceLoader.THREAD_LOAD_LOADED:
-				scene = ResourceLoader.load_threaded_get(path)
-			break
+		while ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+			await get_tree().process_frame
+		if ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_LOADED:
+			scene = ResourceLoader.load_threaded_get(path)
 		if not is_instance_valid(root) or not root.is_inside_tree() or root.get_node_or_null("Era") != null:
-			return   # unloaded, or another era arrived, while the scene parsed
-	if scene == null:
-		return
-	PerfLog.mark("tile era scene %s: parsed in %d ms" % [loc, Time.get_ticks_msec() - t_scene])
-	t_scene = Time.get_ticks_msec()
+			scene = null   # unloaded, or another era arrived, while the scene parsed
+	if scene != null:
+		PerfLog.mark("tile era scene %s: parsed in %d ms" % [path.get_file(), Time.get_ticks_msec() - t_scene])
+	return scene
+
+
+## The era's ambient nodes under the tile root; story nodes are dropped before _ready. The heavy
+## groups enter empty and their members are added back a few milliseconds a frame, so a city tile
+## (hundreds of buildings, each building its mesh and collision in _ready) no longer costs one
+## two-second frame and a stalled GPU fence.
+func _fill_era(root: Node3D, scene: PackedScene, loc: Vector2i) -> void:
+	var t_scene := Time.get_ticks_msec()
 	var node: Node3D = scene.instantiate()
 	PerfLog.mark("instantiate %d ms" % (Time.get_ticks_msec() - t_scene))
 	for c in node.get_children():
@@ -342,9 +352,6 @@ func _set_tile_era(loc: Vector2i, era_id: String) -> void:
 			node.remove_child(c)
 			c.free()
 	node.name = "Era"
-	# The heavy groups enter empty; their members are added back a few milliseconds a frame, so a
-	# city tile (hundreds of buildings, each building its mesh and collision in _ready) no longer
-	# costs one two-second frame and a stalled GPU fence.
 	trim_to_tile(node, size)
 	var pending: Array = []   # [group, member]
 	for group in node.get_children():
@@ -354,11 +361,13 @@ func _set_tile_era(loc: Vector2i, era_id: String) -> void:
 				pending.append([group, m])
 	root.add_child(node)
 	var t0 := Time.get_ticks_usec()
+	var alive := true
 	for i in pending.size():
-		if not is_instance_valid(node) or not node.is_inside_tree():
+		alive = is_instance_valid(node) and node.is_inside_tree()
+		if not alive:
 			for j in range(i, pending.size()):
 				pending[j][1].free()   # the tile was unloaded meanwhile
-			return
+			break
 		var t_m := Time.get_ticks_usec()
 		pending[i][0].add_child(pending[i][1])
 		if Time.get_ticks_usec() - t_m > 25000:
@@ -366,14 +375,12 @@ func _set_tile_era(loc: Vector2i, era_id: String) -> void:
 		if Time.get_ticks_usec() - t0 > FILL_BUDGET_USEC:
 			await get_tree().process_frame
 			t0 = Time.get_ticks_usec()
-	if not is_instance_valid(node) or not node.is_inside_tree():
-		return
-	PerfLog.mark("tile era filled %s (%d members)" % [loc, pending.size()])
-	if node is EraController:
-		node.activate()
+	if alive and is_instance_valid(node) and node.is_inside_tree():
+		PerfLog.mark("tile era filled %s (%d members)" % [loc, pending.size()])
+		if node is EraController:
+			node.activate()
 
 
-## World.apply_era: every loaded tile follows the era.
 func set_era(era_id: String) -> void:
 	for loc in tiles:
 		if loc != Vector2i.ZERO and is_ready(loc):

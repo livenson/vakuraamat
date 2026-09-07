@@ -21,15 +21,15 @@ the same script frozen with tools/service/build.sh ships beside the exported gam
 Nothing here is exposed beyond the loopback interface unless you bind it so.
 """
 import argparse, time, json, os, re, shutil, sys, threading, traceback, urllib.parse, urllib.request, zipfile
-
-# The service shares the machine with a running game: the pipeline's numeric libraries stay on a
-# couple of threads (set before numpy loads) and the process runs at a lower priority (main()).
-for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "GDAL_NUM_THREADS"):
-    os.environ.setdefault(_v, "2")
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE); sys.path.insert(0, os.path.join(HERE, "pipeline"))
+# The service shares the machine with a running game: the pipeline's numeric libraries stay on a
+# couple of threads (set before numpy loads with the pipeline modules) and the process runs at a
+# lower priority (main()).
+for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "GDAL_NUM_THREADS"):
+    os.environ.setdefault(_v, "2")
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the repository, or the bundle directory of the frozen sidecar (tools/service/build.sh)
 import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads, fetch_stops, fetch_tenants, fetch_fields, market  # noqa: E402

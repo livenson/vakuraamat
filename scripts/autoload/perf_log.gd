@@ -63,12 +63,12 @@ func _process(_delta: float) -> void:
 		_file.store_line("%s mark %.0f ms | %s" % [_stamp(), ms, ", ".join(_prev_marks)])
 	var t := now / 1e6
 	if t - _sec_start >= 1.0:
-		var P := Performance
+		var perf := Performance
 		_file.store_line("%s fps %3d | %5.1f/%6.1f ms | proc %5.1f phys %4.1f | dc %4d obj %5d nodes %5d | mem %4.0f/%5.0f MB | %s" % [
 			_stamp(), _sec_frames, _sec_sum / maxi(_sec_frames, 1), _sec_max,
-			P.get_monitor(P.TIME_PROCESS) * 1000.0, P.get_monitor(P.TIME_PHYSICS_PROCESS) * 1000.0,
-			int(P.get_monitor(P.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)), int(P.get_monitor(P.RENDER_TOTAL_OBJECTS_IN_FRAME)), int(P.get_monitor(P.OBJECT_NODE_COUNT)),
-			P.get_monitor(P.MEMORY_STATIC) / 1048576.0, P.get_monitor(P.RENDER_VIDEO_MEM_USED) / 1048576.0, _where()])
+			perf.get_monitor(perf.TIME_PROCESS) * 1000.0, perf.get_monitor(perf.TIME_PHYSICS_PROCESS) * 1000.0,
+			int(perf.get_monitor(perf.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)), int(perf.get_monitor(perf.RENDER_TOTAL_OBJECTS_IN_FRAME)), int(perf.get_monitor(perf.OBJECT_NODE_COUNT)),
+			perf.get_monitor(perf.MEMORY_STATIC) / 1048576.0, perf.get_monitor(perf.RENDER_VIDEO_MEM_USED) / 1048576.0, _where()])
 		_file.flush()
 		_sec_start = t
 		_sec_frames = 0

@@ -117,17 +117,17 @@ func execute(cmd: Dictionary) -> Array:
 ## One line of the engine's frame counters: where the time goes (process = scripts and nodes,
 ## physics, the render server) and how much the scene asks of the renderer per frame.
 static func stats_line() -> String:
-	var P := Performance
+	var perf := Performance
 	return ("fps %d | frame %.1f ms: process %.1f physics %.1f navigation %.1f | draw calls %d objects %d primitives %d | "
 		+ "nodes %d orphans %d | static mem %.0f MB video mem %.0f MB (textures %.0f buffers %.0f) | objects %d resources %d") % [
 		Engine.get_frames_per_second(),
 		1000.0 / maxf(Engine.get_frames_per_second(), 1.0),
-		P.get_monitor(P.TIME_PROCESS) * 1000.0, P.get_monitor(P.TIME_PHYSICS_PROCESS) * 1000.0, P.get_monitor(P.TIME_NAVIGATION_PROCESS) * 1000.0,
-		int(P.get_monitor(P.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)), int(P.get_monitor(P.RENDER_TOTAL_OBJECTS_IN_FRAME)), int(P.get_monitor(P.RENDER_TOTAL_PRIMITIVES_IN_FRAME)),
-		int(P.get_monitor(P.OBJECT_NODE_COUNT)), int(P.get_monitor(P.OBJECT_ORPHAN_NODE_COUNT)),
-		P.get_monitor(P.MEMORY_STATIC) / 1048576.0, P.get_monitor(P.RENDER_VIDEO_MEM_USED) / 1048576.0,
-		P.get_monitor(P.RENDER_TEXTURE_MEM_USED) / 1048576.0, P.get_monitor(P.RENDER_BUFFER_MEM_USED) / 1048576.0,
-		int(P.get_monitor(P.OBJECT_COUNT)), int(P.get_monitor(P.OBJECT_RESOURCE_COUNT))]
+		perf.get_monitor(perf.TIME_PROCESS) * 1000.0, perf.get_monitor(perf.TIME_PHYSICS_PROCESS) * 1000.0, perf.get_monitor(perf.TIME_NAVIGATION_PROCESS) * 1000.0,
+		int(perf.get_monitor(perf.RENDER_TOTAL_DRAW_CALLS_IN_FRAME)), int(perf.get_monitor(perf.RENDER_TOTAL_OBJECTS_IN_FRAME)), int(perf.get_monitor(perf.RENDER_TOTAL_PRIMITIVES_IN_FRAME)),
+		int(perf.get_monitor(perf.OBJECT_NODE_COUNT)), int(perf.get_monitor(perf.OBJECT_ORPHAN_NODE_COUNT)),
+		perf.get_monitor(perf.MEMORY_STATIC) / 1048576.0, perf.get_monitor(perf.RENDER_VIDEO_MEM_USED) / 1048576.0,
+		perf.get_monitor(perf.RENDER_TEXTURE_MEM_USED) / 1048576.0, perf.get_monitor(perf.RENDER_BUFFER_MEM_USED) / 1048576.0,
+		int(perf.get_monitor(perf.OBJECT_COUNT)), int(perf.get_monitor(perf.OBJECT_RESOURCE_COUNT))]
 
 
 ## Reload one resource in the running game. Scripts re-read their source and keep instance state;
