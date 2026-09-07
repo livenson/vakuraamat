@@ -22,7 +22,8 @@ var _prev_marks: Array[String] = []   # marks of the frame that just ended
 
 func _ready() -> void:
 	process_priority = -1000   # first in the frame: the delta measured here spans the whole previous frame
-	enabled = not ("--no-perf-log" in OS.get_cmdline_user_args())
+	# headless runs (tests, tools) share the user directory with the player's game: they must not truncate its log
+	enabled = DisplayServer.get_name() != "headless" and not ("--no-perf-log" in OS.get_cmdline_user_args())
 	if not enabled:
 		return
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://logs"))

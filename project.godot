@@ -34,6 +34,10 @@ SaveManager="*res://scripts/autoload/save_manager.gd"
 GameState="*res://scripts/autoload/game_state.gd"
 WindowMode="*res://scripts/autoload/window_mode.gd"
 
+[debug]
+
+file_logging/max_log_files=20
+
 [display]
 
 window/size/viewport_width=1600
