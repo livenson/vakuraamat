@@ -81,7 +81,8 @@ follows the react-fix-reload-verify protocol above.
 ## Performance log
 
 Every session, release builds included, writes `<userdir>/logs/perf.log` (the `PerfLog` autoload;
-`--no-perf-log` turns it off). One line a second: fps, average and worst frame ms, process and
+`--no-perf-log` turns it off; the previous session's file becomes `perf.prev.log`, so a crashed
+session's log survives the relaunch, and a session past 16 MB rolls into it and starts afresh). One line a second: fps, average and worst frame ms, process and
 physics ms, draw calls, objects, nodes, memory, the player's position and mode (walk or fly), the
 tile streamer's status. Any frame over 100 ms adds a `SPIKE` line with the marks systems left in
 that frame (`PerfLog.mark("...")`: tile load, ready and unload, the era scene of a neighbour, the

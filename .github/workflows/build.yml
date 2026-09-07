@@ -110,6 +110,13 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: dist
+      - name: "Name the builds after the release (Vakuraamat-v1.2.3-macos.zip)"
+        shell: bash
+        run: |
+          for f in dist/*/*.zip; do
+            mv "$f" "$(dirname "$f")/$(basename "$f" .zip | sed "s/^Vakuraamat-/Vakuraamat-${GITHUB_REF_NAME}-/").zip"
+          done
+          ls -la dist/*
       - name: "Release notes: the tag's message, the commits since the previous tag, how to run"
         shell: bash
         run: |

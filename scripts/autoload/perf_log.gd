@@ -7,7 +7,9 @@
 extends Node
 
 const PATH := "user://logs/perf.log"
+const PREV := "user://logs/perf.prev.log"   # the previous session (a crashed one survives the relaunch)
 const SPIKE_MS := 100.0
+const ROLL_BYTES := 16 * 1024 * 1024        # a long session rolls into perf.prev.log and starts afresh
 
 var enabled := true
 var _file: FileAccess
@@ -27,11 +29,25 @@ func _ready() -> void:
 	if not enabled:
 		return
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://logs"))
+	_open(true)
+	if not enabled:
+		return
+
+
+## Start a fresh file, the current one becoming perf.prev.log; `session` marks a new run's header.
+func _open(session: bool) -> void:
+	if _file:
+		_file.close()
+		_file = null
+	if FileAccess.file_exists(PATH):
+		if FileAccess.file_exists(PREV):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(PREV))
+		DirAccess.rename_absolute(ProjectSettings.globalize_path(PATH), ProjectSettings.globalize_path(PREV))
 	_file = FileAccess.open(PATH, FileAccess.WRITE)
 	if _file == null:
 		enabled = false
 		return
-	_file.store_line("# %s  %s  %s  site %s" % [Time.get_datetime_string_from_system(), OS.get_name(), "debug" if OS.is_debug_build() else "release", Sites.active])
+	_file.store_line("# %s  %s  %s  site %s%s" % [Time.get_datetime_string_from_system(), OS.get_name(), "debug" if OS.is_debug_build() else "release", Sites.active, "" if session else "  (continued: the earlier part is perf.prev.log)"])
 	_file.store_line("# every second: fps | frame ms avg/max | process/physics ms | draw calls, objects, nodes | static/video MB | position, mode | marks")
 	_file.flush()
 	_last_usec = Time.get_ticks_usec()
@@ -74,6 +90,8 @@ func _process(_delta: float) -> void:
 		_sec_frames = 0
 		_sec_sum = 0.0
 		_sec_max = 0.0
+		if _file.get_position() > ROLL_BYTES:
+			_open(false)
 
 
 func _stamp() -> String:

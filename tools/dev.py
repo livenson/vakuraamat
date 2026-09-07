@@ -10,8 +10,8 @@
     python3 tools/dev.py quit
     python3 tools/dev.py codes                      # toggle the K codes overlay
     python3 tools/dev.py stats                      # frame counters: process/physics ms, draw calls, memory
-    python3 tools/dev.py perf [all]                 # the session's performance log: the spikes (frames over 100 ms)
-                                                    # with what ran in them; "all" prints every line
+    python3 tools/dev.py perf [all|prev]            # the session's performance log: the spikes (frames over 100 ms)
+                                                    # with what ran in them; "all" every line; "prev" the previous session
     python3 tools/dev.py teleport <x> <z> [yaw_deg]
     python3 tools/dev.py era <era_id>
     python3 tools/dev.py screenshot </abs/path.png>
@@ -63,7 +63,8 @@ TARGET = {"pid": None, "all": False}
 def perf(args):
     """Print user://logs/perf.log (PerfLog autoload, written in release builds too): by default the
     header and the SPIKE lines with the second before each, "all" for the whole file."""
-    path = os.path.join(user_dir(), "logs", "perf.log")
+    path = os.path.join(user_dir(), "logs", "perf.prev.log" if "prev" in args else "perf.log")
+    args = [a for a in args if a != "prev"]
     if not os.path.exists(path):
         print("no perf log at", path)
         return
