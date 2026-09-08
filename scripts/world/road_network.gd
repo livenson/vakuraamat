@@ -371,7 +371,7 @@ func _billboards(terrain: Terrain3D) -> void:
 					holder.rotation.y = atan2(face.x, face.y) + (PI * 0.25 * side)
 					holder.add_child(model)
 					add_child(holder)
-					_poster_quad(holder, b, k, firms[i % firms.size()], pack)
+					_poster_panel(model, firms[i % firms.size()], pack)
 					i += 1
 				along += BILLBOARD_SPACING
 			acc += seg
@@ -380,26 +380,33 @@ func _billboards(terrain: Terrain3D) -> void:
 		print("[roads] %d billboards for %d firms, first at %s yaw %.0f" % [i, firms.size(), first.position, rad_to_deg(first.rotation.y)])
 
 
-## The poster: a quad just in front of the model's panel (its upper part, the full width).
-func _poster_quad(holder: Node3D, b: AABB, k: float, firm: Dictionary, pack: String) -> void:
-	var w := b.size.x * k
-	var h := b.size.y * k
-	var quad := MeshInstance3D.new()
-	var pm := QuadMesh.new()
-	pm.size = Vector2(w * 0.93, h * 0.36)
-	quad.mesh = pm
-	quad.position = Vector3(0.0, h * 0.775, b.size.z * k * 0.5 + 0.03)
+## The poster: the model's own panel repainted. The board ships with a template texture (a colour
+## grid reading "Billboard 48' x 14'"), which is what stood by the road; the panel is its own mesh
+## with its own material ("billboard-grid"), so overriding that surface puts the firm exactly where
+## the template was, at the panel's own mapping. A quad hung in front of the board instead of this
+## missed it: the model's panel does not face the holder's +Z, which is why the placement carries a
+## 45 degree correction.
+func _poster_panel(model: Node3D, firm: Dictionary, pack: String) -> void:
+	var panel: MeshInstance3D = null
+	for mi in model.find_children("*", "MeshInstance3D", true, false):
+		if mi.mesh == null or mi.mesh.get_surface_count() == 0:
+			continue
+		var m: Material = mi.mesh.surface_get_material(0)
+		if m and str(m.resource_name).begins_with("billboard-grid"):
+			panel = mi
+			break
+	if panel == null:
+		return
 	var mat := StandardMaterial3D.new()
-	mat.albedo_color = Color(0.9, 0.9, 0.9)
-	mat.roughness = 0.8
-	quad.material_override = mat
-	holder.add_child(quad)
+	mat.albedo_color = Color(0.85, 0.85, 0.85)   # until the poster is drawn, a blank board, not the grid
+	mat.roughness = 0.85
+	panel.set_surface_override_material(0, mat)
 	var lines: Array[String] = [str(firm.get("name", ""))]
 	if firm.get("emtak") and firm.emtak.get("text"):
 		lines.append(str(firm.emtak.text))
 	elif firm.get("sector"):
 		lines.append(tr("SECTOR_" + str(firm.sector).to_upper()))
-	_paint_poster.call_deferred(mat, lines, Vector2i(768, 300), pack)
+	_paint_poster.call_deferred(mat, lines, Vector2i(1024, 300), pack)   # the panel is 18.2 x 5.3, near 3.4:1
 
 
 func _paint_poster(mat: StandardMaterial3D, lines: Array[String], size: Vector2i, pack: String) -> void:
