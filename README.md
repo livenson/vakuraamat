@@ -10,7 +10,7 @@ Business Register open data with Godot 4.7, GDScript and Terrain3D.
 | | |
 |---|---|
 | ![The front page](docs/screenshots/menu.jpg) The front page: the plate of your square kilometre | ![The plots](docs/screenshots/plots.jpg) The book (Tab): the cadastre with purpose, area, taxation value and ownership |
-| ![A Kvissentali street](docs/screenshots/street.jpg) A Kvissentali street: real buildings, real companies on their name plates | ![Inside a company's building](docs/screenshots/shop.jpg) Inside a company's building: rooms, furniture by use, windows onto the street |
+| ![A Kvissentali street](docs/screenshots/street.jpg) A Kvissentali street: the Building Register's houses on the cadastre's plots | ![Inside a company's building](docs/screenshots/shop.jpg) Inside a company's building: rooms, furniture by use, windows onto the street |
 | ![The news](docs/screenshots/news.jpg) The news (N): the region's real headlines and official notices | ![Debug map](docs/screenshots/map.jpg) The map (M): plots, companies, street names and house numbers on the orthophoto |
 
 ## What you do
