@@ -1,4 +1,4 @@
-# All in-game UI, built in code: HUD (place, month, clock, cash), notices, the vakuraamat book
+# All in-game UI, built in code: HUD (place, clock), notices, the vakuraamat book
 # (BookPanel, Tab), the place's news (NewsPanel, N), the journal, the K codes overlay, the debug map,
 # the pause menu and F8 reports. Opening any panel frees the mouse and blocks gameplay input.
 extends CanvasLayer
@@ -97,9 +97,6 @@ func _ready() -> void:
 		_close()
 		book.open_parcel(t)
 		_open(book))
-	Ledger.player_changed.connect(_refresh_era_label)
-	Ledger.month_changed.connect(func(_m): _refresh_era_label())
-	Ledger.event_added.connect(_on_ledger_event)
 	pause.custom_minimum_size = Vector2(600, 0)
 	debug_map.custom_minimum_size = Vector2(1180, 840)
 	_center_panel(debug_map)
@@ -381,8 +378,7 @@ func _refresh_era_label() -> void:
 	if era == null:
 		era_label.text = ""
 		return
-	var badge := ("      " + tr("UI_ONLINE_BADGE")) if Ledger.online else ""
-	era_label.text = "%s      %s      %s      %s%s" % [Sites.display_name(Sites.active), Ledger.date_string(), world.clock_string().left(5), Ledger.format_money(Ledger.cash()), badge]
+	era_label.text = "%s      %s" % [Sites.display_name(Sites.active), world.clock_string().left(5)]
 	var obj := _objective()
 	if obj != "":
 		era_label.text += "\n" + obj
@@ -588,16 +584,14 @@ func _refresh_codes() -> void:
 	lines.append(tr("UI_CODES_PARCEL") + ": " + (Parcels.describe(u) if not u.is_empty() else "-"))
 	if not u.is_empty():
 		lines.append("   " + str(u.get("link", "")))
-		var row := Ledger.parcel(u.tunnus)
-		if not row.is_empty():
-			var owner: String = tr("UI_LEDGER_YOU") if Ledger.is_mine(u.tunnus) else str(row.owner_name)
-			lines.append("   %s: %s   %s: %s   %s: %s%s" % [tr("UI_CODES_OWNER"), owner, tr("UI_LEDGER_COL_PRICE"), Ledger.format_money(int(row.price)),
-				tr("UI_LEDGER_COL_YIELD"), Ledger.format_money(Ledger.yield_of(u.tunnus)), tr("UI_PER_MONTH")])
-			var rows := Ledger.tenants_of(u.tunnus)
-			if not rows.is_empty():
-				lines.append("   " + tr("UI_CODES_TENANT") + ":")
-				for t in rows:
-					lines.append("      " + _company_line(t))
+		if u.get("land_value") != null:
+			lines.append("   %s: %s   %s: %s" % [tr("UI_CODES_OWNER"), str(u.get("ownership", "")),
+				tr("UI_BOOK_COL_VALUE"), BookTheme.money(int(u.land_value))])
+		var rows := Tenants.of(Sites.pack_of(layer), str(u.tunnus))
+		if not rows.is_empty():
+			lines.append("   " + tr("UI_CODES_TENANT") + ":")
+			for t in rows:
+				lines.append("      " + _company_line(t))
 	var links := Reporter.links_for(pos, interactor.target, layer)
 	if links.has("etak_id"):
 		lines.append(tr("UI_CODES_BUILDING") + ": ETAK %d   %s" % [int(links.etak_id), str(links.get("ehr", ""))])
@@ -618,7 +612,7 @@ static func _company_line(t: Dictionary) -> String:
 	if t.get("employees") != null and int(t.employees) > 0:
 		bits.append(TranslationServer.translate("UI_EMPLOYEES") % int(t.employees))
 	if t.get("turnover") != null and int(t.turnover) > 0:
-		bits.append(TranslationServer.translate("UI_TURNOVER") % Ledger.format_money(int(t.turnover)))
+		bits.append(TranslationServer.translate("UI_TURNOVER") % BookTheme.money(int(t.turnover)))
 	if t.get("health") and str(t.health) != "sound":
 		bits.append(TranslationServer.translate("HEALTH_" + str(t.health).to_upper()))
 	return " · ".join(bits)
@@ -742,22 +736,10 @@ const DEBUG_COLORS := {
 
 func _fill_debug_map() -> void:
 	var body := _clear_body(debug_map)
-	body.get_node("Title").text = tr("UI_DEBUG_MAP") + "   ·   " + Sites.active + "   ·   " + Ledger.date_string()
+	body.get_node("Title").text = tr("UI_DEBUG_MAP") + "   ·   " + Sites.active
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 6)
 	body.add_child(row)
-	var be := Button.new()
-	be.text = "+ 50 000 €"
-	be.pressed.connect(func():
-		await Ledger.debug_grant(50000)
-		_fill_debug_map())
-	row.add_child(be)
-	var bn := Button.new()
-	bn.text = tr("UI_LEDGER_MONTH") + " →"
-	bn.pressed.connect(func():
-		Ledger.debug_advance_month()
-		_fill_debug_map())
-	row.add_child(bn)
 	var bm := Button.new()
 	bm.text = tr("UI_MAP_MODE") + ": " + tr("UI_MAP_MODE_" + _map_mode.to_upper())
 	bm.pressed.connect(func():
@@ -1130,55 +1112,20 @@ func debug_open(which: String) -> void:
 		"menu": _toggle(pause, _fill_pause)
 
 
-# --- journal (J): my own ledger lines and the codex
+# --- journal (J): the codex, what this place is and where its facts come from
 func _fill_journal() -> void:
 	var body := _clear_body(journal)
 	body.get_node("Title").text = tr("UI_JOURNAL")
-	var tabs := TabContainer.new()
-	tabs.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	body.add_child(tabs)
 	var scroll := ScrollContainer.new()
-	scroll.name = tr("UI_LEDGER")
-	tabs.add_child(scroll)
-	var box := VBoxContainer.new()
-	box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	box.add_theme_constant_override("separation", 6)
-	scroll.add_child(box)
-	var mine := Ledger.events(200, true)
-	if mine.is_empty():
-		BookTheme.label(tr("UI_LEDGER_EMPTY"), "ProseLabel", box)
-	var grid := GridContainer.new()
-	grid.columns = 3
-	box.add_child(grid)
-	for e in mine:
-		BookTheme.label(Ledger.date_for(int(e.month)), "DetailLabel", grid)
-		var l := BookTheme.label(str(e.title), "", grid)
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		var amount := int(e.amount)
-		var a := BookTheme.label(("%+s" % BookTheme.money(amount)) if amount > 0 else (BookTheme.money(amount) if amount < 0 else ""), "", grid)
-		a.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-		a.custom_minimum_size = Vector2(120, 0)
-		if amount != 0:
-			a.add_theme_color_override("font_color", BookTheme.GREEN if amount > 0 else BookTheme.RUBRIC)
-	var codex := ScrollContainer.new()
-	codex.name = tr("UI_CODEX")
-	tabs.add_child(codex)
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	body.add_child(scroll)
 	var cbox := VBoxContainer.new()
 	cbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cbox.add_theme_constant_override("separation", 8)
-	codex.add_child(cbox)
+	scroll.add_child(cbox)
 	for k in Sites.get_value("codex", []):
 		BookTheme.label(tr(str(k) + "_TITLE"), "SubheadLabel", cbox)
 		var l := BookTheme.label(tr(str(k)), "ProseLabel", cbox)
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		l.custom_minimum_size = Vector2(700, 0)
 
-
-## Offers on my plots and sales of them become notices; everything else waits in the feed.
-func _on_ledger_event(e: Dictionary) -> void:
-	var tunnus := str(e.get("tunnus", ""))
-	if tunnus == "" or not Ledger.is_mine(tunnus):
-		return
-	if str(e.kind) == "bid" and int(e.actor_id) != Ledger.me_id():
-		show_notice(tr("NOTICE_BID_RECEIVED") % [Ledger.parcel(tunnus).get("address", tunnus), int(e.amount)])

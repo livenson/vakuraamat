@@ -214,29 +214,10 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None, te
     os.makedirs(os.path.join(site_dir, "data/eras"), exist_ok=True)
     tex, strength, tint = era_texture(tile, e, y, tile_dir, texture_mode)
     props = {"id": q(e), "display_name_key": q(f"ERA_{y}_NAME"), "year_label": q(str(y)), "scene_path": q(f"{pack}/scenes/{e}.tscn"),
-             "texture_strength": str(strength), "ground_tint": "Color(%s, %s, %s, 1)" % tint, "default_time_of_day": "14.5", "order": "0",
-             "currency_key": q("CUR_EUR"), "starting_money": "0"}
+             "texture_strength": str(strength), "ground_tint": "Color(%s, %s, %s, 1)" % tint, "default_time_of_day": "14.5", "order": "0"}
     ext = set_texture(props, tex, texture_mode)
     write_tres(os.path.join(site_dir, f"data/eras/{e}.tres"), "res://scripts/era/era_definition.gd", props, ext)
     S(f"ERA_{y}_NAME", f"Aasta {y}", f"The year {y}")
-
-    # --- structures copied from the template (their strings too) ---------------------------------
-    tmpl_dir = os.path.join(template_root, "sites", template)
-    tmpl_strings = {}
-    tp = os.path.join(tmpl_dir, "strings.csv")
-    if os.path.exists(tp):
-        for r in list(csv.reader(open(tp, newline="", encoding="utf-8")))[1:]:
-            if r and r[0].strip():
-                tmpl_strings[r[0]] = r
-    src = os.path.join(tmpl_dir, "data", "structures")
-    if os.path.isdir(src):
-        for f in sorted(os.listdir(src)):
-            if f.endswith(".tres"):
-                p = read_tres(os.path.join(src, f))
-                for k in ("display_name_key", "description_key"):
-                    if k in p and unquote(p[k]) in tmpl_strings:
-                        strings.append(tmpl_strings[unquote(p[k])])
-                write_tres(os.path.join(site_dir, "data", "structures", f), p["_script"], p)
 
     # --- layout and scenes --------------------------------------------------------------------------
     layout = anchor_layout(half, anchors)

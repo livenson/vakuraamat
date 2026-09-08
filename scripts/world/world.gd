@@ -90,19 +90,10 @@ func _ready() -> void:
 	var tw := create_tween()
 	tw.tween_property(fade, "color:a", 0.0, FADE_TIME)
 	_ready_done = true
-	Ledger.start(Sites.active)
 	var marks := ParcelMarks.new()
 	marks.name = "ParcelMarks"
 	add_child(marks)
 	marks.setup(self)
-	var builder := ParcelBuilder.new()
-	builder.name = "ParcelBuilder"
-	add_child(builder)
-	builder.setup(self)
-	var figures := PresenceFigures.new()
-	figures.name = "PresenceFigures"
-	add_child(figures)
-	figures.setup(self)
 	var interiors := Interiors.new()
 	interiors.name = "Interiors"
 	add_child(interiors)
@@ -130,20 +121,7 @@ func _ready() -> void:
 			if parts.size() > 4:
 				player.set_pose(player.global_position, player.rotation.y, deg_to_rad(float(parts[4])))
 		elif a == "--fly":
-			player.flying = true
-		elif a.begins_with("--own="):
-			# verification runs: buy a plot (and build on it: --own=<tunnus>+<structure>) once the ground stands
-			var bits := a.trim_prefix("--own=").split("+")
-			get_tree().create_timer(1.5).timeout.connect(func():
-				if Ledger.parcel(bits[0]).is_empty():
-					Ledger.reset_local(Sites.active)   # a direct world run has no book yet
-				await Ledger.debug_grant(1000000)
-				var err: String = await Ledger.buy(bits[0])
-				if bits.size() > 1 and err == "":
-					err = await Ledger.build(bits[0], bits[1])
-				print("[world] --own %s: %s" % [a, "ok" if err == "" else err]))
-		elif a == "--fly":
-			player.flying = true   # checks of the survey view (the interactor's long reach, the outline)
+			player.flying = true   # checks of the survey view (the crosshair's reach, the outline)
 		elif a.begins_with("--hour="):
 			if sky and sky.tod:
 				sky.tod.current_time = float(a.trim_prefix("--hour="))
@@ -223,8 +201,6 @@ func _exit_tree() -> void:
 
 
 func _process(_delta: float) -> void:
-	if _ready_done:
-		Ledger.move(player.global_position, player.rotation.y)
 	if not _ready_done:
 		return
 	if sky and sky.tod:

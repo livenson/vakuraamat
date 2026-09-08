@@ -13,6 +13,4 @@ texture_strength = 1.0
 ground_tint = Color(1.0, 1.0, 1.0, 1)
 default_time_of_day = 14.5
 order = 0
-currency_key = "CUR_EUR"
-starting_money = 0
 terrain_texture = ExtResource("2")

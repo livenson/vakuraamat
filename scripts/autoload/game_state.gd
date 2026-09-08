@@ -1,5 +1,5 @@
 # Autoload "GameState": the era registry (one present-day layer per pack), the current layer, the
-# running world and the new-game / continue orchestration. Economic state lives in Ledger.
+# running world and the new-game / resume orchestration.
 extends Node
 
 var eras: Dictionary = {}                 # id -> EraDefinition (one per pack today)
@@ -14,7 +14,6 @@ var menu_open_locations := false          # pause menu asked the main menu to op
 func reset() -> void:
 	current_era = ""
 	pending_load = false
-	Ledger.reset_local(Sites.active)
 
 
 func _ready() -> void:

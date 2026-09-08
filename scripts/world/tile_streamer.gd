@@ -257,9 +257,6 @@ func _load_now(loc: Vector2i) -> void:
 	_hide_haze(loc)
 	print("[Tiles] %s ready at %s" % [pack, loc])
 	PerfLog.mark("tile ready %s" % pack)
-	t_step = Time.get_ticks_msec()
-	Ledger.add_pack(pack, offset_of(loc))
-	PerfLog.mark("add_pack %d ms" % (Time.get_ticks_msec() - t_step))
 	if _hold != Vector3.INF and tile_of(_hold) == loc:
 		world._snap(world.player, 1.0)
 		_hold = Vector3.INF

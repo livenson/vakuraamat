@@ -1,5 +1,5 @@
-# Main menu: the first page of the book. A rubric rule down the margin, the running head (the place,
-# the saved book's month and cash), the menu as ruled entries with their detail in the right column,
+# Main menu: the first page of the book. A rubric rule down the margin, the running head (the place
+# and when you were last in it), the menu as ruled entries with their detail in the right column,
 # and the plate: the pack's square kilometre with its cadastral units drawn over the orthophoto.
 # The Locations page (packs you have, packs on the tile service, suggested places, a search, the town)
 # is the second page.
@@ -117,16 +117,12 @@ func _build() -> void:
 	plate.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	plate.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	columns.add_child(plate)
-	plate.setup(Sites.active, summary.get("owned", []) if saved_here else [])
+	plate.setup(Sites.active, [])
 
 
-## "October 2026, 250 000 €" for a saved book (the town's name when the book is online).
+## When you were last here, for the Resume entry: "2026-09-08 16:12".
 func _book_line(summary: Dictionary) -> String:
-	var when := Ledger.date_for(int(summary.get("month", 0)), str(summary.get("site", "")))
-	if str(summary.get("backend", "local")) == "town":
-		return "%s, %s" % [when, tr("UI_ONLINE_BADGE")]
-	var cash := int(summary.get("cash", -1))
-	return when if cash < 0 else "%s, %s" % [when, BookTheme.money(cash)]
+	return str(summary.get("saved_at", "")).replace("T", " ").left(16)
 
 
 ## A ruled ledger entry: the action on the left, its detail in the right column.
@@ -271,41 +267,6 @@ func _build_locations_panel() -> void:
 	_storage_box.add_theme_constant_override("separation", 6)
 	list.add_child(_storage_box)
 	_fill_storage()
-
-	# --- town (the shared ledger)
-	_section(list, "MENU_TOWN")
-	var trow := HBoxContainer.new()
-	list.add_child(trow)
-	var town_db := Ledger.db_name_for(Sites.active)
-	var town_url := str(Ledger.setting("town", "url", Ledger.DEFAULT_TOWN_URL))
-	BookTheme.label(tr("MENU_TOWN_ADDRESS") % [town_url, town_db], "", trow)
-	_small(trow, "MENU_COPY", func():
-		DisplayServer.clipboard_set("%s %s" % [town_url, town_db])
-		_status.text = tr("MENU_COPIED"))
-	var urow := HBoxContainer.new()
-	list.add_child(urow)
-	var ul := Label.new()
-	ul.text = tr("MENU_TOWN_URL") + ": "
-	urow.add_child(ul)
-	var url_edit := LineEdit.new()
-	url_edit.text = town_url
-	url_edit.custom_minimum_size = Vector2(300, 0)
-	urow.add_child(url_edit)
-	_small(urow, "MENU_SAVE", func():
-		var cfg := ConfigFile.new()
-		cfg.load(Sites.SETTINGS)
-		cfg.set_value("town", "url", url_edit.text.strip_edges())
-		cfg.save(Sites.SETTINGS)
-		_status.text = tr("MENU_SAVED"))
-	var offline := CheckButton.new()
-	offline.text = tr("MENU_PLAY_OFFLINE")
-	offline.button_pressed = bool(Ledger.setting("town", "offline", false))
-	offline.toggled.connect(func(on: bool):
-		var cfg := ConfigFile.new()
-		cfg.load(Sites.SETTINGS)
-		cfg.set_value("town", "offline", on)
-		cfg.save(Sites.SETTINGS))
-	urow.add_child(offline)
 
 	_status = BookTheme.label("", "DetailLabel", box)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

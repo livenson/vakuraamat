@@ -1,6 +1,6 @@
 # Headless check of every site pack under res://sites: the registry loads through Sites, the layer
-# scene instantiates as an EraController, translations resolve, the structures are consistent and
-# the offline ledger can open the pack.
+# scene instantiates as an EraController, translations resolve, and the pack's cadastre and
+# companies load.
 #   godot --headless --path . res://tools/godot/site_test.tscn
 extends Node
 
@@ -36,16 +36,12 @@ func _ready() -> void:
 				node.free()
 			if FileAccess.file_exists("res://assets/terrain/%s/terrain_meta.json" % Sites.tile()):
 				_check(era.texture() != null, "%s: %s has no terrain texture (make era-maps)" % [site, era.id])
-			_check(tr(era.currency_key) != era.currency_key, "%s: %s currency key untranslated" % [site, era.id])
-		var defs := {}
-		Sites.load_dir(Sites.data_dir("structures"), defs)
-		for sid in defs:
-			var st: StructureDefinition = defs[sid]
-			_check(st.requires == "" or defs.has(st.requires), "%s: structure %s requires unknown %s" % [site, sid, st.requires])
-		var l := LocalLedger.new()
-		l.start(site, "Tester")
-		_check(l.parcels.size() > 10, "%s: the offline ledger found %d parcels" % [site, l.parcels.size()])
-		print("[site] %s ok: %d layer(s), %d structures, %d parcels, %d tenants" % [site, eras.size(), defs.size(), l.parcels.size(), l.tenants.size()])
+		var units := Parcels.units(site)
+		_check(units.size() > 10, "%s: parcels.json has %d units" % [site, units.size()])
+		var companies := 0
+		for u in units:
+			companies += Tenants.of(site, str(u.get("tunnus", ""))).size()
+		print("[site] %s ok: %d layer(s), %d plots, %d companies" % [site, eras.size(), units.size(), companies])
 	Sites.select(original, false)
 	if not _failed:
 		print("[site] PASSED")

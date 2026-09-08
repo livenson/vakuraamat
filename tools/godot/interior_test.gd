@@ -36,7 +36,7 @@ func _ready() -> void:
 	var door: BuildingDoor = null
 	for d in doors:
 		var b: FootprintBuilding = d.building
-		if b.floors >= 2 and b.tunnus != "" and Ledger.tenants_of(b.tunnus).size() > 0:
+		if b.floors >= 2 and b.tunnus != "" and Tenants.of(Sites.active, b.tunnus).size() > 0:
 			door = d
 			break
 	if door == null:

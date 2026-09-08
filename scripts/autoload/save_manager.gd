@@ -1,7 +1,7 @@
-# JSON save files in user://saves/. One autosave slot plus manual slots.
-# Serialises TimelineState, GameState (era, chapter, time), Inventory, Journal,
-# world pickups and narrative variables. Flat JSON per the Godot docs; numbers
-# come back as floats, so consumers cast.
+# Where you were, in user://saves/. There is no game state to keep - every building, plot and
+# company is read from the pack's files - so a save is only the place, the spot you stood on, the
+# way you faced and the time of day, and "Resume" puts you back there. One autosave slot plus
+# manual ones. Flat JSON per the Godot docs; numbers come back as floats, so consumers cast.
 extends Node
 
 const SAVE_DIR := "user://saves/"
@@ -28,11 +28,10 @@ func has_save(slot: String = AUTOSAVE) -> bool:
 
 func save(slot: String = AUTOSAVE) -> bool:
 	var data := {
-		"version": 3,
+		"version": 4,
 		"site": Sites.active,
 		"saved_at": Time.get_datetime_string_from_system(),
 		"game": GameState.to_dict(),
-		"ledger": Ledger.to_dict(),
 	}
 	var f := FileAccess.open(slot_path(slot), FileAccess.WRITE)
 	if f == null:
@@ -51,8 +50,8 @@ func load_slot(slot: String = AUTOSAVE) -> bool:
 	if typeof(data) != TYPE_DICTIONARY:
 		push_error("corrupt save %s" % slot)
 		return false
-	if int(data.get("version", 0)) < 3:
-		push_warning("save %s is from the historical game (version %s); starting fresh" % [slot, data.get("version")])
+	if int(data.get("version", 0)) < 4:
+		push_warning("save %s is from before the game was removed (version %s); starting fresh" % [slot, data.get("version")])
 		return false
 	var site := str(data.get("site", Sites.active))
 	if site != Sites.active:
@@ -63,8 +62,7 @@ func load_slot(slot: String = AUTOSAVE) -> bool:
 			return false
 		if Sites.available.has(site):
 			Sites.select(site)   # registries reload
-	Ledger.from_dict(data.get("ledger", {}))
-	await GameState.from_dict(data.get("game", {}))   # last: loads the layer, moves the player
+	await GameState.from_dict(data.get("game", {}))   # loads the layer, moves the player
 	dirty = false
 	return true
 
@@ -77,20 +75,16 @@ func saved_site(slot: String = AUTOSAVE) -> String:
 	return str(data.get("site", "")) if typeof(data) == TYPE_DICTIONARY else ""
 
 
-## What a save holds, without loading it: site, when, the month, the cash (offline books) and the town.
+## What a save holds, without loading it: the place, when it was written, and where you stood.
 func summary(slot: String = AUTOSAVE) -> Dictionary:
 	if not has_save(slot):
 		return {}
 	var data = JSON.parse_string(FileAccess.get_file_as_string(slot_path(slot)))
-	if typeof(data) != TYPE_DICTIONARY or int(data.get("version", 0)) < 3:
+	if typeof(data) != TYPE_DICTIONARY or int(data.get("version", 0)) < 4:
 		return {}
-	var ledger: Dictionary = data.get("ledger", {})
-	var local: Dictionary = ledger.get("local", {})
-	var players: Dictionary = local.get("players", {})
-	var me: Dictionary = players.get(str(int(local.get("me_id", 1))), {})
-	return {"site": str(data.get("site", "")), "saved_at": str(data.get("saved_at", "")), "month": int(local.get("month", 0)),
-		"cash": int(me.get("cash", 0)) if not me.is_empty() else -1, "town": str(ledger.get("town", "")), "backend": str(ledger.get("backend", "local")),
-		"owned": local.get("parcels", {}).keys()}
+	var world: Dictionary = data.get("game", {}).get("world", {})
+	return {"site": str(data.get("site", "")), "saved_at": str(data.get("saved_at", "")),
+		"pos": world.get("player_pos", []), "time_of_day": float(world.get("time_of_day", 10.0))}
 
 
 func autosave() -> void:
