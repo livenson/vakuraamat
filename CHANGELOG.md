@@ -8,7 +8,7 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
-## Unreleased
+## v0.6.0 — 2026-09-08
 
 The game is gone. Vakuraamat is a digital twin now: the same square kilometre of real Estonian
 ground, the same real plots, buildings and companies, but nothing to buy, sell, bid on or build,
