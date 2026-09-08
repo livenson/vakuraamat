@@ -27,6 +27,7 @@ func reload() -> void:
 	Parcels.forget()
 	Tenants.forget()
 	News.forget()
+	Departures.forget()
 	PlaceSearch.forget()
 	eras.clear()
 	Sites.load_dir(Sites.data_dir("eras"), eras)

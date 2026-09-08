@@ -67,6 +67,8 @@ func _ready() -> void:
 
 const POSTER_RECT := Rect2(0.793, 0.674, 0.198, 0.317)   # the second advert panel in the town shelter's atlas (UV space)
 const POSTER_REACH := 300.0
+# The timetable panel, the one shelter_board.py bakes SÕIDUPLAAN onto. Same atlas, same reverse face.
+const BOARD_RECT := Rect2(0.581, 0.674, 0.200, 0.317)
 
 ## The advert panel of a town shelter shows the nearest registered companies: a poster is rendered
 ## in a viewport and painted over the panel's part of the shelter's texture (a copy per shelter).
@@ -153,6 +155,160 @@ func _render_poster(names: Array[String], size: Vector2i, pack: String = "") -> 
 	place.add_theme_font_size_override("font_size", int(size.y * 0.05))
 	place.add_theme_color_override("font_color", Color(0.15, 0.15, 0.2))
 	vp.add_child(place)
+	add_child(vp)
+	await RenderingServer.frame_post_draw
+	await RenderingServer.frame_post_draw
+	var img: Image = vp.get_texture().get_image()
+	vp.queue_free()
+	return img
+
+
+## The stop's sheet (E): what the register says calls here, the whole day's times per line, and
+## which bus is next by the world's clock.
+func _stop_sheet(st: Dictionary, pack: String) -> String:
+	var lines: Array[String] = [tr("UI_BUS_STOP")]
+	if st.get("road_name"):
+		lines.append(str(st.road_name))
+	var stop_id := str(st.get("id", ""))
+	var serving := Departures.at_stop(pack, stop_id)
+	if serving.is_empty():
+		# no timetable in the pack: the OSM route_ref is all there is, and it is usually empty
+		var refs := str(st.get("refs", ""))
+		lines.append(tr("UI_BUS_LINES") % refs if refs != "" else tr("UI_BUS_NO_SERVICE"))
+		return "\n".join(lines)
+	var hour: float = GameState.world.sky.tod.current_time if GameState.world and GameState.world.sky and GameState.world.sky.tod else 12.0
+	var next := Departures.next_from(pack, stop_id, hour, 4)
+	if not next.is_empty():
+		lines.append("")
+		lines.append(tr("UI_BUS_NEXT"))
+		for n in next:
+			lines.append("   %s  %s  %s  (%s)" % [n.line, n.time, n.headsign, tr("UI_BUS_IN_MIN") % int(n.minutes)])
+	var day := Departures.today(pack)
+	for r in serving:
+		var times: Array = Departures.times_of(r, day)
+		if times.is_empty():
+			continue
+		lines.append("")
+		lines.append("%s  %s" % [str(r.line), str(r.headsign)])
+		for row in _by_hour(times):
+			lines.append("   " + row)
+	return "\n".join(lines)
+
+
+## "06   05  25  45" per hour, the way a stop's board prints a day.
+static func _by_hour(times: Array) -> Array[String]:
+	var hours: Dictionary = {}
+	for t in times:
+		var bits := str(t).split(":")
+		if bits.size() == 2:
+			hours.get_or_add(bits[0], []).append(bits[1])
+	var out: Array[String] = []
+	for h in hours.keys():
+		out.append("%s   %s" % [h, "  ".join(hours[h])])
+	out.sort()
+	return out
+
+
+## The register's timetable painted over the panel shelter_board.py baked. Same per-shelter copy as
+## the advert poster: the pixels and the material are duplicated so the shared atlas is untouched.
+func _timetable(model: Node3D, stop_id: String, pack: String) -> void:
+	var serving := Departures.at_stop(pack, stop_id)
+	if serving.is_empty():
+		return   # nothing real to say: the baked board stays
+	var meshes := model.find_children("*", "MeshInstance3D", true, false)
+	var mi: MeshInstance3D = meshes[0] if not meshes.is_empty() else null
+	if mi == null or mi.mesh == null or mi.mesh.get_surface_count() == 0:
+		return
+	var mat: Material = mi.get_surface_override_material(0)
+	if mat == null:
+		mat = mi.mesh.surface_get_material(0)
+	if not (mat is BaseMaterial3D) or (mat as BaseMaterial3D).albedo_texture == null:
+		return
+	var atlas: Image = (mat as BaseMaterial3D).albedo_texture.get_image()
+	if atlas == null:
+		return
+	atlas = atlas.duplicate()
+	if atlas.is_compressed():
+		atlas.decompress()
+	atlas.convert(Image.FORMAT_RGBA8)
+	var px := Rect2i(int(BOARD_RECT.position.x * atlas.get_width()), int(BOARD_RECT.position.y * atlas.get_height()),
+		int(BOARD_RECT.size.x * atlas.get_width()), int(BOARD_RECT.size.y * atlas.get_height()))
+	var board: Image = await _render_timetable(serving, Departures.today(pack), px.size)
+	if board == null or not is_instance_valid(mi):
+		return
+	board.convert(Image.FORMAT_RGBA8)
+	board.flip_x()   # this panel is the board's reverse face, as the poster's is
+	if board.get_size() != px.size:
+		board.resize(px.size.x, px.size.y)
+	atlas.blit_rect(board, Rect2i(Vector2i.ZERO, px.size), px.position)
+	var own: BaseMaterial3D = mat.duplicate()
+	own.albedo_texture = ImageTexture.create_from_image(atlas)
+	mi.set_surface_override_material(0, own)
+
+
+## A timetable image in the shape an Estonian stop prints one: a blue head, then each line with its
+## destination and the hours it leaves, minutes across.
+func _render_timetable(serving: Array, day: String, size: Vector2i) -> Image:
+	var vp := SubViewport.new()
+	vp.size = size
+	vp.render_target_update_mode = SubViewport.UPDATE_ONCE
+	vp.transparent_bg = false
+	var bg := ColorRect.new()
+	bg.color = Color(0.925, 0.925, 0.902)
+	bg.size = size
+	vp.add_child(bg)
+	var head := ColorRect.new()
+	head.color = Color(0.078, 0.235, 0.471)
+	head.size = Vector2(size.x, size.y * 0.12)
+	vp.add_child(head)
+	var title := Label.new()
+	title.text = tr("UI_BUS_TIMETABLE").to_upper()
+	title.position = Vector2(size.x * 0.06, size.y * 0.015)
+	title.add_theme_font_size_override("font_size", int(size.y * 0.062))
+	title.add_theme_color_override("font_color", Color.WHITE)
+	vp.add_child(title)
+	# lay the rows out first: a terminus carries two whole days of times, so the type is sized to
+	# what there is rather than the list cut off at the bottom edge of the panel
+	var rows: Array = []
+	for r in serving:
+		var times: Array = Departures.times_of(r, day)
+		if times.is_empty():
+			continue
+		rows.append({"head": true, "line": str(r.line), "dest": str(r.headsign)})
+		for line in _by_hour(times):
+			rows.append({"head": false, "text": line})
+	if rows.is_empty():
+		rows.append({"head": false, "text": tr("UI_BUS_NO_SERVICE")})
+	var box := VBoxContainer.new()
+	box.position = Vector2(size.x * 0.05, size.y * 0.15)
+	box.size = Vector2(size.x * 0.9, size.y * 0.83)
+	var step := minf(size.y * 0.048, size.y * 0.83 / maxf(rows.size(), 1.0))
+	box.add_theme_constant_override("separation", int(maxf(step * 0.12, 1.0)))
+	vp.add_child(box)
+	for row in rows:
+		if row.head:
+			var head_row := HBoxContainer.new()
+			head_row.add_theme_constant_override("separation", int(size.x * 0.03))
+			box.add_child(head_row)
+			var badge := Label.new()
+			badge.text = " %s " % row.line
+			badge.add_theme_font_size_override("font_size", int(step * 0.88))
+			badge.add_theme_color_override("font_color", Color.WHITE)
+			var sb := StyleBoxFlat.new()
+			sb.bg_color = Color(0.078, 0.235, 0.471)
+			badge.add_theme_stylebox_override("normal", sb)
+			head_row.add_child(badge)
+			var dest := Label.new()
+			dest.text = row.dest
+			dest.add_theme_font_size_override("font_size", int(step * 0.88))
+			dest.add_theme_color_override("font_color", Color(0.16, 0.16, 0.16))
+			head_row.add_child(dest)
+		else:
+			var l := Label.new()
+			l.text = row.text
+			l.add_theme_font_size_override("font_size", int(step * 0.72))
+			l.add_theme_color_override("font_color", Color(0.35, 0.35, 0.35))
+			box.add_child(l)
 	add_child(vp)
 	await RenderingServer.frame_post_draw
 	await RenderingServer.frame_post_draw
@@ -260,7 +416,8 @@ const STOP_MODELS := {"rural": "res://assets/vendor/sketchfab/bus_stop_rural.glb
 ## each stop moved to the roadside and its heading): the Soviet-era shelter on roads, the small
 ## modern one on streets; the timetable board is readable (E) with the stop's name and lines.
 func _bus_stops(terrain: Terrain3D) -> void:
-	var path := Sites.path_in(Sites.pack_of(self), "stops.json")
+	var pack := Sites.pack_of(self)
+	var path := Sites.path_in(pack, "stops.json")
 	if not FileAccess.file_exists(path):
 		return
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
@@ -308,14 +465,12 @@ func _bus_stops(terrain: Terrain3D) -> void:
 		holder.add_child(body)
 		var board := Readable.new()
 		var name := str(st.get("name", ""))
-		var lines := str(st.get("refs", ""))
-		var text := tr("UI_BUS_STOP") + ("\n" + str(st.get("road_name", "")) if st.get("road_name") else "")
-		if lines != "":
-			text += "\n" + tr("UI_BUS_LINES") % lines
-		board.setup(name if name != "" else tr("UI_BUS_STOP"), text, Vector3(b.size.x * k, b.size.y * k, b.size.z * k))
+		board.setup(name if name != "" else tr("UI_BUS_STOP"), _stop_sheet(st, pack), Vector3(b.size.x * k, b.size.y * k, b.size.z * k))
 		board.position = Vector3(0, b.size.y * k * 0.5, 0)
 		holder.add_child(board)
 		add_child(holder)
+		if kind == "town":
+			_timetable(model, str(st.get("id", "")), pack)   # the register's own times over the baked board
 
 
 ## Lamp posts along the streets (asphalt with a kerb): one every LAMP_SPACING metres on the right

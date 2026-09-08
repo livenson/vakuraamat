@@ -269,3 +269,7 @@ UI_BOOK_COUNTS,%d maatükki · %d hoonet · %d ettevõtet,%d plots · %d buildin
 UI_BOOK_VALUES,"Maa maksustamishind %d, mediaan","Land taxation value %d, median"
 UI_BOOK_OF_PLOTS,%d maatükil,over %d plots
 UI_NO_PLOT_HERE,Sa ei seisa ühelgi katastriüksusel.,You are not standing on a cadastral unit.
+UI_BUS_TIMETABLE,Sõiduplaan,Timetable
+UI_BUS_NEXT,Järgmised väljumised,Next departures
+UI_BUS_IN_MIN,%d min pärast,in %d min
+UI_BUS_NO_SERVICE,Selle peatuse sõiduplaani registris ei ole.,The register has no timetable for this stop.
