@@ -416,8 +416,10 @@ const SKETCHFAB_CARS := {"car_sedan": 4.5, "car_wagon": 4.6, "car_hatchback": 4.
 const SKETCHFAB_WEIGHTS := ["car_sedan", "car_sedan", "car_wagon", "car_wagon", "car_hatchback", "car_hatchback", "car_compact", "car_suv", "car_suv",
 	"car_minivan", "car_pickup", "car_lada", "car_lada", "car_coupe", "car_sport", "car_offroad"]
 const KIT_UTILITY := ["van", "delivery", "taxi", "truck"]   # the Kenney kit keeps the working vehicles
-# Facing +Z after the split (model_preview shows their front): turned round to face -Z like the agents.
-const CAR_FLIP := ["car_lada", "car_suv", "car_compact", "car_coupe", "car_hatchback", "car_minivan", "car_offroad", "car_pickup"]
+# Which way a model was exported, checked one by one in model_preview (its camera sits on +Z, so a
+# car showing its front there faces +Z). All of comrade1280's pack faces +Z and is turned round to
+# face -Z like the agents; the Lada was exported the other way and must not be turned.
+const CAR_FACES_BACK := ["car_lada"]
 
 
 ## A car from the Kenney Car Kit (CC0) when it is installed, else the box car. Pre-1950 cars are a
@@ -457,7 +459,7 @@ func _make_sketchfab_car() -> Node3D:
 	model.position = Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k)
 	var root := Node3D.new()
 	var turn := Node3D.new()
-	turn.rotation.y = (PI / 2.0 if b.size.x > b.size.z else 0.0) + (PI if name in CAR_FLIP else 0.0)   # the pack faces -Z like the agents
+	turn.rotation.y = (PI / 2.0 if b.size.x > b.size.z else 0.0) + (0.0 if name in CAR_FACES_BACK else PI)
 	turn.add_child(model)
 	root.add_child(turn)
 	_tint_car(model, 2026)
