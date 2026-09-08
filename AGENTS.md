@@ -51,6 +51,10 @@ its design documents in the repo root describe that version.
 - Buildings come from `tools/pipeline/fetch_buildings.py` (ETAK polygons + Building Register attributes +
   Geo3D LOD2 roofs) into `sites/<id>/buildings.json`; parcels with land values from `fetch_parcels.py`,
   tenants from `fetch_tenants.py`, the market snapshot from `market.py`.
+- The tile service holds the pipeline modules in memory from the moment it started: after changing
+  anything under `tools/pipeline/`, restart it (`pkill -f tools/tile_service.py`, then `tools/play.sh`
+  or `make service`) or the next pack is built by the old code. Cached `.slim` register files are
+  keyed on `register_extra.SLIM_VERSION`; bump it when a slimmer changes.
 - Services: `tools/tile_service.py` (packs for a point, port 8765) is a loopback Python server the game
   talks to through `Locator`; the town server is SpacetimeDB on 127.0.0.1:3300 (`make server`,
   `make town SITE=<id>`); `tools/news_feeder.py` pushes real headlines and notices into a town.

@@ -13,7 +13,7 @@ into `<name>.slim.jsonl` (one small record per company, only the fields below), 
 tens of MB. People are kept as structure only: role counts and the register's own `isikukood_hash`
 (a stable anonymous id, used to link companies that share an owner); no names, e-mails or phones.
 """
-import csv, io, json, os, re, time, urllib.request, zipfile
+import csv, glob, io, json, os, re, time, urllib.request, uuid, zipfile
 
 from emtak import group, group_of_tax_words
 
@@ -25,6 +25,33 @@ TAX_FILES = {"tasutud_maksud_kaesolev_aasta.csv": "https://ncfailid.emta.ee/s/DF
              "tasutud_maksud_varasemad_aastad.csv": "https://ncfailid.emta.ee/s/bCszrta8THHA9xn/download/tasutud_maksud_varasemad_aastad.csv"}
 UA = {"User-Agent": "vakuraamat-pipeline/0.1 (open-source game; polite, cached)"}
 BOARD_ROLES = {"JUHL", "JUHE", "JUHT", "TEGJ", "PROK"}   # board member, chair, managing director, procurator
+SLIM_VERSION = 2          # bump when a slimmer changes: the cached .slim files are keyed on it
+HASH_RE = re.compile(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}")
+CODE_RE = re.compile(r"\d{6,}")
+FOREIGN_NS = uuid.uuid5(uuid.NAMESPACE_URL, "vakuraamat/foreign-holder")
+NO_ID = {"", "-", "--", "---", "puudub", "pole", "puudu", "n/a", "na", "none", "0"}
+
+
+def holder_id(raw):
+    """A shareholder's or board member's id as something opaque and comparable, or None.
+
+    The register hands an Estonian private person a hash and an Estonian company its registry code,
+    both already opaque enough to link companies that share an owner. A foreign holder arrives as
+    whatever that country's register calls it - "HRB 153232", "900 606 898 R. C. S. Paris",
+    "2019/179296/07", "556185-1428" - which is free text. It is only 14 of 372151 owner ids, but it
+    is free text in a field that must carry no readable person, so validate_site rejects the pack and
+    a world cannot be made at all (Pargi tn 17, v0.4.1). Those are hashed into the same shape, which
+    keeps co-ownership linking and stores nothing readable.
+
+    "puudub", "-" and their like mean the register has no identifier: hashing them would link every
+    company that wrote the same placeholder into one owner, so they are dropped instead.
+    """
+    s = str(raw or "").strip()
+    if not s or s.casefold() in NO_ID:
+        return None
+    if HASH_RE.fullmatch(s) or CODE_RE.fullmatch(s):
+        return s
+    return str(uuid.uuid5(FOREIGN_NS, s.casefold()))
 
 
 def log(msg):
@@ -125,10 +152,10 @@ def slim_persons(obj):
     for p in obj.get("kaardile_kantud_isikud") or []:
         if p.get("lopp_kpv"):
             continue
-        h = p.get("isikukood_hash") or p.get("isikukood_registrikood")
+        h = holder_id(p.get("isikukood_hash") or p.get("isikukood_registrikood"))
         if p.get("isiku_roll") in BOARD_ROLES:
             if h:
-                board.append(str(h))
+                board.append(h)
         else:
             others += 1
     return {"code": obj.get("ariregistri_kood"), "board": sorted(set(board)), "other_roles": others}
@@ -139,14 +166,14 @@ def slim_shareholders(obj):
     for p in obj.get("osanikud") or []:
         if p.get("lopp_kpv"):
             continue
-        h = p.get("isikukood_hash") or p.get("isikukood_registrikood")
+        h = holder_id(p.get("isikukood_hash") or p.get("isikukood_registrikood"))
         if not h:
             continue
         try:
             stake = float(str(p.get("osaluse_protsent")).replace(",", "."))   # percent of the shares
         except (TypeError, ValueError):
             stake = None
-        owners.append([str(h), stake])
+        owners.append([h, stake])
     return {"code": obj.get("ariregistri_kood"), "owners": owners}
 
 
@@ -154,7 +181,7 @@ SLIMMERS = {GENERAL: slim_general, PERSONS: slim_persons, SHAREHOLDERS: slim_sha
 
 
 def slim_path(zip_path):
-    return zip_path[:-len(".json.zip")] + ".slim.jsonl"
+    return zip_path[:-len(".json.zip")] + f".slim.v{SLIM_VERSION}.jsonl"
 
 
 def ensure_slim(zip_path):
@@ -170,6 +197,10 @@ def ensure_slim(zip_path):
             f.write(json.dumps(fn(obj), ensure_ascii=False) + "\n")
             n += 1
     os.replace(out + ".part", out)
+    stem = zip_path[:-len(".json.zip")]
+    for old in glob.glob(stem + ".slim.jsonl") + glob.glob(stem + ".slim.v*.jsonl"):
+        if old != out:
+            os.remove(old)      # a slimmer changed: the older shapes are 35 MB each, and stale
     log(f"slimmed {os.path.basename(zip_path)}: {n} companies in {time.time() - t0:.0f} s -> {os.path.basename(out)}")
     return out
 
