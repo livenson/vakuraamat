@@ -1,5 +1,5 @@
 # All in-game UI, built in code: HUD (place, month, clock, cash), notices, the vakuraamat book
-# (LedgerPanel, Tab), the town feed (NewsPanel, N), the journal, the K codes overlay, the debug map,
+# (BookPanel, Tab), the place's news (NewsPanel, N), the journal, the K codes overlay, the debug map,
 # the pause menu and F8 reports. Opening any panel frees the mouse and blocks gameplay input.
 extends CanvasLayer
 
@@ -29,7 +29,7 @@ var sheet_panel: PanelContainer     # a readable's page (notice board, register 
 var pause: PanelContainer
 var report_panel: PanelContainer
 var codes_label: Label            # K: cadastral number, building codes, road, registry links
-var ledger_panel: LedgerPanel    # Tab: the town's book
+var book: BookPanel              # Tab: what the registers say about this place
 var _guide: Dictionary = {}      # {tunnus, pos, label}: the plot the HUD arrow points at
 var news_panel: NewsPanel        # N: the town feed
 var find_bar: FindBar            # /: find an address, a company or a street in the town
@@ -60,16 +60,16 @@ func _ready() -> void:
 	pause = _build_panel("UI_MENU")
 	report_panel = _build_panel("UI_REPORT_TITLE")
 	report_panel.custom_minimum_size = Vector2(640, 0)
-	ledger_panel = LedgerPanel.new()
-	add_child(ledger_panel)
-	ledger_panel.setup(world)
-	_center_panel(ledger_panel)
-	ledger_panel.show_parcel.connect(func(t):
+	book = BookPanel.new()
+	add_child(book)
+	book.setup(world)
+	_center_panel(book)
+	book.show_parcel.connect(func(t):
 		var marks: Node = world.get_node_or_null("ParcelMarks")
 		if marks:
 			marks.flash(t))
-	ledger_panel.guide.connect(guide_to)
-	ledger_panel.teleport.connect(teleport_to)
+	book.guide.connect(guide_to)
+	book.teleport.connect(teleport_to)
 	find_bar = FindBar.new()
 	add_child(find_bar)
 	find_bar.setup()
@@ -95,8 +95,8 @@ func _ready() -> void:
 	_center_panel(news_panel)
 	news_panel.show_parcel.connect(func(t):
 		_close()
-		ledger_panel.open_parcel(t)
-		_open(ledger_panel))
+		book.open_parcel(t)
+		_open(book))
 	Ledger.player_changed.connect(_refresh_era_label)
 	Ledger.month_changed.connect(func(_m): _refresh_era_label())
 	Ledger.event_added.connect(_on_ledger_event)
@@ -459,8 +459,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			Reporter.snapshot(world)   # the frame as seen, before the panel covers it
 			_toggle(report_panel, _fill_report)
 		return
-	if event.is_action_pressed("ledger"):
-		_toggle(ledger_panel, ledger_panel.fill)
+	if event.is_action_pressed("book"):
+		_toggle(book, book.fill)
 	elif event.is_action_pressed("find"):
 		if _open_panel == find_bar:
 			_close()
@@ -470,8 +470,8 @@ func _unhandled_input(event: InputEvent) -> void:
 			_open(find_bar)
 	elif event.is_action_pressed("news"):
 		_toggle(news_panel, news_panel.fill)
-	elif event.is_action_pressed("buy_here"):
-		_buy_here()
+	elif event.is_action_pressed("plot_here"):
+		_plot_here()
 	elif event.is_action_pressed("journal"):
 		_toggle(journal, _fill_journal)
 	elif event.is_action_pressed("debug_map"):
@@ -514,8 +514,8 @@ func show_sheet(title: String, text: String, tunnus: String = "") -> void:
 		open_book.text = tr("UI_SHEET_OPEN_PLOT")
 		open_book.pressed.connect(func():
 			_close()
-			ledger_panel.open_parcel(tunnus)
-			_open(ledger_panel))
+			book.open_parcel(tunnus)
+			_open(book))
 		var row := HBoxContainer.new()
 		row.add_child(open_book)
 		page.add_child(row)
@@ -527,7 +527,7 @@ func show_sheet(title: String, text: String, tunnus: String = "") -> void:
 
 
 func _filler_for(p: Control) -> Callable:
-	var fillers := {ledger_panel: ledger_panel.fill, news_panel: news_panel.fill, report_panel: _fill_report, debug_map: _fill_debug_map, pause: _fill_pause}
+	var fillers := {book: book.fill, news_panel: news_panel.fill, report_panel: _fill_report, debug_map: _fill_debug_map, pause: _fill_pause}
 	return fillers.get(p, _fill_journal)
 
 
@@ -625,16 +625,16 @@ static func _company_line(t: Dictionary) -> String:
 
 
 ## B: open the book at the plot under the player's feet.
-func _buy_here() -> void:
-	if _open_panel and _open_panel != ledger_panel:
+func _plot_here() -> void:
+	if _open_panel and _open_panel != book:
 		return
 	var u := Parcels.at(player.global_position)
-	if u.is_empty() or Ledger.parcel(u.tunnus).is_empty():
-		show_notice(tr("LEDGER_NO_PARCEL_HERE"))
+	if u.is_empty():
+		show_notice(tr("UI_NO_PLOT_HERE"))
 		return
-	ledger_panel.open_parcel(u.tunnus)
-	if _open_panel != ledger_panel:
-		_open(ledger_panel)
+	book.open_parcel(u.tunnus)
+	if _open_panel != book:
+		_open(book)
 
 
 ## The current cadastral unit's boundary as a line strip just above the ground.
@@ -1104,28 +1104,28 @@ func debug_open(which: String) -> void:
 		find_bar.debug_type(which.trim_prefix("find:"))
 		return
 	if which.begins_with("plots:"):   # the book's plot list, filtered: --open=plots:<text>
-		ledger_panel.tabs.current_tab = 0
-		ledger_panel.debug_filter(which.trim_prefix("plots:"))
-		_open(ledger_panel)
+		book.tabs.current_tab = 0
+		book.debug_filter(which.trim_prefix("plots:"))
+		_open(book)
 		return
 	if which.begins_with("plot:"):   # the book open on one plot: --open=plot:<tunnus>[#<year index>]
 		var arg := which.trim_prefix("plot:")
 		var at := arg.split("#")      # #0 also opens the plot's oldest photograph large, for checks
-		ledger_panel.open_parcel(at[0])
-		_open(ledger_panel)
+		book.open_parcel(at[0])
+		_open(book)
 		if at.size() > 1:
-			get_tree().create_timer(4.0).timeout.connect(func(): ledger_panel.debug_enlarge(int(at[1])))
+			get_tree().create_timer(4.0).timeout.connect(func(): book.debug_enlarge(int(at[1])))
 		return
 	match which:
 		"journal": _toggle(journal, _fill_journal)
 		"map": _toggle(debug_map, _fill_debug_map)
-		"ledger": _toggle(ledger_panel, ledger_panel.fill)
-		"town":
-			ledger_panel.tabs.current_tab = 5
-			_toggle(ledger_panel, ledger_panel.fill)
+		"book": _toggle(book, book.fill)
+		"place":
+			book.tabs.current_tab = 3
+			_toggle(book, book.fill)
 		"companies":
-			ledger_panel.tabs.current_tab = 4
-			_toggle(ledger_panel, ledger_panel.fill)
+			book.tabs.current_tab = 2
+			_toggle(book, book.fill)
 		"news": _toggle(news_panel, news_panel.fill)
 		"menu": _toggle(pause, _fill_pause)
 

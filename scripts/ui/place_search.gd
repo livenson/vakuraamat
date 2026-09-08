@@ -98,7 +98,7 @@ static func _plots(q: String, out: Array) -> void:
 
 
 static func _buildings(q: String, out: Array) -> void:
-	for b in _pack_list("buildings.json", "buildings"):
+	for b in pack_list("buildings.json", "buildings"):
 		# buildings.json carries nulls, not missing keys, for what the register does not know
 		# (71 of Kvissentali's 211 buildings have no year), and Dictionary.get only substitutes
 		# the default when the key is absent: everything here goes through _text and _num.
@@ -122,7 +122,7 @@ static func _companies(q: String, out: Array) -> void:
 	var at: Dictionary = {}     # tunnus -> plot position
 	for p in Parcels.all():
 		at[str(p.tunnus)] = Vector2(float(p.x), float(p.z))
-	for t in _pack_list("tenants.json", "tenants"):
+	for t in pack_list("tenants.json", "tenants"):
 		if str(t.get("status", "")) != "R" or t.get("tunnus") == null:
 			continue
 		var s := score(_text(t, "name"), q)
@@ -179,8 +179,8 @@ static func forget() -> void:
 	_cache.clear()
 
 
-## A list out of the active pack's json, cached like Parcels.units does.
-static func _pack_list(file: String, key: String) -> Array:
+## A list out of the active pack's json, cached like Parcels.units does. Shared with the book.
+static func pack_list(file: String, key: String) -> Array:
 	var path := Sites.path(file)
 	if not _cache.has(path):
 		var parsed = JSON.parse_string(FileAccess.get_file_as_string(path)) if FileAccess.file_exists(path) else null

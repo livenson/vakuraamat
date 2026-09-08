@@ -32,7 +32,7 @@ func _ready() -> void:
 	_check(loaded and Ledger.cash() == cash, "save round-trip failed: %d vs %d" % [Ledger.cash(), cash])
 	print("[boot] save/load ok (%s)" % ProjectSettings.globalize_path(SaveManager.slot_path("boot_test")))
 	TranslationServer.set_locale("en")
-	_check(tr("ERA_2026_NAME") != "ERA_2026_NAME" and tr("UI_LEDGER_TITLE") != "UI_LEDGER_TITLE", "translations missing")
+	_check(tr("ERA_2026_NAME") != "ERA_2026_NAME" and tr("UI_BOOK_TITLE") != "UI_BOOK_TITLE", "translations missing")
 	var et: Translation = TranslationServer.get_translation_object("et")
 	print("[boot] en: ", tr("ERA_2026_NAME"), " | et: ", et.get_message("ERA_2026_NAME") if et else "n/a")
 	if not _failed:

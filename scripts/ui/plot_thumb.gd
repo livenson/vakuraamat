@@ -19,7 +19,7 @@ func setup(label: String, tex: Texture2D, outline: PackedVector2Array) -> void:
 	frame.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	frame.stretch_mode = TextureRect.STRETCH_SCALE
 	frame.mouse_filter = Control.MOUSE_FILTER_STOP
-	frame.tooltip_text = tr("UI_LEDGER_ENLARGE")
+	frame.tooltip_text = tr("UI_BOOK_ENLARGE")
 	frame.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	frame.gui_input.connect(func(e: InputEvent):
 		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:

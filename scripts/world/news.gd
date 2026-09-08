@@ -25,16 +25,14 @@ static func all(pack: String = "") -> Array:
 	return _cache[path]
 
 
-## Who the items are credited to, for the book's place page.
-static func attribution(pack: String = "") -> Array:
+## Who the items are credited to, as the file writes it (a string, a list, or a dictionary of
+## source to credit). The book's place page flattens it with the other files' attributions.
+static func attribution(pack: String = "") -> Variant:
 	var path := Sites.path_in(pack if pack != "" else Sites.active, "news.json")
 	if not FileAccess.file_exists(path):
 		return []
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
-	if typeof(parsed) != TYPE_DICTIONARY:
-		return []
-	var a = parsed.get("attribution", [])
-	return a if typeof(a) == TYPE_ARRAY else [str(a)]
+	return parsed.get("attribution", []) if typeof(parsed) == TYPE_DICTIONARY else []
 
 
 static func forget() -> void:

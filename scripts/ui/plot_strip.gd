@@ -40,7 +40,7 @@ func setup(world: Node3D, tunnus: String, heading: bool = true) -> void:
 	if square.size.x <= 0.0:
 		return
 	if heading:
-		var head := BookTheme.label(tr("UI_LEDGER_OVER_THE_YEARS"), "DetailLabel", self)
+		var head := BookTheme.label(tr("UI_BOOK_OVER_THE_YEARS"), "DetailLabel", self)
 		head.add_theme_color_override("font_color", BookTheme.BLUE)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 10)
@@ -49,7 +49,7 @@ func setup(world: Node3D, tunnus: String, heading: bool = true) -> void:
 	var all: Array = []          # what the viewer steps through, in the order they are shown
 	var now := PlotHistory.current(square, georef, Sites.tile_dir())
 	if now != null:
-		all.append({"label": tr("UI_LEDGER_TODAY"), "texture": now, "local": true})
+		all.append({"label": tr("UI_BOOK_TODAY"), "texture": now, "local": true})
 	var pending := PlotThumb.new()
 	row.add_child(pending)
 	pending.setup_pending("…")

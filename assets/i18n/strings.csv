@@ -75,7 +75,7 @@ BUILD_NO_MATERIALS,Materjali ei jätku.,Not enough materials.
 BUILD_COST,Hind: %s,Cost: %s
 UI_DEBUG_MAP,Silumiskaart,Debug map
 UI_DEBUG_MAP_HINT,Klõps kaardil: teleport. Hiir punkti kohal näitab nime. M sulgeb.,Click the map to teleport. Hover a dot for its name. M closes.
-UI_KEYS,E tegutse   Tab vakuraamat   / otsi   B osta siin   N uudised   J päevik   L keel   M kaart   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   Tab vakuraamat   / find   B buy here   N news   J journal   L language   M map   K codes   F fly   T teleport   H home   F8 report   Esc menu
+UI_KEYS,E tegutse   Tab vakuraamat   / otsi   B maatükk siin   N uudised   J päevik   L keel   M kaart   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   Tab vakuraamat   / find   B this plot   N news   J journal   L language   M map   K codes   F fly   T teleport   H home   F8 report   Esc menu
 MENU_SITE,Asukoht,Location
 UI_BUILDING_GROUND,Maa ehitatakse laserandmetest...,Building the ground from the laser data...
 MENU_NEW_LOCATION,Uus asukoht...,New location...
@@ -182,36 +182,36 @@ NOTICE_RENT,Üür laekus: %d €,Rent received: %d €
 NOTICE_TAX_DUE,Maamaks ootab maksmist: %d €,Land tax due: %d €
 NOTICE_BID_RECEIVED,Pakkumine maatükile %s: %d €,An offer for %s: %d €
 NOTICE_MONTH,Uus kuu: %s,A new month: %s
-UI_LEDGER_TITLE,Vakuraamat,Vakuraamat
-UI_LEDGER_PARCELS,Maatükid,Plots
-UI_LEDGER_PLOT,Maatükk,Plot
+UI_BOOK_TITLE,Vakuraamat,Vakuraamat
+UI_BOOK_PLOTS,Maatükid,Plots
+UI_BOOK_PLOT,Maatükk,Plot
 UI_LEDGER_PORTFOLIO,Varad,Portfolio
 UI_LEDGER_OFFERS,Pakkumised,Offers
 UI_LEDGER_TOWN,Linn,Town
 UI_LEDGER_FILTER_ALL,kõik,all
 UI_LEDGER_FILTER_MINE,minu,mine
 UI_LEDGER_FILTER_SALE,müügis,for sale
-UI_LEDGER_COL_ADDRESS,Aadress,Address
-UI_LEDGER_COL_PURPOSE,Sihtotstarve,Purpose
-UI_LEDGER_COL_AREA,Pindala,Area
-UI_LEDGER_COL_VALUE,Maa väärtus,Land value
+UI_BOOK_COL_ADDRESS,Aadress,Address
+UI_BOOK_COL_PURPOSE,Sihtotstarve,Purpose
+UI_BOOK_COL_AREA,Pindala,Area
+UI_BOOK_COL_VALUE,Maa väärtus,Land value
 UI_LEDGER_COL_PRICE,Hind,Price
 UI_LEDGER_COL_OWNER,Omanik,Owner
 UI_LEDGER_COL_YIELD,Tulu,Yield
 UI_LEDGER_YOU,sina,you
-UI_LEDGER_MORE,"… ja veel %d kaugemal","… and %d more further away"
-UI_LEDGER_PICK,"Vali maatükk nimekirjast või seisa sellel ja vajuta B.","Pick a plot from the list, or stand on one and press B."
-UI_LEDGER_TENANTS,Üürnikud,Tenants
-UI_LEDGER_NO_TENANTS,Üürnikke ei ole.,No tenants.
+UI_BOOK_MORE,"… ja veel %d kaugemal","… and %d more further away"
+UI_BOOK_PICK,"Vali maatükk nimekirjast või seisa sellel ja vajuta B.","Pick a plot from the list, or stand on one and press B."
+UI_BOOK_REGISTERED_HERE,Siia registreeritud,Registered here
+UI_BOOK_NONE_REGISTERED,Ühtegi ettevõtet ei ole siia registreeritud.,No company is registered here.
 UI_LEDGER_ARREARS,võlg,arrears
 UI_LEDGER_BUILT,Ehitatud,Built
-UI_LEDGER_OVER_THE_YEARS,Krunt läbi aastate,This plot over the years
-UI_LEDGER_TODAY,täna,today
-UI_LEDGER_ENLARGE,Klõpsa suuremalt vaatamiseks,Click to see it larger
-UI_LEDGER_SORT_BY,Järjesta: %s,Sort by %s
+UI_BOOK_OVER_THE_YEARS,Krunt läbi aastate,This plot over the years
+UI_BOOK_TODAY,täna,today
+UI_BOOK_ENLARGE,Klõpsa suuremalt vaatamiseks,Click to see it larger
+UI_BOOK_SORT_BY,Järjesta: %s,Sort by %s
 UI_SHEET_OPEN_PLOT,Ava krunt vakuraamatus,Open the plot in the book
-UI_LEDGER_FIND_PLACEHOLDER,Otsi aadressi või ettevõtet,Find an address or a company
-UI_LEDGER_NO_MATCH,Midagi ei vasta otsingule "%s".,Nothing matches "%s".
+UI_BOOK_FIND_PLACEHOLDER,Otsi aadressi või ettevõtet,Find an address or a company
+UI_BOOK_NO_MATCH,Midagi ei vasta otsingule "%s".,Nothing matches "%s".
 UI_FIND_PLOTS_ON,%d krunti,%d plots
 UI_FIND_PLACEHOLDER,Aadress, ettevõte või tänav,An address, a company or a street
 UI_FIND_HINT,Nooled valivad · Enter juhatab · Shift+Enter hüppab · Esc sulgeb,Arrows choose · Enter points the way · Shift+Enter jumps · Esc closes
@@ -240,7 +240,7 @@ UI_LEDGER_MONTH,kuu,month
 UI_LEDGER_INDEX,Hinnaindeks,Price index
 UI_LEDGER_STATUS,Ühendus,Connection
 UI_LEDGER_OWNED_TOWN,Omanikuga maatükke,Plots with an owner
-UI_LEDGER_TOWN_HINT,"Maa väärtused on Maa-ameti 2022. aasta korralise hindamise maksustamishinnad; üürnikud on äriregistri avaandmetest.","Land values are the 2022 taxation values from Maa-amet's regular valuation; tenants come from the Business Register's open data."
+UI_BOOK_SOURCES,"Kõik siinsed arvud on avaandmed, nagu registrid need annavad.","Every figure here is open data, as the registers give it."
 UI_ONLINE,võrgus: %s,online: %s
 UI_OFFLINE,võrguta (oma raamat),offline (own ledger)
 UI_PER_MONTH,/kuus,/month
@@ -353,9 +353,18 @@ UI_BOARD,juhatuses %d,board of %d
 UI_OWNER_MANAGED,omanik juhib,owner-managed
 UI_CAPITAL,kapital %s,capital %s
 UI_ALL,Kõik,All
-UI_LEDGER_COMPANIES,Ettevõtted,Companies
-UI_LEDGER_COL_COMPANY,Ettevõte,Company
-UI_LEDGER_COL_SECTOR,Tegevusala,Sector
-UI_LEDGER_COL_EMPLOYEES,Töötajaid,Employees
-UI_LEDGER_COL_TURNOVER,Käive,Turnover
-UI_LEDGER_COL_ADDRESS,Aadress,Address
+UI_BOOK_COMPANIES,Ettevõtted,Companies
+UI_BOOK_COL_COMPANY,Ettevõte,Company
+UI_BOOK_COL_SECTOR,Tegevusala,Sector
+UI_BOOK_COL_EMPLOYEES,Töötajaid,Employees
+UI_BOOK_COL_TURNOVER,Käive,Turnover
+UI_BOOK_PLACE,Paik,Place
+UI_BOOK_COL_OWNERSHIP,Omandivorm,Ownership
+UI_BOOK_LAND_REGISTRY,Kinnistu,Land registry
+UI_BOOK_REGISTERED,Katastrisse kantud,Entered in the cadastre
+UI_BOOK_IN_THE_REGISTER,Vaata registris,See it in the register
+UI_BOOK_VINTAGE,Andmed seisuga %s,Data as of %s
+UI_BOOK_COUNTS,%d maatükki · %d hoonet · %d ettevõtet,%d plots · %d buildings · %d companies
+UI_BOOK_VALUES,"Maa maksustamishind %d, mediaan","Land taxation value %d, median"
+UI_BOOK_OF_PLOTS,%d maatükil,over %d plots
+UI_NO_PLOT_HERE,Sa ei seisa ühelgi katastriüksusel.,You are not standing on a cadastral unit.
