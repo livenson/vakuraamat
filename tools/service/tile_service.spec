@@ -14,7 +14,10 @@ datas = [
     (os.path.join(ROOT, "assets", "i18n", "strings.csv"), "assets/i18n"),
 ]
 binaries, hiddenimports = [], []
-for pkg in ("rasterio", "pyogrio", "shapely", "pyproj"):
+# certifi carries cacert.pem: a frozen binary has no system CA store, and without it every
+# https call to the geoportal, the registers and the WMS fails to verify (tile_service points
+# SSL_CERT_FILE at this copy when it runs frozen)
+for pkg in ("rasterio", "pyogrio", "shapely", "pyproj", "certifi"):
     d, b, h = collect_all(pkg)
     datas += d; binaries += b; hiddenimports += h
 

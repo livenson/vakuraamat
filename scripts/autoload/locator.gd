@@ -188,7 +188,10 @@ func spawn_local(script_rel: String, port: int, health_url: String) -> bool:
 	elif sidecar != "":
 		var work := ProjectSettings.globalize_path("user://service")
 		DirAccess.make_dir_recursive_absolute(work)
-		pid = OS.create_process(sidecar, ["--port", str(port), "--workspace", work, "--raw-dir", work.path_join("data_raw"), "--parent-pid", str(OS.get_process_id())])
+		var log_path := ProjectSettings.globalize_path("user://logs/tile_service.log")
+		DirAccess.make_dir_recursive_absolute(log_path.get_base_dir())
+		pid = OS.create_process(sidecar, ["--port", str(port), "--workspace", work, "--raw-dir", work.path_join("data_raw"),
+				"--parent-pid", str(OS.get_process_id()), "--log", log_path])
 		_sidecar_pid = pid
 		script_rel = sidecar.get_file()
 	else:
@@ -197,11 +200,19 @@ func spawn_local(script_rel: String, port: int, health_url: String) -> bool:
 		push_warning("could not start %s" % script_rel)
 		return false
 	print("[Locator] started %s (pid %d)" % [script_rel, pid])
-	for i in 30:
+	# A frozen sidecar unpacks ~75 MB before its first line runs (measured 10.7 s on a warm machine),
+	# and a cold first launch is slower still: 15 s used to be the whole budget.
+	for i in 90:
 		await get_tree().create_timer(0.5).timeout
 		var r := await http(health_url)
 		if r.ok:
+			print("[Locator] %s answered after %.1f s" % [script_rel, (i + 1) * 0.5])
 			return true
+	# say which of the two it was: the process never got as far as Python, or it ran and did not serve
+	var log_path := "user://logs/tile_service.log"
+	var wrote: bool = FileAccess.file_exists(log_path) and FileAccess.open(log_path, FileAccess.READ).get_length() > 0
+	push_warning("%s (pid %d) did not answer %s in 45 s; it %s - see %s" % [script_rel, pid, health_url,
+			"logged something" if wrote else "wrote nothing, so it never started", ProjectSettings.globalize_path(log_path)])
 	return false
 
 

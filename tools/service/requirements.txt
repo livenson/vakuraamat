@@ -1,4 +1,5 @@
 # The tile service and pipeline as pip packages (no system GDAL): rasterio, pyogrio, shapely, pyproj wheels.
+certifi>=2024.0        # the frozen sidecar has no system CA store: without this every https call fails
 numpy>=2.0
 pillow>=10
 rasterio>=1.4

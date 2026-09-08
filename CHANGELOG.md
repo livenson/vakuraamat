@@ -8,6 +8,22 @@ release has the detail.
 
 The earliest entries were written from the tags' own messages after the fact.
 
+## v0.4.1 — 2026-09-08
+
+A build downloaded from a release could not make a world for a new place. The tile service that
+comes with a build started and reported itself healthy, but carried no certificate store, so every
+call it made to Maa-amet, the registers and the map services failed to verify and returned nothing.
+It shipped that way in v0.2.0, v0.3.0 and v0.4.0; running from the repository was never affected.
+
+- The service now carries the certificate bundle and points its connections at it.
+- It writes to `logs/tile_service.log` in the game's own folder, so a service that misbehaves says
+  why. It never had anywhere to report before, which is why this went three releases unseen.
+- The game waits 45 s rather than 15 s for the service to come up — it unpacks 75 MB before its
+  first line runs, which measured 10.7 s on a warm machine and more on a cold first launch — and
+  when it does give up it says whether the service never started or started and did not answer.
+- The build checks, before publishing, that the packaged service can actually geocode a place.
+  A health check alone would have passed happily through all three broken releases.
+
 ## v0.4.0 — 2026-09-08
 
 Loading. Both waits — opening a world you have, and making one for a place you do not — were long

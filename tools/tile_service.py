@@ -30,6 +30,16 @@ sys.path.insert(0, HERE); sys.path.insert(0, os.path.join(HERE, "pipeline"))
 # lower priority (main()).
 for _v in ("OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "GDAL_NUM_THREADS"):
     os.environ.setdefault(_v, "2")
+# A frozen build (tools/service/build.sh) carries no system CA store, so OpenSSL's default paths
+# point at nothing and every https call - the geoportal, the registers, the WMS - fails to verify.
+# certifi's bundle is packed beside the binary; point OpenSSL at it before anything opens a socket.
+if getattr(sys, "frozen", False):
+    try:
+        import certifi
+        os.environ.setdefault("SSL_CERT_FILE", certifi.where())
+        os.environ.setdefault("REQUESTS_CA_BUNDLE", certifi.where())
+    except ImportError:
+        print("[tile_service] warning: certifi is missing; https calls will fail to verify", flush=True)
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the repository, or the bundle directory of the frozen sidecar (tools/service/build.sh)
 import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads, fetch_stops, fetch_tenants, fetch_fields, market  # noqa: E402
@@ -467,7 +477,18 @@ def main():
     ap.add_argument("--workspace", default=None, help="generated packs (default: <raw dir>/service)")
     ap.add_argument("--raw-dir", default=None, help="download cache shared by every job (default: data_raw/ in the repo, or VAKURAAMAT_RAW_DIR)")
     ap.add_argument("--parent-pid", type=int, default=0, help="exit when this process is gone (the game that started the sidecar)")
+    ap.add_argument("--log", default=None, help="append stdout and stderr to this file (the game passes it: a sidecar "
+                    "started by the game has nowhere else to report, and a silent one is undiagnosable)")
     a = ap.parse_args()
+    if a.log:
+        try:
+            os.makedirs(os.path.dirname(os.path.abspath(a.log)), exist_ok=True)
+            f = open(a.log, "a", buffering=1)
+            os.dup2(f.fileno(), sys.stdout.fileno())
+            os.dup2(f.fileno(), sys.stderr.fileno())
+        except OSError as e:
+            print(f"[tile_service] cannot write {a.log}: {e}", flush=True)
+        print(f"[tile_service] --- started {time.strftime('%Y-%m-%d %H:%M:%S')} ---", flush=True)
     try:
         os.nice(10)   # the game's frames come first; not on Windows
     except (AttributeError, OSError):
