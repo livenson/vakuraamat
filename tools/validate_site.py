@@ -12,6 +12,7 @@ import argparse, csv, json, os, re, sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
 import paths  # noqa: E402
+import new_site  # noqa: E402
 ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar
 sys.path.insert(0, os.path.join(ROOT, "tools"))
 
@@ -305,6 +306,19 @@ def validate(site, rep, root=ROOT):
         rep.warn("no scenes.json: the layer scene must be hand-made")
 
 
+## The game and the pipeline each carry the pack version; a pack stamped by one is judged by the
+## other, so they must agree. Read the constant out of the GDScript rather than trusting a comment.
+def check_pack_version(root, rep):
+    path = os.path.join(root, "scripts/autoload/sites.gd")
+    if not os.path.exists(path):
+        return
+    m = re.search(r"^const PACK_VERSION\s*:=\s*(\d+)", open(path, encoding="utf-8").read(), re.M)
+    if not m:
+        rep.err("sites.gd has no PACK_VERSION constant to match tools/new_site.py")
+    elif int(m.group(1)) != new_site.PACK_VERSION:
+        rep.err(f"PACK_VERSION disagrees: new_site.py says {new_site.PACK_VERSION}, sites.gd says {m.group(1)}")
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--site", default="palupera")
@@ -313,6 +327,11 @@ def main(argv=None):
     a = ap.parse_args(argv)
     sites = sorted(d for d in os.listdir(os.path.join(a.root, "sites")) if os.path.exists(os.path.join(a.root, "sites", d, "site.json"))) if a.all else [a.site]
     failed = False
+    shared = Report()
+    check_pack_version(a.root, shared)
+    for e in shared.errors:
+        print(f"[pipeline] FAILED: {e}")   # "FAILED" so make test's grep surfaces it
+    failed = bool(shared.errors)
     for s in sites:
         rep = Report()
         validate(s, rep, a.root)

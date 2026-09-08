@@ -13,6 +13,10 @@ const USER_ROOT := "user://sites/"      # packs generated or downloaded at runti
 const USER_TILES := "user://tiles/"
 const SETTINGS := "user://settings.cfg"
 const DEFAULT_SITE := "palupera"
+## Which pipeline this build expects a pack to have been built by. Mirrors PACK_VERSION in
+## tools/new_site.py, which writes it into every pack's site.json; validate_site.py fails if the two
+## drift. A pack stamped with less than this is rebuilt (Locator.refresh_stale).
+const PACK_VERSION := 1
 
 var available: Array[String] = []
 var active := ""
@@ -76,6 +80,29 @@ static func _is_historical(manifest_path: String) -> bool:
 
 func is_user_pack(id: String) -> bool:
 	return _root_of.get(id, ROOT) == USER_ROOT
+
+
+## The pipeline that built a pack. A pack from before the stamp existed answers 0, which is the
+## whole point: it must read as older than anything, not as current. (Locator.ground_is_coarse
+## defaults the other way and so never notices a tile that predates its own key.)
+func pack_version(id: String) -> int:
+	return int(manifest_for(id).get("pipeline", 0))
+
+
+## True when a downloaded pack was built by an older pipeline than this build expects. Shipped packs
+## are never stale: they are regenerated with the rest of the tree.
+func is_stale(id: String) -> bool:
+	return is_user_pack(id) and pack_version(id) < PACK_VERSION
+
+
+## Every installed pack that wants rebuilding, oldest stamp first.
+func stale_packs() -> Array[String]:
+	var out: Array[String] = []
+	for id in available:
+		if is_stale(id):
+			out.append(id)
+	out.sort_custom(func(a, b): return pack_version(a) < pack_version(b))
+	return out
 
 
 ## Switch the active site (main menu). Registries listen to site_changed and reload.

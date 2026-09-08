@@ -17,6 +17,12 @@ import argparse, csv, json, math, os, re, shutil, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Which pipeline built a pack. Bump it when a stage starts producing something older packs do not
+# have, and every installed pack older than this is rebuilt the next time the game meets it
+# (Sites.PACK_VERSION mirrors it; validate_site.py fails if the two drift).
+#   1: the tenants carry the register's general data, the Tax Board's figures and a sector
+PACK_VERSION = 1
 sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar
@@ -242,7 +248,7 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None, te
 
     # --- manifest + strings ---------------------------------------------------------------------------
     manifest = {
-        "id": site, "name_key": SITE_KEY, "subtitle_key": f"{SITE_KEY}_SUBTITLE",
+        "id": site, "pipeline": PACK_VERSION, "name_key": SITE_KEY, "subtitle_key": f"{SITE_KEY}_SUBTITLE",
         "description": f"{name}: generated site pack.",
         "terrain": {"tile": tile, "center": [float(center[0]), float(center[1])], "size": size, "latitude": lat, "longitude": lon, "utc_offset": 3.0, "date": [2026, 9, 3]},
         "start": {"era": e, "spawn": layout["spawn"], "yaw_deg": yaw},

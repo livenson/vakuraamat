@@ -65,6 +65,18 @@ func _ready() -> void:
 	_check(e.texture() != null and e.texture().get_width() > 0, "texture by user:// path failed")
 	# terrain builder inputs recognised for the copied tile
 	_check(TerrainBuilder.has_inputs("user://tiles/palupera") and not TerrainBuilder.has_region_data("user://tiles/palupera"), "builder input detection")
+	# the pack version: a copy of a current pack is current, and a manifest from before the stamp
+	# existed must read as older than anything rather than as up to date - the trap that let 21
+	# packs built by an older pipeline sit unnoticed
+	_check(Sites.pack_version(ID) == Sites.PACK_VERSION and not Sites.is_stale(ID), "a fresh copy reads as stale: %d" % Sites.pack_version(ID))
+	var without: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(mpath))
+	without.erase("pipeline")
+	var wf := FileAccess.open(mpath, FileAccess.WRITE)
+	wf.store_string(JSON.stringify(without, "  "))
+	wf.close()
+	_check(Sites.pack_version(ID) == 0 and Sites.is_stale(ID), "a pack with no stamp must read as stale")
+	_check(Sites.stale_packs().has(ID), "stale_packs did not list it: %s" % [Sites.stale_packs()])
+	_check(not Sites.is_stale("palupera"), "a shipped pack must never be stale")
 	Sites.select("palupera", false)
 	_cleanup()
 	if not _failed:
