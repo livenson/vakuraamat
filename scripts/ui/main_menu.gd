@@ -237,13 +237,29 @@ func _build_locations_panel() -> void:
 	_service_box.add_child(waiting)
 	_fill_service_packs()
 
-	# --- suggested places
+	# --- suggested places, on a small map of the country: a coordinate says nothing, a mark on
+	# Estonia says whether the place is on an island, by Peipsi or an hour from where you already are
 	_section(list, "MENU_SUGGESTED")
+	var map := EstoniaMap.new()
+	map.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	for id in Sites.available:
+		if _is_tile_pack(id):
+			continue
+		var c: Array = Sites.manifest_for(id).get("terrain", {}).get("center", [])
+		if c.size() == 2:
+			map.places.append({"name": Sites.display_name(id), "x": c[0], "y": c[1],
+				"kind": "current" if id == Sites.active else "installed"})
+	list.add_child(map)
+	BookTheme.label(tr("MENU_MAP_LEGEND"), "DetailLabel", list)
 	var text := FileAccess.get_file_as_string(SUGGESTED)
 	var places = JSON.parse_string(text) if text != "" else []
 	var et := TranslationServer.get_locale().begins_with("et")
 	for p in (places if typeof(places) == TYPE_ARRAY else []):
+		var mark := map.places.size()
+		map.places.append({"name": str(p.name), "x": p.x, "y": p.y, "kind": "suggested"})
 		var row := _row(list, str(p.name), "%s   L-EST97 %d %d" % [str(p.get("note_et" if et else "note_en", "")), int(p.x), int(p.y)])
+		row.mouse_entered.connect(func(): map.highlight(mark))   # the row lights its mark on the map
+		row.mouse_exited.connect(func(): map.highlight(-1))
 		_row_button(row, "MENU_CREATE", func(): _create(str(p.name), float(p.x), float(p.y)))
 
 	# --- search

@@ -99,6 +99,7 @@ MENU_LOCATIONS,Asukohad...,Locations...
 MENU_AVAILABLE,Olemas,Available
 MENU_ON_SERVICE,Valmis teenuses,Ready on the service
 MENU_SUGGESTED,Soovitatud kohad,Suggested places
+MENU_MAP_LEGEND,"Ring: soovitatud koht. Täidetud: sinu maailmad, praegune paksem. Vii kursor rea või märgi peale.","Ring: a suggested place. Filled: your own worlds, the current one ringed. Point at a row or a mark."
 MENU_SEARCH_PLACES,Otsi kohta,Search for a place
 MENU_PLAY,Mängi,Play
 MENU_INSTALL_PLAY,Paigalda ja mängi,Install and play

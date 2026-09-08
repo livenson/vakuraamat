@@ -78,6 +78,16 @@ Scripted equivalent: `curl -X POST :8765/tile -d '{"name":"Aakre","x":629807,"y"
 (`assets/data/suggested_places.json`), a place search (address, place name, coordinates, or your IP
 location), and the friends section.
 
+The suggested places sit on a small map of the country (`EstoniaMap`, `scripts/ui/estonia_map.gd`):
+a ring for every place offered, a filled mark for a world you already have and a ringed one for the
+world you are in. Pointing at a mark names it, pointing at a row lights its mark. The coastline is
+`assets/data/estonia.json` - the county division unioned and simplified to 300 m by
+`tools/pipeline/fetch_outline.py`, with Võrtsjärv from the ETAK water layer; Peipsi needs no drawing,
+since no county covers it and the union's own edge is its shore. The file is committed; re-run the
+script only to follow a new administrative division.
+`tools/godot/menu_shot.tscn -- --locations --scroll=2870 --map=<n>` screenshots the map with one
+mark lit.
+
 ## Reading the place
 
 In the world, **Tab** opens the vakuraamat. *Plots* is the cadastre as a sortable, searchable list -
