@@ -15,6 +15,7 @@ All CC BY (Creative Commons Attribution); fetched 2026-09-06 through the Sketchf
 | `juniper.glb` | Juniper | evolveduk | https://sketchfab.com/3d-models/e74c7156984542c2a4cdf6ce8a0c8e96 |
 | `bus_stop_rural.glb` | Outdated Soviet Bus Stop | Ottto3ds | https://sketchfab.com/3d-models/1cc322c7d98f4f7794a326fa65809fb8 |
 | `bus_stop_town.glb` | Small Bus Stop Shelter | Ottto3ds | https://sketchfab.com/3d-models/2286fddbe24d45d482f9b94a406eca49 |
+| `bus_city.glb` | CITY BUS (LOW POLY) V3 | mcstr0517 | https://sketchfab.com/3d-models/6dccb9e281bc46d097df19f6dc9650ac |
 | `assets/textures/crops/{potato,maize,legume}.png` (baked cards) | Farm plants models (mobile game-ready, lowpoly) | lolipop_1707 | https://sketchfab.com/3d-models/9b59e7cf3bcd4feb80ff0cf5fb780055 |
 | `assets/models/trees/spruce_src.glb` | Low-Poly Game-Ready Spruce Tree | Dark_Knife15 | https://sketchfab.com/3d-models/ef06bbc949b64e81a5016e18d3263416 |
 | `billboard.glb`, `billboard_overhang.glb` | Low Poly Billboard Sign - Standard / Overhang | jeffkolada | https://sketchfab.com/3d-models/269d489f468c430da74ed4921ee6361d , https://sketchfab.com/3d-models/bbbc335c94724061b5caaed3bb52b7cd |
