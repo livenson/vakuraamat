@@ -133,7 +133,7 @@ func guide_to(tunnus: String) -> void:
 	if _guide.get("tunnus", "") == tunnus:
 		_guide = {}
 		return
-	var p := Ledger.parcel(tunnus)
+	var p := Parcels.by_tunnus(tunnus)
 	if p.is_empty():
 		return
 	var pos := Vector3(float(p.x), 0.0, float(p.z))
@@ -146,7 +146,7 @@ func guide_to(tunnus: String) -> void:
 
 ## Jump to a plot: the game's teleport, the same as T and a click on the map.
 func teleport_to(tunnus: String) -> void:
-	var p := Ledger.parcel(tunnus)
+	var p := Parcels.by_tunnus(tunnus)
 	if p.is_empty():
 		return
 	_close()
@@ -158,7 +158,7 @@ func teleport_to(tunnus: String) -> void:
 
 
 ## Point the arrow at a place that is not one of the town's plots - a street, or a building whose
-## plot the ledger does not carry - so the find bar can offer those too.
+## plot the cadastre does not carry - so the find bar can offer those too.
 func guide_to_point(at: Vector2, label: String) -> void:
 	var pos := Vector3(at.x, 0.0, at.y)
 	if world.terrain and world.terrain.data:

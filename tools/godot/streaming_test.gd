@@ -91,10 +91,27 @@ func _ready() -> void:
 	await get_tree().create_timer(0.3).timeout
 	_check(world.player.global_position.x > 1024.0, "player pushed back although the tile is loaded")
 	_check(not Parcels.at(world.player.global_position).is_empty() or true, "parcel lookup crashed")
+	# the book, the find bar and the map arrow read every standing tile through Parcels.all(), in
+	# world metres: a neighbour's units must arrive shifted by its tile offset, exactly once each
+	var home := Parcels.units("palupera").size()
+	var away := Parcels.units(_nid).size()
+	var merged := Parcels.all()
+	_check(merged.size() == home + away, "Parcels.all() has %d units, expected %d + %d" % [merged.size(), home, away])
+	var far_rows: Array = merged.filter(func(u): return str(u.get("pack", "")) == _nid)
+	_check(far_rows.size() == away, "%d of the neighbour's %d units came through" % [far_rows.size(), away])
+	var one: Dictionary = far_rows[0]
+	var origin_row: Dictionary = {}
+	for u in Parcels.units(_nid):
+		if str(u.tunnus) == str(one.tunnus):
+			origin_row = u
+	_check(absf(float(one.x) - float(origin_row.x) - 1024.0) < 0.01 and absf(float(one.z) - float(origin_row.z)) < 0.01,
+			"neighbour unit %s not shifted by the tile offset (%.1f,%.1f from %.1f,%.1f)" % [one.tunnus, one.x, one.z, origin_row.x, origin_row.z])
+	_check(Parcels.by_tunnus(str(one.tunnus)).get("x", 0.0) == one.x, "by_tunnus disagrees with all() for %s" % one.tunnus)
 	# 4. unloading the tile prunes its doors
 	st._unload(Vector2i(1, 0))
 	await get_tree().process_frame
 	_check(Interiors.instance._doors.all(func(d): return is_instance_valid(d)), "doors of an unloaded tile not pruned")
+	_check(Parcels.all().size() == home, "Parcels.all() still has the unloaded tile's units (%d, expected %d)" % [Parcels.all().size(), home])
 	print("[stream] PASSED")
 	_cleanup()
 	get_tree().quit(0)
@@ -115,10 +132,24 @@ func _install_neighbour() -> void:
 	var f := FileAccess.open(Sites.USER_ROOT + _nid + "/site.json", FileAccess.WRITE)
 	f.store_string(JSON.stringify(m, "  "))
 	f.close()
+	_renumber_parcels(Sites.USER_ROOT + _nid + "/parcels.json")
 	if "--slow" in OS.get_cmdline_user_args():
 		_remove_dir(Sites.USER_TILES + _nid + "/data")   # force the first-visit path: build the region from the inputs
 	Sites.scan()
 	print("[stream] neighbour %s installed" % _nid)
+
+
+## The copy's cadastral numbers, suffixed. A real neighbour has its own; without this every unit of
+## the clone is a duplicate of the origin's and Parcels.all() keeps only one of each.
+func _renumber_parcels(path: String) -> void:
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return
+	for u in parsed.get("parcels", []):
+		u["tunnus"] = str(u.get("tunnus", "")) + "-n"
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(JSON.stringify(parsed))
+	f.close()
 
 
 func _copy_dir(src: String, dst: String) -> void:

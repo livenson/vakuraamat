@@ -22,8 +22,13 @@ func _ready() -> void:
 	reload()
 
 
-## (Re)load the registries from the active site pack.
+## (Re)load the registries from the active site pack. The parsed-pack caches go with them: a pack
+## reinstalled under the player (Locator.take_refined) would otherwise answer from the old files.
 func reload() -> void:
+	Parcels.forget()
+	Tenants.forget()
+	News.forget()
+	PlaceSearch.forget()
 	eras.clear()
 	Sites.load_dir(Sites.data_dir("eras"), eras)
 	print("[GameState] site %s: %d layer(s)" % [Sites.active, eras.size()])

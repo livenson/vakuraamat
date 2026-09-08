@@ -87,7 +87,7 @@ static func find(query: String, near: Vector2, limit: int = LIMIT) -> Array:
 
 
 static func _plots(q: String, out: Array) -> void:
-	for p in Ledger.parcels():
+	for p in Parcels.all():
 		var address := _text(p, "address")
 		var s: int = maxi(score(address, q), score(_text(p, "tunnus"), q))
 		if s > 0:
@@ -120,7 +120,7 @@ static func _buildings(q: String, out: Array) -> void:
 ## Companies are searched by name; where they are is the plot they are registered at.
 static func _companies(q: String, out: Array) -> void:
 	var at: Dictionary = {}     # tunnus -> plot position
-	for p in Ledger.parcels():
+	for p in Parcels.all():
 		at[str(p.tunnus)] = Vector2(float(p.x), float(p.z))
 	for t in _pack_list("tenants.json", "tenants"):
 		if str(t.get("status", "")) != "R" or t.get("tunnus") == null:
@@ -136,7 +136,7 @@ static func _companies(q: String, out: Array) -> void:
 static func _streets(q: String, out: Array) -> void:
 	var sums: Dictionary = {}
 	var counts: Dictionary = {}
-	for p in Ledger.parcels():
+	for p in Parcels.all():
 		var street := _street_of(_text(p, "address"))
 		if street == "":
 			continue
@@ -173,6 +173,10 @@ static func _num(d: Dictionary, key: String) -> float:
 
 
 static var _cache: Dictionary = {}
+
+
+static func forget() -> void:
+	_cache.clear()
 
 
 ## A list out of the active pack's json, cached like Parcels.units does.

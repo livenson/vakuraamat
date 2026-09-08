@@ -1021,10 +1021,10 @@ static func register_sheet(b: FootprintBuilding) -> String:
 		if t.get("employees") != null and int(t.employees) > 0:
 			facts.append(TranslationServer.translate("UI_EMPLOYEES") % int(t.employees))
 		lines.append("  " + " · ".join(facts))
-	var p := Ledger.parcel(b.tunnus)
+	var p := Parcels.by_tunnus(b.tunnus)
 	if not p.is_empty():
 		lines.append("")
-		lines.append(TranslationServer.translate("UI_SHEET_OWNER") % [b.tunnus, str(p.get("owner_name", ""))])
+		lines.append(TranslationServer.translate("UI_SHEET_OWNER") % [b.tunnus, str(p.get("ownership", ""))])
 	return "\n".join(lines)
 
 

@@ -1,6 +1,6 @@
 # PlaceSearch matches the way a person typing an address expects: the register's two spellings of a
 # street answer each other, Estonian letters fold, and what is found is a plot, a building, a
-# company or a street of the active pack.
+# company or a street of the active pack (read straight from the pack files, no world running).
 #   godot --headless --path . res://tools/godot/search_test.tscn
 extends Node
 
@@ -17,7 +17,6 @@ func _check(cond: bool, msg: String) -> void:
 func _ready() -> void:
 	Sites.select("kvissentali", false)
 	GameState.reset()
-	Ledger.reset_local("kvissentali")
 	await get_tree().process_frame
 
 	# the register writes a street both ways in one pack: either spelling has to find either

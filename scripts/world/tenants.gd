@@ -1,6 +1,6 @@
-# Registered companies at a cadastral unit of any installed pack: the origin pack answers from the
-# Ledger (its rows carry arrears and the town's live state), a streamed neighbour from that pack's
-# tenants.json (exact matches only, the rule LocalLedger applies). Cached per file like Parcels.units.
+# Registered companies at a cadastral unit of any installed pack, from that pack's tenants.json.
+# Only rows the pipeline matched to a unit exactly are kept: a company whose address merely names
+# the street is not on any one plot. Cached per file like Parcels.units.
 class_name Tenants
 extends RefCounted
 
@@ -10,9 +10,7 @@ static var _cache: Dictionary = {}   # tenants.json path -> {tunnus: Array of ro
 static func of(pack: String, tunnus: String) -> Array:
 	if tunnus == "":
 		return []
-	if pack == "" or pack == Sites.active:
-		return Ledger.tenants_of(tunnus)
-	var path := Sites.path_in(pack, "tenants.json")
+	var path := Sites.path_in(pack if pack != "" else Sites.active, "tenants.json")
 	if not _cache.has(path):
 		var by_tunnus := {}
 		if FileAccess.file_exists(path):
@@ -23,6 +21,10 @@ static func of(pack: String, tunnus: String) -> Array:
 						by_tunnus.get_or_add(str(t.tunnus), []).append(t)
 		_cache[path] = by_tunnus
 	return _cache[path].get(tunnus, [])
+
+
+static func forget() -> void:
+	_cache.clear()
 
 
 ## Names of the active companies (status R), the rule the door label and the name plates share.
