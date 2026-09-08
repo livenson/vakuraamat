@@ -33,16 +33,20 @@ def transform_points(points, src_epsg, dst_epsg):
     return [t.transform(x, y) for x, y in points]
 
 
-def clip_dem(paths, bbox, out_tif=None, fill=True):
+def clip_dem(paths, bbox, out_tif=None, fill=True, smooth=False):
     """The 1 m ground model over `bbox` from one or more GeoTIFF sheets (mosaicked on the way):
-    (float32 array rows north to south, zmin, zmax). NoData holes (water) are interpolated across."""
+    (float32 array rows north to south, zmin, zmax). NoData holes (water) are interpolated across.
+    `smooth`: the sheets are coarser than 1 m (the 5 m DTM), so sample them bilinearly instead of
+    repeating each source cell into a 5 x 5 block of steps."""
     import rasterio
+    from rasterio.enums import Resampling
     from rasterio.fill import fillnodata
     from rasterio.merge import merge
     xmin, ymin, xmax, ymax = bbox
     srcs = [rasterio.open(p) for p in paths]
     try:
-        arr, transform = merge(srcs, bounds=(xmin, ymin, xmax, ymax), res=(1.0, 1.0), nodata=srcs[0].nodata)
+        arr, transform = merge(srcs, bounds=(xmin, ymin, xmax, ymax), res=(1.0, 1.0), nodata=srcs[0].nodata,
+                               resampling=Resampling.bilinear if smooth else Resampling.nearest)
         nodata = srcs[0].nodata
         crs = srcs[0].crs
     finally:

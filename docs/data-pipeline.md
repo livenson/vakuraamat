@@ -9,6 +9,7 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | Source | What | Tool | Output |
 |---|---|---|---|
 | Maa-amet geoportal, 1 m DTM sheets (`dem_1m_geotiff`) | ground heights, EH2000 | `tools/pipeline/fetch_tile.py` | `assets/terrain/<tile>/heightmap.r32`, `terrain_meta.json` |
+| the same sheets at 5 m (`dem_5m_geotiff`, `--dem-res 5`) | the ground a new place ships with | `fetch_tile.py` | the same files, `dtm_res_m: 5` in the meta |
 | Maa-amet nDSM (1:2000 sheets) | canopy and object heights | `fetch_tile.py` | `assets/terrain/<tile>/canopy.r32` |
 | Maa-amet WMS `fotokaart` (`EESTIFOTO`) | 25 cm orthophoto | `fetch_tile.py` | `assets/terrain/<tile>/ortho.jpg` |
 | Maa-amet Geo3D single trees (LOD0 üksikpuud) | every laser-detected tree: position, height, crown, conifer or deciduous | `tools/pipeline/fetch_trees.py` | `assets/terrain/<tile>/trees.json` |
@@ -135,7 +136,10 @@ python3 tools/pipeline/fetch_tile.py --site palupera        # or --name <tile> -
 ```
 
 Step 1 finds the 1:10 000 map sheets under the four corners (the sheet grid is downloaded once into
-`data_raw/`), POSTs the geoportal download form for each sheet's 1 m DTM GeoTIFF (~74 MB, cached),
+`data_raw/`), POSTs the geoportal download form for each sheet's DTM GeoTIFF (1 m: ~74 MB; `--dem-res 5`:
+~4 MB, resampled bilinearly to the 1 m output grid, a median 1.8 cm from the 1 m result and what the
+tile service ships first so a new place can be walked in about a minute; `--only-dem` replaces the
+heightmap of a tile that already stands, which is how the refinement pass upgrades it), all cached,
 mosaics and clips them with `rasterio.merge`, fills NoData with `rasterio.fill` and writes a raw float32 heightmap (Godot's PNG loader truncates 16-bit to 8-bit
 and its EXR loader rejects GDAL's channel names). It then fetches the orthophoto from the `fotokaart`
 WMS (JPEG, at most 4096 px per request: 1024 m at 4096 px is 25 cm per pixel) and the nDSM.

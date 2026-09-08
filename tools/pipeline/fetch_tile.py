@@ -250,6 +250,11 @@ def main(argv=None):
     ap.add_argument("--texture-px", type=int, default=WMS_MAX_PX, help="orthophoto size in pixels (max 4096 per WMS request)")
     ap.add_argument("--z-scale", type=float, default=1.0, help="vertical exaggeration recorded in meta (applied at import time)")
     ap.add_argument("--no-canopy", action="store_true", help="skip the nDSM/CHM canopy layer")
+    ap.add_argument("--dem-res", type=int, default=1, choices=[1, 5], help="ground model grid: 1 m (a 5x5 km sheet is ~75 MB) "
+                    "or 5 m (~4 MB, resampled bilinearly to the 1 m output grid; median difference under 2 cm on flat "
+                    "ground). The 5 m model is what a pack ships first so the place can be walked; the 1 m one replaces it later.")
+    ap.add_argument("--only-dem", action="store_true", help="fetch just the ground model and update heightmap.r32 and the "
+                    "meta in place (the refinement pass: a coarse tile becomes a 1 m one)")
     ap.add_argument("--project", default=os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
                     help="project root (default: repo root)")
     ap.add_argument("--raw-dir", help="download cache (default: <project>/data_raw)")
@@ -306,14 +311,15 @@ def main(argv=None):
     progress(0.02, "map sheets " + ",".join(sheets))
 
     # --- DTM ---------------------------------------------------------------
+    kind = "dem_1m_geotiff" if a.dem_res == 1 else "dem_5m_geotiff"
     dtm_urls, dtm_paths = [], []
     for i, sh in enumerate(sheets):
-        url = dtm_download_url(sh)
+        url = dtm_download_url(sh, kind)
         fname = urllib.parse.parse_qs(urllib.parse.urlparse(url).query)["f"][0]
         dtm_urls.append(url)
         cached = os.path.exists(os.path.join(raw_dir, fname))
         f0, f1 = 0.05 + 0.4 * i / len(sheets), 0.05 + 0.4 * (i + 1) / len(sheets)
-        text = f"1 m ground model, sheet {sh} ({i + 1}/{len(sheets)})"
+        text = f"{a.dem_res} m ground model, sheet {sh} ({i + 1}/{len(sheets)})"
         progress(f0, text + (", cached" if cached else ""))
         dtm_paths.append(download(url, os.path.join(raw_dir, fname), label=text, span=(f0, f1)))
     progress(0.5, "clipping the ground model")
@@ -321,8 +327,8 @@ def main(argv=None):
     dtm_name = ",".join(os.path.basename(p) for p in dtm_paths)
     clipped = os.path.join(raw_dir, f"{a.name}_dtm_{a.size}m.tif")
     # the sheets mosaicked and clipped; water bodies etc. may be NoData: interpolated across so the mesh has no holes
-    data, zmin, zmax = geo.clip_dem(dtm_paths, (xmin, ymin, xmax, ymax), clipped)
-    log(f"height range {zmin:.2f}..{zmax:.2f} m")
+    data, zmin, zmax = geo.clip_dem(dtm_paths, (xmin, ymin, xmax, ymax), clipped, smooth=a.dem_res > 1)
+    log(f"height range {zmin:.2f}..{zmax:.2f} m  (from the {a.dem_res} m model)")
 
     # Raw float32: Godot reads it with Image.create_from_data(FORMAT_RF) - no codec surprises.
     # (Godot's PNG loader drops 16-bit to 8-bit and its EXR loader rejects GDAL's channel naming.)
@@ -333,6 +339,14 @@ def main(argv=None):
     got = os.path.getsize(os.path.join(out_dir, "heightmap.r32"))
     if got != expected:
         sys.exit(f"heightmap.r32 is {got} bytes, expected {expected}")
+    if a.only_dem:
+        # the refinement pass: the rest of the tile stands, only the ground and its numbers change
+        meta = json.load(open(meta_path)) if os.path.exists(meta_path) else {}
+        meta.update({"z_min": round(zmin, 3), "z_max": round(zmax, 3), "dtm_res_m": a.dem_res})
+        meta.setdefault("source", {}).update({"dtm": dtm_url, "dtm_files": dtm_name, "dtm_sheets": sheets})
+        json.dump(meta, open(meta_path, "w"), indent=2)
+        log(f"wrote {out_dir}/heightmap.r32 at {a.dem_res} m and updated the meta")
+        return
 
     # --- Orthophoto via WMS (EESTIFOTO = latest nationwide orthophoto) -----
     px = min(a.texture_px, WMS_MAX_PX)
@@ -368,6 +382,7 @@ def main(argv=None):
         "size_m": a.size,
         "size_px": a.size,
         "resolution_m": 1.0,
+        "dtm_res_m": a.dem_res,   # the ground model it came from; 5 means a finer one can still replace it
         "heightmap": "heightmap.r32",
         "heightmap_format": "float32 little-endian, row-major, row 0 = north edge (ymax), metres EH2000",
         "z_min": round(zmin, 3), "z_max": round(zmax, 3),

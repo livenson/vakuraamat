@@ -33,6 +33,16 @@ its design documents in the repo root describe that version.
   teleport|screenshot` talks to the running debug game through `user://dev/commands.jsonl`
   (`DevChannel` autoload). See `docs/dev-loop.md`.
 - Country data adapters: `tools/pipeline/sources.py` (Estonia implemented; add a class per country).
+- A pack for a new place is built in two passes. The job ships what the place needs to be walked in
+  (the 5 m ground model, 4 MB a sheet against 75 MB for the 1 m one; the register, cadastre, roads,
+  tenants), then `refine_job` fetches the 1 m ground, the measured trees and the news in the
+  background and rewrites the zip. The tile's `terrain_meta.json` carries `dtm_res_m`; while it says
+  5, `Locator.take_refined` takes the finished pack the next time the place is entered from the menu
+  (the install clears the region data, so the ground is rebuilt from the finer model on the way in).
+  Every stage that reaches a national service goes through `with_deadline`: an optional layer may
+  never hold the pack (the notices feed alone held it for eight minutes). Per-building register
+  lookups go through `fetch_buildings.prefetch_ehr` (a few threads sharing one rate limit), never one
+  after another.
 - Buildings come from `tools/pipeline/fetch_buildings.py` (ETAK polygons + Building Register attributes +
   Geo3D LOD2 roofs) into `sites/<id>/buildings.json`; parcels with land values from `fetch_parcels.py`,
   tenants from `fetch_tenants.py`, the market snapshot from `market.py`.

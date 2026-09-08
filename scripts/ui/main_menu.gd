@@ -99,7 +99,7 @@ func _build() -> void:
 			if summary.site != "" and summary.site != Sites.active and Sites.available.has(summary.site):
 				Sites.select(summary.site)
 			GameState.pending_load = true
-			get_tree().change_scene_to_file("res://scenes/world/world.tscn"))
+			await _enter_world())
 	_entry("UI_NEW_GAME", Sites.display_name(Sites.active), func(): _start_new_game())
 	_entry("MENU_LOCATIONS", tr("MENU_PACKS_COUNT") % Sites.available.size(), _build_locations_panel)
 	_entry("MENU_LANGUAGE", "English" if TranslationServer.get_locale().begins_with("et") else "Eesti", func():
@@ -149,11 +149,20 @@ func _entry(key: String, detail: String, cb: Callable) -> Button:
 	return b
 
 
+## Into the world. A place still walking on the 5 m ground model takes the 1 m one first when the
+## service has it ready: the install clears the tile's region data and the world rebuilds it on the
+## way in. A moment at most, and nothing at all when the ground is already fine or no service answers.
+func _enter_world() -> void:
+	if Locator.ground_is_coarse(Sites.active):
+		await Locator.take_refined(Sites.active)
+	get_tree().change_scene_to_file("res://scenes/world/world.tscn")
+
+
 func _start_new_game(site_id: String = "") -> void:
 	if site_id != "" and site_id != Sites.active:
 		Sites.select(site_id)
 	GameState.reset()
-	get_tree().change_scene_to_file("res://scenes/world/world.tscn")
+	await _enter_world()
 
 
 func _button(key: String, cb: Callable) -> void:
@@ -202,7 +211,7 @@ func _build_locations_panel() -> void:
 			_row_button(row, "UI_CONTINUE_GAME", func():
 				Sites.select(id)
 				GameState.pending_load = true
-				get_tree().change_scene_to_file("res://scenes/world/world.tscn"))
+				await _enter_world())
 		_row_button(row, "MENU_PLAY", func(): _start_new_game(id))
 
 	# --- ready on the tile service (filled in when it answers)

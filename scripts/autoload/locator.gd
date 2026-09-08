@@ -342,6 +342,42 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 	return {"ok": error == "", "id": id, "error": error}
 
 
+## A pack ships the 5 m ground model so a new place can be walked in about a minute; the service
+## fetches the 1 m one afterwards. True when the tile still carries the coarse ground.
+static func ground_is_coarse(id: String) -> bool:
+	if not Sites.is_user_pack(id):
+		return false
+	var meta_path := Sites.tile_dir_of(id) + "/terrain_meta.json"
+	if not FileAccess.file_exists(meta_path):
+		return false
+	var m = JSON.parse_string(FileAccess.get_file_as_string(meta_path))
+	return typeof(m) == TYPE_DICTIONARY and float(m.get("dtm_res_m", 1.0)) > 1.0
+
+
+## Take the refined pack (1 m ground, measured trees, news) when the service has it ready. The
+## install clears the tile's region data, so the world rebuilds the ground from the finer model on
+## the way in. Returns true when something was installed. Quiet and quick when the service is down:
+## the coarse ground is a complete world, not a placeholder.
+func take_refined(id: String) -> bool:
+	if not ground_is_coarse(id) or not await service_alive():
+		return false
+	var st := await http(service_url() + "/status?id=" + id)
+	if not st.ok:
+		return false
+	var d = JSON.parse_string(st.body)
+	if typeof(d) != TYPE_DICTIONARY or not bool(d.get("refined", false)):
+		return false
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cache"))
+	var zip_path := "user://cache/%s.zip" % id
+	var dl := await http(service_url() + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path)
+	if not dl.ok or not install_zip(zip_path, id):
+		return false
+	if id == Sites.active:
+		Sites.reload_active()   # the pack's own files changed under it (news, trees, the meta)
+	print("[Locator] %s: the 1 m ground model replaced the 5 m one; the tile is rebuilt on the way in" % id)
+	return true
+
+
 ## Poll the job until it is done; "" on success, else the error text.
 func _wait_for_job(base: String, id: String) -> String:
 	while true:

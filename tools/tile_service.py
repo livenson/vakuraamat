@@ -20,7 +20,7 @@ download cache shared (data_raw/, or --raw-dir). Needs python3 with numpy, Pillo
 the same script frozen with tools/service/build.sh ships beside the exported game as the tile_service sidecar.
 Nothing here is exposed beyond the loopback interface unless you bind it so.
 """
-import argparse, time, json, os, re, shutil, sys, threading, traceback, urllib.parse, urllib.request, zipfile
+import argparse, concurrent.futures, time, json, os, re, shutil, sys, threading, traceback, urllib.parse, urllib.request, zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -81,11 +81,15 @@ def save_stats(st):
 
 
 def note_rate(text):
-    """Keep the fetcher's last reported download rate ("... 12/74 MB, 3.1 MB/s")."""
+    """Keep a running mean of the fetcher's reported download rate ("... 12/74 MB, 3.1 MB/s").
+    A single value is whatever the last burst happened to reach, and the estimate then promises a
+    minute where the link delivers a quarter of an hour; the mean of the last twenty is closer."""
     m = re.search(r"([\d.]+) MB/s", text)
     if m and float(m.group(1)) > 0:
         st = load_stats()
-        st["rate_bps"] = float(m.group(1)) * 1e6
+        rates = (st.get("rates") or [])[-19:] + [float(m.group(1)) * 1e6]
+        st["rates"] = rates
+        st["rate_bps"] = sum(rates) / len(rates)
         save_stats(st)
 
 
@@ -93,6 +97,25 @@ def note_job(seconds):
     st = load_stats()
     st["jobs"] = (st.get("jobs") or [])[-9:] + [round(seconds)]
     save_stats(st)
+
+
+def with_deadline(name, seconds, fn, *args, **kwargs):
+    """Run an optional stage with a hard time budget. A stage that reaches national services can
+    stall for minutes on a slow feed (the notices XML has a 180 s socket timeout, twice); the pack
+    must not wait for it. On timeout the worker is abandoned to finish or die on its own and the
+    job carries on without that layer. Returns (ok, result)."""
+    ex = concurrent.futures.ThreadPoolExecutor(max_workers=1)   # not a with-block: shutdown must not wait
+    fut = ex.submit(fn, *args, **kwargs)
+    try:
+        return True, fut.result(timeout=seconds)
+    except concurrent.futures.TimeoutError:
+        log(f"{name}: still running after {seconds} s; the pack goes without it")
+        return False, None
+    except Exception as e:  # noqa: BLE001 - every one of these layers is optional
+        log(f"{name}: unavailable ({e})")
+        return False, None
+    finally:
+        ex.shutdown(wait=False)
 
 
 def head_size(url):
@@ -115,9 +138,13 @@ def estimate(x, y, size):
         items.append({"name": name, "bytes": n, "cached": cached})
 
     sheets = sorted({fetch_tile.sheet_for_point(px, py, raw_dir) for px, py in [(xmin + 1, ymin + 1), (xmax - 1, ymin + 1), (xmin + 1, ymax - 1), (xmax - 1, ymax - 1)]})
+    refine = 0
     for sh in sheets:
-        url = fetch_tile.dtm_download_url(sh)
-        add("DTM %s" % sh, url, urllib.parse.parse_qs(urllib.parse.urlparse(url).query)["f"][0])
+        url = fetch_tile.dtm_download_url(sh, "dem_5m_geotiff")   # the ground the first pack ships
+        add("DTM %s (5 m)" % sh, url, urllib.parse.parse_qs(urllib.parse.urlparse(url).query)["f"][0])
+        fine = fetch_tile.dtm_download_url(sh)                     # fetched afterwards, not part of the wait
+        fname = urllib.parse.parse_qs(urllib.parse.urlparse(fine).query)["f"][0]
+        refine += 0 if os.path.exists(os.path.join(raw_dir, fname)) else head_size(fine)
     for sheet in fetch_tile.sheets_2000_for_bbox(xmin, ymin, xmax, ymax, raw_dir):
         links = sorted(fetch_tile.geoportal_links(sheet, "ndsm_rel_1m_geotiff"), key=fetch_tile.link_year)
         if links:
@@ -129,7 +156,9 @@ def estimate(x, y, size):
     to_get = sum(i["bytes"] for i in items if not i["cached"])
     return {"items": items, "bytes": sum(i["bytes"] for i in items), "cached_bytes": sum(i["bytes"] for i in items if i["cached"]),
             "download_bytes": to_get, "rate_bps": rate, "seconds_download": round(to_get / rate),
-            "seconds_process": round(sum(jobs) / len(jobs)) if jobs else 360, "free_bytes": shutil.disk_usage(WORKSPACE).free}
+            "seconds_process": round(sum(jobs) / len(jobs)) if jobs else 120,
+            "refine_bytes": refine, "seconds_refine": round(refine / rate),   # the 1 m ground, fetched after the pack is playable
+            "free_bytes": shutil.disk_usage(WORKSPACE).free}
 
 
 def cache_info():
@@ -145,6 +174,28 @@ def cache_info():
             packs.append({"id": f, "bytes": n})
             total += n
     return {"bytes": total, "packs": packs, "free_bytes": shutil.disk_usage(WORKSPACE).free, "path": WORKSPACE}
+
+
+def write_zip(sid, ws):
+    """The pack the game installs: the site files and the tile's engine files. Written to a .part
+    first and moved into place, so the refinement pass can replace it under a client that is
+    downloading."""
+    zpath = os.path.join(WORKSPACE, sid + ".zip")
+    with zipfile.ZipFile(zpath + ".part", "w", zipfile.ZIP_DEFLATED) as z:
+        site_dir = os.path.join(ws, "sites", sid)
+        for dp, _, files in os.walk(site_dir):
+            for f in files:
+                if f.endswith(".import"):
+                    continue
+                full = os.path.join(dp, f)
+                z.write(full, "site/" + os.path.relpath(full, site_dir))
+        tile_dir = os.path.join(ws, "assets", "terrain", sid)
+        for f in sorted(os.listdir(tile_dir)):
+            full = os.path.join(tile_dir, f)
+            if os.path.isfile(full) and not f.endswith(".import"):
+                z.write(full, "tile/" + f)   # includes trees.json when the dataset covers the tile
+    os.replace(zpath + ".part", zpath)
+    return zpath
 
 
 def run_job(job):
@@ -178,29 +229,18 @@ def run_job(job):
             note_rate(text)
         fetch_tile.PROGRESS = on_progress
         try:
-            fetch_tile.main(["--project", ws, "--site", sid, "--raw-dir", paths.raw_root()])
+            # the 5 m ground model (4 MB a sheet against 75 MB) so the place can be walked in a
+            # minute; refine_job fetches the 1 m one afterwards and the game picks it up next visit
+            fetch_tile.main(["--project", ws, "--site", sid, "--raw-dir", paths.raw_root(), "--dem-res", "5"])
         finally:
             fetch_tile.PROGRESS = None
-        stage("measured trees", 0.46)
-        try:
-            fetch_trees.fetch(sid, root=ws)
-        except Exception as e:  # noqa: BLE001 - optional layer
-            log(f"{sid}: tree dataset unavailable ({e}); statistical scatter")
         stage("building register", 0.5)
-        try:
-            fetch_buildings.fetch(sid, root=ws, progress=lambda f, t: stage(t, 0.5 + 0.1 * f))
-        except Exception as e:  # noqa: BLE001 - the register is optional; the nDSM massing stands in
-            log(f"{sid}: building register unavailable ({e}); using laser massing")
+        with_deadline(f"{sid}: building register", 240, fetch_buildings.fetch, sid, root=ws,
+                      progress=lambda f, t: stage(t, 0.5 + 0.1 * f))
         stage("cadastre", 0.61)
-        try:
-            fetch_parcels.fetch(sid, root=ws)
-        except Exception as e:  # noqa: BLE001 - optional layer
-            log(f"{sid}: fetch_parcels unavailable ({e})")
+        with_deadline(f"{sid}: cadastre", 120, fetch_parcels.fetch, sid, root=ws)
         stage("roads", 0.63)
-        try:
-            fetch_roads.fetch(sid, root=ws)
-        except Exception as e:  # noqa: BLE001 - optional layer
-            log(f"{sid}: fetch_roads unavailable ({e})")
+        with_deadline(f"{sid}: roads", 120, fetch_roads.fetch, sid, root=ws)
         # Overpass queues requests for tens of seconds: the stops fetch runs beside the register stages
         def stops_job():
             try:
@@ -210,25 +250,11 @@ def run_job(job):
         stops_thread = threading.Thread(target=stops_job, daemon=True)
         stops_thread.start()
         stage("fields (PRIA)", 0.635)
-        try:
-            fetch_fields.fetch(sid, root=ws)
-        except Exception as e:  # noqa: BLE001 - optional layer
-            log(f"{sid}: fetch_fields unavailable ({e})")
+        with_deadline(f"{sid}: fields", 120, fetch_fields.fetch, sid, root=ws)
         stage("tenants (business register)", 0.64)
-        try:
-            fetch_tenants.fetch(sid, root=ws)
-        except Exception as e:  # noqa: BLE001 - optional layer
-            log(f"{sid}: tenants unavailable ({e})")
-        stage("news (RSS, Ametlikud Teadaanded)", 0.655)
-        try:
-            news_feeder.main(["--site", sid, "--root", ws, "--local", "--once"])
-        except Exception as e:  # noqa: BLE001 - optional layer
-            log(f"{sid}: news unavailable ({e})")
+        with_deadline(f"{sid}: tenants", 180, fetch_tenants.fetch, sid, root=ws)
         stage("market snapshot", 0.66)
-        try:
-            market.derive(sid, root=ws)
-        except Exception as e:  # noqa: BLE001 - optional layer
-            log(f"{sid}: market unavailable ({e})")
+        with_deadline(f"{sid}: market", 60, market.derive, sid, root=ws)
         if stops_thread.is_alive():
             stage("bus stops (OpenStreetMap)", 0.665)
             stops_thread.join(60)
@@ -252,24 +278,11 @@ def run_job(job):
         if rep.errors:
             raise RuntimeError("validation: " + "; ".join(rep.errors[:5]))
         stage("packing", 0.9)
-        zpath = os.path.join(WORKSPACE, sid + ".zip")
-        with zipfile.ZipFile(zpath + ".part", "w", zipfile.ZIP_DEFLATED) as z:
-            site_dir = os.path.join(ws, "sites", sid)
-            for dp, _, files in os.walk(site_dir):
-                for f in files:
-                    if f.endswith(".import"):
-                        continue
-                    full = os.path.join(dp, f)
-                    z.write(full, "site/" + os.path.relpath(full, site_dir))
-            tile_dir = os.path.join(ws, "assets", "terrain", sid)
-            for f in sorted(os.listdir(tile_dir)):
-                full = os.path.join(tile_dir, f)
-                if os.path.isfile(full) and not f.endswith(".import"):
-                    z.write(full, "tile/" + f)   # includes trees.json when the dataset covers the tile
-        os.replace(zpath + ".part", zpath)
+        zpath = write_zip(sid, ws)
         with LOCK:
-            job.update(stage="ready", progress=1.0, done=True, zip=zpath)
+            job.update(stage="ready", progress=1.0, done=True, zip=zpath, refined=False, refine_stage="queued")
         note_job(time.time() - started)
+        threading.Thread(target=refine_job, args=(job, ws), daemon=True).start()
         marks.append((time.time() - started, "ready"))
         # what the wait was actually spent on, so a slow stage can be found without a profiler
         spans = [(marks[i + 1][0] - marks[i][0], marks[i][1]) for i in range(len(marks) - 1)]
@@ -279,6 +292,41 @@ def run_job(job):
         traceback.print_exc()
         with LOCK:
             job.update(stage="failed", done=True, error=str(e) or "failed")
+
+
+def refine_job(job, ws):
+    """What a pack does not need to be walked in, fetched after it is playable: the 1 m ground
+    model in place of the 5 m one, the measured trees, and the news. Each has a budget, the zip is
+    rewritten when they are in, and /status reports `refined`; the game downloads the pack again on
+    its next visit to the place and rebuilds the tile from the finer ground."""
+    sid = job["id"]
+    started = time.time()
+
+    def rstage(name):
+        with LOCK:
+            job["refine_stage"] = name
+        log(f"{sid}: refining - {name} [{time.time() - started:.0f} s]")
+    try:
+        rstage("1 m ground model")
+        ok, _ = with_deadline(f"{sid}: 1 m ground model", 900, fetch_tile.main,
+                              ["--project", ws, "--site", sid, "--raw-dir", paths.raw_root(), "--dem-res", "1", "--only-dem"])
+        rstage("measured trees")
+        with_deadline(f"{sid}: measured trees", 600, fetch_trees.fetch, sid, root=ws)
+        rstage("news (RSS, Ametlikud Teadaanded)")
+        # the notices feed is two national XML documents with a 180 s socket timeout each: generous
+        # here because nothing waits on it any more, where it used to hold the pack for eight minutes
+        with_deadline(f"{sid}: news", 420, news_feeder.main, ["--site", sid, "--root", ws, "--local", "--once"])
+        rstage("packing")
+        write_zip(sid, ws)
+        if ok:
+            open(os.path.join(WORKSPACE, sid + ".refined"), "w").close()   # JOBS is memory only; this survives a restart
+        with LOCK:
+            job.update(refined=True, refine_stage="ready", ground_res_m=1 if ok else 5)
+        log(f"{sid}: refined ({time.time() - started:.0f} s)")
+    except Exception as e:  # noqa: BLE001 - the pack already stands; a failed refinement is not fatal
+        traceback.print_exc()
+        with LOCK:
+            job.update(refined=False, refine_stage="failed: " + (str(e) or "failed"))
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -331,14 +379,16 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, packs)
         if u.path == "/status":
             sid = qs.get("id", [""])[0]
+            refined = bool(sid) and os.path.exists(os.path.join(WORKSPACE, sid + ".refined"))
             with LOCK:
                 job = dict(JOBS.get(sid, {}))
             if not job:
                 zpath = os.path.join(WORKSPACE, sid + ".zip")
                 if sid and os.path.exists(zpath):
-                    return self._json(200, {"id": sid, "stage": "ready", "progress": 1.0, "done": True})
+                    return self._json(200, {"id": sid, "stage": "ready", "progress": 1.0, "done": True, "refined": refined})
                 return self._json(404, {"error": "unknown job"})
             job.pop("zip", None)
+            job["refined"] = bool(job.get("refined")) or refined
             return self._json(200, job)
         if u.path == "/download":
             sid = qs.get("id", [""])[0]

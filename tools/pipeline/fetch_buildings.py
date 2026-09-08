@@ -23,7 +23,7 @@ roof colour, heat source and fuel -> chimney, solar electricity -> panels, own w
 A building appears in an era when year <= the era's year; buildings without a year are shown in the
 newest era only (tools/gen_era_scenes.py "footprints" node). EHR answers are cached in data_raw/ehr/.
 """
-import argparse, json, os, shutil, sys, time, urllib.parse, urllib.request, zipfile
+import argparse, concurrent.futures, json, os, shutil, sys, threading, time, urllib.parse, urllib.request, zipfile
 
 import numpy as np
 
@@ -71,6 +71,52 @@ def fetch_ehr(code, cache_dir):
     if d is not None:
         json.dump(d, open(p, "w"))
     return d
+
+
+def ehr_code(props):
+    """The register code of an ETAK feature; ETAK numbers a building's parts "<code>-2" and the
+    register knows the code alone."""
+    code = props.get("ehr_gid")
+    return str(code).split("-")[0] if code and "-" in str(code) else code
+
+
+def prefetch_ehr(codes, cache_dir, progress=None, workers=6, rate=20.0):
+    """Fill the register cache for a whole tile at once. The API answers one building per call, so
+    600 of them one after another is two and a half minutes of pure round-trip latency; a few
+    threads sharing one pace (at most `rate` calls a second between them all, so the register sees
+    no more traffic than a person clicking) turn that into the transfer time. Answers land in the
+    same files fetch_ehr reads, so the loop after this one hits the cache."""
+    os.makedirs(cache_dir, exist_ok=True)
+    todo = [c for c in dict.fromkeys(codes) if c and not os.path.exists(os.path.join(cache_dir, f"{c}.json"))]
+    if not todo:
+        return 0
+    gap = 1.0 / rate
+    lock = threading.Lock()
+    state = {"next": time.monotonic(), "done": 0}
+
+    def one(code):
+        with lock:
+            now = time.monotonic()
+            wait = max(0.0, state["next"] - now)
+            state["next"] = max(now, state["next"]) + gap
+        if wait > 0:
+            time.sleep(wait)
+        d = get_json(EHR_API.format(code=code), timeout=40)
+        if d is not None:
+            tmp = os.path.join(cache_dir, f"{code}.json.part")
+            with open(tmp, "w") as f:
+                json.dump(d, f)
+            os.replace(tmp, os.path.join(cache_dir, f"{code}.json"))
+        with lock:
+            state["done"] += 1
+            n = state["done"]
+        if progress and n % 10 == 0:
+            progress(n / len(todo), f"building register {n}/{len(todo)}")
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as ex:
+        list(ex.map(one, todo))
+    log(f"register: {state['done']} buildings looked up ({len(codes) - len(todo)} already cached)")
+    return state["done"]
 
 
 # Register technical indicators (klNimetus) that shape a building's look.
@@ -299,11 +345,11 @@ def fetch(site, root=ROOT, use_ehr=True, use_lod2=True, progress=None):
     import paths
     cache = paths.raw("ehr")
     lod2 = fetch_lod2(xmin, ymin, xmax, ymax, paths.raw("lod2")) if use_lod2 else {}
+    if use_ehr:
+        prefetch_ehr([ehr_code(f.get("properties", {})) for f in feats], cache, progress=progress)
     out = []
     with_ehr = with_year = with_lod2 = 0
     for i, f in enumerate(feats):
-        if progress and i % 10 == 0:
-            progress(i / max(len(feats), 1), f"building register {i}/{len(feats)}")
         g = f.get("geometry") or {}
         rings = g.get("coordinates") if g.get("type") == "Polygon" else (g.get("coordinates", [[]])[0] if g.get("type") == "MultiPolygon" else None)
         if not rings:
@@ -315,9 +361,7 @@ def fetch(site, root=ROOT, use_ehr=True, use_lod2=True, progress=None):
             continue
         xs = [p[0] for p in poly]; zs = [p[1] for p in poly]
         props = f.get("properties", {})
-        code = props.get("ehr_gid")
-        if code and "-" in str(code):
-            code = str(code).split("-")[0]   # ETAK numbers a building's parts "<code>-2"; the register knows the code alone
+        code = ehr_code(props)
         info = {}
         if use_ehr and code:
             d = fetch_ehr(code, cache)
