@@ -237,8 +237,8 @@ def run_job(job):
         os.makedirs(os.path.join(ws, "assets", "terrain"), exist_ok=True)
         open(os.path.join(ws, ".gdignore"), "a").close()
         stage("scaffold", 0.05)
-        new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid, template="palupera",
-                          force=True, root=ws, template_root=ROOT, texture_mode="path", seed=job.get("seed"), block_ids=job.get("blocks"))
+        new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid,
+                          force=True, root=ws, texture_mode="path", seed=job.get("seed"), block_ids=job.get("blocks"))
         stage("Maa-amet data", 0.1)
 
         def on_progress(frac, text):   # the fetcher's steps become the job's stage
@@ -286,8 +286,8 @@ def run_job(job):
         _, _, anchors = extract_features.extract(sid, root=ws)
         stage("layout", 0.7)
         new_site.apply_anchors(sid, anchors, root=ws)
-        new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid, template="palupera", force=True,
-                          root=ws, template_root=ROOT, texture_mode="path", anchors=anchors, seed=job.get("seed"), block_ids=job.get("blocks"))
+        new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid, force=True,
+                          root=ws, texture_mode="path", anchors=anchors, seed=job.get("seed"), block_ids=job.get("blocks"))
         new_site.relink_era_maps(sid, root=ws, texture_mode="path")
         stage("scenes", 0.75)
         if not gen_era_scenes.generate(sid, root=ws):

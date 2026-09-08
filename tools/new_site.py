@@ -2,7 +2,7 @@
 """Scaffolds a new site pack under sites/<id>/.
 
     python3 tools/new_site.py --id kvissentali --name "Kvissentali" --center 657600 6477150
-        [--size 1024] [--template palupera] [--force]
+        [--size 1024] [--force]
     python3 tools/new_site.py --id kvissentali --relink-era-maps
 
 What you get: site.json (terrain centre, latitude/longitude, start, codex), layout.json (named spots
@@ -191,8 +191,8 @@ def apply_anchors(site, anchors, root=ROOT):
     return layout
 
 
-def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None, template="palupera",
-             force=False, root=ROOT, template_root=ROOT, texture_mode="import", anchors=None, seed=None, block_ids=None):
+def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
+             force=False, root=ROOT, texture_mode="import", anchors=None, seed=None, block_ids=None):
     """A present-day site pack. `eras`, `seed` and `block_ids` are accepted for older callers and ignored."""
     if not re.fullmatch(r"[a-z][a-z0-9_]*", site):
         sys.exit("--id must be lowercase letters, digits, underscores")
@@ -283,7 +283,6 @@ if __name__ == "__main__":
     ap.add_argument("--size", type=int, default=1024)
     ap.add_argument("--eras", default="2026", help="accepted and ignored: the present day is the only layer")
     ap.add_argument("--tile", help="terrain tile name (default: the site id)")
-    ap.add_argument("--template", default="palupera", help="site whose structures to copy")
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--relink-era-maps", action="store_true", help="only re-point the era resources at fetched ground maps")
     ap.add_argument("--root", default=ROOT, help="project root holding sites/ and assets/terrain/ (default: the repo)")
@@ -298,5 +297,5 @@ if __name__ == "__main__":
         if not a.center:
             sys.exit("--center X Y is required")
         anchors = json.load(open(a.anchors)) if a.anchors else None
-        scaffold(a.id, a.name, a.center, a.size, a.eras, a.tile, a.template, a.force, a.root, ROOT, a.texture_mode, anchors,
+        scaffold(a.id, a.name, a.center, a.size, a.eras, a.tile, a.force, a.root, a.texture_mode, anchors,
                  a.seed, a.blocks.split(",") if a.blocks else None)

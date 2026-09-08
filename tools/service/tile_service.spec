@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 # PyInstaller spec for the tile-service sidecar: tools/tile_service.py with the pipeline modules,
-# the template pack (sites/palupera), the parcel rules and the core strings it reads.
+# the manifest and strings of the template pack (sites/palupera), the parcel rules and the core
+# strings it reads.
 #   pyinstaller --clean --noconfirm tools/service/tile_service.spec        (tools/service/build.sh)
 import os
 from PyInstaller.utils.hooks import collect_all
@@ -9,7 +10,6 @@ ROOT = os.path.abspath(os.path.join(SPECPATH, "..", ".."))
 datas = [
     (os.path.join(ROOT, "sites", "palupera", "site.json"), "sites/palupera"),
     (os.path.join(ROOT, "sites", "palupera", "strings.csv"), "sites/palupera"),
-    (os.path.join(ROOT, "sites", "palupera", "data", "structures"), "sites/palupera/data/structures"),
     (os.path.join(ROOT, "assets", "data", "parcel_rules.json"), "assets/data"),
     (os.path.join(ROOT, "assets", "i18n", "strings.csv"), "assets/i18n"),
 ]
