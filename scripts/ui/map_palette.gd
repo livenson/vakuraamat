@@ -37,6 +37,18 @@ static func colour(mode: String, t: Dictionary) -> Color:
 	return NO_TENANT
 
 
+## What the mode is measuring, for the foot of its legend: a translation key, or "" for the modes
+## whose classes say it themselves. "Health" is the one that reads as something else entirely -
+## the condition of the building, or a hospital - so it says whose health and where it comes from.
+static func note(mode: String) -> String:
+	match mode:
+		"health":
+			return "UI_MAP_HEALTH_NOTE"
+		"age":
+			return "UI_MAP_AGE_NOTE"
+	return ""
+
+
 ## Legend entries of a mode: [[label key or text, colour], ...].
 static func legend(mode: String) -> Array:
 	var out := []

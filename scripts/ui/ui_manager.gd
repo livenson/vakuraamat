@@ -898,7 +898,12 @@ func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String,
 	var w := 150.0
 	for it in items:
 		w = maxf(w, font.get_string_size(tr(str(it[0])), HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x + 30.0)
-	var h := 20.0 + items.size() * 15.0
+	var note := tr(MapPalette.note(_map_mode)) if MapPalette.note(_map_mode) != "" else ""
+	var note_h := 0.0
+	if note != "":
+		w = maxf(w, 190.0)
+		note_h = 6.0 + font.get_multiline_string_size(note, HORIZONTAL_ALIGNMENT_LEFT, w - 12.0, 10).y
+	var h := 20.0 + items.size() * 15.0 + note_h
 	var margin := c.size.x - (origin.x + side)
 	var box := Rect2(origin + Vector2(side + 10, 0), Vector2(w, h)) if margin >= w + 14 \
 		else Rect2(origin + Vector2(side - w - 8, side - h - 24), Vector2(w, h))
@@ -909,6 +914,9 @@ func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String,
 		var y := box.position.y + 26 + i * 15
 		c.draw_rect(Rect2(box.position.x + 6, y - 9, 10, 10), items[i][1])
 		c.draw_string(font, Vector2(box.position.x + 20, y), tr(str(items[i][0])), HORIZONTAL_ALIGNMENT_LEFT, -1, 11, BookTheme.INK)
+	if note != "":
+		var ny := box.position.y + 26 + items.size() * 15 + 4
+		c.draw_multiline_string(font, Vector2(box.position.x + 6, ny), note, HORIZONTAL_ALIGNMENT_LEFT, w - 12.0, 10, -1, BookTheme.FADED)
 
 
 ## Lay the map's text out without overlaps: street names along their longest stretch first, then
