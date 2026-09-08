@@ -83,7 +83,17 @@ func _show(index: int) -> void:
 ## meanwhile, so the view is never empty; "today" comes from the tile's own photograph, which is
 ## already as sharp as it gets.
 func _load_big(shot: Dictionary) -> void:
-	if bool(shot.get("local", false)) or bool(shot.get("big", false)):
+	if bool(shot.get("big", false)):
+		return
+	if bool(shot.get("local", false)):
+		# the tile's own photograph: re-crop it from the orthophoto at the large size rather than
+		# letting the strip's thumbnail be scaled up, which is why today used to be the soft one
+		var own: Texture2D = PlotHistory.current_large(_pack, _square, BIG)
+		if own != null:
+			shot["texture"] = own
+			shot["big"] = true
+			if is_instance_valid(_picture):
+				_picture.texture = own
 		return
 	var label: String = str(shot.label)
 	var tex: Texture2D = await PlotHistory.fetch_large(_pack, _tunnus, label, _square, BIG)

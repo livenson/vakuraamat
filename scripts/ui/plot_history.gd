@@ -69,7 +69,10 @@ static func outline_in(poly: PackedVector2Array, square: Rect2, georef: TerrainG
 
 ## The newest picture, cropped out of the tile's own orthophoto - no request, and it is by
 ## definition the one that matches the world the player is standing in. Null if the tile has none.
-static func current(square: Rect2, georef: TerrainGeoref, tile_dir: String) -> Texture2D:
+## `px` is what the crop is scaled to; the older years are re-requested from the service at the
+## large view's size, so this one is asked for the same size or it alone stays a blurry thumbnail.
+## The orthophoto is 25 cm to the pixel, so a plot's square usually has the detail to answer.
+static func current(square: Rect2, georef: TerrainGeoref, tile_dir: String, px: int = PX) -> Texture2D:
 	var path := tile_dir + "/ortho.jpg"
 	if not FileAccess.file_exists(path) or not georef.is_valid():
 		return null
@@ -87,7 +90,7 @@ static func current(square: Rect2, georef: TerrainGeoref, tile_dir: String) -> T
 	if region.size.x < 8 or region.size.y < 8:
 		return null
 	var crop := img.get_region(region)
-	crop.resize(PX, PX, Image.INTERPOLATE_LANCZOS)
+	crop.resize(px, px, Image.INTERPOLATE_LANCZOS)
 	return ImageTexture.create_from_image(crop)
 
 
@@ -128,6 +131,13 @@ static func _fetch_one(layers: Array, square: Rect2, base: String) -> Texture2D:
 			f.close()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(base + ".part"))
 	return null
+
+
+## The tile's own photograph of a plot at the large view's size. The tile is the one the plot sits
+## on, which for a streamed neighbour is not the one the player entered from the menu.
+static func current_large(pack: String, square: Rect2, px: int) -> Texture2D:
+	var dir := Sites.tile_dir_of(pack if pack != "" else Sites.active)
+	return current(square, TerrainGeoref.load_dir(dir), dir, px)
 
 
 ## The same square as one epoch's thumbnail, asked for at `px` instead of PX, for the large view.
