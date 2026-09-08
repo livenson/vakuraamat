@@ -32,6 +32,10 @@ func _ready() -> void:
 		_build_locations_panel()
 	else:
 		_build()
+	# Packs an older pipeline built are brought up to date from here, quietly and one at a time. The
+	# menu is where it can start without competing with anything; Locator is an autoload, so it
+	# carries on into the world and yields to any tile the player is actually waiting for.
+	Locator.start_backfill()
 
 
 ## A fresh page: paper, grain, the rubric margin rule; returns the body area right of the margin.
@@ -460,6 +464,7 @@ func _fill_storage() -> void:
 	var worlds := 0
 	var tiles := 0
 	var tile_ids: Array[String] = []
+	var stale_tiles: Array[String] = []
 	for id in Sites.available:
 		if not Sites.is_user_pack(id):
 			continue
@@ -467,13 +472,27 @@ func _fill_storage() -> void:
 		if _is_tile_pack(id):
 			tiles += n
 			tile_ids.append(id)
+			if Sites.is_stale(id):
+				stale_tiles.append(id)
 			continue
 		worlds += n
-		var row := _row(_storage_box, Sites.display_name(id), Locator.fmt_bytes(float(n)) + ("   " + tr("MENU_CURRENT") if id == Sites.active else ""))
+		var detail := Locator.fmt_bytes(float(n)) + ("   " + tr("MENU_CURRENT") if id == Sites.active else "")
+		if Sites.is_stale(id):
+			detail += "   " + tr("MENU_OUTDATED")
+		var row := _row(_storage_box, Sites.display_name(id), detail)
+		if Sites.is_stale(id):
+			_refresh_button(row, [id])
 		if id != Sites.active:
 			_remove_button(row, [id])
 	if not tile_ids.is_empty():
-		var row := _row(_storage_box, tr("MENU_NEIGHBOUR_TILES") % tile_ids.size(), Locator.fmt_bytes(float(tiles)))
+		# every t<E>_<N> pack collapses into this one row, so the count of outdated ones and the
+		# button that rebuilds them have to live here: there is no per-tile row to hang them on
+		var detail := Locator.fmt_bytes(float(tiles))
+		if not stale_tiles.is_empty():
+			detail += "   " + tr("MENU_TILES_OUTDATED") % stale_tiles.size()
+		var row := _row(_storage_box, tr("MENU_NEIGHBOUR_TILES") % tile_ids.size(), detail)
+		if not stale_tiles.is_empty():
+			_refresh_button(row, stale_tiles)
 		_remove_button(row, tile_ids, "MENU_DELETE_ALL_TILES")
 	var free := Locator.free_bytes()
 	var line := BookTheme.label(tr("MENU_STORAGE_LINE") % [Locator.fmt_bytes(float(worlds)), Locator.fmt_bytes(float(tiles)), Locator.fmt_bytes(float(free)) if free >= 0 else "?"], "DetailLabel", _storage_box)
@@ -486,6 +505,23 @@ func _fill_storage() -> void:
 ## A pack the streamer fetched for a neighbouring tile: t<E>_<N>.
 static func _is_tile_pack(id: String) -> bool:
 	return id.begins_with("t") and id.substr(1).replace("_", "").is_valid_int()
+
+
+## Put packs an older pipeline built into the rebuild queue. They are fetched one at a time in the
+## background, so the button reports what it queued and the page is redrawn when it is next opened.
+func _refresh_button(row: HBoxContainer, ids: Array) -> void:
+	var b := Button.new()
+	BookTheme.hand(b)
+	b.text = tr("MENU_REFRESH")
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	b.pressed.connect(func():
+		b.disabled = true
+		await Locator.queue_refresh(ids)
+		if not is_instance_valid(_status):
+			return
+		var left := Locator.backfill_left()
+		_status.text = tr("MENU_REFRESH_QUEUED") % left if left > 0 else tr("MENU_SERVICE_DOWN") % Locator.service_url())
+	row.add_child(b)
 
 
 ## Remove asks twice: the first press turns the button into "Really remove".

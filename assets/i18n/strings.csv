@@ -219,6 +219,10 @@ MENU_STORAGE,Salvestatud maailmad,Storage
 MENU_STORAGE_LINE,"%s paigaldatud maailmades, %s naabruse ruutudes, kettal vaba %s","%s in installed worlds, %s in neighbour tiles, %s free on disk"
 MENU_SERVICE_CACHE,"Kaarditeenuse vahemälu: %s (%s)","Tile service cache: %s (%s)"
 MENU_NEIGHBOUR_TILES,"Naabruse ruudud (%d)","Neighbour tiles (%d)"
+MENU_OUTDATED,vananenud,out of date
+MENU_TILES_OUTDATED,"%d vananenud","%d out of date"
+MENU_REFRESH,Värskenda,Refresh
+MENU_REFRESH_QUEUED,"%d paika värskendatakse taustal.","%d place(s) are being brought up to date in the background."
 MENU_DELETE,Kustuta,Remove
 MENU_CONFIRM_DELETE,Kindlasti kustuta,Really remove
 MENU_DELETE_ALL_TILES,Kustuta kõik naabruse ruudud,Remove all neighbour tiles

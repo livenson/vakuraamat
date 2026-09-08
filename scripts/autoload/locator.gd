@@ -401,6 +401,76 @@ func take_refined(id: String) -> bool:
 	return true
 
 
+## Who is talking to the service. A tile the player is standing at the edge of takes it; the
+## background backfill waits for "" and never takes it from them. TileStreamer sets it around its
+## own fetches: the service builds one pack at a time and so does Locator's queue, so without this
+## an on-demand fetch could sit behind a rebuild nobody is waiting for.
+var job_owner := ""
+
+var _backfill: Array[String] = []
+var _backfill_running := false
+
+
+## How many packs are still to be rebuilt, the one in flight included.
+func backfill_left() -> int:
+	return _backfill.size() + (1 if _backfill_running else 0)
+
+
+## Bring every downloaded pack an older pipeline built up to date, one at a time, quietly, and
+## always behind whatever the player is waiting for. Started from the main menu; being an autoload,
+## it carries on into the world.
+##
+## No progress is written down anywhere: the stamp in each pack's manifest is the record. A pack
+## that got there is no longer stale, so a restart resumes rather than begins again, and a pack that
+## the service hands back unchanged fails refresh_pack's stamp check rather than being retried
+## forever.
+func start_backfill() -> void:
+	if OS.has_feature("headless"):
+		return
+	await queue_refresh(Sites.stale_packs())
+
+
+## Add packs to the queue and, unless it is already turning, start it. The Storage page uses this to
+## ask for a rebuild by hand; start_backfill is the same queue seeded with everything that is stale.
+func queue_refresh(ids: Array) -> void:
+	for id in ids:
+		if not _backfill.has(str(id)):
+			_backfill.append(str(id))
+	if _backfill_running or _backfill.is_empty() or not await service_alive():
+		return
+	_backfill_running = true
+	print("[Locator] %d pack(s) to bring up to pipeline %d" % [_backfill.size(), Sites.PACK_VERSION])
+	while not _backfill.is_empty():
+		while job_owner != "" and job_owner != "backfill":
+			await get_tree().create_timer(1.0).timeout
+		var id: String = _backfill.pop_front()
+		if not Sites.is_stale(id):
+			continue   # a tile the player walked to got there first
+		job_owner = "backfill"
+		var r := await _backfill_one(id)
+		job_owner = ""
+		if not r.get("ok", false):
+			print("[Locator] %s not refreshed: %s" % [id, str(r.get("error", ""))])
+			if not await service_alive():
+				print("[Locator] backfill stopped: the tile service went away")
+				break
+	_backfill_running = false
+	print("[Locator] backfill done; %d pack(s) still older than pipeline %d" % [Sites.stale_packs().size(), Sites.PACK_VERSION])
+
+
+## A pack the player is walking on cannot just have its files rewritten: the buildings and parcels
+## in front of them came out of those files. That one goes through the streamer, which swaps the
+## whole tile; anything not standing is refreshed on disk and read fresh next time it loads.
+func _backfill_one(id: String) -> Dictionary:
+	var streamer: Node = GameState.world.streamer if GameState.world else null
+	if streamer:
+		for loc in streamer.tiles:
+			if str(streamer.tiles[loc].get("pack", "")) == id and streamer.is_ready(loc):
+				var swapped: bool = await streamer.refresh_tile(loc)
+				return {"ok": swapped, "id": id, "error": "" if swapped else "the tile could not be swapped yet"}
+	return await refresh_pack(id)
+
+
 ## Rebuild a pack that an older pipeline built, and put the result in place. The registers are
 ## re-fetched and the ground is not, so nothing under user://tiles changes and the caller can swap
 ## the pack into a running world without touching a Terrain3D region.

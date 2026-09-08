@@ -156,7 +156,9 @@ func _pump() -> void:
 			years.append(str(e.id).rsplit("_", true, 1)[-1])
 		var eras := ",".join(years) if not years.is_empty() else "2026"
 		print("[Tiles] fetching %s for tile %s (%d, %d)" % [pack, loc, cx, cy])
+		Locator.job_owner = "stream"   # the background backfill waits: someone is standing at this edge
 		var r: Dictionary = await Locator.fetch_pack(pack, "Tile %d %d" % [cx, cy], cx, cy, int(size), eras)
+		Locator.job_owner = ""
 		if tiles.has(loc) and tiles[loc].state == "fetching":
 			if r.get("ok", false):
 				tiles[loc].state = "loading"
@@ -440,7 +442,10 @@ func refresh_tile(loc: Vector2i) -> bool:
 	var t: Dictionary = tiles[loc]
 	var pack: String = t.pack
 	print("[Tiles] refreshing %s at %s" % [pack, loc])
+	var held := Locator.job_owner
+	Locator.job_owner = "stream"
 	var r: Dictionary = await Locator.refresh_pack(pack)
+	Locator.job_owner = held   # the backfill may be the one that asked for this
 	if not tiles.has(loc) or tiles[loc] != t:
 		return false   # unloaded while the service worked
 	if not r.get("ok", false):
