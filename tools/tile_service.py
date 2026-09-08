@@ -226,6 +226,13 @@ def run_job(job):
             raise RuntimeError("only %.1f GB free on the service's disk (%s); a world needs about 2 GB" % (free / 1024 ** 3, WORKSPACE))
         if os.path.exists(ws) and job.get("force"):
             shutil.rmtree(ws)
+        # A rebuild starts from an empty slate as far as the client is concerned: the marker and the
+        # zip from the previous build are both still on disk, and /status and /download would keep
+        # handing them out for the whole run.
+        if job.get("force") or job.get("refresh"):
+            marker = os.path.join(WORKSPACE, sid + ".refined")
+            if os.path.exists(marker):
+                os.remove(marker)
         os.makedirs(os.path.join(ws, "sites"), exist_ok=True)
         os.makedirs(os.path.join(ws, "assets", "terrain"), exist_ok=True)
         open(os.path.join(ws, ".gdignore"), "a").close()
@@ -240,8 +247,13 @@ def run_job(job):
         fetch_tile.PROGRESS = on_progress
         try:
             # the 5 m ground model (4 MB a sheet against 75 MB) so the place can be walked in a
-            # minute; refine_job fetches the 1 m one afterwards and the game picks it up next visit
-            fetch_tile.main(["--project", ws, "--site", sid, "--raw-dir", paths.raw_root(), "--dem-res", "5"])
+            # minute; refine_job fetches the 1 m one afterwards and the game picks it up next visit.
+            # A refresh is about the registers, so it keeps the ground it has - including the 1 m one
+            # a refine pass may already have paid for, which a re-fetch would throw away.
+            if job.get("refresh") and os.path.exists(os.path.join(ws, "assets", "terrain", sid, "heightmap.r32")):
+                log(f"{sid}: refresh, keeping the ground already fetched")
+            else:
+                fetch_tile.main(["--project", ws, "--site", sid, "--raw-dir", paths.raw_root(), "--dem-res", "5"])
         finally:
             fetch_tile.PROGRESS = None
         stage("building register", 0.5)
@@ -408,6 +420,13 @@ class Handler(BaseHTTPRequestHandler):
             zpath = os.path.join(WORKSPACE, sid + ".zip")
             if not sid or not os.path.exists(zpath):
                 return self._json(404, {"error": "not ready"})
+            # the zip is only replaced at the packing stage, so while a job runs this file is still
+            # the previous build: handing it out would install the very pack the client asked to
+            # have rebuilt
+            with LOCK:
+                running = JOBS.get(sid, {})
+            if running and not running.get("done"):
+                return self._json(409, {"error": "still building", "stage": running.get("stage", "")})
             self.send_response(200); self.send_header("Content-Type", "application/zip"); self.send_header("Content-Length", str(os.path.getsize(zpath))); self.end_headers()
             with open(zpath, "rb") as f:
                 shutil.copyfileobj(f, self.wfile)
@@ -434,10 +453,12 @@ class Handler(BaseHTTPRequestHandler):
             job = JOBS.get(sid)
             if job and not job.get("done"):
                 return self._json(202, {"id": sid, "stage": job["stage"]})
-            if os.path.exists(os.path.join(WORKSPACE, sid + ".zip")) and not req.get("force"):
+            rebuild = bool(req.get("force")) or bool(req.get("refresh"))
+            if os.path.exists(os.path.join(WORKSPACE, sid + ".zip")) and not rebuild:
                 JOBS[sid] = {"id": sid, "stage": "ready", "progress": 1.0, "done": True}
                 return self._json(202, {"id": sid, "stage": "ready"})
-            job = {"id": sid, "name": name, "x": x, "y": y, "size": size, "eras": eras, "force": bool(req.get("force")),
+            job = {"id": sid, "name": name, "x": x, "y": y, "size": size, "eras": eras,
+                   "force": bool(req.get("force")), "refresh": bool(req.get("refresh")),
                    "seed": int(req["seed"]) if req.get("seed") is not None else None, "blocks": req.get("blocks") or None,
                    "stage": "queued", "progress": 0.0, "done": False}
             JOBS[sid] = job

@@ -309,10 +309,20 @@ func create_world(name: String, x: float, y: float, size: int = 1024, eras: Stri
 
 ## Generate (or reuse from the service cache), download and install a pack without activating it:
 ## the world streamer uses this for neighbouring tiles. Returns {ok, id, error}.
-func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, eras: String = "2026", seed_value: int = -1, blocks: Array = []) -> Dictionary:
+## `refresh` asks the service to rebuild a pack it already has, keeping the ground it already
+## fetched and re-running only the register stages - a minute or two rather than the twenty a full
+## rebuild costs, and nothing under `tile/` changes, which is what lets a refreshed pack be swapped
+## in without touching the terrain. `quiet` keeps the stage out of `progress`, which the streamer
+## shows on the HUD and in the notice explaining why the player is held at an edge: a refresh
+## running in the background must not take that line over.
+func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, eras: String = "2026", seed_value: int = -1, blocks: Array = [],
+		refresh: bool = false, quiet: bool = false) -> Dictionary:
 	var base := service_url()
 	var error := ""
-	progress.emit(tr("MENU_STAGE_SERVICE"), 0.0)
+	var say := func(text: String, at: float):
+		if not quiet:
+			progress.emit(text, at)
+	say.call(tr("MENU_STAGE_SERVICE"), 0.0)
 	var free := free_bytes()
 	if not await ensure_service():
 		error = tr("MENU_SERVICE_DOWN") % base
@@ -323,32 +333,34 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 	var req := {}
 	if error == "":
 		req = {"id": id, "name": name, "x": x, "y": y, "size": size, "eras": eras}
+		if refresh:
+			req["refresh"] = true
 		if seed_value >= 0:
 			req["seed"] = seed_value
 		if not blocks.is_empty():
 			req["blocks"] = blocks
 		var body := JSON.stringify(req)
-		progress.emit(tr("MENU_STAGE_REQUEST"), 0.02)
+		say.call(tr("MENU_STAGE_REQUEST"), 0.02)
 		var r := await http(base + "/tile", HTTPClient.METHOD_POST, body)
 		if not r.ok:
 			error = r.body if r.body != "" else "HTTP %d" % r.code
 	if error == "":
-		error = await _wait_for_job(base, id)
+		error = await _wait_for_job(base, id, quiet)
 		if error == "status: HTTP 404" and not req.is_empty():
 			# the service was restarted mid-job and forgot it: submit once more (its caches make it quick)
-			progress.emit(tr("MENU_STAGE_REQUEST"), 0.02)
+			say.call(tr("MENU_STAGE_REQUEST"), 0.02)
 			var again := await http(base + "/tile", HTTPClient.METHOD_POST, JSON.stringify(req))
-			error = await _wait_for_job(base, id) if again.ok else ("HTTP %d" % again.code)
+			error = await _wait_for_job(base, id, quiet) if again.ok else ("HTTP %d" % again.code)
 	if error == "":
 		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cache"))
 		var zip_path := "user://cache/%s.zip" % id
-		progress.emit(tr("MENU_STAGE_DOWNLOAD"), 0.93)
+		say.call(tr("MENU_STAGE_DOWNLOAD"), 0.93)
 		var dl := await http(base + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path)
 		if not dl.ok:
 			error = "download: HTTP %d" % dl.code
 		else:
-			progress.emit(tr("MENU_STAGE_INSTALL"), 0.97)
-			if not install_zip(zip_path, id):
+			say.call(tr("MENU_STAGE_INSTALL"), 0.97)
+			if not install_zip(zip_path, id, refresh):
 				error = "could not unpack " + zip_path
 	return {"ok": error == "", "id": id, "error": error}
 
@@ -376,7 +388,7 @@ func take_refined(id: String) -> bool:
 	if not st.ok:
 		return false
 	var d = JSON.parse_string(st.body)
-	if typeof(d) != TYPE_DICTIONARY or not bool(d.get("refined", false)):
+	if typeof(d) != TYPE_DICTIONARY or not bool(d.get("refined", false)) or not bool(d.get("done", true)):
 		return false
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cache"))
 	var zip_path := "user://cache/%s.zip" % id
@@ -390,7 +402,7 @@ func take_refined(id: String) -> bool:
 
 
 ## Poll the job until it is done; "" on success, else the error text.
-func _wait_for_job(base: String, id: String) -> String:
+func _wait_for_job(base: String, id: String, quiet: bool = false) -> String:
 	while true:
 		var st := await http(base + "/status?id=" + id)
 		if not st.ok:
@@ -398,7 +410,8 @@ func _wait_for_job(base: String, id: String) -> String:
 		var d = JSON.parse_string(st.body)
 		if typeof(d) != TYPE_DICTIONARY:
 			return "bad status"
-		progress.emit(str(d.get("stage", "")), clampf(float(d.get("progress", 0.0)) * 0.9, 0.03, 0.9))
+		if not quiet:
+			progress.emit(str(d.get("stage", "")), clampf(float(d.get("progress", 0.0)) * 0.9, 0.03, 0.9))
 		if d.get("error", "") != "":
 			return str(d.error)
 		if bool(d.get("done", false)):
@@ -408,7 +421,9 @@ func _wait_for_job(base: String, id: String) -> String:
 
 
 ## Unpack a service zip: site/* -> user://sites/<id>/, tile/* -> user://tiles/<tile>/.
-func install_zip(zip_path: String, id: String) -> bool:
+## `site_only` leaves the tile alone - a refresh rebuilds the registers, not the ground, and the
+## region data under user://tiles is what the player is standing on.
+func install_zip(zip_path: String, id: String, site_only: bool = false) -> bool:
 	var z := ZIPReader.new()
 	if z.open(zip_path) != OK:
 		return false
@@ -425,6 +440,8 @@ func install_zip(zip_path: String, id: String) -> bool:
 		if f.begins_with("site/"):
 			dest = Sites.USER_ROOT + id + "/" + f.trim_prefix("site/")
 		elif f.begins_with("tile/"):
+			if site_only:
+				continue
 			dest = Sites.USER_TILES + tile + "/" + f.trim_prefix("tile/")
 		else:
 			continue
@@ -437,6 +454,8 @@ func install_zip(zip_path: String, id: String) -> bool:
 		out.store_buffer(z.read_file(f))
 		out.close()
 	z.close()
+	if site_only:
+		return true
 	# a fresh tile: any stale region data from an earlier download must go
 	var old_data := ProjectSettings.globalize_path(Sites.USER_TILES + tile + "/data")
 	if DirAccess.dir_exists_absolute(old_data):
