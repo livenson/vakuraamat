@@ -114,7 +114,8 @@ def company_address(row):
 
 
 def build_index(parcels, buildings):
-    idx = {"by_key": {}, "by_stem_num": {}, "bkey": {}, "by_adr_id": {}, "streets": set(), "farms": {}, "parcel_of_building": {}}
+    idx = {"by_key": {}, "by_stem_num": {}, "bkey": {}, "by_adr_id": {}, "streets": set(), "farms": {}, "parcel_of_building": {},
+           "tunnus_set": {u["tunnus"] for u in parcels}}
     for u in parcels:
         for k in address_keys(u.get("address")):
             if k[1]:
@@ -205,6 +206,15 @@ def fetch(site, root=ROOT, stats=False, refresh=False, max_age_days=7, keep_unma
         tunnus, bid, m, via = match(row, idx)
         if m == "exact" and bid is not None and tunnus is None:
             tunnus = None   # building known, parcel unknown: still exact on the building
+        if tunnus is not None and tunnus not in idx["tunnus_set"]:
+            # the gazetteer knows a cadastral unit this tile does not: the address sits on a plot
+            # whose polygon fell outside the square, or the cadastre clipped it away. Keep the
+            # company - the building it is in may well be here - but not a reference to a plot the
+            # pack cannot show, which is a dangling row the validator rightly refuses the pack for.
+            st["tunnus_outside"] = st.get("tunnus_outside", 0) + 1
+            tunnus = None
+            if m == "exact" and bid is None:
+                m, via = "street", via + "+outside"
         if m == "none":
             k = normalise(company_address(row))
             if k[0] in idx["streets"]:
