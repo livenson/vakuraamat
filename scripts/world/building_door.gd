@@ -63,7 +63,7 @@ func hover_text() -> String:
 	if building.purpose != "":
 		bits.append(building.purpose)
 	if building.year > 0:
-		bits.append(str(building.year))
+		bits.append(tr("UI_IN_USE_SINCE") % building.year)
 	var st := building.storeys()
 	bits.append(tr("UI_FLOORS") % int(st.floors))
 	return " · ".join(bits)

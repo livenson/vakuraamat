@@ -9,6 +9,12 @@ Sources (both open data, attribution required):
     Register code (ehr_gid).
   * EHR, the Building Register (livekluster.ehr.ee, GET /api/building/v2/buildingdata?ehr_code=):
     first year of use, floors, footprint area, gross volume, name, purpose, status.
+    `year` is `esmaneKasutus`, the year the building was first taken into use - in practice the year
+    of its use permit, which can be long after it was built (Madruse tn 4 in Kvissentali stands in
+    the 2007 orthophoto and has a permit dated 2015-02-10). It is still the right field: of 600
+    cached records 79% carry it, against 16% for `ehAlustKp` and 8% for `kavKasutusKp`, and where
+    both exist `esmaneKasutus` is a median 29 years *earlier* than `ehAlustKp`, which usually dates
+    a later rebuild rather than the original. The game says "in use since", not "built".
   * Maa-amet 3D building models (Geo3D, LOD2 with roof shapes, FileGDB per municipality, read with
     pyogrio): the actual roof geometry, keyed by ETAK id. Downloads are cached in data_raw/lod2/.
   * The tile's canopy.r32 (nDSM) for the measured height of footprints without a model.

@@ -999,7 +999,7 @@ static func register_sheet(b: FootprintBuilding) -> String:
 	if b.purpose != "":
 		bits.append(b.purpose)
 	if b.year > 0:
-		bits.append(str(b.year))
+		bits.append(TranslationServer.translate("UI_IN_USE_SINCE") % b.year)
 	var st := b.storeys()
 	bits.append(TranslationServer.translate("UI_FLOORS") % int(st.floors))
 	if b.facade != "":

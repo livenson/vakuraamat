@@ -111,7 +111,7 @@ static func _buildings(q: String, out: Array) -> void:
 			if _text(b, "purpose") != "":
 				bits.append(_text(b, "purpose"))
 			if _num(b, "year") > 0:
-				bits.append(str(int(_num(b, "year"))))
+				bits.append(TranslationServer.translate("UI_IN_USE_SINCE") % int(_num(b, "year")))
 			out.append({"kind": "building", "score": s, "label": address,
 					"detail": " · ".join(bits), "tunnus": _text(b, "tunnus"),
 					"pos": Vector2(_num(b, "x"), _num(b, "z"))})

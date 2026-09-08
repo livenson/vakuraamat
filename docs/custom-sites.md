@@ -164,7 +164,9 @@ or `--failed` for the sheet).
 `sites/<id>/buildings.json`:
 
 - **ETAK** (the topographic database, WFS) gives every building polygon in the tile and its type;
-- the **Building Register (EHR)** adds, per building code, the first year of use, floors, footprint
+- the **Building Register (EHR)** adds, per building code, the first year of use (`esmaneKasutus`:
+  the year it was taken into use, in practice the year of the use permit, which can be years after
+  it was built - so the game says "in use since", not "built"), floors, footprint
   area, volume, purpose and status;
 - **Maa-amet Geo3D LOD2** adds the actual roof geometry (FileGDB per municipality, read with pyogrio;
   the municipality comes from the address gazetteer);
