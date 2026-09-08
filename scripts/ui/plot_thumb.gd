@@ -32,11 +32,19 @@ func setup(label: String, tex: Texture2D, outline: PackedVector2Array) -> void:
 
 
 ## A placeholder of the same size, so the strip keeps its shape while the pictures arrive.
-func setup_pending(label: String) -> void:
+## A slot for a picture that is still being fetched: the campaign's own label under it, so the strip
+## has its final shape and names while the pictures come in.
+func setup_pending(label: String, note: String = "") -> void:
 	var box := ColorRect.new()
 	box.color = Color(0, 0, 0, 0.06)
 	box.custom_minimum_size = Vector2(SIZE, SIZE)
 	add_child(box)
+	if note != "":
+		var n := BookTheme.label(note, "DetailLabel", box)
+		n.set_anchors_preset(Control.PRESET_CENTER)
+		n.grow_horizontal = Control.GROW_DIRECTION_BOTH
+		n.grow_vertical = Control.GROW_DIRECTION_BOTH
+		n.add_theme_color_override("font_color", BookTheme.FADED)
 	var l := BookTheme.label(label, "DetailLabel", self)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 

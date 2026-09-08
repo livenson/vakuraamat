@@ -3,8 +3,9 @@
 # 2022 taxation value, ownership form and the registry link.
 #
 # `units(pack)` is one pack's own file, in that pack's local metres. `all()` is every unit of every
-# tile standing right now, in world metres: a streamed neighbour's x/z are shifted by its tile
-# offset, so a position taken from a row can be walked, flown or pointed at directly.
+# tile standing right now, in world metres: a streamed neighbour's x/z AND its boundary polygon are
+# shifted by its tile offset, so anything taken from a row can be walked to, flown to, drawn, or
+# handed to the georeference directly.
 class_name Parcels
 extends RefCounted
 
@@ -130,5 +131,12 @@ static func _add(pack: String, offset: Vector3) -> void:
 		row["pack"] = pack
 		row["x"] = float(u.get("x", 0)) + offset.x
 		row["z"] = float(u.get("z", 0)) + offset.z
+		if offset != Vector3.ZERO:
+			# a new array, not the cached one shifted: units() hands out the pack's own file and the
+			# boundary has to stay in that pack's metres for whoever asks for it there
+			var moved: Array = []
+			for c in u.get("polygon", []):
+				moved.append([float(c[0]) + offset.x, float(c[1]) + offset.z])
+			row["polygon"] = moved
 		_merged.append(row)
 		_by_tunnus[tunnus] = row

@@ -252,22 +252,17 @@ func _fill_plot() -> void:
 		body.add_child(_lbl(tr("UI_BOOK_REGISTERED_HERE"), 15, GOLD))
 		for t in rows:
 			var status := "" if t.get("status") == "R" else "  (%s)" % tr("UI_TENANT_INACTIVE")
-			body.add_child(_lbl("   %s, %s, %s %s%s" % [t.get("name", ""), t.get("legal_form", ""), tr("UI_SINCE"), t.get("since", ""), status], 14))
+			var crow := HBoxContainer.new()
+			crow.add_theme_constant_override("separation", 10)
+			body.add_child(crow)
+			crow.add_child(_lbl("   %s, %s, %s %s%s" % [t.get("name", ""), t.get("legal_form", ""), tr("UI_SINCE"), t.get("since", ""), status], 14))
+			_link_button(crow, str(t.get("link", "")), tr("UI_BOOK_IN_THE_REGISTER"))
 			var facts := _company_facts(t)
 			if facts != "":
 				body.add_child(_lbl("      " + facts, 13, BookTheme.FADED if str(t.get("health", "")) != "distressed" else BookTheme.RUBRIC))
-	if str(p.get("link", "")) != "":
-		var lrow := HBoxContainer.new()
-		body.add_child(lrow)
-		var lb := Button.new()
-		lb.theme_type_variation = "TextButton"
-		lb.text = tr("UI_BOOK_IN_THE_REGISTER")
-		lb.tooltip_text = str(p.link)
-		var link: String = str(p.link)
-		lb.pressed.connect(func():
-			DisplayServer.clipboard_set(link)
-			OS.shell_open(link))
-		lrow.add_child(lb)
+	var lrow := HBoxContainer.new()
+	body.add_child(lrow)
+	_link_button(lrow, str(p.get("link", "")), tr("UI_BOOK_IN_THE_REGISTER"))
 	_fill_plot_history(body, p.tunnus)
 	show_parcel.emit(p.tunnus)
 
@@ -353,6 +348,7 @@ func _fill_companies() -> void:
 		nb.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		nb.clip_text = true
 		nb.custom_minimum_size = Vector2(280, 0)
+		nb.tooltip_text = str(r.get("link", ""))
 		nb.pressed.connect(func(): open_parcel(str(r.tunnus)))
 		if str(r.get("health", "")) == "distressed":
 			nb.add_theme_color_override("font_color", BookTheme.RUBRIC)
@@ -526,6 +522,23 @@ func _num(text: String) -> Label:
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	return l
+
+
+## A link out to the register the row came from - the cadastre for a plot, the Business Register for
+## a company. The address is copied to the clipboard as well as opened, because a browser that is not
+## running yet sometimes swallows the first shell_open.
+func _link_button(parent: Node, url: String, label: String) -> Button:
+	if url == "":
+		return null
+	var b := Button.new()
+	b.theme_type_variation = "TextButton"
+	b.text = label
+	b.tooltip_text = url
+	b.pressed.connect(func():
+		DisplayServer.clipboard_set(url)
+		OS.shell_open(url))
+	parent.add_child(b)
+	return b
 
 
 ## "Guide" points the HUD arrow at the plot; "Go" jumps there (the teleport, like T and the map).

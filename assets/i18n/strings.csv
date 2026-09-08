@@ -273,3 +273,4 @@ UI_BUS_TIMETABLE,Sõiduplaan,Timetable
 UI_BUS_NEXT,Järgmised väljumised,Next departures
 UI_BUS_IN_MIN,%d min pärast,in %d min
 UI_BUS_NO_SERVICE,Selle peatuse sõiduplaani registris ei ole.,The register has no timetable for this stop.
+UI_BOOK_LOADING,Laadin…,Loading…
