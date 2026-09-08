@@ -61,6 +61,9 @@ its design documents in the repo root describe that version.
   (or `prepare_trees.gd -- --only=<name>` then `bake_impostors.tscn -- --only=<name>`) merges its meshes,
   prunes stray pieces beside the trunk, brightens the needles and bakes the impostor. `MODEL_HEIGHT` in
   terrain_builder.gd is the model's own height; instances scale to the canopy height, up to 6x.
+- Releases: add the entry to `CHANGELOG.md`, then `git tag -a vX.Y.Z` with the same summary as its
+  message and push the tag; `.github/workflows/build.yml` builds the three platforms and makes the
+  GitHub release from the tag's message plus the commits since the previous tag.
 - `make setup` once; `make test` before every commit (validates every pack, boots every pack, dev
   channel, traffic, streaming, the offline ledger and the two-client town test); `make lint`;
   `make export` for a macOS build.

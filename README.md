@@ -131,6 +131,8 @@ the same for any point from inside the game. A town is a SpacetimeDB database se
   each dataset is converted; [docs/visual-upgrade-plan.md](docs/visual-upgrade-plan.md): rendering steps and their status.
 - [docs/history/](docs/history/): the design, plan and language notes of the historical three-era game,
   which lives on at the tag `v0.9-historical`.
+- [CHANGELOG.md](CHANGELOG.md): what changed in each release. A release is an annotated `v*` tag;
+  pushing it builds the three platforms and attaches them to a GitHub release.
 
 ## Licence of the data
 
