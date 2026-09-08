@@ -25,7 +25,7 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   open source). Prefer CC0/MIT. Nothing from Fab/Megascans. Data files carry `attribution`.
 - Site content lives in `sites/<id>/`: `site.json` (manifest), `layout.json` (positions),
   `scenes.json` (the layer), `data/eras/era_2026.tres`, `parcels.json`, `buildings.json`,
-  `tenants.json`, `market.json`, `news.json`, `roads.json`, `strings.csv`. `make scenes SITE=<id>`
+  `tenants.json`, `market.json`, `news.json`, `roads.json`, `stops.json`, `departures.json`, `strings.csv`. `make scenes SITE=<id>`
   regenerates `sites/<id>/scenes/*.tscn`; do not hand-edit those scenes. Engine code (`scripts/`,
   `scenes/`) must not reference a site by name; go through `Sites` (manifest, `data_dir`, `layout`, `tile`).
 - Real names: the companies are real (legal persons only). News and notices are stored as headline,
@@ -52,7 +52,7 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
 - Buildings come from `tools/pipeline/fetch_buildings.py` (ETAK polygons + Building Register attributes +
   Geo3D LOD2 roofs) into `sites/<id>/buildings.json`; parcels with land values from `fetch_parcels.py`,
   tenants from `fetch_tenants.py`, the valuation medians from `market.py`, the headlines and official
-  notices from `news_feeder.py`.
+  notices from `news_feeder.py`, the bus lines and departure times from `fetch_departures.py`.
 - The tile service holds the pipeline modules in memory from the moment it started: after changing
   anything under `tools/pipeline/`, restart it (`pkill -f tools/tile_service.py`, then `tools/play.sh`
   or `make service`) or the next pack is built by the old code. Cached `.slim` register files are

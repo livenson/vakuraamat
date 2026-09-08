@@ -38,6 +38,18 @@ falls inside, up to six hundred metres out, and holds it for a moment when your 
 Saves keep only where you were: the place, the spot, the way you faced and the time of day.
 Saves from the game do not load.
 
+The bus stops tell the truth now, and buses keep it. The shelter's board used to carry five invented
+Tartu lines on a made-up cadence; it carries the timetable the public transport register publishes
+for that stop, hours down the side and minutes across, and E gives the next departures by the
+world's clock. Kvissentali turns out to be the end of lines 8 and 10; Palupera gets one bus a day to
+Elva, Otepää, Puka and Valga. A bus then turns up and runs the route, calling where the register
+says it calls. It drives at a bus's speed rather than the clock's, so the journey takes longer in
+game minutes than a real 8 would, but it leaves when it is supposed to.
+
+Two things that were plainly wrong and now are not: the shelter's timetable was printed mirrored,
+and most of the traffic was driving backwards - the model list that turns cars to face the way they
+travel had the Lada turned round and three of the commonest cars left out.
+
 ## v0.5.1 — 2026-09-08
 
 Some places could not be made into a world at all. Creating one would run to about three quarters

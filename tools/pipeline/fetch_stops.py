@@ -8,8 +8,9 @@ road_kind, road_name, refs}]} in local metres (x east from the tile's west edge,
 Each stop is moved onto the nearest road segment's edge: `yaw` is the heading (radians, Godot's -Z forward,
 clockwise-positive about Y) a shelter faces to look across that road, `side` +1/-1 which side of the
 segment it stands on. WGS84 <-> L-EST97 goes through pyproj.
-Estonia's national stop feed (peatus.ee GTFS) is offline in 2026 and the Tallinn feed covers Harju only, so
-OSM is the source; its ODbL licence asks for "© OpenStreetMap contributors" (THIRD_PARTY.md).
+OpenStreetMap is the source for where a shelter stands and which way it faces; its ODbL licence asks for
+"© OpenStreetMap contributors" (THIRD_PARTY.md). Which buses call there and when is a different question
+with a different answer: fetch_departures.py takes that from the public transport register's GTFS.
 """
 import argparse, json, math, os, sys, time, urllib.parse, urllib.request
 

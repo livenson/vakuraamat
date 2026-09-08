@@ -23,6 +23,9 @@ Business Register open data with Godot 4.7, GDScript and Terrain3D.
 - **Fly (F):** from the air the crosshair names the building under it, up to six hundred metres out.
 - **The news (N):** the region's real headlines and the official notices - planning procedures,
   auctions, bankruptcy proceedings - that name this place's streets, settlements or companies.
+- **The buses are the real ones:** the shelter's board carries the timetable the public transport
+  register publishes for that stop, and a bus turns up to run it. Kvissentali is the end of lines 8
+  and 10; Palupera gets one a day to Elva, Otepää, Puka and Valga.
 - **Walk in:** every real building has a door; inside is generated from its footprint and register
   data (storeys, rooms, stairs, window rhythm) and furnished by use.
 - **Know your tenants:** every company carries what the Business Register and the Tax Board publish:
@@ -78,6 +81,7 @@ flowchart LR
   EMTA[Tax Board quarterly: taxes, turnover, employees]
   PRIA[PRIA field register WFS: fields and declared crops]
   OSM[OpenStreetMap: bus stops]
+  GTFS[Public transport register: lines, times, route geometry]
   RSS[ERR and Postimees RSS, Ametlikud Teadaanded]
   PH[Poly Haven CC0 textures]
   SKF[Sketchfab and Poly Pizza CC BY models: cars, lamps, shelters, trees, farm props]
@@ -90,6 +94,7 @@ flowchart LR
   ARI & EMTA --> FTE[fetch_tenants.py] --> TEJ[(tenants.json)]
   PRIA --> FF[fetch_fields.py] --> FJ[(fields_2026.json)]
   OSM & RJ --> FS[fetch_stops.py] --> SJ[(stops.json)]
+  GTFS & SJ --> FD[fetch_departures.py] --> DJ[(departures.json)]
   PJ & BJ --> FTE
   TILE --> EF[extract_features.py] --> WJ[(water and massing)]
   PH --> PHF[fetch_polyhaven.py] --> TEX[(ground and facade textures)]
@@ -101,6 +106,7 @@ flowchart LR
 
   REG & SCN & TEX & FJ & SJ & SKF --> GAME[Godot: terrain, buildings, interiors, roads, parcels, traffic, crops, bus stops]
   PJ & TEJ & MJ & NJ --> BOOK[The book: the cadastre, the companies, the place] --> GAME
+  DJ --> BUS[Shelter timetables and the buses that keep them] --> GAME
 ```
 
 The full table of sources, tools, outputs and readers, the make targets and the pipeline internals

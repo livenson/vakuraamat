@@ -277,6 +277,28 @@ them. Feeds and area names come from `parcels.json`'s `summary`; `sites/<id>/new
 override `feeds`, `names` and `notice_types`. For a standing feed, a launchd job or cron line running
 `make news-local SITE=<id>` every 15 minutes is enough.
 
+### Buses: the register's own timetable
+
+`make stops SITE=<id>` puts the shelters where OpenStreetMap has them; `make departures SITE=<id>`
+then asks the public transport register which buses actually call there. It downloads the national
+GTFS (one 52 MB zip for the country, cached a week under `data_raw/gtfs/`), keeps the stops that
+fall inside the tile, matches each to the pack's own OSM stop by position, and writes
+`sites/<id>/departures.json`: per line and direction, the destination, the route geometry through
+the tile, the stops it calls at and the departure times for a weekday, a Saturday and a Sunday.
+It is a separate file from `stops.json` on purpose - that one is derived from OpenStreetMap and
+carries ODbL's share-alike, which should not spread to the register's data.
+
+The town shelter's board is then repainted per stop with those times, hours down the side and
+minutes across, and `E` gives the readable version with the next departures by the world's clock. A
+`Buses` node in the era scene (written by `gen_era_scenes.py` beside `traffic` when the pack has a
+timetable) puts a bus on each route as its departure time comes round. A bus drives at a bus's
+speed rather than the clock's: a day passes in 150 real minutes, so a trip takes longer in game
+minutes than the register allows, but it leaves when it is supposed to.
+
+Two things about the feed, for whoever next touches the fetcher: `stops.txt` has columns named
+`lest_x` and `lest_y` holding the northing and the easting in that order, and `shapes.txt` has no
+projected columns at all, so route geometry goes through pyproj.
+
 ## Traffic and the bicycle
 
 The `traffic` node (`{"type": "traffic", "year": 2026, "density": 1.0, "max_agents": 40}`) builds a

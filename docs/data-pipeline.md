@@ -20,6 +20,7 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | Maa-amet cadastre, WFS `kataster:ky_kehtiv` | cadastral units: number, address, purpose, area, ownership, polygon, the 2022 taxation value | `tools/pipeline/fetch_parcels.py` | `sites/<id>/parcels.json` |
 | PRIA field register, WFS `pria_avalik:pria_pollud` and `pria_massiivid` on kls.pria.ee | farmed fields: polygon, the crop declared for this year's area aid | `tools/pipeline/fetch_fields.py` | `sites/<id>/fields_2026.json` (crops planted by `scripts/world/crops.gd`) |
 | OpenStreetMap, Overpass `highway=bus_stop` nodes (ODbL) | bus stops, snapped to the nearest ETAK road with a heading | `tools/pipeline/fetch_stops.py` | `sites/<id>/stops.json` (shelters by `RoadNetwork._bus_stops`) |
+| Public transport register GTFS (`eu-gtfs.remix.com` mirror of the national feed) | the lines calling at the tile's stops, their destinations, departure times per service day and the route geometry | `tools/pipeline/fetch_departures.py` | `sites/<id>/departures.json` |
 | derived from `parcels.json` (optional Maa-amet transaction export) | euro per m² medians by purpose | `tools/pipeline/market.py` | `sites/<id>/market.json` |
 | e-Business Register open data (daily CSV, CC BY 4.0) | companies matched to the tile's addresses | `tools/pipeline/fetch_tenants.py` | `sites/<id>/tenants.json` |
 | e-Business Register general data, persons and shareholders (daily JSON dumps, CC BY 4.0) | EMTAK activity and the sector, share capital, web address, annual-report employee counts, deletion date; board and shareholder counts and hashed ids (structure only, no names) | `tools/pipeline/register_extra.py` (slimmed once per download into `data_raw/ariregister/*.slim.jsonl`) | the same rows in `tenants.json` |
@@ -69,6 +70,7 @@ the menu and packs the result as a zip the game installs under `user://`.
 | `parcels.json` | `scripts/world/parcels.gd` (the book, the find bar, the map arrow), `parcel_kit.gd`, `parcel_marks.gd`, the K overlay |
 | `market.json` | the book's Place page: the 2022 taxation-value medians per purpose |
 | `stops.json` | `scripts/world/road_network.gd`: a bus shelter at each stop (Soviet-era on roads, small modern on streets), its board readable |
+| `departures.json` | `scripts/world/departures.gd`: the shelter's timetable board and its E sheet, and `bus_service.gd`, which puts a bus on the route at each departure |
 | `fields_2026.json` | `scripts/world/crops.gd`: rows of cereal, rape, potato, legume or maize plants on each declared field; grassland and fallow stay as the ground shows them |
 | `tenants.json` | `scripts/world/tenants.gd`, name plates, interiors (use of a building), the book |
 | `news.json` | `scripts/world/news.gd` -> `scripts/ui/news_panel.gd` |
@@ -120,6 +122,7 @@ bake). Large stable binaries (models, textures, addon binaries) are tracked with
 | `make props` | boundary stone, figures, prepared vegetation scenes | Blender scripts in `tools/blender` |
 | `make validate` | report | every `sites/*/` (no Godot) |
 | `make news-local SITE=<id>` | `sites/<id>/news.json` | ERR and Postimees RSS, Ametlikud Teadaanded |
+| `make departures SITE=<id>` | `sites/<id>/departures.json` | the register's GTFS (needs `make stops` first) |
 | `make test`, `make lint` | the headless suite; gdlint, ruff, shellcheck | |
 
 ## The terrain pipeline in detail

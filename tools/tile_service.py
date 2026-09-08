@@ -43,7 +43,7 @@ if getattr(sys, "frozen", False):
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the repository, or the bundle directory of the frozen sidecar (tools/service/build.sh)
 import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads, fetch_stops, fetch_tenants, fetch_fields, market  # noqa: E402
-import fetch_tile, news_feeder, validate_site  # noqa: E402
+import fetch_tile, fetch_departures, news_feeder, validate_site  # noqa: E402
 MIN_FREE_BYTES = 2 * 1024 ** 3   # a job needs raw sheets, the workspace and the zip: refuse under 2 GB
 ORTHO_BYTES = 6 * 1024 ** 2      # the WMS orthophoto JPEG (4096 px) and the small historical maps
 GEOCODER = "https://inaadress.maaamet.ee/inaadress/gazetteer?results=8&features=EHAK,TANAV,KATASTRIYKSUS,EHITISHOONE&address="
@@ -322,6 +322,9 @@ def refine_job(job, ws):
                               ["--project", ws, "--site", sid, "--raw-dir", paths.raw_root(), "--dem-res", "1", "--only-dem"])
         rstage("measured trees")
         with_deadline(f"{sid}: measured trees", 600, fetch_trees.fetch, sid, root=ws)
+        rstage("bus departures (public transport register)")
+        # the national GTFS is one 52 MB zip for the whole country, cached a week like the register dumps
+        with_deadline(f"{sid}: departures", 300, fetch_departures.fetch, sid, root=ws)
         rstage("news (RSS, Ametlikud Teadaanded)")
         # the notices feed is two national XML documents with a 180 s socket timeout each: generous
         # here because nothing waits on it any more, where it used to hold the pack for eight minutes
