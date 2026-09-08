@@ -890,14 +890,18 @@ func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String,
 		for pr in parcels:
 			if not pr.get("owners", []).is_empty():
 				c.draw_circle(origin + Vector2(pr.at) * k, 3.0, Color(1.0, 0.85, 0.3))
-	# legend: bottom right, one line per class
+	# legend: one line per class, in the page beside the map. The map is square and the panel is not,
+	# so there is a margin either side of it; putting the legend there stops it covering the plots it
+	# is explaining. Only if that margin is too narrow does it sit inside, bottom right, as it used to.
 	var items: Array = MapPalette.legend(_map_mode)
 	var title := tr("UI_MAP_MODE_" + _map_mode.to_upper())
 	var w := 150.0
 	for it in items:
 		w = maxf(w, font.get_string_size(tr(str(it[0])), HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x + 30.0)
 	var h := 20.0 + items.size() * 15.0
-	var box := Rect2(origin + Vector2(side - w - 8, side - h - 24), Vector2(w, h))
+	var margin := c.size.x - (origin.x + side)
+	var box := Rect2(origin + Vector2(side + 10, 0), Vector2(w, h)) if margin >= w + 14 \
+		else Rect2(origin + Vector2(side - w - 8, side - h - 24), Vector2(w, h))
 	c.draw_rect(box, Color(BookTheme.PAGE, 0.92))
 	c.draw_rect(box, BookTheme.INK, false, 1.0)
 	c.draw_string(font, box.position + Vector2(6, 14), title, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, BookTheme.INK)
