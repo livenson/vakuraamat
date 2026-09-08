@@ -8,7 +8,12 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
-## v0.6.0 — 2026-09-08
+## v0.6.1 — 2026-09-08
+
+Tagged v0.6.0 first, and it never built: the packaging step for the tile service still expected a
+directory that went with the economy, so all three platform builds stopped before they began and
+nothing was attached to that tag. Nothing about the game changed between the two — everything below
+is v0.6.0, with a build that runs.
 
 The game is gone. Vakuraamat is a digital twin now: the same square kilometre of real Estonian
 ground, the same real plots, buildings and companies, but nothing to buy, sell, bid on or build,
