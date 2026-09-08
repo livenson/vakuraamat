@@ -20,6 +20,7 @@ const WMS := "https://kaart.maaamet.ee/wms/ajalooline"
 # rather than to lose the layer. Try https first, in case a later engine fixes it.
 static var _scheme_ok := ""   # remembered for the session once one of them answers
 static var _busy: Dictionary = {}   # base path -> true while that picture is being fetched
+static var _answered := false       # did the last _fetch_image get any picture back at all?
 const PX := 200                  # thumbnail size, and the WMS request size
 const PAD := 12.0                # metres of context around the plot, so it is not edge to edge
 const MIN_SPAN := 60.0           # a tiny plot still gets a legible square
@@ -113,11 +114,56 @@ static func fetch(pack: String, tunnus: String, square: Rect2) -> Array:
 
 
 static func _fetch_one(layers: Array, square: Rect2, base: String) -> Texture2D:
-	var answered := false     # did any layer return a picture at all, blank or not?
+	var img := await _fetch_image(layers, square, base, PX)
+	if img != null:
+		DirAccess.rename_absolute(ProjectSettings.globalize_path(base + ".part"),
+				ProjectSettings.globalize_path(base + ".jpg"))
+		return ImageTexture.create_from_image(img)
+	# Only remember "nothing here" when the service actually answered and the square came back
+	# blank. A refused connection is not an answer: marking it would leave a plot opened once while
+	# offline with no history for good.
+	if _answered:
+		var f := FileAccess.open(base + ".none", FileAccess.WRITE)
+		if f:
+			f.close()
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(base + ".part"))
+	return null
+
+
+## The same square as one epoch's thumbnail, asked for at `px` instead of PX, for the large view.
+## Cached beside the thumbnail; null when it cannot be had, and the caller keeps the small one.
+static func fetch_large(pack: String, tunnus: String, label: String, square: Rect2, px: int) -> Texture2D:
+	var dir := "user://cache/plots/%s" % pack
+	var base := "%s/%s_%s@%d" % [dir, tunnus.replace(":", "_"), label, px]
+	var tex := _load(base + ".jpg")
+	if tex != null:
+		return tex
+	var epoch: Dictionary = {}
+	for e in EPOCHS:
+		if str(e.label) == label:
+			epoch = e
+			break
+	if epoch.is_empty() or _busy.has(base):
+		return null
+	_busy[base] = true
+	var img := await _fetch_image(epoch.layers, square, base, px)
+	_busy.erase(base)
+	if img == null:
+		return null
+	DirAccess.rename_absolute(ProjectSettings.globalize_path(base + ".part"),
+			ProjectSettings.globalize_path(base + ".jpg"))
+	return ImageTexture.create_from_image(img)
+
+
+## The first of `layers` that answers with a picture that has ground on it, at `px` square. Sets
+## `_answered` to whether anything answered at all, so the caller can tell "no coverage here" from
+## "the service could not be reached".
+static func _fetch_image(layers: Array, square: Rect2, base: String, px: int) -> Image:
+	_answered = false
 	for layer in layers:
 		var q := {
 			"SERVICE": "WMS", "VERSION": "1.3.0", "REQUEST": "GetMap", "LAYERS": layer, "STYLES": "",
-			"CRS": "EPSG:3301", "WIDTH": PX, "HEIGHT": PX, "FORMAT": "image/jpeg",
+			"CRS": "EPSG:3301", "WIDTH": px, "HEIGHT": px, "FORMAT": "image/jpeg",
 			# WMS 1.3.0 axis order for EPSG:3301 is northing, easting
 			"BBOX": "%f,%f,%f,%f" % [square.position.y, square.position.x,
 					square.position.y + square.size.y, square.position.x + square.size.x],
@@ -125,20 +171,9 @@ static func _fetch_one(layers: Array, square: Rect2, base: String) -> Texture2D:
 		var img := await _get_image(WMS + "?" + _query(q), base + ".part")
 		if img == null:
 			continue                                   # nothing answered: a transport failure, not an answer
-		answered = true
-		if not _has_ground(img):
-			continue                                   # a blank square: this campaign missed the plot
-		DirAccess.rename_absolute(ProjectSettings.globalize_path(base + ".part"),
-				ProjectSettings.globalize_path(base + ".jpg"))
-		return ImageTexture.create_from_image(img)
-	# Only remember "nothing here" when the service actually answered and the square came back
-	# blank. A refused connection is not an answer: marking it would leave a plot opened once while
-	# offline with no history for good.
-	if answered:
-		var f := FileAccess.open(base + ".none", FileAccess.WRITE)
-		if f:
-			f.close()
-	DirAccess.remove_absolute(ProjectSettings.globalize_path(base + ".part"))
+		_answered = true
+		if _has_ground(img):
+			return img                                 # else a blank square: this campaign missed the plot
 	return null
 
 

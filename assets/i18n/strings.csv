@@ -207,6 +207,7 @@ UI_LEDGER_ARREARS,võlg,arrears
 UI_LEDGER_BUILT,Ehitatud,Built
 UI_LEDGER_OVER_THE_YEARS,Krunt läbi aastate,This plot over the years
 UI_LEDGER_TODAY,täna,today
+UI_LEDGER_ENLARGE,Klõpsa suuremalt vaatamiseks,Click to see it larger
 UI_LEDGER_NEEDS,vajab,needs
 UI_LEDGER_CASH,Raha,Cash
 UI_LEDGER_OWNED,Maatükke,Plots owned

@@ -41,6 +41,10 @@ func detach_heavy() -> Array:
 		if group.name in STAGGERED:
 			for m in group.get_children():
 				group.remove_child(m)
+				# A detached member still points at the scene root as its owner, and adding it back
+				# warns that the owner is no longer its ancestor. Nothing reads owner at runtime
+				# (it is for packing a scene, which never happens here), so drop it.
+				m.owner = null
 				pending.append([group, m])
 	return pending
 

@@ -284,11 +284,10 @@ func _fill_plot_history(body: Node, tunnus: String) -> void:
 	strip.add_theme_constant_override("separation", 10)
 	body.add_child(strip)
 	var outline := PlotHistory.outline_in(poly, square, georef)
+	var all: Array = []          # what the viewer steps through, in the order they are shown
 	var now := PlotHistory.current(square, georef, Sites.tile_dir())
 	if now != null:
-		var t := PlotThumb.new()
-		strip.add_child(t)
-		t.setup(tr("UI_LEDGER_TODAY"), now, outline)
+		all.append({"label": tr("UI_LEDGER_TODAY"), "texture": now, "local": true})
 	var pending := PlotThumb.new()
 	strip.add_child(pending)
 	pending.setup_pending("…")
@@ -296,11 +295,33 @@ func _fill_plot_history(body: Node, tunnus: String) -> void:
 	if not is_instance_valid(strip) or not is_instance_valid(pending):
 		return   # the book was rebuilt or closed while the pictures were fetched
 	pending.queue_free()
-	for i in shots.size():
+	all = shots + all            # oldest first, the tile's own photograph last
+	for i in all.size():
 		var t := PlotThumb.new()
 		strip.add_child(t)
-		strip.move_child(t, i)   # oldest first, the tile's own photograph last
-		t.setup(str(shots[i].label), shots[i].texture, outline)
+		t.setup(str(all[i].label), all[i].texture, outline)
+		var at := i
+		t.picked.connect(func(): _open_plot_viewer(all, at, outline, square, tunnus))
+
+
+## Checks: open the strip's nth picture large, as clicking it does (--open=plot:<tunnus>#<n>).
+func debug_enlarge(index: int) -> void:
+	for strip in _pages["UI_LEDGER_PLOT"].find_children("*", "HBoxContainer", true, false):
+		var thumbs: Array = strip.get_children().filter(func(c): return c is PlotThumb)
+		if index < thumbs.size():
+			thumbs[index].picked.emit()
+			return
+
+
+## One year at the size of the page, stepped through with the years along the bottom or the arrow
+## keys. Laid over the whole screen rather than the book, so the picture is as large as it can be.
+func _open_plot_viewer(shots: Array, index: int, outline: PackedVector2Array, square: Rect2, tunnus: String) -> void:
+	var layer: Node = get_parent()
+	while layer and not (layer is CanvasLayer):
+		layer = layer.get_parent()
+	var v := PlotViewer.new()
+	(layer if layer else self).add_child(v)
+	v.open_at(shots, index, outline, square, Sites.active, tunnus)
 
 
 # ---------------------------------------------------------------- one plot

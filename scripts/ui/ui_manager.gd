@@ -1032,9 +1032,13 @@ func debug_open(which: String) -> void:
 		_map_mode = which.trim_prefix("map:")
 		_toggle(debug_map, _fill_debug_map)
 		return
-	if which.begins_with("plot:"):   # the book open on one plot: --open=plot:<tunnus>
-		ledger_panel.open_parcel(which.trim_prefix("plot:"))
+	if which.begins_with("plot:"):   # the book open on one plot: --open=plot:<tunnus>[#<year index>]
+		var arg := which.trim_prefix("plot:")
+		var at := arg.split("#")      # #0 also opens the plot's oldest photograph large, for checks
+		ledger_panel.open_parcel(at[0])
 		_open(ledger_panel)
+		if at.size() > 1:
+			get_tree().create_timer(4.0).timeout.connect(func(): ledger_panel.debug_enlarge(int(at[1])))
 		return
 	match which:
 		"journal": _toggle(journal, _fill_journal)
