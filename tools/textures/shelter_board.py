@@ -3,7 +3,11 @@
 (assets/vendor/sketchfab/bus_stop_town.glb, Ottto3ds, CC BY) and rewrites the glb in place.
 The game paints the nearest companies' poster over the second panel at runtime (RoadNetwork._poster).
 
-    python3 tools/textures/shelter_board.py [--flip]
+    python3 tools/textures/shelter_board.py [--mirror] [--flip]
+
+The panels sit on a constant-X plane whose U runs along +Z, so the atlas is read right to left and
+a board painted the obvious way comes out mirrored ("NAALPUDIOS"): --mirror paints it pre-flipped,
+which is how the shipped glb is baked. --flip is the same for the V axis, if a model ever needs it.
 """
 import io, json, struct, sys
 from PIL import Image, ImageDraw, ImageFont
@@ -13,7 +17,7 @@ PANELS = [(595, 690, 800, 1015), (812, 690, 1015, 1015)]   # in the 1024 px atla
 FONT = "/System/Library/Fonts/Helvetica.ttc"
 
 
-def board(w, h, flip):
+def board(w, h, flip, mirror=False):
     p = Image.new("RGBA", (w, h), (236, 236, 230, 255))
     d = ImageDraw.Draw(p)
     d.rectangle([0, 0, w, int(h * 0.12)], fill=(20, 60, 120, 255))
@@ -32,11 +36,16 @@ def board(w, h, flip):
             d.text((int(w * 0.06), yy), "  ".join(f"{6 + k * 5 + i:02d}:{m:02d}" for m in (5, 25, 45)), fill=(90, 90, 90, 255), font=f2)
             yy += int(h * 0.045)
         y = yy + int(h * 0.02)
-    return p.transpose(Image.FLIP_TOP_BOTTOM) if flip else p
+    if mirror:
+        p = p.transpose(Image.FLIP_LEFT_RIGHT)
+    if flip:
+        p = p.transpose(Image.FLIP_TOP_BOTTOM)
+    return p
 
 
 def main():
     flip = "--flip" in sys.argv
+    mirror = "--mirror" in sys.argv
     b = open(SRC, "rb").read()
     ln = struct.unpack_from("<I", b, 12)[0]
     j = json.loads(b[20:20 + ln])
@@ -50,7 +59,7 @@ def main():
     w, h = im.size
     for box in PANELS:
         x0, y0, x1, y1 = [int(v * w / 1024) for v in box]
-        im.paste(board(x1 - x0, y1 - y0, flip), (x0, y0))
+        im.paste(board(x1 - x0, y1 - y0, flip, mirror), (x0, y0))
     out = io.BytesIO()
     im.save(out, "PNG")
     new = out.getvalue()
@@ -68,7 +77,7 @@ def main():
     jb += b" " * ((4 - len(jb) % 4) % 4)
     glb = struct.pack("<III", 0x46546C67, 2, 12 + 8 + len(jb) + 8 + len(newbin)) + struct.pack("<II", len(jb), 0x4E4F534A) + jb + struct.pack("<II", len(newbin), 0x004E4942) + newbin
     open(SRC, "wb").write(glb)
-    print(f"[shelter_board] rewrote {SRC} ({len(glb)} bytes, flip={flip})")
+    print(f"[shelter_board] rewrote {SRC} ({len(glb)} bytes, mirror={mirror}, flip={flip})")
 
 
 if __name__ == "__main__":
