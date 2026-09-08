@@ -6150,15 +6150,6 @@ kit = "hedge"
 tunnus = "79514:036:0063"
 polygon = PackedVector2Array(8.5, 23.1, 27.6, 20.9, 20.2, -27.2, -27.7, -24.8, -24.8, 27.1)
 
-[node name="P79514_036_0065" type="Node3D" parent="Parcels"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 526.6, 0.0, 489.8)
-
-[node name="Kit" type="Node3D" parent="Parcels/P79514_036_0065"]
-script = ExtResource("4")
-kit = "hedge"
-tunnus = "79514:036:0065"
-polygon = PackedVector2Array(1.8, -14.3, -8.7, -1.8, -5.2, 2.3, 8.7, 14.2)
-
 [node name="P79514_036_0067" type="Node3D" parent="Parcels"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 740.5, 0.0, 324.1)
 
@@ -6806,33 +6797,6 @@ script = ExtResource("4")
 kit = "hedge"
 tunnus = "79514:037:0115"
 polygon = PackedVector2Array(-26.7, -7.2, -16.6, 20.4, 26.8, 4.7, -5.5, -20.4)
-
-[node name="P79514_037_0116" type="Node3D" parent="Parcels"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 265.0, 0.0, 579.9)
-
-[node name="Kit" type="Node3D" parent="Parcels/P79514_037_0116"]
-script = ExtResource("4")
-kit = "hedge"
-tunnus = "79514:037:0116"
-polygon = PackedVector2Array(-6.9, -15.3, -4.7, -4.9, -0.4, 16.1, 6.9, 14.6, 2.3, -7.4, 0.2, -16.1)
-
-[node name="P79514_037_0117" type="Node3D" parent="Parcels"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 272.4, 0.0, 614.9)
-
-[node name="Kit" type="Node3D" parent="Parcels/P79514_037_0117"]
-script = ExtResource("4")
-kit = "hedge"
-tunnus = "79514:037:0117"
-polygon = PackedVector2Array(-7.8, -18.9, 0.4, 20.3, 7.7, 18.7, -0.5, -20.4)
-
-[node name="P79514_037_0118" type="Node3D" parent="Parcels"]
-transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 284.0, 0.0, 678.7)
-
-[node name="Kit" type="Node3D" parent="Parcels/P79514_037_0118"]
-script = ExtResource("4")
-kit = "hedge"
-tunnus = "79514:037:0118"
-polygon = PackedVector2Array(-11.2, -43.5, 7.3, 45.1, 11.1, 26.4, -3.9, -45.1)
 
 [node name="P79514_037_0121" type="Node3D" parent="Parcels"]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 581.2, 0.0, 540.1)

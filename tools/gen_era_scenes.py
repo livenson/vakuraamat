@@ -57,6 +57,23 @@ def color(c):
 
 
 
+def mean_width(polygon):
+    """Twice the area over the perimeter: the width a plot of this shape has on average, in metres.
+    A square garden of 30 m gives 15, a 5 m allotment strip gives about 5, whatever its length or
+    how it bends. Rules use it to tell a plot from a ribbon; the register's own area cannot, since
+    a strip and a garden of the same area look alike in a number."""
+    n = len(polygon)
+    if n < 3:
+        return 0.0
+    a = p = 0.0
+    for i in range(n):
+        x1, y1 = polygon[i]
+        x2, y2 = polygon[(i + 1) % n]
+        a += x1 * y2 - x2 * y1
+        p += math.hypot(x2 - x1, y2 - y1)
+    return 0.0 if p <= 0 else abs(a) / p   # |a| / 2 is the area, so 2A/P is |a|/P
+
+
 def stripe_rows(ortho_path, size_m, polygon):
     """Regular rows in the orthophoto inside a parcel (solar parks, orchards, greenhouses): returns
     (period_m, row_angle_deg) when a strong periodic pattern with a 3-20 m period exists, else None.
@@ -259,7 +276,9 @@ class Scene:
     def parcels(self, units, rules, year, exclusions=(), ortho_path=None, size_m=1024):
         """Cadastral units -> kits by assets/data/parcel_rules.json (first matching rule; kit null = nothing).
         A rule with "needs_rows" only matches when the orthophoto shows regular rows on the unit
-        (solar parks); the kit then gets row_period and row_angle."""
+        (solar parks); the kit then gets row_period and row_angle. "min_width" is the unit's mean
+        width in metres (2 x area / perimeter), which keeps a kit meant for a garden off an
+        allotment strip of the same area."""
         sc = self.ext_res("Script", "res://scripts/world/parcel_kit.gd")
         self.group("Parcels", ".", 0, 0)
         n = 0
@@ -275,6 +294,8 @@ class Scene:
                 if "min_area" in r and area < r["min_area"]:
                     continue
                 if "max_area" in r and area > r["max_area"]:
+                    continue
+                if "min_width" in r and mean_width(u["polygon"]) < r["min_width"]:
                     continue
                 if r.get("ownership") and u.get("ownership") not in r["ownership"]:
                     continue

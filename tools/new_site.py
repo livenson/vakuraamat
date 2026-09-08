@@ -22,7 +22,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # have, and every installed pack older than this is rebuilt the next time the game meets it
 # (Sites.PACK_VERSION mirrors it; validate_site.py fails if the two drift).
 #   1: the tenants carry the register's general data, the Tax Board's figures and a sector
-PACK_VERSION = 1
+#   2: a garden hedge needs a garden - parcel kits skip a unit narrower than the rule's min_width,
+#      so allotment strips no longer fence themselves off one beside the other
+PACK_VERSION = 2
 sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar
