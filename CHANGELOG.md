@@ -8,6 +8,22 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
+## v0.5.1 — 2026-09-08
+
+Some places could not be made into a world at all. Creating one would run to about three quarters
+and then stop with "the world could not be created" and a line about register hashes — Pargi tn 17
+in Tartu was one, and any place with a foreign company among its tenants was liable to be another.
+
+Every company in the game keeps its owners as anonymous ids, never as names, so that companies
+sharing an owner can be linked without anyone being identified. Estonian holders already arrive that
+way. A holder registered abroad arrives as whatever that country's register calls them — the Paris
+commercial register writes "900 606 898 R. C. S. Paris" — and that text was being carried straight
+through, which the pack's own privacy check refused, correctly, by abandoning the whole job.
+
+Foreign identifiers are now turned into anonymous ids of the same kind before they are stored, so
+the link between co-owned companies still works and nothing readable is kept. Fourteen such holders
+exist in the national register; a place near any of them was unbuildable and now is not.
+
 ## v0.5.0 — 2026-09-08
 
 The land has a history now, and you can find your way around the town by typing.
