@@ -32,6 +32,7 @@ var codes_label: Label            # K: cadastral number, building codes, road, r
 var ledger_panel: LedgerPanel    # Tab: the town's book
 var _guide: Dictionary = {}      # {tunnus, pos, label}: the plot the HUD arrow points at
 var news_panel: NewsPanel        # N: the town feed
+var find_bar: FindBar            # /: find an address, a company or a street in the town
 var codes_on := false
 var _codes_lines: MeshInstance3D = null
 var _debug_canvas: Control
@@ -69,6 +70,25 @@ func _ready() -> void:
 			marks.flash(t))
 	ledger_panel.guide.connect(guide_to)
 	ledger_panel.teleport.connect(teleport_to)
+	find_bar = FindBar.new()
+	add_child(find_bar)
+	find_bar.setup()
+	find_bar.visible = false
+	# near the top rather than the middle: the world stays visible under it while you type
+	find_bar.set_anchors_and_offsets_preset(Control.PRESET_CENTER_TOP, Control.PRESET_MODE_MINSIZE)
+	find_bar.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	find_bar.grow_vertical = Control.GROW_DIRECTION_END
+	find_bar.offset_top += 110
+	find_bar.offset_bottom += 110
+	find_bar.guide.connect(func(tunnus: String, pos: Vector2, label: String):
+		_close()
+		if tunnus != "":
+			guide_to(tunnus)
+		else:
+			guide_to_point(pos, label))
+	find_bar.go.connect(func(_t: String, pos: Vector2, label: String):
+		_close()
+		jump_to_point(pos, label))
 	news_panel = NewsPanel.new()
 	add_child(news_panel)
 	news_panel.setup()
@@ -135,6 +155,24 @@ func teleport_to(tunnus: String) -> void:
 	if _guide.get("tunnus", "") == tunnus:
 		_guide = {}
 	show_notice(tr("NOTICE_TELEPORT") % [int(p.x), int(p.z)])
+
+
+## Point the arrow at a place that is not one of the town's plots - a street, or a building whose
+## plot the ledger does not carry - so the find bar can offer those too.
+func guide_to_point(at: Vector2, label: String) -> void:
+	var pos := Vector3(at.x, 0.0, at.y)
+	if world.terrain and world.terrain.data:
+		pos.y = world.terrain.data.get_height(pos)
+	_guide = {"tunnus": "", "pos": pos + Vector3(0, 1.5, 0), "label": label}
+	show_notice(tr("NOTICE_GUIDE_SET") % label)
+
+
+## Jump to a place by position, the same as teleport_to does by plot.
+func jump_to_point(at: Vector2, label: String) -> void:
+	player.set_pose(Vector3(at.x, 200.0, at.y), player.rotation.y, 0.0)
+	world._snap(player, 1.0)
+	_guide = {}
+	show_notice(tr("NOTICE_TELEPORT_TO") % label)
 
 
 ## World position the HUD arrow points at (the guided plot), or null.
@@ -423,6 +461,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		return
 	if event.is_action_pressed("ledger"):
 		_toggle(ledger_panel, ledger_panel.fill)
+	elif event.is_action_pressed("find"):
+		if _open_panel == find_bar:
+			_close()
+		else:
+			_close()
+			find_bar.open_at(Vector2(player.global_position.x, player.global_position.z))
+			_open(find_bar)
 	elif event.is_action_pressed("news"):
 		_toggle(news_panel, news_panel.fill)
 	elif event.is_action_pressed("buy_here"):
@@ -1052,6 +1097,16 @@ func debug_open(which: String) -> void:
 	if which.begins_with("map:"):   # the map in a company mode: --open=map:sector|size|health|age|owners
 		_map_mode = which.trim_prefix("map:")
 		_toggle(debug_map, _fill_debug_map)
+		return
+	if which.begins_with("find:"):   # the find bar with a query typed in: --open=find:<text>
+		find_bar.open_at(Vector2(player.global_position.x, player.global_position.z))
+		_open(find_bar)
+		find_bar.debug_type(which.trim_prefix("find:"))
+		return
+	if which.begins_with("plots:"):   # the book's plot list, filtered: --open=plots:<text>
+		ledger_panel.tabs.current_tab = 0
+		ledger_panel.debug_filter(which.trim_prefix("plots:"))
+		_open(ledger_panel)
 		return
 	if which.begins_with("plot:"):   # the book open on one plot: --open=plot:<tunnus>[#<year index>]
 		var arg := which.trim_prefix("plot:")

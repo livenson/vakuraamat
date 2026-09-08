@@ -27,6 +27,7 @@ const COLUMNS := [
 var world: Node3D
 var tabs: TabContainer
 var _filter := "all"
+var _query := ""
 var _sort := "address"
 var _sort_desc := false
 var _selected := ""
@@ -104,10 +105,39 @@ func _fill_parcels() -> void:
 			_filter = f
 			_fill_parcels())
 		row.add_child(b)
+	# a page holds 120 of a few hundred plots, so sorted by name you would see the As and never the
+	# rest: typing narrows the list instead of scrolling it
+	var find := LineEdit.new()
+	find.placeholder_text = tr("UI_LEDGER_FIND_PLACEHOLDER")
+	find.text = _query
+	find.custom_minimum_size = Vector2(260, 0)
+	find.right_icon = null
+	find.text_changed.connect(func(t: String):
+		_query = t
+		_fill_parcels())
+	row.add_child(find)
+	if _query != "":
+		var clear := Button.new()
+		clear.text = "×"
+		clear.pressed.connect(func():
+			_query = ""
+			_fill_parcels())
+		row.add_child(clear)
+	find.call_deferred("grab_focus")
+	find.call_deferred("set_caret_column", _query.length())
 	var player: Node3D = world.get_node_or_null("Player") if world else null
 	var pos := Vector2(player.global_position.x, player.global_position.z) if player else Vector2.ZERO
 	var rows: Array = Ledger.parcels().filter(func(p):
 		return (_filter == "all" and (p.sellable or int(p.owner_id) != 0)) or (_filter == "mine" and Ledger.is_mine(p.tunnus)) or (_filter == "sale" and p.for_sale))
+	if _query.strip_edges() != "":
+		# the address, the cadastral number, or a company registered on the plot
+		rows = rows.filter(func(p):
+			if PlaceSearch.score(str(p.get("address", "")), _query) > 0 or PlaceSearch.score(str(p.tunnus), _query) > 0:
+				return true
+			for t in Ledger.tenants_of(str(p.tunnus)):
+				if PlaceSearch.score(str(t.get("name", "")), _query) > 0:
+					return true
+			return false)
 	_sort_rows(rows, pos)
 	var grid := GridContainer.new()
 	grid.columns = 8
@@ -154,6 +184,8 @@ func _fill_parcels() -> void:
 		grid.add_child(_nav_buttons(tunnus))
 	if rows.size() > MAX_ROWS:
 		body.add_child(_lbl(tr("UI_LEDGER_MORE") % (rows.size() - MAX_ROWS), 13))
+	elif rows.is_empty():
+		body.add_child(_lbl(tr("UI_LEDGER_NO_MATCH") % _query, 14))
 
 
 ## Order the plot list by the chosen column. Addresses sort naturally - "Aruküla tee 9" before
@@ -344,6 +376,12 @@ func _fill_plot_history(body: Node, tunnus: String) -> void:
 	var strip := PlotStrip.new()
 	body.add_child(strip)
 	strip.setup(world, tunnus)
+
+
+## Checks: the plot list filtered by `text` (--open=plots:<text>).
+func debug_filter(text: String) -> void:
+	_query = text
+	fill()
 
 
 ## Checks: open the strip's nth picture large, as clicking it does (--open=plot:<tunnus>#<n>).

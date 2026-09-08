@@ -32,6 +32,11 @@ its design documents in the repo root describe that version.
 - Playtest loop: reports from F8 land in `user://reports/` (feed.log); `python3 tools/dev.py reload|restart|replay|
   teleport|screenshot` talks to the running debug game through `user://dev/commands.jsonl`
   (`DevChannel` autoload). See `docs/dev-loop.md`.
+- Pack files use `null`, not a missing key, for what a register does not say (71 of Kvissentali's
+  211 buildings have no year), and `Dictionary.get(key, default)` only substitutes the default when
+  the key is *absent*: `int(null)` then fails with "Nonexistent 'int' constructor" and takes the rest
+  of the loop with it. Read those fields through a helper that treats null as empty (`PlaceSearch._text`
+  and `_num` are the pattern).
 - Country data adapters: `tools/pipeline/sources.py` (Estonia implemented; add a class per country).
 - A pack for a new place is built in two passes. The job ships what the place needs to be walked in
   (the 5 m ground model, 4 MB a sheet against 75 MB for the 1 m one; the register, cadastre, roads,
@@ -85,7 +90,8 @@ its design documents in the repo root describe that version.
   L-shaped houses); the eave is the top of the longest wall face; window sills measure from the ground
   under each face. Test with a report replay: `-- --report=<json> --screenshot=...`.
 - World flags for checks: `--examine="<address part>"` opens a building's register sheet (E on its
-  wall), `--open=plot:<tunnus>#<n>` opens the plot page and enlarges the nth picture of its history,
+  wall), `--open=find:<text>` and `--open=plots:<text>` open the find bar and the book's plot list
+  with a query typed in, `--open=plot:<tunnus>#<n>` opens the plot page and enlarges the nth picture of its history,
   `--hour=<h>` sets the time of day (street lights and windows light after
   18:30), `--own=<tunnus>+<structure>` buys a plot in a fresh local book and builds on it.
 - Data sources, make targets and the terrain pipeline are documented in `docs/data-pipeline.md`; the

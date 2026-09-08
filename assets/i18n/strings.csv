@@ -75,7 +75,7 @@ BUILD_NO_MATERIALS,Materjali ei jätku.,Not enough materials.
 BUILD_COST,Hind: %s,Cost: %s
 UI_DEBUG_MAP,Silumiskaart,Debug map
 UI_DEBUG_MAP_HINT,Klõps kaardil: teleport. Hiir punkti kohal näitab nime. M sulgeb.,Click the map to teleport. Hover a dot for its name. M closes.
-UI_KEYS,E tegutse   Tab vakuraamat   B osta siin   N uudised   J päevik   L keel   M kaart   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   Tab vakuraamat   B buy here   N news   J journal   L language   M map   K codes   F fly   T teleport   H home   F8 report   Esc menu
+UI_KEYS,E tegutse   Tab vakuraamat   / otsi   B osta siin   N uudised   J päevik   L keel   M kaart   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   Tab vakuraamat   / find   B buy here   N news   J journal   L language   M map   K codes   F fly   T teleport   H home   F8 report   Esc menu
 MENU_SITE,Asukoht,Location
 UI_BUILDING_GROUND,Maa ehitatakse laserandmetest...,Building the ground from the laser data...
 MENU_NEW_LOCATION,Uus asukoht...,New location...
@@ -210,6 +210,17 @@ UI_LEDGER_TODAY,täna,today
 UI_LEDGER_ENLARGE,Klõpsa suuremalt vaatamiseks,Click to see it larger
 UI_LEDGER_SORT_BY,Järjesta: %s,Sort by %s
 UI_SHEET_OPEN_PLOT,Ava krunt vakuraamatus,Open the plot in the book
+UI_LEDGER_FIND_PLACEHOLDER,Otsi aadressi või ettevõtet,Find an address or a company
+UI_LEDGER_NO_MATCH,Midagi ei vasta otsingule "%s".,Nothing matches "%s".
+UI_FIND_PLOTS_ON,%d krunti,%d plots
+UI_FIND_PLACEHOLDER,Aadress, ettevõte või tänav,An address, a company or a street
+UI_FIND_HINT,Nooled valivad · Enter juhatab · Shift+Enter hüppab · Esc sulgeb,Arrows choose · Enter points the way · Shift+Enter jumps · Esc closes
+UI_FIND_NOTHING,Selles linnas ei leidu midagi sellist.,Nothing like that in this town.
+UI_FIND_KIND_PLOT,krunt,plot
+UI_FIND_KIND_BUILDING,hoone,building
+UI_FIND_KIND_COMPANY,ettevõte,company
+UI_FIND_KIND_STREET,tänav,street
+NOTICE_TELEPORT_TO,Hüppasid: %s,Jumped to %s
 UI_LEDGER_NEEDS,vajab,needs
 UI_LEDGER_CASH,Raha,Cash
 UI_LEDGER_OWNED,Maatükke,Plots owned
