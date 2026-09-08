@@ -31,19 +31,25 @@ func setup(label: String, tex: Texture2D, outline: PackedVector2Array) -> void:
 	year.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 
 
-## A placeholder of the same size, so the strip keeps its shape while the pictures arrive.
-## A slot for a picture that is still being fetched: the campaign's own label under it, so the strip
-## has its final shape and names while the pictures come in.
+## A slot for a picture that is still being fetched: the campaign's own year under it, so the strip
+## keeps its shape and names its years while the pictures arrive.
 func setup_pending(label: String, note: String = "") -> void:
-	var box := ColorRect.new()
-	box.color = Color(0, 0, 0, 0.06)
+	# The sized element is a plain Control the VBox stretches to SIZE, and both the wash and the word
+	# fill it: anchoring the label to the centre of a bare ColorRect put it on the box's top-left
+	# corner wherever the strip was not laid out by the book's own page.
+	var box := Control.new()
 	box.custom_minimum_size = Vector2(SIZE, SIZE)
 	add_child(box)
+	var bg := ColorRect.new()
+	bg.color = Color(0, 0, 0, 0.06)
+	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(bg)
 	if note != "":
 		var n := BookTheme.label(note, "DetailLabel", box)
-		n.set_anchors_preset(Control.PRESET_CENTER)
-		n.grow_horizontal = Control.GROW_DIRECTION_BOTH
-		n.grow_vertical = Control.GROW_DIRECTION_BOTH
+		n.set_anchors_preset(Control.PRESET_FULL_RECT)
+		n.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		n.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		n.add_theme_color_override("font_color", BookTheme.FADED)
 	var l := BookTheme.label(label, "DetailLabel", self)
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
