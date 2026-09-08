@@ -50,6 +50,21 @@ Two things that were plainly wrong and now are not: the shelter's timetable was 
 and most of the traffic was driving backwards - the model list that turns cars to face the way they
 travel had the Lada turned round and three of the commonest cars left out.
 
+Places you downloaded months ago catch up with the ones you download today. Most of them were
+gathered before the register enrichment worked, so their companies had no line of business, no
+staff, no standing — which is why the map's company layers washed those places in a single grey.
+A place now records which version of the data pipeline made it, and one that is behind is quietly
+gathered again: the registers are fetched afresh, the ground it already has is kept, and it takes
+seconds rather than the twenty minutes a full rebuild does. You are not made to wait for it. A
+neighbouring square is shown as it is and replaced when it is ready — never while you are standing
+on it or indoors there — and the rest are brought up to date in the background while you walk about.
+Storage says which places are behind and offers to fetch them now.
+
+The map's colours say what they are colouring. "Health" is the company on the plot, from the
+business register, the Tax Board and the reporting deadline — not the state of the building, which
+is what it read as; the layer is called company health now and the legend says where it comes from,
+as does the founding-year layer, which is the company's year and not the house's.
+
 ## v0.5.1 — 2026-09-08
 
 Some places could not be made into a world at all. Creating one would run to about three quarters

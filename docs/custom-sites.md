@@ -414,6 +414,7 @@ a start era without a register.
 ```jsonc
 {
   "id": "kvissentali",                    // must equal the directory name
+  "pipeline": 1,                          // which pipeline built the pack; see "Packs that know how old they are"
   "name_key": "SITE_KVISSENTALI",         // menu label
   "subtitle_key": "SITE_KVISSENTALI_SUBTITLE",
   "terrain": {
@@ -478,8 +479,35 @@ game's disk has under 1 GB free or the service's under 2 GB.
 The Storage section lists installed worlds with their size (site files, tile files and built region
 data, the downloaded zip), the streamed neighbour tiles (`t<E>_<N>` packs) as one line, the free
 space and the service cache (`GET /cache`). Remove moves a pack to the system trash after a second
-press; the current world cannot be removed. `tools/godot/menu_shot.tscn -- --locations --bottom
---query=<place>` screenshots the page.
+press; the current world cannot be removed. A pack an older pipeline built is marked out of date
+(the neighbour-tiles line carries the count, since every `t<E>_<N>` pack shares it) and carries a
+Refresh button that puts it in the rebuild queue. `tools/godot/menu_shot.tscn -- --locations
+--bottom --query=<place>` screenshots the page.
+
+## Packs that know how old they are
+
+A pack's `site.json` carries `"pipeline"`: the version of the pipeline that built it. `PACK_VERSION`
+in `tools/new_site.py` is the writer, `Sites.PACK_VERSION` the reader, and `make validate` fails if
+the two drift. A manifest without the key reads as 0 - older than anything - which is what makes
+every pack built before this existed get rebuilt.
+
+Bump `PACK_VERSION` when a stage starts producing something a pack cannot do without. On the next
+launch the game brings the older packs up to date:
+
+- **Anything not standing** goes through a queue on `Locator`, started from the main menu, one pack
+  at a time and quiet. It yields to any tile the player is waiting at an edge for.
+- **A tile that is standing** is loaded as it is and swapped afterwards
+  (`TileStreamer.refresh_tile`): the place is complete either way, and holding someone at an edge
+  for a rebuild they did not ask for would be the worse trade. The swap is refused while they are
+  standing in that tile or inside one of its rooms; the next tick tries again.
+- **The world's own tile** cannot be swapped from under a running world, so it is rebuilt at the
+  menu on the way in, behind a progress sheet.
+
+A refresh (`POST /tile` with `"refresh": true`) re-fetches the registers and keeps the ground that
+was already fetched, so it takes seconds to a couple of minutes rather than the twenty a forced
+rebuild takes - and because nothing under `user://tiles` changes, no Terrain3D region is added or
+removed and the ground the player can see never blinks. No progress is written down anywhere: the
+stamp in each manifest is the record.
 
 ## Companies: what the register and the Tax Board add
 

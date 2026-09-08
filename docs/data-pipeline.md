@@ -213,3 +213,16 @@ run `tools/tile_service.py` with the venv's Python instead. The service runs the
 feeder and the validation in-process (no subprocesses), and every download cache (sheets, register
 dumps, Tax Board, LOD2, trees) lives under one raw directory (`VAKURAAMAT_RAW_DIR`).
 
+`POST /tile` takes two flags that change what a job does to a pack that already exists:
+
+| flag | what it keeps | what it costs |
+|---|---|---|
+| neither | everything: the existing zip is handed back unchanged | seconds |
+| `"refresh": true` | the ground already fetched (the 1 m DTM, the trees); every register is fetched again | seconds to a couple of minutes |
+| `"force": true` | nothing; the workspace is removed and the whole pack rebuilt | about twenty minutes (the 1 m DTM alone is ~900 s, the trees ~600 s) |
+
+The game only ever sends `refresh`, and only for a pack whose `"pipeline"` stamp is older than the
+build expects - see **Packs that know how old they are** in `docs/custom-sites.md`. It installs the
+site files and leaves `user://tiles` alone, so a running world can swap the pack in without adding
+or removing a Terrain3D region.
+

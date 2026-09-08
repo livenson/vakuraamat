@@ -57,6 +57,14 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   anything under `tools/pipeline/`, restart it (`pkill -f tools/tile_service.py`, then `tools/play.sh`
   or `make service`) or the next pack is built by the old code. Cached `.slim` register files are
   keyed on `register_extra.SLIM_VERSION`; bump it when a slimmer changes.
+- Every pack records which pipeline built it as `"pipeline"` in its `site.json` (`PACK_VERSION` in
+  `tools/new_site.py`, mirrored by `Sites.PACK_VERSION`; `make validate` fails if the two drift).
+  **Bump it whenever a stage starts producing something a pack cannot do without** - a new field the
+  UI reads, a source added, a shape changed. Downloaded packs stamped lower than the build's number
+  are rebuilt: the tile the player is walking on is loaded first and swapped afterwards
+  (`TileStreamer.refresh_tile`), the rest go through `Locator`'s background queue. A refresh
+  re-fetches the registers and keeps the ground, so it costs seconds, not the twenty minutes a
+  forced rebuild does.
 - Service: `tools/tile_service.py` (packs for a point, port 8765) is a loopback Python server the game
   talks to through `Locator`. It is the only service.
 - Core UI strings stay in `assets/i18n/strings.csv`; place strings go in the pack's `strings.csv`
