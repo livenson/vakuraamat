@@ -1,14 +1,15 @@
-[gd_scene load_steps=17 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/props/examine_point.tscn" id="1"]
 [ext_resource type="Script" path="res://scripts/world/footprint_building.gd" id="2"]
 [ext_resource type="Script" path="res://scripts/world/road_network.gd" id="3"]
 [ext_resource type="Script" path="res://scripts/world/parcel_kit.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/world/traffic_system.gd" id="5"]
-[ext_resource type="Script" path="res://scripts/interaction/bicycle.gd" id="6"]
-[ext_resource type="PackedScene" path="res://assets/models/props/boundary_stone.glb" id="7"]
-[ext_resource type="PackedScene" path="res://assets/vegetation/tree_juniper.tscn" id="8"]
-[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="9"]
+[ext_resource type="Script" path="res://scripts/world/bus_service.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/interaction/bicycle.gd" id="7"]
+[ext_resource type="PackedScene" path="res://assets/models/props/boundary_stone.glb" id="8"]
+[ext_resource type="PackedScene" path="res://assets/vegetation/tree_juniper.tscn" id="9"]
+[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="10"]
 
 [sub_resource type="StandardMaterial3D" id="M1"]
 albedo_color = Color(0.300, 0.220, 0.140, 1)
@@ -39,7 +40,7 @@ albedo_color = Color(0.550, 0.530, 0.500, 1)
 roughness = 0.9
 
 [node name="era_2026" type="Node3D"]
-script = ExtResource("9")
+script = ExtResource("10")
 era_id = "era_2026"
 
 [node name="Landmark" type="Node3D" parent="."]
@@ -6921,9 +6922,13 @@ density = 1.0
 max_agents = 40
 metadata/no_snap = true
 
+[node name="Buses" type="Node3D" parent="."]
+script = ExtResource("6")
+metadata/no_snap = true
+
 [node name="Bicycle" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 503.0, 0, 513.0)
-script = ExtResource("6")
+script = ExtResource("7")
 
 [node name="Gate" type="Node3D" parent="."]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 359.0, 0.0, 496.0)
@@ -6969,7 +6974,7 @@ label_key = "LOC_WELL"
 [node name="KeepsakeStone" type="Node3D" parent="."]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 235.5, 0.0, 499.2)
 
-[node name="Stone" parent="KeepsakeStone" instance=ExtResource("7")]
+[node name="Stone" parent="KeepsakeStone" instance=ExtResource("8")]
 transform = Transform3D(0.9397, 0, 0.3420, 0, 1.0, 0, -0.3420, 0, 0.9397, 3, 0.0, 0)
 
 [node name="StoneExamine" parent="KeepsakeStone" instance=ExtResource("1")]
@@ -7003,22 +7008,22 @@ label_key = "LOC_LANDMARK"
 [node name="Orchard" type="Node3D" parent="."]
 transform = Transform3D(1.0000, 0, 0.0000, 0, 1.0, 0, -0.0000, 0, 1.0000, 359.0, 0.0, 496.0)
 
-[node name="Apple0" parent="Orchard" instance=ExtResource("8")]
+[node name="Apple0" parent="Orchard" instance=ExtResource("9")]
 transform = Transform3D(0.5000, 0, 0.0000, 0, 0.5, 0, -0.0000, 0, 0.5000, 0.0, 0.0, 0)
 
-[node name="Apple1" parent="Orchard" instance=ExtResource("8")]
+[node name="Apple1" parent="Orchard" instance=ExtResource("9")]
 transform = Transform3D(0.2722, 0, 0.5347, 0, 0.6, 0, -0.5347, 0, 0.2722, 4.5, 0.0, 0)
 
-[node name="Apple2" parent="Orchard" instance=ExtResource("8")]
+[node name="Apple2" parent="Orchard" instance=ExtResource("9")]
 transform = Transform3D(-0.4120, 0, 0.5659, 0, 0.7, 0, -0.5659, 0, -0.4120, 9.0, 0.0, 0)
 
-[node name="Apple3" parent="Orchard" instance=ExtResource("8")]
+[node name="Apple3" parent="Orchard" instance=ExtResource("9")]
 transform = Transform3D(-0.4937, 0, -0.0789, 0, 0.5, 0, 0.0789, 0, -0.4937, 13.5, 0.0, 0)
 
-[node name="Apple4" parent="Orchard" instance=ExtResource("8")]
+[node name="Apple4" parent="Orchard" instance=ExtResource("9")]
 transform = Transform3D(-0.1844, 0, -0.5710, 0, 0.6, 0, 0.5710, 0, -0.1844, 18.0, 0.0, 0)
 
-[node name="Apple5" parent="Orchard" instance=ExtResource("8")]
+[node name="Apple5" parent="Orchard" instance=ExtResource("9")]
 transform = Transform3D(0.4961, 0, -0.4939, 0, 0.7, 0, 0.4939, 0, 0.4961, 22.5, 0.0, 0)
 
 [node name="OrchardExamine" parent="Orchard" instance=ExtResource("1")]

@@ -241,6 +241,11 @@ class Scene:
         sc = self.ext_res("Script", "res://scripts/world/traffic_system.gd")
         self.node("Traffic", "Node3D", ".", f'script = ExtResource("{sc}")\nyear = {int(year)}\ndensity = {density}\nmax_agents = {int(max_agents)}\nmetadata/no_snap = true')
 
+    def buses(self):
+        """Scheduled buses on the routes of departures.json (scripts/world/bus_service.gd)."""
+        sc = self.ext_res("Script", "res://scripts/world/bus_service.gd")
+        self.node("Buses", "Node3D", ".", f'script = ExtResource("{sc}")\nmetadata/no_snap = true')
+
     def bicycle(self, name, x, z):
         """A parked bicycle the player can ride (scripts/interaction/bicycle.gd)."""
         sc = self.ext_res("Script", "res://scripts/interaction/bicycle.gd")
@@ -441,6 +446,9 @@ class Interpreter:
             elif t == "traffic":
                 if os.path.exists(os.path.join(self.site_dir, "roads.json")):
                     s.traffic(self.num(n.get("year", 2026), env), self.num(n.get("density", 1.0), env), self.num(n.get("max_agents", 40), env))
+                # the scheduled buses ride beside the ambient traffic, from the same node in scenes.json
+                if os.path.exists(os.path.join(self.site_dir, "departures.json")):
+                    s.buses()
             elif t == "bicycle":
                 x, z = self.pos(n.get("at"), env)
                 s.bicycle(name or "Bicycle", x, z)
