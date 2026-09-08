@@ -90,6 +90,17 @@ era switch, the terrain builder's stages, the interiors' door pass), so the line
 the game stood still. `python3 tools/dev.py perf` prints the spikes with the second before each;
 `perf all` the whole file. Add a mark wherever a new heavy step joins the frame.
 
+## The frame cap
+
+A still camera costs what a moving one does: the renderer re-encodes every draw call of the scene
+each frame whether anything moved or not, so an idle window burns a core. `WindowMode` caps the
+game at the screen's own refresh rate and drops it to 10 fps while the window is not focused (the
+log says `[window] max_fps <n> (focused|unfocused)` on each change). Runs that count frames -
+anything with `--screenshot=` or `--frames=` - and headless runs keep the uncapped loop, so the
+screenshot tools and the test suite are unaffected. Measuring a scene's real cost means reading
+`process` ms from `dev.py stats`, not the CPU percentage, which the cap and macOS window occlusion
+both move.
+
 ## Limits
 
 Godot's own "Synchronize Script Changes" only works for games launched from the editor, so this
