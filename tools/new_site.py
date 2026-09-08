@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Scaffolds a new town pack under sites/<id>/.
+"""Scaffolds a new site pack under sites/<id>/.
 
     python3 tools/new_site.py --id kvissentali --name "Kvissentali" --center 657600 6477150
         [--size 1024] [--template palupera] [--force]
@@ -7,9 +7,9 @@
 
 What you get: site.json (terrain centre, latitude/longitude, start, codex), layout.json (named spots
 around the tile centre), scenes.json (a landmark, the real footprints, roads, cadastral parcels, traffic,
-a bicycle), data/eras/era_2026.tres (the present-day layer on the orthophoto), data/structures copied
-from the template, and strings.csv. `make tile SITE=<id>` then fetches the ground, buildings, parcels
-with land values, tenants and the market snapshot; `make town SITE=<id>` opens it as a shared town.
+a bicycle), data/eras/era_2026.tres (the present-day layer on the orthophoto) and strings.csv.
+`make tile SITE=<id>` then fetches the ground, the buildings, the parcels with their taxation
+values, the companies registered on them and the valuation medians.
 The `--eras` option is accepted for the tile service and ignored: the present day is the only layer.
 """
 import argparse, csv, json, math, os, re, shutil, sys
@@ -187,7 +187,7 @@ def apply_anchors(site, anchors, root=ROOT):
 
 def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None, template="palupera",
              force=False, root=ROOT, template_root=ROOT, texture_mode="import", anchors=None, seed=None, block_ids=None):
-    """A present-day town pack. `eras`, `seed` and `block_ids` are accepted for older callers and ignored."""
+    """A present-day site pack. `eras`, `seed` and `block_ids` are accepted for older callers and ignored."""
     if not re.fullmatch(r"[a-z][a-z0-9_]*", site):
         sys.exit("--id must be lowercase letters, digits, underscores")
     site_dir = os.path.join(root, "sites", site)
@@ -237,13 +237,13 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None, te
     S("LOC_LANDMARK", "Maamärk", "The landmark"); S("LOC_FARMSTEAD", "Talu", "The farmstead")
     S(f"EX_LANDMARK_{y}", f"{name}: siit algab sinu raamat.", f"{name}: your book starts here.")
     S("CODEX_REAL_TITLE", "Päris", "Real"); S("CODEX_REAL", f"Maa: {name}, Maa- ja Ruumiameti kõrgusandmed, ortofoto, hooned, katastriüksused ja maa väärtused, meetri täpsusega.", f"The ground: {name}, from the Land Board's elevation data, orthophoto, buildings, cadastral units and land values, to the metre.")
-    S("CODEX_INVENTED_TITLE", "Välja mõeldud", "Invented"); S("CODEX_INVENTED", "Hinnad liiguvad, üürnikud jäävad võlgu ja perekonnad Kask, Tamm ja Lepik teevad pakkumisi mängu reeglite järgi; ükski tehing ei ole päris.", "Prices move, tenants fall behind and the Kask, Tamm and Lepik families bid by the game's rules; no deal is real.")
+    S("CODEX_INVENTED_TITLE", "Välja mõeldud", "Invented"); S("CODEX_INVENTED", "Majade seinad ja katused on taastatud ehitisregistri mõõtude ja Maa-ameti LOD2 mudeli järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.", "The walls and roofs are reconstructed from the Building Register's measurements and Maa-amet's LOD2 model; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one.")
     S("CODEX_DATA_TITLE", "Andmed", "Data"); S("CODEX_DATA", "Kaardiandmed: Maa- ja Ruumiamet 2026. %s" % CREDIT_ET, "Map data: Maa- ja Ruumiamet 2026. %s" % CREDIT_EN)
 
     # --- manifest + strings ---------------------------------------------------------------------------
     manifest = {
         "id": site, "name_key": SITE_KEY, "subtitle_key": f"{SITE_KEY}_SUBTITLE",
-        "description": f"{name}: generated town pack.",
+        "description": f"{name}: generated site pack.",
         "terrain": {"tile": tile, "center": [float(center[0]), float(center[1])], "size": size, "latitude": lat, "longitude": lon, "utc_offset": 3.0, "date": [2026, 9, 3]},
         "start": {"era": e, "spawn": layout["spawn"], "yaw_deg": yaw},
         "water": "water_2026.json", "buildings": "buildings_2026.json",
@@ -265,7 +265,7 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None, te
             json.dump([], open(p, "w"))
     print(f"[new_site] {os.path.relpath(site_dir, root)}: centre EPSG:3301 {center[0]:.0f} {center[1]:.0f} = {lat} N {lon} E")
     if root == ROOT:
-        print(f"[new_site] next: make tile SITE={site}   (ground, buildings, parcels, tenants, market, scenes), make validate, make town SITE={site}")
+        print(f"[new_site] next: make tile SITE={site}   (ground, buildings, parcels, tenants, market, scenes), then make validate")
     return site_dir
 
 

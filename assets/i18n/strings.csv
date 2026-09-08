@@ -2,7 +2,6 @@ keys,et,en
 UI_REGISTER_TITLE,Vakuraamat,The register
 UI_REGISTER_HINT,Vali lehekülg,Choose a page
 UI_JOURNAL,Päevik,Journal
-UI_LEDGER,Pearaamat,Ledger
 UI_MAPS,Kaardid,Maps
 UI_INVENTORY,Kott,Bag
 UI_ARTIFACTS,Ajast välja,Out of time
@@ -10,8 +9,8 @@ UI_LOCAL_ITEMS,Siit ja praegu,Here and now
 UI_EMPTY,(tühi),(empty)
 UI_CLOSE,Sulge,Close
 UI_CONTINUE,Edasi,Continue
-UI_NEW_GAME,Uus mäng,New game
-UI_CONTINUE_GAME,Jätka,Continue
+UI_NEW_GAME,Mine kohale,Go there
+UI_CONTINUE_GAME,Tagasi sinna,Back to where I was
 UI_QUIT,Välju,Quit
 UI_MENU,Menüü,Menu
 UI_SAVE_MENU,Salvesta ja mine peamenüüsse,Save and go to main menu
@@ -31,14 +30,12 @@ NOTICE_ERA,%s,%s
 UI_CHAPTER,%s. peatükk,Chapter %s
 UI_EPILOGUE,Epiloog,Epilogue
 UI_REGISTER_LOCKED,Sul pole veel raamatut.,You don't have the book yet.
-UI_LEDGER_EMPTY,Veel pole midagi muutunud.,Nothing has changed yet.
 UI_PLAY_AGAIN,Mängi uuesti,Play again
 MENU_LANGUAGE,Keel / Language,Keel / Language
 MENU_FULLSCREEN,Täisekraan,Fullscreen
 MENU_ON,sees,on
 MENU_OFF,väljas,off
 MENU_CREDIT,Kaardiandmed: Maa- ja Ruumiamet 2026,Map data: Maa- ja Ruumiamet 2026
-UI_PROMPT_USE,Tegutse,Act
 UI_CODEX,Mis on tõsi,What's real
 FARM_PLOT,Peenar,Plot
 FARM_PLANT,Külva,Sow
@@ -139,72 +136,17 @@ UI_LOADING_WORLD,%s laeb...,Loading %s...
 NOTICE_EDGE_PENDING,Sealpoolne maa on alles mõõtmisel – oota hetk,The land beyond is still being surveyed. Wait a moment
 NOTICE_EDGE_NONE,Sealpool kaarti ei ole,There is no map beyond here
 NOTICE_TILE_READY,Naaberala on valmis,The next stretch of land is ready
-CUR_EUR,€,€
-MONTH_1,jaanuar,January
-MONTH_2,veebruar,February
-MONTH_3,märts,March
-MONTH_4,aprill,April
-MONTH_5,mai,May
-MONTH_6,juuni,June
-MONTH_7,juuli,July
-MONTH_8,august,August
-MONTH_9,september,September
-MONTH_10,oktoober,October
-MONTH_11,november,November
-MONTH_12,detsember,December
-LEDGER_NO_MONEY,Raha ei jätku.,Not enough money.
-LEDGER_NO_MONEY_SHORT,Raha ei jätku: puudu %s.,Not enough money: %s short.
-LEDGER_NOT_FOR_SALE,See maatükk ei ole müügis.,This plot is not for sale.
-LEDGER_NOT_OWNER,See ei ole sinu maatükk.,This is not your plot.
-LEDGER_ALREADY_OWNER,See on juba sinu oma.,You already own this.
-LEDGER_NOT_BIDDABLE,Sellele maatükile ei saa pakkumist teha.,No bids can be made on this plot.
-LEDGER_NO_BID,Sellist pakkumist ei ole.,No such bid.
-LEDGER_BIDDER_BROKE,Pakkujal ei ole enam raha.,The bidder no longer has the money.
-LEDGER_NO_OBLIGATION,Sellist kohustust ei ole.,No such obligation.
-LEDGER_NO_STRUCTURE,Sellist ehitist ei ole.,No such structure.
-LEDGER_ALREADY_BUILT,See on juba ehitatud.,Already built.
-LEDGER_REQUIRES,Enne on vaja midagi muud ehitada.,Something else must be built first.
-LEDGER_WRONG_PURPOSE,See ei sobi selle maa sihtotstarbega.,This does not fit the plot's purpose.
-LEDGER_NO_ARREARS,Võlgnevusi ei ole.,No arrears.
-LEDGER_NO_PARCEL,Siin ei ole katastriüksust.,No cadastral unit here.
-LEDGER_NO_PARCEL_HERE,Sa ei seisa ühelgi maatükil.,You are not standing on a plot.
-LEDGER_NOT_SEEDED,Linn ei ole veel avatud.,The town is not open yet.
-LEDGER_NOT_JOINED,Sa ei ole linnaga liitunud.,You have not joined the town.
-LEDGER_HASH_MISMATCH,Sinu kaart erineb linna omast: genereeri ala uuesti.,Your map differs from the town's: regenerate the area.
-LEDGER_NOT_ADMIN,Ainult linna avaja saab seda teha.,Only the town's founder can do that.
-LEDGER_NOT_DEBUG,Ainult arenduslinnas.,Only in a development town.
-LEDGER_BAD_NAME,Nimi ei sobi.,That name will not do.
-LEDGER_OFFLINE_ONLY,Ainult võrguta mängus.,Only when playing offline.
-NOTICE_TOWN_ONLINE,Linnaga ühendatud: %s,Connected to the town: %s
-NOTICE_TOWN_OFFLINE,Linna ei leitud, mängid oma raamatuga.,No town found; playing with your own ledger.
-NOTICE_BOUGHT,Ostetud: %s,Bought: %s
-NOTICE_RENT,Üür laekus: %d €,Rent received: %d €
-NOTICE_TAX_DUE,Maamaks ootab maksmist: %d €,Land tax due: %d €
-NOTICE_BID_RECEIVED,Pakkumine maatükile %s: %d €,An offer for %s: %d €
-NOTICE_MONTH,Uus kuu: %s,A new month: %s
 UI_BOOK_TITLE,Vakuraamat,Vakuraamat
 UI_BOOK_PLOTS,Maatükid,Plots
 UI_BOOK_PLOT,Maatükk,Plot
-UI_LEDGER_PORTFOLIO,Varad,Portfolio
-UI_LEDGER_OFFERS,Pakkumised,Offers
-UI_LEDGER_TOWN,Linn,Town
-UI_LEDGER_FILTER_ALL,kõik,all
-UI_LEDGER_FILTER_MINE,minu,mine
-UI_LEDGER_FILTER_SALE,müügis,for sale
 UI_BOOK_COL_ADDRESS,Aadress,Address
 UI_BOOK_COL_PURPOSE,Sihtotstarve,Purpose
 UI_BOOK_COL_AREA,Pindala,Area
 UI_BOOK_COL_VALUE,Maa väärtus,Land value
-UI_LEDGER_COL_PRICE,Hind,Price
-UI_LEDGER_COL_OWNER,Omanik,Owner
-UI_LEDGER_COL_YIELD,Tulu,Yield
-UI_LEDGER_YOU,sina,you
 UI_BOOK_MORE,"… ja veel %d kaugemal","… and %d more further away"
 UI_BOOK_PICK,"Vali maatükk nimekirjast või seisa sellel ja vajuta B.","Pick a plot from the list, or stand on one and press B."
 UI_BOOK_REGISTERED_HERE,Siia registreeritud,Registered here
 UI_BOOK_NONE_REGISTERED,Ühtegi ettevõtet ei ole siia registreeritud.,No company is registered here.
-UI_LEDGER_ARREARS,võlg,arrears
-UI_LEDGER_BUILT,Ehitatud,Built
 UI_BOOK_OVER_THE_YEARS,Krunt läbi aastate,This plot over the years
 UI_BOOK_TODAY,täna,today
 UI_BOOK_ENLARGE,Klõpsa suuremalt vaatamiseks,Click to see it larger
@@ -222,45 +164,13 @@ UI_FIND_KIND_COMPANY,ettevõte,company
 UI_FIND_KIND_STREET,tänav,street
 NOTICE_TELEPORT_TO,Hüppasid: %s,Jumped to %s
 UI_IN_USE_SINCE,kasutusel alates %d,in use since %d
-UI_LEDGER_NEEDS,vajab,needs
-UI_LEDGER_CASH,Raha,Cash
-UI_LEDGER_OWNED,Maatükke,Plots owned
-UI_LEDGER_INCOME,Tulu,Income
-UI_LEDGER_FAVOURS,Teened,Favours
-UI_LEDGER_HEAT,Tähelepanu,Heat
-UI_LEDGER_REPUTATION,Maine,Reputation
-UI_LEDGER_OBLIGATIONS,Kohustused,Obligations
-UI_LEDGER_LAND_TAX,Maamaks,Land tax
-UI_LEDGER_PENALTY,Viivis,Penalty
-UI_LEDGER_DUE,tähtaeg,due
-UI_LEDGER_DONATE_HINT,Anneta linnale (maine üles, tähelepanu alla):,Donate to the town (reputation up, heat down):
-UI_LEDGER_OFFERS_IN,Pakkumised minu maatükkidele,Offers on my plots
-UI_LEDGER_OFFERS_OUT,Minu pakkumised,My offers
-UI_LEDGER_MONTH,kuu,month
-UI_LEDGER_INDEX,Hinnaindeks,Price index
-UI_LEDGER_STATUS,Ühendus,Connection
-UI_LEDGER_OWNED_TOWN,Omanikuga maatükke,Plots with an owner
 UI_BOOK_SOURCES,"Kõik siinsed arvud on avaandmed, nagu registrid need annavad.","Every figure here is open data, as the registers give it."
-UI_ONLINE,võrgus: %s,online: %s
-UI_OFFLINE,võrguta (oma raamat),offline (own ledger)
-UI_PER_MONTH,/kuus,/month
 UI_SINCE,alates,since
 UI_TENANT_INACTIVE,ei tegutse,inactive
 UI_NEWS,Uudised,News
 UI_NEWS_EMPTY,Veel ei ole midagi juhtunud.,Nothing has happened yet.
 UI_CODES_TENANT,Üürnikud,Tenants
 UI_CODES_OWNER,Omanik,Owner
-BTN_BUY,Osta,Buy
-BTN_BID,Paku,Bid
-BTN_LIST,Pane müüki,List for sale
-BTN_UNLIST,Võta müügist,Unlist
-BTN_BUILD,Ehita,Build
-BTN_PRESS,Nõua võlg sisse,Collect arrears
-BTN_ARREARS,Tasu võlg,Settle arrears
-BTN_DONATE,Anneta,Donate
-BTN_PAY,Maksa,Pay
-BTN_ACCEPT,Nõustu,Accept
-BTN_WITHDRAW,Võta tagasi,Withdraw
 BTN_LINK,Ava link,Open link
 BTN_SHOW,Näita,Show
 PURPOSE_ELAMUMAA,elamumaa,residential
@@ -274,21 +184,12 @@ PURPOSE_SIHTOTSTARBETA_MAA,sihtotstarbeta maa,no purpose set
 PURPOSE_JAATMEHOIDLA_MAA,jäätmehoidla maa,waste
 PURPOSE_VEEKOGUDE_MAA,veekogude maa,water
 PURPOSE_KAITSEALUNE_MAA,kaitsealune maa,protected
-MENU_TOWN,Linn (ühine raamat),Town (shared ledger)
-MENU_TOWN_ADDRESS,"Linna aadress: %s  %s","Town address: %s  %s"
-MENU_TOWN_URL,Server,Server
-MENU_PLAY_OFFLINE,Mängi võrguta,Play offline
-MENU_COPY,Kopeeri,Copy
-MENU_COPIED,Kopeeritud.,Copied.
-MENU_SAVE,Salvesta,Save
-MENU_SAVED,Salvestatud.,Saved.
 BTN_GUIDE,Juhata,Guide
 BTN_GUIDE_TIP,Näita kompassil ja ekraanil teed selle maatükini,Point the compass and the screen marker at this plot
 BTN_TELEPORT,Mine,Go
 BTN_TELEPORT_TIP,Hüppa kohe sinna,Jump there now
 NOTICE_GUIDE_SET,Teejuht: %s,Guiding you to %s
 NOTICE_GUIDE_ARRIVED,Kohal: %s,You are at %s
-UI_ONLINE_BADGE,võrgus,online
 UI_PROMPT_SWITCH_ON,Lülita sisse,Switch on
 UI_PROMPT_SWITCH_OFF,Lülita välja,Switch off
 UI_PROMPT_CARRY,Tõsta,Carry

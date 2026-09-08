@@ -1,6 +1,6 @@
 keys,et,en
 SITE_KVISSENTALI,Kvissentali,Kvissentali
-SITE_KVISSENTALI_SUBTITLE,"Kvissentali: päris maa, päris väärtused.","Kvissentali: real plots, real values."
+SITE_KVISSENTALI_SUBTITLE,"Kvissentali: päris maa, päris registrid.","Kvissentali: real ground, real registers."
 ERA_1798_NAME,Aasta 1798,The year 1798
 ERA_1938_NAME,Aasta 1938,The year 1938
 ERA_2026_NAME,Aasta 2026,The year 2026
@@ -112,7 +112,7 @@ NOTICE_REGISTER_FOUND,Vakuraamat. Ava see (Tab) ja vali lehekülg.,The register.
 CODEX_REAL_TITLE,Päris,Real
 CODEX_REAL,"Maa: Kvissentali, Maa- ja Ruumiameti kõrgusandmed, ortofoto ja ajaloolised kaardid, meetri täpsusega.","The ground: Kvissentali, from the Land Board's elevation data, orthophoto and historical maps, to the metre."
 CODEX_INVENTED_TITLE,Välja mõeldud,Invented
-CODEX_INVENTED,"Inimesed, nende nimed ja lugu on kokku pandud lugude klotsidest; ükski neist ei kujuta päris inimest.","The people, their names and the story are assembled from story blocks; none depicts a real person."
+CODEX_INVENTED,"Majade seinad ja katused on taastatud ehitisregistri mõõtude ja Maa-ameti LOD2 mudeli järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.","The walls and roofs are reconstructed from the Building Register's measurements and Maa-amet's LOD2 model; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one."
 EX_LANDMARK_1798,Maamärk aastal 1798.,The landmark in 1798.
 POST_1798,Pood (1798),The shop (1798)
 POST_1798_TEXT,Ostetakse ja müüakse selle aasta raha eest.,Buying and selling for this year's money.
@@ -124,13 +124,3 @@ POST_2026,Pood (2026),The shop (2026)
 POST_2026_TEXT,Ostetakse ja müüakse selle aasta raha eest.,Buying and selling for this year's money.
 CODEX_DATA_TITLE,Andmed,Data
 CODEX_DATA,"Kaardiandmed: Maa- ja Ruumiamet 2026. Maa maksustamishind 2022: Maakataster, Maa- ja Ruumiamet. Ettevõtted: Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0). Teated: Ametlikud Teadaanded (ainult pealkiri ja link). Uudised: ERR ja Postimees (pealkirjad ja lingid).","Map data: Maa- ja Ruumiamet 2026. Land values 2022: the cadastre, Maa- ja Ruumiamet. Companies: e-Business Register open data, Centre of Registers and Information Systems (CC BY 4.0). Notices: Official Announcements (title and link only). News: ERR and Postimees (headlines and links)."
-STRUCT_KIOSK,Kiosk,Kiosk
-STRUCT_KIOSK_DESC,Väike müügikiosk krundi tänavapoolses servas.,A small sales kiosk at the street side of the plot.
-STRUCT_PARKING,Parkla,Parking
-STRUCT_PARKING_DESC,Kruusaga kaetud parkimisplats; iga hoone tahab seda.,A gravel parking area; every building wants one.
-STRUCT_SOLAR_TABLE,Päikesepaneelid,Solar array
-STRUCT_SOLAR_TABLE_DESC,"Rida päikesepaneele; toodab ka siis, kui üürnik ei maksa.",A row of solar panels; it produces even when the tenant does not pay.
-STRUCT_STORAGE_HALL,Laohall,Storage hall
-STRUCT_STORAGE_HALL_DESC,Kerge terashall rendipindadeks.,A light steel hall let as storage units.
-STRUCT_PLAYGROUND,Mänguväljak,Playground
-STRUCT_PLAYGROUND_DESC,"Kiik, liumägi ja pink; naabrid peavad sinust rohkem.","A swing, a slide and a bench; the neighbours think better of you."

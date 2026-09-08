@@ -78,7 +78,7 @@ EX_FIELD_1798,Ribapõllud. Iga riba on teise pere oma ja ükski pole nende endi.
 CODEX_REAL_TITLE,Tõestisündinud,Attested
 CODEX_REAL,"Maa: Palupera küla ja mõisa ümbrus, Maa- ja Ruumiameti kõrgusandmete ja ortofoto järgi, meetri täpsusega. Vakuraamat (Wackenbuch) oli mõisa register taludest ja kohustustest; 1798. aastal peeti seda saksa keeles. Liivimaa talupojad said perekonnanimed 1823–1826. 1919. aasta maaseadus võõrandas mõisad ja jagas maa asundustaludeks; Palupera mõisa peahoones tegutseb 1933. aastast kool. Nimede eestistamine oli 1935. aastast tasuta ja umbes 195 000 inimest vahetas nime.","The ground: the surroundings of Palupera village and manor, from the Land Board's elevation data and orthophoto, to the metre. The vakuraamat (Wackenbuch) was a manor's register of farms and obligations; in 1798 it was kept in German. Livonian peasants received surnames in 1823–1826. The 1919 Land Act expropriated the manors and divided the land into settler farms; a school has run in Palupera manor house since 1933. Estonianising surnames was free from 1935 and about 195,000 people changed theirs."
 CODEX_INVENTED_TITLE,Välja mõeldud,Invented
-CODEX_INVENTED,"Tõrvamäe mõis, parun von Tolkenau, Kaseoja pere ja kõik inimesed selles loos. Ühtki päris peret ega mõisat ei kujutata.","Tõrvamäe manor, the baron von Tolkenau, the Kaseoja family and every person in this story. No real family or manor is depicted."
+CODEX_INVENTED,"Majade seinad ja katused on taastatud ehitisregistri mõõtude ja Maa-ameti LOD2 mudeli järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.","The walls and roofs are reconstructed from the Building Register's measurements and Maa-amet's LOD2 model; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one."
 CODEX_WORDS_TITLE,Sõnad,Words
 CODEX_WORDS,"vakuraamat – mõisa register. adramaa – maaüksus, mida haris üks ader. kubjas – mõisa ülevaataja. maarahvas – nii nimetasid eestlased end enne 19. sajandi keskpaika; sõna „eestlane“ polnud 1798. aastal käibel. asundustalu – 1919. aasta maareformiga loodud talu. Kaseoja – kase oja; Birkenbach on sama nimi saksa keeles.","vakuraamat – a manor's register. adramaa – a unit of land, as much as one plough worked. kubjas – the manor's overseer. maarahvas – 'the country people', what Estonians called themselves before the mid-19th century; the word for 'Estonian' was not in use in 1798. asundustalu – a farm created by the 1919 land reform. Kaseoja – 'birch brook'; Birkenbach is the same name in German."
 CODEX_DATA_TITLE,Andmed,Data
@@ -139,13 +139,3 @@ OBJ_FIND_REGISTER,Leia vakuraamat varemetest (lõuna pool) ja võta see: E.,Find
 OBJ_VISIT_ERAS,Ava vakuraamat (Tab) ja käi kõigil kolmel lehel. Esimene leht on märgitud.,Open the register (Tab) and visit all three pages. The first page is marked.
 OBJ_MEET_1938,"1938: leia Aino talu juurest, Juhan põhjapõllult, maamõõtja mõisa eest.","1938: find Aino at the farm, Juhan on the north field, the surveyor outside the manor."
 OBJ_SIT,"Kui oled valmis, mine 2026. aastasse ja istu Leidaga tamme all.","When you are ready, go to 2026 and sit with Leida under the oak."
-STRUCT_KIOSK,Kiosk,Kiosk
-STRUCT_KIOSK_DESC,Väike müügikiosk krundi tänavapoolses servas.,A small sales kiosk at the street side of the plot.
-STRUCT_PARKING,Parkla,Parking
-STRUCT_PARKING_DESC,Kruusaga kaetud parkimisplats; iga hoone tahab seda.,A gravel parking area; every building wants one.
-STRUCT_SOLAR_TABLE,Päikesepaneelid,Solar array
-STRUCT_SOLAR_TABLE_DESC,"Rida päikesepaneele; toodab ka siis, kui üürnik ei maksa.",A row of solar panels; it produces even when the tenant does not pay.
-STRUCT_STORAGE_HALL,Laohall,Storage hall
-STRUCT_STORAGE_HALL_DESC,Kerge terashall rendipindadeks.,A light steel hall let as storage units.
-STRUCT_PLAYGROUND,Mänguväljak,Playground
-STRUCT_PLAYGROUND_DESC,"Kiik, liumägi ja pink; naabrid peavad sinust rohkem.","A swing, a slide and a bench; the neighbours think better of you."
