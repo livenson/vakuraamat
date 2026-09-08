@@ -234,6 +234,32 @@ def validate(site, rep, root=ROOT):
             for k in ("avaldaja", "andmeandja", "adressaat", "kinnitatud_sisu", "body", "description"):
                 if k in e:
                     rep.err(f"news.json {e.get('id')}: must not store {k}")
+    stops = load_json("stops.json", ("stops",))
+    stop_ids = {str(x.get("id")) for x in stops["stops"]} if stops else set()
+    dep = load_json("departures.json", ("attribution", "source", "fetched", "stops", "routes"))
+    if dep:
+        for x in dep["stops"]:
+            if str(x.get("stop")) not in stop_ids:
+                rep.err(f"departures.json: stop {x.get('stop')!r} is not in stops.json (re-run make stops, then make departures)")
+        for r in dep["routes"]:
+            who = f"departures.json {r.get('line')}/{r.get('headsign')}"
+            if not (str(r.get("line", "")) and isinstance(r.get("shape"), list) and len(r["shape"]) >= 2):
+                rep.err(f"{who}: needs a line and a shape of at least two points")
+            for c in r.get("calls", []):
+                if str(c) not in stop_ids:
+                    rep.err(f"{who}: calls at {c!r}, which is not in stops.json")
+            for day, times in (r.get("departures") or {}).items():
+                if day not in ("weekday", "saturday", "sunday"):
+                    rep.err(f"{who}: unknown service day {day!r}")
+                for t in times:
+                    if not re.fullmatch(r"[0-2]\d:[0-5]\d", str(t)):
+                        rep.err(f"{who}: {t!r} is not a HH:MM departure")
+            # the register names lines, destinations and times; nothing about a driver or a vehicle
+            for k in ("driver", "vehicle_id", "operator_contact", "phone", "email"):
+                if k in r:
+                    rep.err(f"{who}: must not store {k}")
+        if dep["routes"] and not any(r.get("departures") for r in dep["routes"]):
+            rep.warn("departures.json: routes without a single departure")
     market = load_json("market.json", ("by_purpose", "source"))
     if market:
         if not market["by_purpose"]:

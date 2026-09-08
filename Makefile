@@ -9,7 +9,7 @@ SITE ?= palupera
 TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
 CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
-.PHONY: help setup import tile scatter trees props test lint export clean-generated site era-maps features scenes validate tile-service buildings real-trees dev-watch parcels roads market tenants stops mcp branding service news-local
+.PHONY: help setup import tile scatter trees props test lint export clean-generated site era-maps features scenes validate tile-service buildings real-trees dev-watch parcels roads market tenants stops departures mcp branding service news-local
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, uv, git-lfs), the pipeline's Python venv (.venv-service), pull LFS files, first Godot import"
@@ -29,6 +29,7 @@ help:
 	@echo "make validate         check every site pack for broken references (no Godot needed)"
 	@echo "make tenants          match e-Business Register companies to the tile's parcels and buildings into sites/$(SITE)/tenants.json, with the register's general data and the Tax Board's quarters (first run downloads ~460 MB into data_raw/, cached a week)"
 	@echo "make stops            bus stops from OpenStreetMap snapped to the ETAK roads into sites/$(SITE)/stops.json"
+	@echo "make departures       the real lines and departure times at those stops from the public transport register's GTFS into sites/$(SITE)/departures.json (first run downloads 52 MB into data_raw/, cached a week)"
 	@echo "make mcp              build the Sketchfab MCP server for Claude Code (tools/mcp, token in sketchfab.token)"
 	@echo "make news-local       fetch the regional headlines and official notices about SITE into sites/$(SITE)/news.json"
 	@echo "make market           derive sites/$(SITE)/market.json (land value medians per purpose; XLSX=<maa-amet export> joins transaction statistics)"
@@ -53,6 +54,9 @@ import:
 
 stops:                          # bus stops from OpenStreetMap snapped to the ETAK roads (sites/<id>/stops.json)
 	$(PYTHON) tools/pipeline/fetch_stops.py --site $(SITE)
+
+departures:                     # real lines and times at those stops from the register's GTFS (sites/<id>/departures.json)
+	$(PYTHON) tools/pipeline/fetch_departures.py --site $(SITE) $(if $(REFRESH),--refresh)
 
 tile:
 	$(PYTHON) tools/pipeline/fetch_tile.py --site $(SITE)
