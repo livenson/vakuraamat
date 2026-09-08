@@ -152,10 +152,13 @@ def run_job(job):
     ws = os.path.join(WORKSPACE, sid)
     started = time.time()
 
+    marks = []   # (seconds since the job started, stage name): printed as a breakdown when it is ready
+
     def stage(name, frac):
         with LOCK:
             job["stage"] = name; job["progress"] = frac
-        log(f"{sid}: {name}")
+        marks.append((time.time() - started, name))
+        log(f"{sid}: {name} [{time.time() - started:.0f} s]")
     try:
         free = shutil.disk_usage(WORKSPACE).free
         if free < MIN_FREE_BYTES:
@@ -267,6 +270,10 @@ def run_job(job):
         with LOCK:
             job.update(stage="ready", progress=1.0, done=True, zip=zpath)
         note_job(time.time() - started)
+        marks.append((time.time() - started, "ready"))
+        # what the wait was actually spent on, so a slow stage can be found without a profiler
+        spans = [(marks[i + 1][0] - marks[i][0], marks[i][1]) for i in range(len(marks) - 1)]
+        log(f"{sid}: stages " + ", ".join(f"{n} {d:.0f}s" for d, n in sorted(spans, reverse=True)[:8] if d >= 1))
         log(f"{sid}: ready ({os.path.getsize(zpath) / 1e6:.1f} MB, {time.time() - started:.0f} s)")
     except (Exception, SystemExit) as e:  # noqa: BLE001 - report anything to the client (the tools sys.exit on bad input)
         traceback.print_exc()
