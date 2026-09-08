@@ -96,7 +96,10 @@ address, cadastral number or the name of a company registered there. *Plot* is o
 land registry number, when it was entered in the cadastre, where it is, the companies at it with
 what the register and the Tax Board publish, a link into the register, and the plot's own square out
 of every orthophoto flown over it since 1993. *Companies* is every company of the tile with a plot,
-biggest employers first, filtered by sector. *Place* is the pack itself: where it is, when its data
+biggest employers first, filtered by sector and sorted by any of its columns - click a heading for
+name, sector, employees, turnover or address, again to reverse; a figure column starts at its
+largest, a word column at its first letter, and a company the register says nothing about sorts
+last either way. *Place* is the pack itself: where it is, when its data
 was fetched, how many plots, buildings and companies it holds, the median taxation value per square
 metre by purpose (`market.json`), and every attribution its files carry.
 
@@ -535,7 +538,8 @@ The debug map (M) has a company layer: the Layer button cycles sector, employees
 and shared owners (`scripts/ui/map_palette.gd`, legend in the corner; `--open=map:<mode>` for a
 screenshot). The K overlay and the plot sheet list each tenant's activity, staff, turnover, taxes,
 board and health; the book's Companies page lists the tile's companies by employees with a sector
-filter (`--open=companies`). Interiors take their use from the biggest tenant's sector.
+filter and click-to-sort headings (`--open=companies`, `--open=companies:<name|sector|employees|turnover|address>`
+for a screenshot of one order). Interiors take their use from the biggest tenant's sector.
 
 In the world, a shop or café (sector trade or hospitality) gets a bracket sign with its name beside
 the door and a neon OPEN over it, lit in opening hours (`FootprintBuilding.set_props`, hours by

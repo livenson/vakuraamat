@@ -1110,6 +1110,11 @@ func debug_open(which: String) -> void:
 		if at.size() > 1:
 			get_tree().create_timer(4.0).timeout.connect(func(): book.debug_enlarge(int(at[1])))
 		return
+	if which.begins_with("companies:"):   # the company list sorted by one column: --open=companies:<name|sector|employees|turnover|address>
+		book.tabs.current_tab = 2
+		book.debug_sort_companies(which.trim_prefix("companies:"))
+		_open(book)
+		return
 	match which:
 		"journal": _toggle(journal, _fill_journal)
 		"map": _toggle(debug_map, _fill_debug_map)

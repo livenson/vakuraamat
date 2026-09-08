@@ -26,6 +26,16 @@ const COLUMNS := [
 	{"key": "", "by": "near", "right": false},
 ]
 
+# The companies list's columns. Same click-to-sort as the plot list; a figure column starts at its
+# largest (the biggest employer is what the page is read for), a word column at its first letter.
+const COMPANY_COLUMNS := [
+	{"key": "UI_BOOK_COL_COMPANY", "by": "name", "right": false},
+	{"key": "UI_BOOK_COL_SECTOR", "by": "sector", "right": false},
+	{"key": "UI_BOOK_COL_EMPLOYEES", "by": "employees", "right": true},
+	{"key": "UI_BOOK_COL_TURNOVER", "by": "turnover", "right": true},
+	{"key": "UI_BOOK_COL_ADDRESS", "by": "address", "right": false},
+]
+
 var world: Node3D
 var tabs: TabContainer
 var _query := ""
@@ -33,6 +43,8 @@ var _sort := "address"
 var _sort_desc := false
 var _selected := ""
 var _sector_filter := ""
+var _co_sort := "employees"
+var _co_desc := true
 var _pages: Dictionary = {}
 
 
@@ -288,6 +300,14 @@ func debug_filter(text: String) -> void:
 	fill()
 
 
+## Checks: the company list sorted by one column, as clicking its heading does
+## (--open=companies:<name|sector|employees|turnover|address>).
+func debug_sort_companies(by: String) -> void:
+	_co_desc = not _co_desc if _co_sort == by else by in ["employees", "turnover"]
+	_co_sort = by
+	fill()
+
+
 ## Checks: open the strip's nth picture large, as clicking it does (--open=plot:<tunnus>#<n>).
 func debug_enlarge(index: int) -> void:
 	for strip in _pages["UI_BOOK_PLOT"].find_children("*", "PlotStrip", true, false):
@@ -326,21 +346,31 @@ func _fill_companies() -> void:
 			fill())
 		bar.add_child(b)
 	var shown: Array = rows.filter(func(r): return _sector_filter == "" or str(r.get("sector", "")) == _sector_filter)
-	shown.sort_custom(func(a, b):
-		var ea := int(a.get("employees", 0) if a.get("employees") != null else 0)
-		var eb := int(b.get("employees", 0) if b.get("employees") != null else 0)
-		if ea != eb:
-			return ea > eb
-		return int(a.get("turnover", 0) if a.get("turnover") != null else 0) > int(b.get("turnover", 0) if b.get("turnover") != null else 0))
+	_sort_companies(shown)
 	var grid := GridContainer.new()
-	grid.columns = 5
+	grid.columns = COMPANY_COLUMNS.size()
 	grid.add_theme_constant_override("h_separation", 16)
 	grid.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	body.add_child(grid)
-	for h in ["UI_BOOK_COL_COMPANY", "UI_BOOK_COL_SECTOR", "UI_BOOK_COL_EMPLOYEES", "UI_BOOK_COL_TURNOVER", "UI_BOOK_COL_ADDRESS"]:
-		var hl := _lbl(tr(h), 13, GOLD)
-		hl.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-		grid.add_child(hl)
+	# the headings sort the list: click one to sort by it, again to reverse
+	for h in COMPANY_COLUMNS:
+		var hb := Button.new()
+		hb.flat = true
+		hb.theme_type_variation = "ColumnLabel"
+		for st in ["normal", "hover", "pressed", "focus", "disabled"]:
+			hb.add_theme_stylebox_override(st, StyleBoxEmpty.new())   # a button's padding would widen every column
+		hb.add_theme_color_override("font_color", GOLD)
+		hb.add_theme_color_override("font_hover_color", GOLD)
+		hb.text = tr(h.key) + ("  ↓" if _co_sort == h.by and not _co_desc else ("  ↑" if _co_sort == h.by else ""))
+		hb.alignment = HORIZONTAL_ALIGNMENT_RIGHT if h.right else HORIZONTAL_ALIGNMENT_LEFT
+		hb.tooltip_text = tr("UI_BOOK_SORT_BY") % tr(h.key)
+		var by: String = h.by
+		var starts_desc: bool = h.right
+		hb.pressed.connect(func():
+			_co_desc = not _co_desc if _co_sort == by else starts_desc
+			_co_sort = by
+			_fill_companies())
+		grid.add_child(hb)
 	for r in shown.slice(0, MAX_ROWS):
 		var nb := Button.new()
 		nb.text = str(r.get("name", ""))
@@ -369,6 +399,27 @@ func _fill_companies() -> void:
 		al.clip_text = true
 		al.custom_minimum_size = Vector2(200, 0)
 		grid.add_child(al)
+
+
+## Order the company list by the chosen column. A missing figure is not a zero: it sorts last
+## either way, so the rows the register says nothing about never head the page.
+func _sort_companies(rows: Array) -> void:
+	var num := func(r: Dictionary, field: String) -> float:
+		var v = r.get(field)
+		return -1.0 if v == null else float(v)
+	var key := func(r: Dictionary) -> Variant:
+		match _co_sort:
+			"name": return str(r.get("name", "")).to_lower()
+			"sector": return tr("SECTOR_" + str(r.get("sector", "")).to_upper()) if r.get("sector") else "\uffff"
+			"employees": return num.call(r, "employees")
+			"turnover": return num.call(r, "turnover")
+			_: return _address_key(str(r.get("address", "")), str(r.get("name", "")))
+	rows.sort_custom(func(a, b):
+		var ka = key.call(a)
+		var kb = key.call(b)
+		if ka == kb:
+			return str(a.get("name", "")).to_lower() < str(b.get("name", "")).to_lower()
+		return kb < ka if _co_desc else ka < kb)
 
 
 ## What the register and the Tax Board say about a company, on one line.
