@@ -2,7 +2,7 @@
 
 Everything place-specific in Vakuraamat is generated from open data. This page lists the sources,
 the tools that transform them, the files they produce and where the game reads them. The short
-version with a diagram is in the [README](../README.md#data-sources-and-how-they-become-a-town).
+version with a diagram is in the [README](../README.md#data-sources-and-how-they-become-a-place).
 
 ## Sources
 
@@ -22,11 +22,11 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | OpenStreetMap, Overpass `highway=bus_stop` nodes (ODbL) | bus stops, snapped to the nearest ETAK road with a heading | `tools/pipeline/fetch_stops.py` | `sites/<id>/stops.json` (shelters by `RoadNetwork._bus_stops`) |
 | derived from `parcels.json` (optional Maa-amet transaction export) | euro per m² medians by purpose | `tools/pipeline/market.py` | `sites/<id>/market.json` |
 | e-Business Register open data (daily CSV, CC BY 4.0) | companies matched to the tile's addresses | `tools/pipeline/fetch_tenants.py` | `sites/<id>/tenants.json` |
-| e-Business Register general data, persons and shareholders (daily JSON dumps, CC BY 4.0) | EMTAK activity and the game's sector, share capital, web address, annual-report employee counts, deletion date; board and shareholder counts and hashed ids (structure only, no names) | `tools/pipeline/register_extra.py` (slimmed once per download into `data_raw/ariregister/*.slim.jsonl`) | the same rows in `tenants.json` |
+| e-Business Register general data, persons and shareholders (daily JSON dumps, CC BY 4.0) | EMTAK activity and the sector, share capital, web address, annual-report employee counts, deletion date; board and shareholder counts and hashed ids (structure only, no names) | `tools/pipeline/register_extra.py` (slimmed once per download into `data_raw/ariregister/*.slim.jsonl`) | the same rows in `tenants.json` |
 | Tax Board "tasutud maksud" quarterly open data (EMTA) | taxes paid, turnover and employees per company per quarter, the activity sector | `register_extra.py` (`data_raw/emta/`) | `tenants.json`: `employees`, `turnover`, `taxes`, `quarters`, `health` |
 | Ametlikud Teadaanded bankruptcy proceedings | notices naming one of the tile's companies (registry code or name) | `tools/news_feeder.py` | `news.json` events on the company's parcel |
 | Maa-amet in-ADS gazetteer | address and place search | `tools/tile_service.py` (`/geocode`) | menu results |
-| ERR and Postimees RSS, Ametlikud Teadaanded | regional headlines, planning and auction notices | `tools/news_feeder.py` | town database events or `sites/<id>/news.json` |
+| ERR and Postimees RSS, Ametlikud Teadaanded | regional headlines, planning and auction notices | `tools/news_feeder.py` | `sites/<id>/news.json` |
 | Poly Haven (CC0) | ground and facade PBR textures | `tools/pipeline/fetch_polyhaven.py` | `assets/terrain/textures/`, `assets/textures/buildings/` |
 | Sketchfab (CC BY, via the MCP server, `make mcp`) and Poly Pizza (CC0 / CC BY) models | cars, street lamps, benches, bus shelters, the spruce and juniper, hay bales, tractor, farm plants; playground, boats, bathroom and stairs | downloaded, split with `tools/blender/split_glb.py`, listed in `assets/vendor/sketchfab/CREDITS.md` | `assets/vendor/sketchfab/`, `assets/vendor/polypizza/`, `assets/models/trees/spruce_src.glb` |
 
@@ -54,8 +54,6 @@ adapter interface are in `tools/pipeline/sources.py`; only Estonia is implemente
    scattered under them, places the measured trees and the statistical scatter with the Terrain3D
    instancer, and saves `data/terrain3d_00_00.res` and `terrain_assets.tres`.
 6. **Validation** (`make validate`): `tools/validate_site.py` checks every pack without Godot.
-7. **Town** (`make town`): `tools/town_admin.py` seeds a SpacetimeDB database from `parcels.json`,
-   `tenants.json` and `market.json`; `tools/news_feeder.py` posts the feed into it.
 
 The tile service (`tools/tile_service.py`) runs steps 1 to 6 for any point in Estonia on request from
 the menu and packs the result as a zip the game installs under `user://`.
@@ -68,11 +66,12 @@ the menu and packs the result as a zip the game installs under `user://`.
 | `data/terrain3d_00_00.res` | Terrain3D |
 | `buildings.json` | `scripts/world/footprint_building.gd` (walls, roofs, windows, chimneys), `scripts/world/interiors.gd` (rooms, furniture), the debug map (house numbers) |
 | `roads.json` | `scripts/world/road_network.gd` (ribbons, kerbs, street lights), the traffic graph, the debug map (street names) |
-| `parcels.json`, `market.json` | `scripts/world/parcel_kit.gd`, `scripts/world/parcel_marks.gd`, the ledger (`scripts/ledger/`), the K overlay |
+| `parcels.json` | `scripts/world/parcels.gd` (the book, the find bar, the map arrow), `parcel_kit.gd`, `parcel_marks.gd`, the K overlay |
+| `market.json` | the book's Place page: the 2022 taxation-value medians per purpose |
 | `stops.json` | `scripts/world/road_network.gd`: a bus shelter at each stop (Soviet-era on roads, small modern on streets), its board readable |
 | `fields_2026.json` | `scripts/world/crops.gd`: rows of cereal, rape, potato, legume or maize plants on each declared field; grassland and fallow stay as the ground shows them |
-| `tenants.json` | `scripts/world/tenants.gd`, name plates, interiors (use of a building), the ledger |
-| `news.json` or the town database | `scripts/ui/news_panel.gd` |
+| `tenants.json` | `scripts/world/tenants.gd`, name plates, interiors (use of a building), the book |
+| `news.json` | `scripts/world/news.gd` -> `scripts/ui/news_panel.gd` |
 | `scenes/era_2026.tscn` | `scripts/era/era_controller.gd` |
 
 ## Requirements (macOS)
@@ -85,7 +84,6 @@ the menu and packs the result as a zip the game installs under `user://`.
 | Python 3.12 venv with numpy, Pillow, rasterio, pyogrio, shapely, pyproj (`tools/service/requirements.txt`) | `.venv-service`, made by `make setup` (uv) | no system GDAL: the wheels carry it |
 | Blender | 5.2 LTS (only to regenerate props and trees) | `brew install --cask blender` |
 | Python 3 | any 3.9+ (stdlib only) | system |
-| SpacetimeDB | 2.10 CLI and a Rust toolchain (only for towns) | `make server` prints what is missing |
 
 QGIS is not needed: the whole clip and convert step is scripted with rasterio (`tools/pipeline/geo.py`). First open: run
 `godot --headless --path . --import` once (or open the project in the editor). Terrain3D's macOS
@@ -121,7 +119,7 @@ bake). Large stable binaries (models, textures, addon binaries) are tracked with
 | `make trees` | `assets/models/trees/*.glb`, `*_lod.tscn`, impostor atlases | Blender Sapling presets; a vendored `<name>_src.glb` (the Sketchfab spruce) wins over the generated tree and is merged, pruned and baked the same way |
 | `make props` | boundary stone, figures, prepared vegetation scenes | Blender scripts in `tools/blender` |
 | `make validate` | report | every `sites/*/` (no Godot) |
-| `make server`, `make town SITE=<id>`, `make news` | a local SpacetimeDB, a seeded town, the feed | the pack |
+| `make news-local SITE=<id>` | `sites/<id>/news.json` | ERR and Postimees RSS, Ametlikud Teadaanded |
 | `make test`, `make lint` | the headless suite; gdlint, ruff, shellcheck | |
 
 ## The terrain pipeline in detail
@@ -181,19 +179,16 @@ easting and northing so alignment can be checked against Maa-amet's map viewer.
 
 ```
 addons/terrain_3d/, addons/sky_3d/    vendored addons
-addons/SpacetimeDB/, spacetime_bindings/  the town client and its generated bindings
 assets/terrain/<tile>/               heightmap.r32, canopy.r32, ortho.jpg, trees.json, terrain_meta.json, data/
 assets/terrain/ortho_drape.gdshader  the orthophoto drape
 assets/vendor/                       Kenney kits, forest vegetation, MakeHuman figures (see THIRD_PARTY.md)
 sites/<id>/                          site pack: site.json, layout.json, scenes.json, *.json registers, scenes/, strings.csv
-scripts/autoload/                    Sites, GameState, Ledger, Locator, SaveManager, EventBus, Reporter, DevChannel
+scripts/autoload/                    Sites, GameState, Locator, SaveManager, EventBus, Reporter, DevChannel
 scripts/world/                       terrain, buildings, interiors, roads, parcels, traffic, figures
-scripts/ledger/                      the local book and the town client
 scripts/ui/                          the book theme, panels, HUD, menu
-server/vakuraamat/                   the SpacetimeDB module (Rust) and its pure rules crate
 tools/pipeline/                      the fetchers and derivations
 tools/godot/                         headless tools and tests
-tools/dev.py, tools/tile_service.py, tools/town_admin.py, tools/news_feeder.py
+tools/dev.py, tools/tile_service.py, tools/news_feeder.py
 data_raw/                            downloads and intermediates (git-ignored)
 ```
 

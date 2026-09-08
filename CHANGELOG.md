@@ -8,6 +8,36 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
+## Unreleased
+
+The game is gone. Vakuraamat is a digital twin now: the same square kilometre of real Estonian
+ground, the same real plots, buildings and companies, but nothing to buy, sell, bid on or build,
+no money, no months passing, and no shared town.
+
+What that means where you stand: the running head is the place and the time of day. The book (Tab)
+has four pages instead of six, all read-only. *Plots* is the cadastre — address, purpose, area, the
+2022 taxation value, the form of ownership — sortable by any of them and narrowed by typing an
+address, a cadastral number or the name of a company registered there. *Plot* is one unit's page,
+and it says more than it used to: its land registry number, when it was entered in the cadastre,
+the settlement and municipality, the companies at it, a link into the register itself, and the
+plot's own square out of every orthophoto flown over it since 1993. *Companies* is unchanged.
+*Place* is new — the pack itself, what it holds, when its data was fetched, what a square metre of
+each kind of land was valued at in 2022, and every source the figures come from.
+
+**B** opens the plot you are standing on rather than buying it. The news (N) is still the region's
+real headlines and the official notices that name this place. The journal (J) is the codex, which
+no longer claims that prices move and three invented families bid on your plots: what is invented
+here is the walls and roofs reconstructed from the Building Register, and the interiors, trees,
+traffic and passers-by.
+
+Flying over a place and reading the buildings below now works. It reached 120 metres before,
+against a camera that sees four kilometres, so from any real survey height nothing answered at all,
+and even in range it wanted an aim nobody can hold. The crosshair now names the nearest building it
+falls inside, up to six hundred metres out, and holds it for a moment when your aim slips.
+
+Saves keep only where you were: the place, the spot, the way you faced and the time of day.
+Saves from the game do not load.
+
 ## v0.5.1 — 2026-09-08
 
 Some places could not be made into a world at all. Creating one would run to about three quarters

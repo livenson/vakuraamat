@@ -160,14 +160,14 @@ year's orthophoto to the parcel's own polygon.
 *How it would work:* entirely from the WMS, one small `GetMap` per year per parcel (or one per tile,
 cropped locally to each polygon).
 
-*Strengths:* ties the imagery to the thing the game is about. You are buying a plot; here is what has
+*Strengths:* ties the imagery to the thing the twin is about. Here is a plot; here is what has
 happened on it in thirty years. It also gives the land value a story — a plot that was forest in 1998
 and a car park now says something a number does not.
 
 *Weaknesses:* the smallest, quietest version. Nobody will discover it by accident.
 
 *As built:* `scripts/ui/plot_history.gd` and `scripts/ui/plot_thumb.gd`, shown by
-`LedgerPanel._fill_plot_history`. Five campaigns (1993-2000, 2005, 2010, 2015, 2020) plus a crop of
+`BookPanel._fill_plot_history`. Five campaigns (1993-2000, 2005, 2010, 2015, 2020) plus a crop of
 the tile's own orthophoto as "today", each with the plot's boundary drawn on it. The newest costs
 nothing; the rest are one `GetMap` each, cached under `user://cache/plots`, so a plot fills in over
 a second the first time it is opened and instantly ever after. A campaign that did not fly over the
@@ -182,7 +182,7 @@ plot you own showing you its own history when you buy it.
 *Strengths:* the only version that is part of the game rather than beside it, and the one that could
 reward exploring.
 
-*Weaknesses:* the most design work by far, and it needs a reason to exist in the economy — a
+*Weaknesses:* the most design work by far, and it needs a reason to exist in the book — a
 collection with no consequence is a chore. Worth thinking about only after one of the others proves
 that the imagery is worth looking at at all.
 

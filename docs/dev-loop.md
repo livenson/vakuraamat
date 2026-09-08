@@ -6,7 +6,7 @@ Three pieces, all in debug builds (running from the project) and off in exported
 
 F8 grabs the frame as you see it, then opens a note box. *Send* writes to `user://reports/`:
 
-- `report_<time>.json`: your note, site, layer, month, cash, owned plots, position, yaw and pitch, what the crosshair
+- `report_<time>.json`: your note, site, layer, position, yaw and pitch, what the crosshair
   was on (node path, label, hover text, ids), interactables within 15 m, register buildings within
   25 m (name, year, materials), committed flags, artifacts, the last engine errors and warnings,
   the locale and FPS, and a `replay` command line;

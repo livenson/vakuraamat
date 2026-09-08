@@ -18,7 +18,6 @@ one pack exists. Saves record their site and switch to it on Continue.
 | `scenes.json` | the layer: landmarks, props, the real footprints, roads, parcels, traffic, the bicycle | hand |
 | `scenes/era_2026.tscn` | the generated layer scene (do not hand-edit) | `make scenes` |
 | `data/eras/era_2026.tres` | the one `EraDefinition`: id, year, scene, ground texture (the orthophoto) | scaffold |
-| `data/structures/*.tres` | what can be built on an owned plot: cost in euros, rent bonus, allowed purposes, prerequisite | copied from the template, then edited |
 | `parcels.json` | cadastral units with 2022 land values, purposes, ownership form, polygons | `make parcels` |
 | `buildings.json` | real buildings: footprints, register attributes, addresses, cadastral links, LOD2 roofs | `make buildings` |
 | `tenants.json` | Business Register companies matched to the plots and buildings | `make tenants` |
@@ -37,12 +36,11 @@ make site SITE=kvissentali NAME="Kvissentali" CENTER="657600 6477150"
 make tile SITE=kvissentali      # Maa-amet DTM, nDSM, orthophoto; Terrain3D import; vegetation; buildings,
                                 # parcels with land values, tenants, market, roads; scenes; validation  (~10 min, network)
 godot --path . -- --site=kvissentali
-make town SITE=kvissentali      # optional: open it as a shared town on the local SpacetimeDB
+make news-local SITE=kvissentali  # optional: the region's headlines and official notices
 ```
 
 `make site` writes a working town pack: a landmark near the spawn, the real footprints, roads,
-parcels, traffic and a bicycle, the template's structures, and the codex strings. Everything the
-economy needs comes from `make tile`.
+parcels, traffic and a bicycle, and the codex strings. Everything else comes from `make tile`.
 
 Choosing the centre: open the Maa-amet map (kaart.maaamet.ee), read the L-EST97 easting and
 northing of the point you want in the middle, or geocode an address with
@@ -80,61 +78,21 @@ Scripted equivalent: `curl -X POST :8765/tile -d '{"name":"Aakre","x":629807,"y"
 (`assets/data/suggested_places.json`), a place search (address, place name, coordinates, or your IP
 location), and the friends section.
 
-## Towns: the shared ledger
+## Reading the place
 
-A town is one SpacetimeDB database holding a tile's ledger: parcels with land values and prices,
-owners, tenants, bids, obligations, improvements, presence and the news feed. Nothing else is
-shared; every client regenerates the tile from Maa-amet data. The module lives in
-`server/vakuraamat/` (Rust, see its README); `make module` builds it, `make server` runs a local
-SpacetimeDB on 127.0.0.1:3300, and `make town SITE=<id>` publishes the module under the pack's town
-name and seeds it from `parcels.json`, `tenants.json`, the pack's structures and
-`assets/data/economy.json` through `tools/town_admin.py`. The town name (`tools/town_admin.py name`)
-encodes the tile centre and a hash of the pack's parcel and tenant files, so a regenerated pack is a
-new town and a client whose pack differs is refused. `DEBUG=1 make town` allows `grant_cash` for
-local play. The Godot client is the vendored `addons/SpacetimeDB` SDK with bindings generated into
-`spacetime_bindings/` (`godot --headless --path . --script res://addons/SpacetimeDB/cli.gd` after
-publishing the module as `vakuraamat`; commit the result).
+In the world, **Tab** opens the vakuraamat. *Plots* is the cadastre as a sortable, searchable list -
+address, purpose, area, the 2022 taxation value, the form of ownership - and typing narrows it by
+address, cadastral number or the name of a company registered there. *Plot* is one unit's page: its
+land registry number, when it was entered in the cadastre, where it is, the companies at it with
+what the register and the Tax Board publish, a link into the register, and the plot's own square out
+of every orthophoto flown over it since 1993. *Companies* is every company of the tile with a plot,
+biggest employers first, filtered by sector. *Place* is the pack itself: where it is, when its data
+was fetched, how many plots, buildings and companies it holds, the median taxation value per square
+metre by purpose (`market.json`), and every attribution its files carry.
 
-In the game, the `Ledger` autoload probes the server named in `user://settings.cfg` (`[town] url`,
-default `http://127.0.0.1:3300`; set it in the Locations panel's Town section or paste a friend's)
-for the pack's town when the world loads. If the town answers, the game joins it with the identity
-token kept in `[town] token`, subscribes to every table and plays online: purchases, bids, rents and
-months come from the server, other players walk around as blue figures with name plates, and the HUD
-says so. If it does not answer, or `[town] offline` is set, the same rules run in the offline book,
-which is what the save file holds. Only `scripts/ledger/town_ledger.gd` touches the SDK; `ledger_test`
-greps the rest. `town_test` starts a throwaway server on port 3777, publishes the prebuilt module,
-seeds Kvissentali and checks that two clients see each other's purchases, bids and presence; it
-reports a skipped pass when the CLI or the module build is missing.
-
-### Playing the ledger
-
-In the world, **V** opens the vakuraamat: the plots nearest to you with land value, price, owner and
-monthly yield (filters all / mine / for sale), one plot's card with Buy, Bid, List for sale, Build,
-Collect arrears, Settle arrears and Accept offer, your portfolio (cash, income, obligations to pay,
-favours, heat, reputation, donations), offers in and out, and the town's month, price index and
-connection. **B** opens the card of the plot you stand on. **N** is the town feed. Gold outlines on
-the ground are your plots, amber ones carry your open bid, blue ones nearby are for sale. Without a
-town server the same rules run in your own offline book (`LocalLedger`); a month passes every ten
-real minutes and pays rents, raises land tax and lets the Kask, Tamm and Lepik families bid on
-your plots. `--open=ledger` and `--open=news` work with `--screenshot`.
-
-### Hosting a town for friends
-
-The local server answers only on this machine. For a town others can join, publish the same module
-to SpacetimeDB's Maincloud (free tier) and point the game at it:
-
-```sh
-spacetime login                                     # once; opens the browser
-make town SITE=kvissentali SERVER=maincloud         # publish + seed the town there
-```
-
-Then set the server to `https://maincloud.spacetimedb.com` in the Locations panel's Town section and
-share the town address the panel shows; a friend pastes the server into their own Town section,
-generates the same tile (same centre, same pipeline) and joins. A pack whose `parcels.json` or
-`tenants.json` differs gets a `LEDGER_HASH_MISMATCH`; re-run `make parcels` and `make tenants` on both
-sides, or share the pack. Keep the news flowing with a scheduled `make news SITE=<id> SERVER=maincloud`
-(cron `*/15 * * * *`, or a launchd `StartInterval` of 900 with `SPACETIME_TOKEN` in its environment).
-SpacetimeDB's licence allows one production instance per project; Maincloud counts as that.
+**B** opens the plot you are standing on, **N** the news, **K** the codes overlay, **/** the find
+bar. `--open=book`, `--open=plots:<text>`, `--open=plot:<tunnus>#<n>`, `--open=companies`,
+`--open=place` and `--open=news` all work with `--screenshot`.
 
 ## The book: how the menus look
 
@@ -144,7 +102,7 @@ margin rule and for money owed; EB Garamond for titles and prose, IBM Plex Sans 
 numerals for buttons, tables and figures) and every top-level Control sets it. Use the type
 variations rather than font overrides: `TitleLabel`, `HeadLabel`, `SubheadLabel`, `ProseLabel`,
 `DetailLabel`, `ColumnLabel` for text, `PrimaryButton`, `TextButton`, `RowButton` for buttons. Money
-goes through `BookTheme.money()` (thousands grouped), dates through `Ledger.date_for()`. The front
+goes through `BookTheme.money()` (thousands grouped). The front
 page's plate (`scripts/ui/map_plate.gd`) draws the pack's cadastral units over its orthophoto and
 fills the saved book's plots. *Create the world* and *Install and play* freeze the Locations page under
 a progress sheet (the service's stage, a bar, the elapsed time; `Locator.progress(text, fraction)`)
@@ -208,7 +166,7 @@ the exterior. `--enter="<address part>"` (or `<address part>@<degrees>` to turn 
 screenshot run inside a building; the door's hover text shows the register's use, year and storeys.
 Doors, tenant name plates and interiors also attach to streamed neighbour tiles (their tenants come
 from that pack's `tenants.json` through `Tenants.of`); parcel outlines stay on the origin tile, whose
-ledger is the one town.
+book is the one place.
 
 ### Things you can use inside
 
@@ -307,17 +265,17 @@ unmatched street numbers, which is the loop for tuning the normaliser. Kvissenta
 
 ### News: the town feed
 
-`make news` (or `tools/news_feeder.py --once`) pulls the region's headlines (ERR items tagged Eesti,
+`make news-local` (or `tools/news_feeder.py --once`) pulls the region's headlines (ERR items tagged Eesti,
 Tartu Postimees and Lõuna-Eesti Postimees for Tartu county, ERR alone elsewhere) and Official
 Announcements of the planning and auction kinds whose address names the pack's settlement or
 municipality, and posts them into the town through the `post_event` reducer with the publisher's
 token. Only the headline or a composed notice title, the source, the date and the link are stored;
 notice bodies, publishers and addressees never are, and person-directed notice kinds are not fetched
-at all. `make news-local` writes the same items to `sites/<id>/news.json` (ignored by git) for offline
+at all. The items are written to `sites/<id>/news.json` (ignored by git)
 play. State lives in `data_raw/news/<town>.json` so reruns only add new items; `--dry-run` prints
 them. Feeds and area names come from `parcels.json`'s `summary`; `sites/<id>/news_config.json` can
 override `feeds`, `names` and `notice_types`. For a standing feed, a launchd job or cron line running
-`make news SITE=<id>` every 15 minutes is enough.
+`make news-local SITE=<id>` every 15 minutes is enough.
 
 ## Traffic and the bicycle
 
@@ -384,7 +342,7 @@ stay inside their tile's road graph.
 
 `tools/play.sh [--site=<id>] [--windowed]` (or `make play ARGS="..."`) starts the tile service
 (port 8765) and the world service (port 8766) if they are not running, keeps their logs under the
-user directory (`logs/tile_service.log`) and launches the game; the town server is `make server`. The game
+user directory (`logs/tile_service.log`) and launches the game. The game
 also starts either service itself when it runs from the source tree and the configured URL is
 local (`Locator.spawn_local`), so `godot --path .` works too; exported builds need a service URL
 in `settings.cfg` (`[service] url`, `worlds_url`).
@@ -478,9 +436,9 @@ and `{"type": "use", "fragment": "oak", "with": {"scale": 0.75, "year": 2026}}`.
 
 ## Rules that still hold
 
-The ledger is the only state that is shared or saved; everything a pack places in the world is
-regenerated from data. Structures a pack offers are `StructureDefinition`s with a euro cost, a rent
-bonus and the purposes they may stand on; the module and the offline ledger both validate them.
+Nothing is invented, owned or priced: every figure the book shows is a field of a pack file, and
+where a register says nothing the line is absent. Everything a pack places in the world is
+regenerated from data on every machine; a save holds only where you were standing.
 
 Every data source a pack uses gets a row in `THIRD_PARTY.md`; the Maa-amet attribution is
 shown in the menu and must stay, and the codex names the register, notice and news sources.
@@ -508,11 +466,10 @@ press; the current world cannot be removed. `tools/godot/menu_shot.tscn -- --loc
 services, public, culture), `capital`, `web`, `employees`, `turnover` (last four Tax Board
 quarters), `taxes`, `employees_hist`, `quarters`, `board_size`, `shareholders`, `owner_managed`,
 `owners` (the register's hashed person ids, used only to link companies sharing an owner; never
-shown), `deleted`, `report_overdue` and `health` (sound, watch, distressed). The strongest tenant
-moves a parcel's rent by 0.8 to 1.3 (`rules::tenant_factor_permille`, mirrored in
-`LocalLedger`). The register dumps are slimmed once per download; a tile job then takes seconds.
+shown), `deleted`, `report_overdue` and `health` (sound, watch, distressed). The register dumps are
+slimmed once per download; a tile job then takes seconds.
 `python3 tools/pipeline/fetch_tenants.py --site <id> --stats` prints the sector histogram.
-Offline play reads the pack's `news.json` into the book (the tile service writes one per world).
+The news panel reads the pack's `news.json` (the tile service writes one per world).
 
 The debug map (M) has a company layer: the Layer button cycles sector, employees, health, founded
 and shared owners (`scripts/ui/map_palette.gd`, legend in the corner; `--open=map:<mode>` for a

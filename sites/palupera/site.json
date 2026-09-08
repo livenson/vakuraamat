@@ -2,7 +2,7 @@
   "id": "palupera",
   "name_key": "SITE_PALUPERA",
   "subtitle_key": "MENU_SUBTITLE",
-  "description": "Palupera village square, Elva parish: 58 cadastral units around the old manor site, bought and rented on the real 2022 land values. The buildings and trees are real; the manor's story is over.",
+  "description": "Palupera village square, Elva parish: 58 cadastral units around the old manor site, with the 2022 taxation values the register gives them. The buildings and trees are real.",
   "terrain": {
     "tile": "palupera",
     "center": [

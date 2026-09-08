@@ -122,7 +122,6 @@ def validate(site, rep, root=ROOT):
 
     # --- registries
     eras = load_dir(site_dir, "eras", rep)
-    structures = load_dir(site_dir, "structures", rep)
     if not eras:
         rep.err("no eras in data/eras")
     elif len(eras) != 1:
@@ -146,12 +145,8 @@ def validate(site, rep, root=ROOT):
             rep.warn(f"era {eid}: scene_path {sp!r} is outside the site pack")
         if not os.path.exists(os.path.join(root, sp.replace("res://", "").replace("user://", ""))) and not (spec and eid in spec.get("eras", {})):
             rep.err(f"era {eid}: scene {sp} missing and scenes.json does not define it (make scenes)")
-    for sid, st in structures.items():
-        key(st.get("display_name_key"), f"structure {sid}"); key(st.get("description_key"), f"structure {sid}")
-        if st.get("requires") and st["requires"] not in structures:
-            rep.err(f"structure {sid}: requires unknown structure {st['requires']!r}")
     if not os.path.exists(os.path.join(site_dir, "parcels.json")):
-        rep.err("parcels.json missing (make parcels): the ledger has nothing to sell")
+        rep.err("parcels.json missing (make parcels): the book has no cadastre to show")
 
     # --- manifest rules
     start = m.get("start", {})
@@ -173,7 +168,7 @@ def validate(site, rep, root=ROOT):
     if m.get("water") and not os.path.exists(os.path.join(site_dir, m["water"])):
         rep.warn(f"water file {m['water']} missing (make features)")
 
-    # --- economy data: parcels with land values, the market snapshot
+    # --- register data: parcels with their taxation values, the valuation medians
     def load_json(name, required):
         path = os.path.join(site_dir, name)
         if not os.path.exists(path):

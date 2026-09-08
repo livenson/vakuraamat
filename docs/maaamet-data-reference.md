@@ -59,7 +59,7 @@ Estonian Land Board Open Data License — **free for commercial and non-commerci
 ### 1.10 Land valuation 2022 and transaction statistics
 - The cadastral WFS (`kataster:ky_kehtiv`) carries `maks_hind`, the taxation value of every unit from the
   2022 regular valuation (all 761k units valued from registry data, no site visits), refreshed nightly.
-  This is the economy game's baseline price per parcel. It is a taxation value, not a market price.
+  This is the value the book shows for a parcel. It is a taxation value, not a market price.
 - Maa-amet's transaction statistics environment (https://www.maaruum.ee/kinnisvara/htraru/) has
   settlement-level medians per property type since 1996, but only as XLSX exports from a query UI;
   no API. Statistics Estonia (IA028 housing price index, JSON API) and Eesti Pank rates are the

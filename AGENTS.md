@@ -3,32 +3,33 @@
 Read this before changing anything. `CLAUDE.md` points here; the human-facing overview is `README.md`.
 
 ## What this is
-A Godot 4.7 (GDScript) economy game on real Estonian terrain from Maa-amet open data: one 1 km²
-tile, its real cadastral units with 2022 land values, real buildings and real tenants (Business
-Register). The player buys, rents out and builds; a month passes every ten minutes; a town's ledger
-can be shared with other players through a SpacetimeDB module (`server/vakuraamat`). Every place is
-a **site pack** under `sites/<id>/` (Kvissentali is the first town, Palupera the rural second); the
-engine reads the active pack through the `Sites` autoload and never names a site.
-Authoring guide: `docs/custom-sites.md`. The historical three-era game is the tag `v0.9-historical`;
-its design documents in the repo root describe that version.
+A Godot 4.7 (GDScript) digital twin of real Estonian ground, built from Maa-amet open data: one
+1 km² tile, its real cadastral units with their 2022 taxation values, real buildings from the
+Building Register with LOD2 roofs, the companies registered at each address (Business Register),
+real roads, and every orthophoto flown over the place since 1993. You walk or fly through it and
+ask the registers what is around you. Every place is a **site pack** under `sites/<id>/`
+(Kvissentali is the first, Palupera the rural second); the engine reads the active pack through the
+`Sites` autoload and never names a site. Authoring guide: `docs/custom-sites.md`.
+Two earlier versions are tags: the historical three-era game is `v0.9-historical`, and the
+present-day economy game (buying, renting, a shared SpacetimeDB town ledger) ends at `v0.5.1`.
 
 ## Hard rules
-- The ledger is the only shared or saved game state. Terrain, buildings, trees, roads and traffic are
-  regenerated from data on every machine and never travel. `Ledger` (autoload) is the single entry
-  point; `scripts/ledger/local_ledger.gd` mirrors the module's rules offline, `town_ledger.gd` is the
-  only script allowed to touch the SpacetimeDB SDK (`ledger_test` greps the rest).
-- Every reducer in `server/vakuraamat` validates ownership and cash server-side; error strings are
-  `LEDGER_*` translation keys. Money is whole euros. Pure arithmetic lives in `server/vakuraamat/rules`
-  (cargo test) and must match `LocalLedger`.
+- Nothing is invented, owned, priced or bought. Every figure the UI shows is a field of a pack file;
+  where a register says nothing, the line is absent. Terrain, buildings, trees, roads and traffic are
+  regenerated from data on every machine, and a save is only where you were standing.
+- The cadastre is read through `Parcels`: `units(pack)` is one pack's own file in its local metres,
+  `all()` is every tile standing right now in world metres (a streamed neighbour's x/z shifted by its
+  tile offset), `by_tunnus()` finds one. Companies through `Tenants.of(pack, tunnus)`, headlines and
+  notices through `News.all()`. All three cache per file and are dropped by `GameState.reload()`.
 - Every third-party file gets a row in `THIRD_PARTY.md` in the same commit (the project will be
   open source). Prefer CC0/MIT. Nothing from Fab/Megascans. Data files carry `attribution`.
 - Site content lives in `sites/<id>/`: `site.json` (manifest), `layout.json` (positions),
-  `scenes.json` (the layer), `data/eras/era_2026.tres`, `data/structures`, `parcels.json`,
-  `buildings.json`, `tenants.json`, `market.json`, `roads.json`, `strings.csv`. `make scenes SITE=<id>`
+  `scenes.json` (the layer), `data/eras/era_2026.tres`, `parcels.json`, `buildings.json`,
+  `tenants.json`, `market.json`, `news.json`, `roads.json`, `strings.csv`. `make scenes SITE=<id>`
   regenerates `sites/<id>/scenes/*.tscn`; do not hand-edit those scenes. Engine code (`scripts/`,
   `scenes/`) must not reference a site by name; go through `Sites` (manifest, `data_dir`, `layout`, `tile`).
-- Real names: tenants are real companies (legal persons only). Grey-zone actions target plots, arrears
-  and money, never a named tenant; news and notices are stored as headline, source, date and link.
+- Real names: the companies are real (legal persons only). News and notices are stored as headline,
+  source, date and link, never as full text.
 - Playtest loop: reports from F8 land in `user://reports/` (feed.log); `python3 tools/dev.py reload|restart|replay|
   teleport|screenshot` talks to the running debug game through `user://dev/commands.jsonl`
   (`DevChannel` autoload). See `docs/dev-loop.md`.
@@ -50,16 +51,14 @@ its design documents in the repo root describe that version.
   after another.
 - Buildings come from `tools/pipeline/fetch_buildings.py` (ETAK polygons + Building Register attributes +
   Geo3D LOD2 roofs) into `sites/<id>/buildings.json`; parcels with land values from `fetch_parcels.py`,
-  tenants from `fetch_tenants.py`, the market snapshot from `market.py`.
+  tenants from `fetch_tenants.py`, the valuation medians from `market.py`, the headlines and official
+  notices from `news_feeder.py`.
 - The tile service holds the pipeline modules in memory from the moment it started: after changing
   anything under `tools/pipeline/`, restart it (`pkill -f tools/tile_service.py`, then `tools/play.sh`
   or `make service`) or the next pack is built by the old code. Cached `.slim` register files are
   keyed on `register_extra.SLIM_VERSION`; bump it when a slimmer changes.
-- Services: `tools/tile_service.py` (packs for a point, port 8765) is a loopback Python server the game
-  talks to through `Locator`; the town server is SpacetimeDB on 127.0.0.1:3300 (`make server`,
-  `make town SITE=<id>`); `tools/news_feeder.py` pushes real headlines and notices into a town.
-- Client bindings in `spacetime_bindings/` are generated by `addons/SpacetimeDB/cli.gd` from the
-  `vakuraamat` dev database and committed; regenerate after every schema change.
+- Service: `tools/tile_service.py` (packs for a point, port 8765) is a loopback Python server the game
+  talks to through `Locator`. It is the only service.
 - Core UI strings stay in `assets/i18n/strings.csv`; place strings go in the pack's `strings.csv`
   (imported to `.translation` next to it; `make import` after editing).
 - Generated data is not committed: `assets/terrain/*/data`, tree meshes and impostor atlases. Rebuild
@@ -74,7 +73,7 @@ its design documents in the repo root describe that version.
   message and push the tag; `.github/workflows/build.yml` builds the three platforms and makes the
   GitHub release from the tag's message plus the commits since the previous tag.
 - `make setup` once; `make test` before every commit (validates every pack, boots every pack, dev
-  channel, traffic, streaming, the offline ledger and the two-client town test); `make lint`;
+  channel, traffic, streaming, interiors, search); `make lint`;
   `make export` for a macOS build.
 - New location: `make site SITE=<id> NAME="..." CENTER="<easting> <northing>"` then `make tile SITE=<id>`
   (fetches DTM/nDSM/orthophoto/historical maps, builds terrain, derives buildings and water,
@@ -84,7 +83,7 @@ its design documents in the repo root describe that version.
   tools; scenes that need autoloads run as `godot --headless --path . res://tools/godot/<test>.tscn`.
 - zsh does not word-split unquoted variables: when looping over argument strings use `${=args}`.
 - Screenshots for visual checks: `godot --path . res://scenes/world/world.tscn -- --screenshot=/abs.png
-  --frames=400 --spawn=x,z,yaw --open=journal|map|menu|ledger|news|town --enter="<address part>"`;
+  --frames=400 --spawn=x,z,yaw --open=journal|map|menu|book|place|news|companies --enter="<address part>"`;
   add `--site=<id>` for another pack.
 
 ## Conventions and pitfalls
@@ -97,7 +96,7 @@ its design documents in the repo root describe that version.
   wall), `--open=find:<text>` and `--open=plots:<text>` open the find bar and the book's plot list
   with a query typed in, `--open=plot:<tunnus>#<n>` opens the plot page and enlarges the nth picture of its history,
   `--hour=<h>` sets the time of day (street lights and windows light after
-  18:30), `--own=<tunnus>+<structure>` buys a plot in a fresh local book and builds on it.
+  18:30), `--fly` starts in the air for a survey.
 - Data sources, make targets and the terrain pipeline are documented in `docs/data-pipeline.md`; the
   README only links there. Keep the README short.
 - Poly Pizza downloads cannot be scripted (403 on the file host); the user saves the glb by hand into
@@ -130,7 +129,7 @@ its design documents in the repo root describe that version.
 - Strings: `assets/i18n/strings.csv` (keys, et, en). Add keys, never hard-code text.
 - UI look: `BookTheme` (scripts/ui/book_theme.gd) is the one theme; new panels set `theme =
   BookTheme.theme()` and use its type variations (HeadLabel, DetailLabel, PrimaryButton, TextButton,
-  RowButton) instead of font or colour overrides; money through `BookTheme.money()`, no " · " joins.
+  RowButton) instead of font or colour overrides; euro figures through `BookTheme.money()`, no " · " joins.
 - A node added from a `SceneTree._init()` script enters the tree one frame later: `await process_frame`
   before touching Terrain3D objects. `assert()` does not stop headless tests; use the
   `_check()` helper pattern and the watchdog timer.
@@ -159,8 +158,9 @@ its design documents in the repo root describe that version.
 - Streamed tiles sit at a 1024 m offset: nodes must read pack files through
   `Sites.path_in(Sites.pack_of(self), ...)` and sample the terrain with `to_global(...)`; `Parcels.at`
   already resolves the tile. Never assume tile-local equals world coordinates. Tenant lookups go
-  through `Tenants.of(Sites.pack_of(node), tunnus)`, never `Ledger.tenants_of` on a node that may sit
-  on a neighbour tile; `TileStreamer.tile_ready` / `tile_unloaded` are the hooks for per-tile content.
+  through `Tenants.of(Sites.pack_of(node), tunnus)` and plots through `Parcels.all()` or
+  `Parcels.by_tunnus()`, which already carry the offset;
+  `TileStreamer.tile_ready` / `tile_unloaded` are the hooks for per-tile content.
 - Hot reload keeps instance state: a member variable added to a script is null on the live instance
   until restart, so guard new dictionaries and arrays (`if _cache == null: _cache = {}`), or `restart`.
 - `tools/dev.py` targets the newest game instance; while `make test` runs, its headless games are
@@ -188,7 +188,7 @@ its design documents in the repo root describe that version.
   stands; the runtime scatter never rewrites `terrain_assets.tres` (`save_assets` false), only `make tile` does.
 
 ## Tests
-`tools/godot/*_test.tscn`: boot (autoloads, the layer, offline ledger, save), site (every pack:
-registry, layer scene, translations, structures, ledger), userpack, devchannel, traffic, streaming,
-ledger (offline rules, isolation grep), town (two clients on a throwaway SpacetimeDB; skips without
-the toolchain). Keep them green. `tools/validate_site.py` checks pack references without Godot.
+`tools/godot/*_test.tscn`: parse, geotiff, search, boot (autoloads, the layer, the cadastre, a save
+round-trip), site (every pack: registry, layer scene, translations, plots, companies), userpack,
+devchannel, traffic, streaming (a synthetic neighbour tile, and the merged offset-aware `Parcels.all()`
+over both), interior. Keep them green. `tools/validate_site.py` checks pack references without Godot.

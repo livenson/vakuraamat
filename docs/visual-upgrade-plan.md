@@ -24,7 +24,7 @@ Spatial Gardener (overlaps Terrain3D's instancer).
 2. Integrate through the existing pipeline: trees and grass through `scatter_vegetation.gd`,
    ground through `ortho_drape.gdshader`, props through `gen_era_scenes.py`.
 3. Capture the same three views before and after (`tools/verify_spike.sh` style) and log FPS.
-4. Keep the tests green: `boot`, `playthrough`, `farming`, `hunting`, `economy`.
+4. Keep the tests green: `make test`.
 5. Commit per step with the FPS numbers in the message.
 
 ## Order
