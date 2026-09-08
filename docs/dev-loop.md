@@ -101,6 +101,29 @@ screenshot tools and the test suite are unaffected. Measuring a scene's real cos
 `process` ms from `dev.py stats`, not the CPU percentage, which the cap and macOS window occlusion
 both move.
 
+## What a frame costs, and where it went
+
+Draw calls, not simulation: a profile of the town pack (`sample` on the running game) put about half
+the main thread inside the Metal encoder - binding buffers and emitting render state, once per draw
+call. Two changes cut that (2026-09-08, `rahe_tn_24`, hour 14, same spawn):
+
+| | draw calls | objects | primitives | process ms |
+|---|---|---|---|---|
+| before | 5829-5966 | 6958-7093 | 12.6 M | 11.8-12.6 |
+| after | 1756 | 2499 | 5.1 M | 5.3-7.4 |
+
+- **Materials are shared** (`FootprintBuilding._shared`). Every building used to build its own wall,
+  roof, window and trim material, ~840 objects for a tile with 211 houses, so no two houses could
+  ever share a pipeline state. They are cached by what makes them differ; the lit window is one
+  material for the whole era layer instead of a copy per house (`EraController._lit_window`).
+- **Two shadow cascades, not four** (`world.gd`). Every cascade re-draws every caster standing in
+  it. The reach stays at 400 m: 250 m measured no better and left a flying camera looking at a town
+  with shadows only in the near gardens. Chimneys, solar panels and wells cast no shadow at all.
+
+Still on the table, in order: MultiMesh for the repeated props (a chimney is a CSG node and a draw
+call per house), merging each block's building shells into one mesh per material, occlusion culling
+(off today) with occluders baked from those merged meshes, and visibility ranges on the trim.
+
 ## Limits
 
 Godot's own "Synchronize Script Changes" only works for games launched from the editor, so this

@@ -137,19 +137,26 @@ func _collect_windows() -> void:
 
 
 ## A mesh's "Window" surfaces get the lit material; buildings built after the collection (their
-## geometry comes from a worker thread) call this when their mesh stands.
+## geometry comes from a worker thread) call this when their mesh stands. One material serves the
+## whole layer: every pane in a place lights at the same hour to the same strength, so a copy per
+## house bought nothing but a pipeline state per house.
 func register_windows(mi: MeshInstance3D) -> void:
 	if mi.mesh == null:
 		return
 	for si in mi.mesh.get_surface_count():
 		var m: Material = mi.mesh.surface_get_material(si)
 		if m is StandardMaterial3D and m.resource_name == "Window":
-			var w: StandardMaterial3D = m.duplicate()   # keeps the glass look (FootprintBuilding._window_material)
-			w.emission_enabled = true
-			w.emission = Color(1.0, 0.72, 0.4)
-			w.emission_energy_multiplier = _window_mats[0].emission_energy_multiplier if not _window_mats.is_empty() else 0.0
-			mi.set_surface_override_material(si, w)
-			_window_mats.append(w)
+			mi.set_surface_override_material(si, _lit_window(m))
+
+
+func _lit_window(base: StandardMaterial3D) -> StandardMaterial3D:
+	if _window_mats.is_empty():
+		var w: StandardMaterial3D = base.duplicate()   # keeps the glass look (FootprintBuilding._window_material)
+		w.emission_enabled = true
+		w.emission = Color(1.0, 0.72, 0.4)
+		w.emission_energy_multiplier = 2.5 if _windows_lit else 0.0
+		_window_mats.append(w)
+	return _window_mats[0]
 
 
 static var current_hour := 12.0

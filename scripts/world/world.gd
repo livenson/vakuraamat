@@ -390,7 +390,12 @@ func _configure_sky() -> void:
 	tod.game_time_enabled = true
 	if sky.sun:
 		# the sun's shadow: blended cascades and a normal bias against the swimming and the striping
-		# on walls that a moving camera shows with the default (unblended, unbiased) settings
+		# on walls that a moving camera shows with the default (unblended, unbiased) settings.
+		# Two cascades, not the default four: every cascade re-draws every caster standing in it,
+		# which on a street of houses is the largest multiplier on the frame. The reach stays at
+		# 400 m - shortening it is cheaper still, but a flying camera then looks down on a town
+		# with no shadows past the near gardens.
+		sky.sun.directional_shadow_mode = DirectionalLight3D.SHADOW_PARALLEL_2_SPLITS
 		sky.sun.directional_shadow_blend_splits = true
 		sky.sun.directional_shadow_max_distance = 400.0
 		sky.sun.shadow_bias = 0.04

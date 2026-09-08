@@ -619,6 +619,7 @@ func _details() -> void:
 		var m := StandardMaterial3D.new()
 		m.albedo_color = Color(0.5, 0.32, 0.26)
 		box.material = m
+		box.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		box.position = Vector3(c.x + 1.5, top + 0.3, c.y)
 		if not model.is_empty():
 			# on the LOD2 roof: at its highest vertex, nudged towards the centre, sunk half a metre in
@@ -641,6 +642,7 @@ func _details() -> void:
 		pm.metallic = 0.6
 		pm.roughness = 0.2
 		panel.material = pm
+		panel.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		panel.position = Vector3(c.x - 1.0, top + 0.2, c.y)
 		add_child(panel)
 	if well:
@@ -653,6 +655,7 @@ func _details() -> void:
 		rm.albedo_color = Color(0.55, 0.53, 0.5)
 		ring.material = rm
 		var ext := _extent()
+		ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		ring.position = Vector3(c.x + ext.x / 2 + 4.0, 0.3, c.y + ext.y / 2 + 2.0)
 		add_child(ring)
 
@@ -667,6 +670,23 @@ func _extent() -> Vector2:
 
 
 # ---------------------------------------------------------------- appearance from the register
+# Materials are shared between buildings, not built per building. The register gives a tile a few
+# dozen distinct looks (plaster, brick, logs, tin roof...), but a material of its own for every house
+# is a pipeline state of its own for every house, and pipeline state is what the renderer pays for
+# per draw call - the encoder work the profile shows on the main thread. Keyed by everything that
+# makes two materials differ; nothing mutates them in place (the lit window and the neon override
+# the surface instead), so one object can stand for every wall that looks the same.
+static var _materials: Dictionary = {}
+
+
+static func _shared(key: String, make: Callable) -> StandardMaterial3D:
+	var m = _materials.get(key)
+	if m == null:
+		m = make.call()
+		_materials[key] = m
+	return m
+
+
 func _tex(name: String) -> Texture2D:
 	return load(TEX + name + "_color.jpg")
 
@@ -676,17 +696,18 @@ func _nrm(name: String) -> Texture2D:
 
 
 func _textured(name: String, tint: Color, scale: float, rough := 0.9) -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
-	m.albedo_texture = _tex(name)
-	m.normal_enabled = true
-	m.normal_texture = _nrm(name)
-	m.albedo_color = tint
-	m.roughness = rough
-	m.uv1_triplanar = true
-	m.uv1_world_triplanar = false
-	m.uv1_scale = Vector3(scale, scale, scale)
-	m.cull_mode = BaseMaterial3D.CULL_DISABLED
-	return m
+	return _shared("tex:%s:%s:%.2f:%.2f" % [name, tint.to_html(), scale, rough], func() -> StandardMaterial3D:
+		var m := StandardMaterial3D.new()
+		m.albedo_texture = _tex(name)
+		m.normal_enabled = true
+		m.normal_texture = _nrm(name)
+		m.albedo_color = tint
+		m.roughness = rough
+		m.uv1_triplanar = true
+		m.uv1_world_triplanar = false
+		m.uv1_scale = Vector3(scale, scale, scale)
+		m.cull_mode = BaseMaterial3D.CULL_DISABLED
+		return m)
 
 
 ## Facade material text -> texture (Poly Haven CC0 sets, see tools/pipeline/fetch_polyhaven.py):
@@ -720,34 +741,39 @@ func _roof_material() -> StandardMaterial3D:
 		return _textured("thatch", roof_color.lightened(0.4), 0.6)
 	if "plekk" in r or "profiil" in r:
 		return _textured("metalroof", roof_color.lightened(0.3), 0.6, 0.5)
-	var m := StandardMaterial3D.new()
-	m.albedo_color = roof_color
-	m.cull_mode = BaseMaterial3D.CULL_DISABLED
-	if "plekk" in r:
-		m.metallic = 0.5
-		m.roughness = 0.45
-	else:
-		m.roughness = 0.95
-	return m
+	var tin := "plekk" in r
+	return _shared("roof:%s:%s" % [roof_color.to_html(), tin], func() -> StandardMaterial3D:
+		var m := StandardMaterial3D.new()
+		m.albedo_color = roof_color
+		m.cull_mode = BaseMaterial3D.CULL_DISABLED
+		if tin:
+			m.metallic = 0.5
+			m.roughness = 0.45
+		else:
+			m.roughness = 0.95
+		return m)
 
 
 func _window_material() -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
-	m.resource_name = "Window"
-	# glass: a dark tint under a mirror-like surface, so a pane shows the sky and the street
-	# instead of a black rectangle (there is no room behind it until the player steps in)
-	m.albedo_color = Color(0.08, 0.1, 0.13)
-	m.metallic = 0.9
-	m.metallic_specular = 1.0
-	m.roughness = 0.05
-	return m
+	return _shared("window", func() -> StandardMaterial3D:
+		var m := StandardMaterial3D.new()
+		m.resource_name = "Window"
+		# glass: a dark tint under a mirror-like surface, so a pane shows the sky and the street
+		# instead of a black rectangle (there is no room behind it until the player steps in)
+		m.albedo_color = Color(0.08, 0.1, 0.13)
+		m.metallic = 0.9
+		m.metallic_specular = 1.0
+		m.roughness = 0.05
+		return m)
 
 
 func _trim_material() -> StandardMaterial3D:
-	var m := StandardMaterial3D.new()
-	m.albedo_color = Color(0.93, 0.92, 0.88) if kind == "dwelling" else Color(0.3, 0.22, 0.16)
-	m.roughness = 0.8
-	return m
+	var dwelling := kind == "dwelling"
+	return _shared("trim:%s" % dwelling, func() -> StandardMaterial3D:
+		var m := StandardMaterial3D.new()
+		m.albedo_color = Color(0.93, 0.92, 0.88) if dwelling else Color(0.3, 0.22, 0.16)
+		m.roughness = 0.8
+		return m)
 
 
 # ---------------------------------------------------------------- windows and doors
