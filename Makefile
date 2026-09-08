@@ -9,7 +9,7 @@ SITE ?= palupera
 TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
 CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
-.PHONY: help setup import tile scatter trees props test lint export clean-generated site era-maps features scenes validate tile-service buildings real-trees dev-watch parcels roads market tenants stops mcp branding service module server town news news-local
+.PHONY: help setup import tile scatter trees props test lint export clean-generated site era-maps features scenes validate tile-service buildings real-trees dev-watch parcels roads market tenants stops mcp branding service news-local
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, uv, git-lfs), the pipeline's Python venv (.venv-service), pull LFS files, first Godot import"
@@ -30,11 +30,7 @@ help:
 	@echo "make tenants          match e-Business Register companies to the tile's parcels and buildings into sites/$(SITE)/tenants.json, with the register's general data and the Tax Board's quarters (first run downloads ~460 MB into data_raw/, cached a week)"
 	@echo "make stops            bus stops from OpenStreetMap snapped to the ETAK roads into sites/$(SITE)/stops.json"
 	@echo "make mcp              build the Sketchfab MCP server for Claude Code (tools/mcp, token in sketchfab.token)"
-	@echo "make module           build the town ledger module (server/vakuraamat, Rust -> wasm; needs rustup with the wasm32 target)"
-	@echo "make server           run a local SpacetimeDB (spacetime start, 127.0.0.1:3300, log under the user dir)"
-	@echo "make town             publish the module as SITE's town (name from tools/town_admin.py) to SERVER and seed it from the pack"
-	@echo "make news             push real regional headlines and official notices into SITE's town (tools/news_feeder.py --once)"
-	@echo "make news-local       write them to sites/$(SITE)/news.json for offline play instead"
+	@echo "make news-local       fetch the regional headlines and official notices about SITE into sites/$(SITE)/news.json"
 	@echo "make market           derive sites/$(SITE)/market.json (land value medians per purpose; XLSX=<maa-amet export> joins transaction statistics)"
 
 setup:
@@ -101,29 +97,8 @@ parcels:
 tenants:
 	$(PYTHON) tools/pipeline/fetch_tenants.py --site $(SITE) --stats
 
-# SpacetimeDB toolchain: the CLI installs to ~/.local/bin, rustup (brew) to /opt/homebrew/opt/rustup/bin.
-STDB_PATH := /opt/homebrew/opt/rustup/bin:$(HOME)/.cargo/bin:$(HOME)/.local/bin:$(PATH)
-SERVER ?= http://127.0.0.1:3300
-TOWN ?= $(shell python3 tools/town_admin.py name --site $(SITE))
-USERDIR := $(HOME)/Library/Application Support/Godot/app_userdata/Vakuraamat
-
-module:
-	cd server/vakuraamat && PATH="$(STDB_PATH)" cargo test --quiet && PATH="$(STDB_PATH)" spacetime build
-
-server:
-	@mkdir -p "$(USERDIR)/logs"
-	@echo ">> SpacetimeDB on $(SERVER), log $(USERDIR)/logs/spacetime.log (Ctrl-C stops it)"
-	PATH="$(STDB_PATH)" spacetime start --listen-addr 127.0.0.1:3300 2>&1 | tee "$(USERDIR)/logs/spacetime.log"
-
-town: module
-	PATH="$(STDB_PATH)" spacetime publish -s $(SERVER) -p server/vakuraamat -y $(TOWN)
-	PATH="$(STDB_PATH)" $(PYTHON) tools/town_admin.py seed --site $(SITE) --server $(SERVER) --db $(TOWN) $(if $(DEBUG),--debug)
-
-news:
-	PATH="$(STDB_PATH)" $(PYTHON) tools/news_feeder.py --site $(SITE) --db $(TOWN) --server $(SERVER) --once
-
 news-local:
-	$(PYTHON) tools/news_feeder.py --site $(SITE) --local --once
+	$(PYTHON) tools/news_feeder.py --site $(SITE) --once
 
 market:
 	$(PYTHON) tools/pipeline/market.py --site $(SITE) $(if $(XLSX),--xlsx $(XLSX))
@@ -165,7 +140,7 @@ test:
 	  printf "%-18s " $$t; timeout 180 $(GODOT) --headless --path . res://tools/godot/$$t.tscn -- --site=palupera 2>&1 | grep -E "PASSED|FAILED" | head -1; if [ "$${PIPESTATUS[0]}" = 124 ]; then echo "TIMEOUT (stuck after 180 s)"; fi; done
 
 lint:
-	git ls-files '*.gd' | grep -v '^addons/\|^spacetime_bindings/' | xargs uvx --python 3.12 --from gdtoolkit==4.5.0 gdlint
+	git ls-files '*.gd' | grep -v '^addons/' | xargs uvx --python 3.12 --from gdtoolkit==4.5.0 gdlint
 	uvx ruff@0.16.6 check tools
 	git ls-files '*.sh' | xargs shellcheck
 	@# the workflows' inline scripts are shellchecked by actionlint on CI, not by the line above:

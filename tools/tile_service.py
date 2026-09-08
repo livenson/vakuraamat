@@ -325,7 +325,7 @@ def refine_job(job, ws):
         rstage("news (RSS, Ametlikud Teadaanded)")
         # the notices feed is two national XML documents with a 180 s socket timeout each: generous
         # here because nothing waits on it any more, where it used to hold the pack for eight minutes
-        with_deadline(f"{sid}: news", 420, news_feeder.main, ["--site", sid, "--root", ws, "--local", "--once"])
+        with_deadline(f"{sid}: news", 420, news_feeder.main, ["--site", sid, "--root", ws, "--once"])
         rstage("packing")
         write_zip(sid, ws)
         if ok:

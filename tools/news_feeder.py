@@ -1,11 +1,8 @@
 #!/usr/bin/env python3
-"""News feeder: real regional headlines and official notices for a town, pushed into the town's SpacetimeDB
-database through the `post_event` reducer (modules cannot fetch HTTP themselves), or written to a local
-news.json for offline play.
+"""News feeder: real regional headlines and official notices about a place, into sites/<id>/news.json.
 
-    python3 tools/news_feeder.py --site kvissentali [--db <town>] [--server http://127.0.0.1:3300]
-                                 [--once | --loop 900] [--dry-run] [--local [--out <path>]] [--no-notices] [--no-rss]
-                                 [--max-per-run 40] [--root <workspace>]
+    python3 tools/news_feeder.py --site kvissentali [--once | --loop 900] [--dry-run] [--out <path>]
+                                 [--no-notices] [--no-rss] [--max-per-run 40] [--root <workspace>]
 
 Sources: ERR (`www.err.ee/rss`, items tagged Eesti), Tartu Postimees and Lõuna-Eesti Postimees RSS for Tartu
 county packs; Official Announcements XML (`ametlikudteadaanded.ee/ee/-/<type>/xml`) for planning procedures
@@ -15,7 +12,7 @@ or any person's name. Town config comes from parcels.json's `summary` (county, s
 and can be overridden by sites/<id>/news_config.json {"feeds": [...], "names": [...], "notice_types": [...]}.
 State (seen ids) lives in data_raw/news/<town>.json.
 """
-import argparse, hashlib, json, os, re, subprocess, sys, time, urllib.error, urllib.request
+import argparse, hashlib, json, os, re, sys, time, urllib.error, urllib.request
 import xml.etree.ElementTree as ET
 from email.utils import parsedate_to_datetime
 from html.parser import HTMLParser
@@ -25,7 +22,6 @@ sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar
 UA = {"User-Agent": "vakuraamat-news/0.1 (open-source game; headlines and links only)"}
-DEFAULT_SERVER = "http://127.0.0.1:3300"
 ERR = {"id": "err", "name": "ERR", "url": "https://www.err.ee/rss", "category": "Eesti", "area": "country", "terms": "ERR: RSS free to embed"}
 TARTU_PM = {"id": "tartu_pm", "name": "Tartu Postimees", "url": "https://tartu.postimees.ee/rss", "area": "county", "terms": "headlines and links only"}
 LOUNA_PM = {"id": "louna_pm", "name": "Lõuna-Eesti Postimees", "url": "https://lounapostimees.postimees.ee/rss", "area": "county", "terms": "headlines and links only"}
@@ -211,25 +207,7 @@ def state_path(root, town):
 
 
 def load_state(path):
-    return json.load(open(path)) if os.path.exists(path) else {"seen": {}, "posted": 0}
-
-
-def token():
-    t = os.environ.get("SPACETIME_TOKEN")
-    if t:
-        return t.strip()
-    out = subprocess.run(["spacetime", "login", "show", "--token"], capture_output=True, text=True).stdout
-    m = re.search(r"eyJ[\w-]+\.[\w-]+\.[\w-]+", out)
-    if not m:
-        sys.exit("[news] no SPACETIME_TOKEN and no token from `spacetime login show --token`")
-    return m.group(0)
-
-
-def post(server, db, tok, e):
-    body = json.dumps([e["kind"], e["title"], e["source"], e["url"], e["tunnus"], e["published"]]).encode()
-    req = urllib.request.Request(f"{server.rstrip('/')}/v1/database/{db}/call/post_event", data=body,
-                                 headers={"Authorization": "Bearer " + tok, "Content-Type": "application/json"}, method="POST")
-    urllib.request.urlopen(req, timeout=30).read()
+    return json.load(open(path)) if os.path.exists(path) else {"seen": {}}
 
 
 def run(a):
@@ -249,8 +227,7 @@ def run(a):
             except Exception as e:  # noqa: BLE001
                 log(f"notices {kind} unavailable ({e})")
     events.sort(key=lambda e: e["published"], reverse=True)
-    town = a.db or a.site
-    sp = state_path(a.root, town)
+    sp = state_path(a.root, a.site)
     st = load_state(sp)
     fresh = [e for e in events if e["id"] not in st["seen"]][: a.max_per_run]
     log(f"{cfg['town']} ({cfg['county']}): {len(events)} items from {len(cfg['feeds'])} feeds + {len(cfg['notice_types'])} notice types, {len(fresh)} new")
@@ -258,31 +235,15 @@ def run(a):
         for e in fresh:
             print(f"  {e['kind']:8} {e['published'][:10]:10} {e['source']:22} {e['title'][:90]}  {e['url']}")
         return
-    if a.local:
-        out_path = a.out or os.path.join(a.root, "sites", a.site, "news.json")
-        d = json.load(open(out_path)) if os.path.exists(out_path) else {"events": []}
-        d["attribution"] = sorted({f.get("terms", "") for f in cfg["feeds"]} | {"Ametlikud Teadaanded (metadata only)"})
-        d["town"] = a.site
-        d["fetched"] = time.strftime("%Y-%m-%d")
-        known = {e["id"] for e in d["events"]}
-        d["events"] = ([e for e in fresh if e["id"] not in known] + d["events"])[:200]
-        json.dump(d, open(out_path, "w"), ensure_ascii=False, indent=0)
-        log(f"wrote {out_path}: {len(d['events'])} events")
-    else:
-        tok = token()
-        n = 0
-        for e in fresh:
-            try:
-                post(a.server, town, tok, e)
-                n += 1
-            except urllib.error.HTTPError as err:
-                body = err.read().decode(errors="replace")[:200]
-                if err.code == 404:
-                    sys.exit(f"[news] reducer post_event not found on {town}: publish the module first ({body})")
-                log(f"post failed {err.code}: {body}")
-                continue
-        st["posted"] = st.get("posted", 0) + n
-        log(f"posted {n} events to {town}")
+    out_path = a.out or os.path.join(a.root, "sites", a.site, "news.json")
+    d = json.load(open(out_path)) if os.path.exists(out_path) else {"events": []}
+    d["attribution"] = sorted({f.get("terms", "") for f in cfg["feeds"]} | {"Ametlikud Teadaanded (metadata only)"})
+    d["town"] = a.site
+    d["fetched"] = time.strftime("%Y-%m-%d")
+    known = {e["id"] for e in d["events"]}
+    d["events"] = ([e for e in fresh if e["id"] not in known] + d["events"])[:200]
+    json.dump(d, open(out_path, "w"), ensure_ascii=False, indent=0)
+    log(f"wrote {out_path}: {len(d['events'])} events")
     for e in fresh:
         st["seen"][e["id"]] = e["published"]
     cutoff = time.strftime("%Y-%m-%d", time.gmtime(time.time() - 60 * 86400))
@@ -294,22 +255,15 @@ def run(a):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--site", default="kvissentali")
-    ap.add_argument("--db", default=None, help="town database name (default: tools/town_admin.py name)")
-    ap.add_argument("--server", default=DEFAULT_SERVER)
     ap.add_argument("--root", default=ROOT)
     ap.add_argument("--once", action="store_true")
     ap.add_argument("--loop", type=int, default=0, help="seconds between runs")
     ap.add_argument("--dry-run", action="store_true")
-    ap.add_argument("--local", action="store_true", help="write sites/<id>/news.json instead of posting")
     ap.add_argument("--out", default=None)
     ap.add_argument("--no-notices", action="store_true")
     ap.add_argument("--no-rss", action="store_true")
     ap.add_argument("--max-per-run", type=int, default=40)
     a = ap.parse_args(argv)
-    if a.db is None and not a.local and not a.dry_run:
-        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-        from town_admin import town_name  # noqa: E402
-        a.db = town_name(a.site, a.root)
     while True:
         run(a)
         if not a.loop:

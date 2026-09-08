@@ -45,7 +45,7 @@ window/stretch/aspect="expand"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/sky_3d/plugin.cfg", "res://addons/terrain_3d/plugin.cfg", "res://addons/SpacetimeDB/plugin.cfg")
+enabled=PackedStringArray("res://addons/sky_3d/plugin.cfg", "res://addons/terrain_3d/plugin.cfg")
 
 [internationalization]
 
