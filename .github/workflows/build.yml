@@ -117,18 +117,28 @@ jobs:
             mv "$f" "$(dirname "$f")/$(basename "$f" .zip | sed "s/^Vakuraamat-/Vakuraamat-${GITHUB_REF_NAME}-/").zip"
           done
           ls -la dist/*
-      - name: "Release notes: the tag's message, the commits since the previous tag, how to run"
+      - name: "Release notes: the release's changelog entry, the commits since the previous tag, how to run"
         shell: bash
         run: |
           tag="${GITHUB_REF_NAME}"
+          # checkout leaves the tag lightweight, and %(contents) then prints the commit message
+          # instead of the annotation: fetch the tag object itself
+          git fetch --force origin "refs/tags/${tag}:refs/tags/${tag}" || true
           prev=$(git describe --tags --abbrev=0 "${tag}^" 2>/dev/null || true)
+          # CHANGELOG.md is where a release is described for players; the tag's message stands in
+          # when the entry is missing
+          awk -v tag="$tag" '$0 ~ "^## " tag "([^0-9.]|$)" {found=1; next} found && /^## / {exit} found {print}' CHANGELOG.md > entry.md || true
           {
-            git tag -l --format='%(contents)' "$tag"
+            if [ -s entry.md ]; then cat entry.md; else git tag -l --format='%(contents)' "$tag"; fi
             echo
             if [ -n "$prev" ]; then
               echo "## Commits since $prev"
               echo
-              git log --format='- %s' "$prev..$tag" | sed -E 's/^(- [^.:;]{0,160}[^ ]).*/\1/'
+              # the first sentence of each subject: a full stop or semicolon before a capital, so
+              # CHANGELOG.md and perf.prev.log keep their names; long ones are cut at a word
+              git log --format='- %s' "$prev..$tag" \
+                | sed -E 's/([.;]) [A-Z(].*$/\1/' \
+                | sed -E 's/^(.{150}[^ ]*) .*/\1 …/'
               echo
             fi
             echo "## Builds"
