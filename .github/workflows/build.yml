@@ -70,8 +70,9 @@ jobs:
           # v0.2.0 to v0.4.0 shipped a sidecar with no CA bundle: it started and answered /health,
           # but every https call failed to verify, so no world could be made from a build. /health
           # alone would not have caught it - the geocode is the test that matters.
-          ./dist/tile_service* --port 8765 --workspace "$RUNNER_TEMP/svc" --raw-dir "$RUNNER_TEMP/svc/raw" &
-          for i in $(seq 1 90); do curl -sf -m 2 http://127.0.0.1:8765/health >/dev/null && break; sleep 1; done
+          svc=dist/tile_service; [ -x "$svc" ] || svc=dist/tile_service.exe
+          "$svc" --port 8765 --workspace "$RUNNER_TEMP/svc" --raw-dir "$RUNNER_TEMP/svc/raw" &
+          for _ in $(seq 1 90); do curl -sf -m 2 http://127.0.0.1:8765/health >/dev/null && break; sleep 1; done
           curl -sf -m 20 http://127.0.0.1:8765/health || { echo "the sidecar never answered"; exit 1; }
           out=$(curl -sf -m 60 "http://127.0.0.1:8765/geocode?q=Haapsalu") || { echo "geocode request failed"; exit 1; }
           echo "$out" | head -c 300; echo

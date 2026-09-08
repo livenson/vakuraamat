@@ -167,6 +167,9 @@ lint:
 	git ls-files '*.gd' | grep -v '^addons/\|^spacetime_bindings/' | xargs uvx --python 3.12 --from gdtoolkit==4.5.0 gdlint
 	uvx ruff@0.16.6 check tools
 	git ls-files '*.sh' | xargs shellcheck
+	@# the workflows' inline scripts are shellchecked by actionlint on CI, not by the line above:
+	@# without it a `run:` script only fails after a push (brew install actionlint / apt install actionlint)
+	@command -v actionlint >/dev/null && actionlint || echo "actionlint not installed - CI still checks .github/workflows"
 
 export:                         # PRESET=macOS|"Windows Desktop"|Linux (needs the 4.7.2 export templates installed)
 	mkdir -p build build/windows build/linux && $(GODOT) --headless --path . --export-release "$(PRESET)" $(if $(filter macOS,$(PRESET)),build/Vakuraamat.zip,$(if $(filter Linux,$(PRESET)),build/linux/Vakuraamat.x86_64,build/windows/Vakuraamat.exe))
