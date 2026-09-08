@@ -11,7 +11,7 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | Maa-amet geoportal, 1 m DTM sheets (`dem_1m_geotiff`) | ground heights, EH2000 | `tools/pipeline/fetch_tile.py` | `assets/terrain/<tile>/heightmap.r32`, `terrain_meta.json` |
 | the same sheets at 5 m (`dem_5m_geotiff`, `--dem-res 5`) | the ground a new place ships with | `fetch_tile.py` | the same files, `dtm_res_m: 5` in the meta |
 | Maa-amet nDSM (1:2000 sheets) | canopy and object heights | `fetch_tile.py` | `assets/terrain/<tile>/canopy.r32` |
-| Maa-amet WMS `fotokaart` (`EESTIFOTO`) | 25 cm orthophoto | `fetch_tile.py` | `assets/terrain/<tile>/ortho.jpg` |
+| Maa-amet WMS `fotokaart` (`EESTIFOTO`) | 25 cm orthophoto; and one plot's square at a time, at the size the book shows it, for the plot page's "today" | `fetch_tile.py`, `scripts/ui/plot_history.gd` | `assets/terrain/<tile>/ortho.jpg`, `user://cache/plots/<pack>/` |
 | Maa-amet Geo3D single trees (LOD0 üksikpuud) | every laser-detected tree: position, height, crown, conifer or deciduous | `tools/pipeline/fetch_trees.py` | `assets/terrain/<tile>/trees.json` |
 | ETAK topographic database, WFS `etak:e_401_hoone_ka` | building polygons and types | `tools/pipeline/fetch_buildings.py` | `sites/<id>/buildings.json` |
 | EHR, the Building Register (`livekluster.ehr.ee`) | year, storeys, purpose, facade and roof materials, heating, water, addresses | `fetch_buildings.py` | `sites/<id>/buildings.json` |

@@ -60,6 +60,13 @@ neighbouring square is shown as it is and replaced when it is ready — never wh
 on it or indoors there — and the rest are brought up to date in the background while you walk about.
 Storage says which places are behind and offers to fetch them now.
 
+The plot's newest picture is as sharp as its older ones. Every year in "this plot over the years"
+is fetched at the size you open it at, except today, which was enlarged out of the tile's own
+photograph — 25 cm to the pixel, so a small plot's square is barely two hundred pixels there and no
+enlargement puts detail back. Today is now asked for as its own picture like the rest, which in a
+city means the finer flight the Land Board holds for it: on Rahe tn 24 in Haabersti that is roof
+tiles and paving slabs where there was a smear.
+
 The map's colours say what they are colouring. "Health" is the company on the plot, from the
 business register, the Tax Board and the reporting deadline — not the state of the building, which
 is what it read as; the layer is called company health now and the legend says where it comes from,

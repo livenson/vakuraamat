@@ -11,6 +11,12 @@ class_name PlotHistory
 extends RefCounted
 
 const WMS := "https://kaart.maaamet.ee/wms/ajalooline"
+# The nationwide latest orthophoto, the same service and layer the terrain pipeline asks for the
+# tile's own texture (tools/pipeline/fetch_tile.py). Asked here for one plot's square instead of a
+# whole square kilometre, so it answers from whatever flight covers that square - in a city that is
+# a finer one than the 25 cm nationwide flight the tile texture is made of.
+const WMS_CURRENT := "https://kaart.maaamet.ee/wms/fotokaart"
+const CURRENT_LAYER := "EESTIFOTO"
 
 # Godot's HTTPRequest cannot read this endpoint over TLS: a GetMap comes back RESULT_CONNECTION_ERROR
 # every time, while the same URL over plain http, the same host's other paths over https, and curl
@@ -140,6 +146,31 @@ static func current_large(pack: String, square: Rect2, px: int) -> Texture2D:
 	return current(square, TerrainGeoref.load_dir(dir), dir, px)
 
 
+## Today at the large view's size, asked for as its own picture rather than magnified out of the
+## tile's texture. That texture is 4096 px over a square kilometre - 25 cm to the pixel - so a small
+## plot's square is a couple of hundred pixels in it and no amount of enlarging puts detail back;
+## this is why today stayed soft while every older year sharpened. Requested directly, the service
+## renders the square from the sharpest flight it has for it. Falls back to the crop, which is what
+## the strip's thumbnail uses anyway and is plenty at that size, when the service cannot be reached.
+static func fetch_current_large(pack: String, tunnus: String, square: Rect2, px: int) -> Texture2D:
+	var dir := "user://cache/plots/%s" % pack
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir))
+	var base := "%s/%s_today@%d" % [dir, tunnus.replace(":", "_"), px]
+	var tex := _load(base + ".jpg")
+	if tex != null:
+		return tex
+	if tunnus != "" and not _busy.has(base):
+		_busy[base] = true
+		var img := await _fetch_image([CURRENT_LAYER], square, base, px, WMS_CURRENT)
+		_busy.erase(base)
+		if img != null:
+			DirAccess.rename_absolute(ProjectSettings.globalize_path(base + ".part"),
+					ProjectSettings.globalize_path(base + ".jpg"))
+			return ImageTexture.create_from_image(img)
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(base + ".part"))
+	return current_large(pack, square, px)
+
+
 ## The same square as one epoch's thumbnail, asked for at `px` instead of PX, for the large view.
 ## Cached beside the thumbnail; null when it cannot be had, and the caller keeps the small one.
 static func fetch_large(pack: String, tunnus: String, label: String, square: Rect2, px: int) -> Texture2D:
@@ -168,7 +199,7 @@ static func fetch_large(pack: String, tunnus: String, label: String, square: Rec
 ## The first of `layers` that answers with a picture that has ground on it, at `px` square. Sets
 ## `_answered` to whether anything answered at all, so the caller can tell "no coverage here" from
 ## "the service could not be reached".
-static func _fetch_image(layers: Array, square: Rect2, base: String, px: int) -> Image:
+static func _fetch_image(layers: Array, square: Rect2, base: String, px: int, wms: String = WMS) -> Image:
 	_answered = false
 	for layer in layers:
 		var q := {
@@ -178,7 +209,7 @@ static func _fetch_image(layers: Array, square: Rect2, base: String, px: int) ->
 			"BBOX": "%f,%f,%f,%f" % [square.position.y, square.position.x,
 					square.position.y + square.size.y, square.position.x + square.size.x],
 		}
-		var img := await _get_image(WMS + "?" + _query(q), base + ".part")
+		var img := await _get_image(wms + "?" + _query(q), base + ".part")
 		if img == null:
 			continue                                   # nothing answered: a transport failure, not an answer
 		_answered = true

@@ -79,24 +79,17 @@ func _show(index: int) -> void:
 	_load_big(shot)
 
 
-## Ask the WMS for this year at the large size and swap it in when it lands. The thumbnail is shown
-## meanwhile, so the view is never empty; "today" comes from the tile's own photograph, which is
-## already as sharp as it gets.
+## Ask for this year at the large size and swap it in when it lands; the thumbnail is shown
+## meanwhile, so the view is never empty. Today goes the same way as the older years now: it used to
+## be enlarged out of the tile's texture, which is 25 cm to the pixel and so had nothing left to
+## give at this size, and it alone stayed soft.
 func _load_big(shot: Dictionary) -> void:
 	if bool(shot.get("big", false)):
 		return
-	if bool(shot.get("local", false)):
-		# the tile's own photograph: re-crop it from the orthophoto at the large size rather than
-		# letting the strip's thumbnail be scaled up, which is why today used to be the soft one
-		var own: Texture2D = PlotHistory.current_large(_pack, _square, BIG)
-		if own != null:
-			shot["texture"] = own
-			shot["big"] = true
-			if is_instance_valid(_picture):
-				_picture.texture = own
-		return
+	var local := bool(shot.get("local", false))
 	var label: String = str(shot.label)
-	var tex: Texture2D = await PlotHistory.fetch_large(_pack, _tunnus, label, _square, BIG)
+	var tex: Texture2D = await PlotHistory.fetch_current_large(_pack, _tunnus, _square, BIG) if local \
+			else await PlotHistory.fetch_large(_pack, _tunnus, label, _square, BIG)
 	if tex == null or not is_instance_valid(self) or _at >= _shots.size():
 		return
 	shot["texture"] = tex
