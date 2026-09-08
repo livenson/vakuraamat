@@ -8,6 +8,33 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
+## v0.6.2 — 2026-09-09
+
+The Locations page draws Estonia. The places it suggests used to be a list of names with a pair of
+coordinates under each, which says nothing about whether a place is on an island, by Peipsi or an
+hour from the world you already have. Now the country is above the list: a ring for every place
+offered, a filled mark for a world you have installed, a ringed mark for the world you are standing
+in. Point at a mark and it names itself; point at a row and its mark lights. The coastline is the
+county division from the Land Board, with Võrtsjärv from the topographic database — Peipsi draws
+itself, since the border runs down the middle of it.
+
+The book's *Companies* page sorts. Click a heading — name, sector, employees, turnover, address —
+and click it again to reverse, the way the plot list has always worked. Employees and turnover
+start at the largest, names at A; a company the register publishes no figure for sorts last either
+way instead of posing as a company with none.
+
+A window you are not looking at no longer costs a processor core. The game drew the whole scene
+again every frame whether or not anything had moved, so leaving it open behind a browser cost what
+playing it cost; it now draws at the screen's own rate while you are there and falls to a trickle
+when you click away.
+
+And the towns run lighter. A frame in a town pack asked the graphics driver for about 5900 separate
+draws; it asks for 1756 now, and the work the processor does per frame roughly halved. Two reasons,
+both in the houses: every building used to mint its own wall, roof, window and trim material — some
+840 of them in a tile of 211 houses, for what the register describes as a dozen looks — and the sun
+drew four shadow passes over every building where two do. Nothing looks different; the shadows keep
+their 400-metre reach, so a flying camera still sees a town with shadows in it.
+
 ## v0.6.1 — 2026-09-08
 
 Tagged v0.6.0 first, and it never built: the packaging step for the tile service still expected a
