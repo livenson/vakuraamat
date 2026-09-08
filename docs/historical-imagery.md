@@ -1,7 +1,7 @@
 # Seeing the place as it was — options for a historical imagery layer
 
-A brainstorm, not a plan. What Maa-amet publishes, what it would cost to use, and five ways it could
-sit in the game. Nothing here is implemented. Measurements were taken on 2026-09-08 against the live
+What Maa-amet publishes, what it costs to use, and five ways it could sit in the game. Option 4 is
+built; the rest are still a brainstorm. Measurements were taken on 2026-09-08 against the live
 services; the numbers are for one 1 km² tile in Tartu unless another place is named.
 
 The short version: **there are two quite different sources here, and one of them is nearly free
@@ -152,7 +152,7 @@ also does not look much like what a person standing in the street sees; the low-
 (0.1–0.4 km) are the ones that would land. Needs a live query per position, so it needs caching and
 a graceful failure.
 
-### Option 4 — in the plot book
+### Option 4 — in the plot book  *(built, 2026-09-08)*
 
 A parcel's page in the book gains a strip: this plot in 1998, 2005, 2014, 2025 — each a crop of that
 year's orthophoto to the parcel's own polygon.
@@ -165,6 +165,14 @@ happened on it in thirty years. It also gives the land value a story — a plot 
 and a car park now says something a number does not.
 
 *Weaknesses:* the smallest, quietest version. Nobody will discover it by accident.
+
+*As built:* `scripts/ui/plot_history.gd` and `scripts/ui/plot_thumb.gd`, shown by
+`LedgerPanel._fill_plot_history`. Five campaigns (1993-2000, 2005, 2010, 2015, 2020) plus a crop of
+the tile's own orthophoto as "today", each with the plot's boundary drawn on it. The newest costs
+nothing; the rest are one `GetMap` each, cached under `user://cache/plots`, so a plot fills in over
+a second the first time it is opened and instantly ever after. A campaign that did not fly over the
+square answers blank and is dropped — remembered, so it is not asked twice, but only when the
+service actually answered, never on a refused connection.
 
 ### Option 5 — photographs as things in the world
 
@@ -187,7 +195,7 @@ the pipeline already calls, in the format the drape already takes. It is a day's
 whether watching the ground change under a fixed town is compelling or merely odd — and if it is
 odd, nothing was spent finding out.
 
-**Option 4 is the natural second**, for the same reason and with no new sources.
+**Option 4 is built** (see above); it was indeed cheap and needed no new sources.
 
 **Options 2 and 3 need Fotoladu**, and so need a decision about depending on a scraped web
 application. If they are wanted, the honest way in is a small, well-cached, entirely optional layer

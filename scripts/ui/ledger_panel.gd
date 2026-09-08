@@ -259,6 +259,50 @@ func _fill_companies() -> void:
 		grid.add_child(al)
 
 
+# ------------------------------------------------------- the plot over the years
+
+## The land itself, campaign by campaign: the plot's square out of every orthophoto flown over it
+## since 1993, with its boundary drawn on each. The newest is a crop of the tile's own photograph
+## and costs nothing; the older ones are fetched once and cached, so this fills in over a second or
+## two the first time a plot is opened and instantly ever after. A tile with no georeference, a
+## plot from another pack, or a service that does not answer simply leaves the strip out.
+func _fill_plot_history(body: Node, tunnus: String) -> void:
+	var georef: TerrainGeoref = world.georef if world and "georef" in world else null
+	if georef == null or not georef.is_valid():
+		return
+	var poly := PackedVector2Array()
+	for u in Parcels.units():
+		if str(u.get("tunnus", "")) == tunnus:
+			for c in u.polygon:
+				poly.append(Vector2(float(c[0]), float(c[1])))
+			break
+	var square := PlotHistory.square_for(poly, georef)
+	if square.size.x <= 0.0:
+		return
+	body.add_child(_lbl(tr("UI_LEDGER_OVER_THE_YEARS"), 15, GOLD))
+	var strip := HBoxContainer.new()
+	strip.add_theme_constant_override("separation", 10)
+	body.add_child(strip)
+	var outline := PlotHistory.outline_in(poly, square, georef)
+	var now := PlotHistory.current(square, georef, Sites.tile_dir())
+	if now != null:
+		var t := PlotThumb.new()
+		strip.add_child(t)
+		t.setup(tr("UI_LEDGER_TODAY"), now, outline)
+	var pending := PlotThumb.new()
+	strip.add_child(pending)
+	pending.setup_pending("…")
+	var shots: Array = await PlotHistory.fetch(Sites.active, tunnus, square)
+	if not is_instance_valid(strip) or not is_instance_valid(pending):
+		return   # the book was rebuilt or closed while the pictures were fetched
+	pending.queue_free()
+	for i in shots.size():
+		var t := PlotThumb.new()
+		strip.add_child(t)
+		strip.move_child(t, i)   # oldest first, the tile's own photograph last
+		t.setup(str(shots[i].label), shots[i].texture, outline)
+
+
 # ---------------------------------------------------------------- one plot
 
 func _fill_plot() -> void:
@@ -297,6 +341,7 @@ func _fill_plot() -> void:
 	var imps := Ledger.improvements_of(p.tunnus)
 	if imps.size() > 0:
 		body.add_child(_lbl(tr("UI_LEDGER_BUILT") + ": " + ", ".join(imps.map(func(i): return _struct_name(i.structure_id))), 14))
+	_fill_plot_history(body, p.tunnus)
 	var actions := HBoxContainer.new()
 	actions.add_theme_constant_override("separation", 10)
 	body.add_child(actions)

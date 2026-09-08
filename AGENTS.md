@@ -158,6 +158,11 @@ its design documents in the repo root describe that version.
 - Water shaders that composite `SCREEN_TEXTURE` must write `ALPHA` (even 1.0) to land in the
   transparent pass; otherwise the screen copy is taken after the surface and everything below vanishes.
 - Godot `-s` tool scripts run without autoloads: static helpers used by tools take paths, not `Sites`.
+- `HTTPRequest` cannot read `kaart.maaamet.ee/wms/...` over TLS: a GetMap comes back
+  RESULT_CONNECTION_ERROR every time, while the same URL over plain http, the same host's other
+  paths over https, and curl over either all answer normally (4.7.2; not gzip, and the certificate
+  chain is the one `geoportaal.maaamet.ee` serves and Godot accepts). `PlotHistory` tries https and
+  falls back to http; the imagery is public open data and the request carries nothing private.
 - Water patches from `extract_features.py` are bounding rectangles; long ditches become slabs over
   land. Basins are carved only where the DTM was flat, but the surface still covers the rectangle.
 - Loading a world hands the player the ground first and fills the rest in behind them: the era scene
