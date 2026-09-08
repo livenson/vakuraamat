@@ -42,4 +42,6 @@ func interact(_player: Node3D) -> void:
 		return
 	var world: Node = GameState.world
 	if world and "ui" in world and world.ui and world.ui.has_method("show_sheet") and Interiors.instance:
-		world.ui.show_sheet(building.address if building.address != "" else tr("UI_BUILDING"), Interiors.register_sheet(building))
+		# the plot it stands on comes with it: the sheet shows the land over the years too
+		world.ui.show_sheet(building.address if building.address != "" else tr("UI_BUILDING"),
+				Interiors.register_sheet(building), building.tunnus)

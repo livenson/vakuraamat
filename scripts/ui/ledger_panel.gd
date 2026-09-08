@@ -11,9 +11,24 @@ signal teleport(tunnus: String)   # jump to a plot
 const GOLD := BookTheme.BLUE   # the accent of the book: what is mine and what I can act on
 const MAX_ROWS := 120
 
+# The plot list's columns, and what each sorts by. "address" is the default: a list of plots is
+# read by name, and the nearest-first order it used to have looked like no order at all.
+const COLUMNS := [
+	{"key": "UI_LEDGER_COL_ADDRESS", "by": "address", "right": false},
+	{"key": "UI_LEDGER_COL_PURPOSE", "by": "purpose", "right": false},
+	{"key": "UI_LEDGER_COL_AREA", "by": "area", "right": true},
+	{"key": "UI_LEDGER_COL_VALUE", "by": "land_value", "right": true},
+	{"key": "UI_LEDGER_COL_PRICE", "by": "price", "right": true},
+	{"key": "UI_LEDGER_COL_OWNER", "by": "owner", "right": false},
+	{"key": "UI_LEDGER_COL_YIELD", "by": "yield", "right": true},
+	{"key": "", "by": "near", "right": false},
+]
+
 var world: Node3D
 var tabs: TabContainer
 var _filter := "all"
+var _sort := "address"
+var _sort_desc := false
 var _selected := ""
 var _pages: Dictionary = {}
 var _price_box: SpinBox
@@ -93,15 +108,30 @@ func _fill_parcels() -> void:
 	var pos := Vector2(player.global_position.x, player.global_position.z) if player else Vector2.ZERO
 	var rows: Array = Ledger.parcels().filter(func(p):
 		return (_filter == "all" and (p.sellable or int(p.owner_id) != 0)) or (_filter == "mine" and Ledger.is_mine(p.tunnus)) or (_filter == "sale" and p.for_sale))
-	rows.sort_custom(func(a, b): return pos.distance_to(Vector2(float(a.x), float(a.z))) < pos.distance_to(Vector2(float(b.x), float(b.z))))
+	_sort_rows(rows, pos)
 	var grid := GridContainer.new()
 	grid.columns = 8
 	grid.add_theme_constant_override("h_separation", 14)
 	body.add_child(grid)
-	for h in ["UI_LEDGER_COL_ADDRESS", "UI_LEDGER_COL_PURPOSE", "UI_LEDGER_COL_AREA", "UI_LEDGER_COL_VALUE", "UI_LEDGER_COL_PRICE", "UI_LEDGER_COL_OWNER", "UI_LEDGER_COL_YIELD", ""]:
-		var hl := BookTheme.label(tr(h) if h != "" else "", "ColumnLabel", grid)
-		if h in ["UI_LEDGER_COL_AREA", "UI_LEDGER_COL_VALUE", "UI_LEDGER_COL_PRICE", "UI_LEDGER_COL_YIELD"]:
-			hl.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	# the headings sort the list: click one to sort by it, again to reverse
+	for h in COLUMNS:
+		if h.key == "":
+			BookTheme.label("", "ColumnLabel", grid)
+			continue
+		var b := Button.new()
+		b.flat = true
+		b.theme_type_variation = "ColumnLabel"
+		for st in ["normal", "hover", "pressed", "focus", "disabled"]:
+			b.add_theme_stylebox_override(st, StyleBoxEmpty.new())   # a button's padding would widen every column
+		b.text = tr(h.key) + ("  ↓" if _sort == h.by and not _sort_desc else ("  ↑" if _sort == h.by else ""))
+		b.alignment = HORIZONTAL_ALIGNMENT_RIGHT if h.right else HORIZONTAL_ALIGNMENT_LEFT
+		b.tooltip_text = tr("UI_LEDGER_SORT_BY") % tr(h.key)
+		var by: String = h.by
+		b.pressed.connect(func():
+			_sort_desc = _sort == by and not _sort_desc
+			_sort = by
+			_fill_parcels())
+		grid.add_child(b)
 	var n := 0
 	for p in rows:
 		if n >= MAX_ROWS:
@@ -124,6 +154,48 @@ func _fill_parcels() -> void:
 		grid.add_child(_nav_buttons(tunnus))
 	if rows.size() > MAX_ROWS:
 		body.add_child(_lbl(tr("UI_LEDGER_MORE") % (rows.size() - MAX_ROWS), 13))
+
+
+## Order the plot list by the chosen column. Addresses sort naturally - "Aruküla tee 9" before
+## "Aruküla tee 30", which a plain string sort gets backwards - and a plot with no address sorts
+## after the named ones rather than at the top under its cadastral number.
+func _sort_rows(rows: Array, near: Vector2) -> void:
+	var key := func(p: Dictionary) -> Variant:
+		match _sort:
+			"address": return _address_key(str(p.get("address", "")), str(p.get("tunnus", "")))
+			"purpose": return _purpose(p.get("purpose", []))
+			"owner": return tr("UI_LEDGER_YOU") if Ledger.is_mine(p.tunnus) else str(p.get("owner_name", ""))
+			"area": return float(p.get("area", 0))
+			"land_value": return float(p.get("land_value", 0))
+			"price": return float(p.get("price", 0)) if p.get("for_sale", false) else -1.0
+			"yield": return float(Ledger.yield_of(p.tunnus))
+			_: return near.distance_to(Vector2(float(p.x), float(p.z)))
+	rows.sort_custom(func(a, b):
+		var ka = key.call(a)
+		var kb = key.call(b)
+		if ka == kb:
+			return str(a.tunnus) < str(b.tunnus)
+		return kb < ka if _sort_desc else ka < kb)
+
+
+## An address as something that sorts the way a person reads it: the street, then the house number
+## as a number, then the rest. Plots without an address go last, under their cadastral number.
+static func _address_key(address: String, tunnus: String) -> String:
+	if address.strip_edges() == "":
+		return "￿" + tunnus
+	var out := ""
+	var digits := ""
+	for ch in address.to_lower():
+		if ch >= "0" and ch <= "9":
+			digits += ch
+		else:
+			if digits != "":
+				out += "%09d" % int(digits)     # numbers compare as numbers, not as text
+				digits = ""
+			out += ch
+	if digits != "":
+		out += "%09d" % int(digits)
+	return out
 
 
 ## What the register and the Tax Board say about a company, on one line.
@@ -267,61 +339,18 @@ func _fill_companies() -> void:
 ## two the first time a plot is opened and instantly ever after. A tile with no georeference, a
 ## plot from another pack, or a service that does not answer simply leaves the strip out.
 func _fill_plot_history(body: Node, tunnus: String) -> void:
-	var georef: TerrainGeoref = world.georef if world and "georef" in world else null
-	if georef == null or not georef.is_valid():
+	if not PlotStrip.can_show(world, tunnus):
 		return
-	var poly := PackedVector2Array()
-	for u in Parcels.units():
-		if str(u.get("tunnus", "")) == tunnus:
-			for c in u.polygon:
-				poly.append(Vector2(float(c[0]), float(c[1])))
-			break
-	var square := PlotHistory.square_for(poly, georef)
-	if square.size.x <= 0.0:
-		return
-	body.add_child(_lbl(tr("UI_LEDGER_OVER_THE_YEARS"), 15, GOLD))
-	var strip := HBoxContainer.new()
-	strip.add_theme_constant_override("separation", 10)
+	var strip := PlotStrip.new()
 	body.add_child(strip)
-	var outline := PlotHistory.outline_in(poly, square, georef)
-	var all: Array = []          # what the viewer steps through, in the order they are shown
-	var now := PlotHistory.current(square, georef, Sites.tile_dir())
-	if now != null:
-		all.append({"label": tr("UI_LEDGER_TODAY"), "texture": now, "local": true})
-	var pending := PlotThumb.new()
-	strip.add_child(pending)
-	pending.setup_pending("…")
-	var shots: Array = await PlotHistory.fetch(Sites.active, tunnus, square)
-	if not is_instance_valid(strip) or not is_instance_valid(pending):
-		return   # the book was rebuilt or closed while the pictures were fetched
-	pending.queue_free()
-	all = shots + all            # oldest first, the tile's own photograph last
-	for i in all.size():
-		var t := PlotThumb.new()
-		strip.add_child(t)
-		t.setup(str(all[i].label), all[i].texture, outline)
-		var at := i
-		t.picked.connect(func(): _open_plot_viewer(all, at, outline, square, tunnus))
+	strip.setup(world, tunnus)
 
 
 ## Checks: open the strip's nth picture large, as clicking it does (--open=plot:<tunnus>#<n>).
 func debug_enlarge(index: int) -> void:
-	for strip in _pages["UI_LEDGER_PLOT"].find_children("*", "HBoxContainer", true, false):
-		var thumbs: Array = strip.get_children().filter(func(c): return c is PlotThumb)
-		if index < thumbs.size():
-			thumbs[index].picked.emit()
-			return
-
-
-## One year at the size of the page, stepped through with the years along the bottom or the arrow
-## keys. Laid over the whole screen rather than the book, so the picture is as large as it can be.
-func _open_plot_viewer(shots: Array, index: int, outline: PackedVector2Array, square: Rect2, tunnus: String) -> void:
-	var layer: Node = get_parent()
-	while layer and not (layer is CanvasLayer):
-		layer = layer.get_parent()
-	var v := PlotViewer.new()
-	(layer if layer else self).add_child(v)
-	v.open_at(shots, index, outline, square, Sites.active, tunnus)
+	for strip in _pages["UI_LEDGER_PLOT"].find_children("*", "PlotStrip", true, false):
+		strip.enlarge(index)
+		return
 
 
 # ---------------------------------------------------------------- one plot

@@ -84,7 +84,9 @@ its design documents in the repo root describe that version.
 - Real buildings snap to the lowest vertex of their footprint outline (the group's bounding box sank
   L-shaped houses); the eave is the top of the longest wall face; window sills measure from the ground
   under each face. Test with a report replay: `-- --report=<json> --screenshot=...`.
-- World flags for checks: `--hour=<h>` sets the time of day (street lights and windows light after
+- World flags for checks: `--examine="<address part>"` opens a building's register sheet (E on its
+  wall), `--open=plot:<tunnus>#<n>` opens the plot page and enlarges the nth picture of its history,
+  `--hour=<h>` sets the time of day (street lights and windows light after
   18:30), `--own=<tunnus>+<structure>` buys a plot in a fresh local book and builds on it.
 - Data sources, make targets and the terrain pipeline are documented in `docs/data-pipeline.md`; the
   README only links there. Keep the README short.

@@ -152,6 +152,8 @@ func _ready() -> void:
 			_configure_environment()
 		elif a.begins_with("--enter="):
 			get_tree().create_timer(2.5).timeout.connect(enter_building.bind(a.trim_prefix("--enter=")))
+		elif a.begins_with("--examine="):
+			get_tree().create_timer(4.0).timeout.connect(examine_building.bind(a.trim_prefix("--examine=")))
 		elif a == "--leave":
 			# checks: after --enter, step back out and turn to face the door from the street
 			get_tree().create_timer(4.0).timeout.connect(func():
@@ -606,6 +608,32 @@ func from_dict(d: Dictionary) -> void:
 
 ## Step into the first real building of the origin layer or any loaded tile whose address contains
 ## `needle` (debug: --enter=, dev channel). "<address>@<degrees>" turns the player after stepping in.
+## Checks: the register sheet of the first building whose address contains `needle`, as E on its
+## wall opens it (--examine="<address part>").
+func examine_building(needle: String) -> bool:
+	for layer in _building_scopes():
+		for b in layer.find_children("*", "FootprintBuilding", true, false):
+			if needle.to_lower() in str(b.address).to_lower():
+				var info := BuildingInfo.new()
+				info.setup(b)
+				info.interact(player)
+				info.free()
+				return true
+	print("[world] --examine: no building matching %s" % needle)
+	return false
+
+
+## The era layers a building can be found in: this tile's and every streamed neighbour's.
+func _building_scopes() -> Array:
+	var scopes: Array = [$EraLayers.get_node_or_null(GameState.current_era)]
+	if streamer:
+		for loc in streamer.tiles:
+			var root: Node = streamer.tiles[loc].get("root")
+			if root:
+				scopes.append(root.get_node_or_null("Era"))
+	return scopes.filter(func(l): return l != null)
+
+
 func enter_building(needle: String) -> bool:
 	var interiors: Interiors = get_node_or_null("Interiors")
 	if interiors == null:
@@ -614,15 +642,7 @@ func enter_building(needle: String) -> bool:
 	if "@" in needle:
 		turn = deg_to_rad(float(needle.get_slice("@", 1)))
 		needle = needle.get_slice("@", 0)
-	var scopes: Array = [$EraLayers.get_node_or_null(GameState.current_era)]
-	if streamer:
-		for loc in streamer.tiles:
-			var root: Node = streamer.tiles[loc].get("root")
-			if root:
-				scopes.append(root.get_node_or_null("Era"))
-	for layer in scopes:
-		if layer == null:
-			continue
+	for layer in _building_scopes():
 		for b in layer.find_children("*", "FootprintBuilding", true, false):
 			if needle.to_lower() in str(b.address).to_lower() and b.get_node_or_null("Door"):
 				interiors.enter(b, player)

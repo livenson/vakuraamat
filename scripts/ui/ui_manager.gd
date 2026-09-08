@@ -55,7 +55,7 @@ func _ready() -> void:
 	journal = _build_panel("UI_JOURNAL")
 	debug_map = _build_panel("UI_DEBUG_MAP")
 	sheet_panel = _build_panel("")
-	sheet_panel.custom_minimum_size = Vector2(640, 420)
+	sheet_panel.custom_minimum_size = Vector2(940, 660)   # room for the plot's strip of years under the sheet
 	pause = _build_panel("UI_MENU")
 	report_panel = _build_panel("UI_REPORT_TITLE")
 	report_panel.custom_minimum_size = Vector2(640, 0)
@@ -443,16 +443,37 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 ## A readable's page: the title as the head, the text as prose; any panel key closes it.
-func show_sheet(title: String, text: String) -> void:
+## A readable's page. With `tunnus`, the sheet is a building's, and it also carries the plot it
+## stands on: the land over the years and a way into the book's plot page, because a building's own
+## register line does not say what the ground under it was doing before it was built.
+func show_sheet(title: String, text: String, tunnus: String = "") -> void:
 	var body := _clear_body(sheet_panel)
 	body.get_node("Title").text = title
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	body.add_child(scroll)
-	var prose := BookTheme.label(text, "ProseLabel", scroll)
+	var page := VBoxContainer.new()
+	page.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	page.size_flags_vertical = Control.SIZE_SHRINK_BEGIN   # the strip keeps its height; the page scrolls
+	page.add_theme_constant_override("separation", 8)
+	scroll.add_child(page)
+	var prose := BookTheme.label(text, "ProseLabel", page)
 	prose.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	prose.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	if tunnus != "" and PlotStrip.can_show(world, tunnus):
+		var strip := PlotStrip.new()
+		page.add_child(strip)
+		strip.setup(world, tunnus)
+		var open_book := Button.new()
+		open_book.text = tr("UI_SHEET_OPEN_PLOT")
+		open_book.pressed.connect(func():
+			_close()
+			ledger_panel.open_parcel(tunnus)
+			_open(ledger_panel))
+		var row := HBoxContainer.new()
+		row.add_child(open_book)
+		page.add_child(row)
 	var hint := BookTheme.label(tr("UI_SHEET_CLOSE"), "DetailLabel", body)
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	if _open_panel and _open_panel != sheet_panel:
