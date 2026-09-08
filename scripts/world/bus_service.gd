@@ -38,9 +38,10 @@ func _physics_process(delta: float) -> void:
 	if not is_visible_in_tree() or GameState.world == null:
 		return
 	for key in _running:
+		if not is_instance_valid(_running[key]):
+			continue   # checked before the typed assignment: assigning a freed instance is the error
 		var bus: BusAgent = _running[key]
-		if is_instance_valid(bus):
-			bus.advance(delta)
+		bus.advance(delta)
 	_timer -= delta
 	if _timer > 0.0:
 		return
@@ -86,10 +87,12 @@ func _sync() -> void:
 				_running[key] = bus
 				print("[buses] %s %s left at %s, %.0f m along" % [r.get("line", ""), r.get("headsign", ""), t, bus.s])
 	for key in _running.keys():
+		if not is_instance_valid(_running[key]):
+			_running.erase(key)
+			continue
 		var bus: BusAgent = _running[key]
-		if not live.has(key) or not is_instance_valid(bus) or bus.done:
-			if is_instance_valid(bus):
-				bus.queue_free()
+		if not live.has(key) or bus.done:
+			bus.queue_free()
 			_running.erase(key)
 
 

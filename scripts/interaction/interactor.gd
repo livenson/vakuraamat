@@ -95,9 +95,13 @@ func _survey_pick() -> Interactable:
 	var best: FootprintBuilding = null
 	var best_far := INF
 	for entry in _survey:
-		var b: FootprintBuilding = entry[0]
-		if not is_instance_valid(b):
+		# the validity check has to come before the typed assignment, not after it: assigning a freed
+		# instance to a typed variable is itself the error, and a tile unloading frees its buildings
+		# while this list still holds them
+		if not is_instance_valid(entry[0]):
+			_survey_age = 0.0   # something went away: rebuild on the next tick rather than limp on
 			continue
+		var b: FootprintBuilding = entry[0]
 		var to: Vector3 = entry[1] - eye
 		var far := to.length()
 		if far > REACH_FLY or far < 0.001 or far >= best_far:
