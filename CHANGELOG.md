@@ -1,12 +1,58 @@
 # Changelog
 
 What changed in each release. A release is an annotated `v*` tag; pushing it builds macOS, Windows
-and Linux and attaches them to a GitHub release whose notes are the tag's message plus the commits
-since the previous tag (`.github/workflows/build.yml`). Entries here are written for players, so a
-change is described by what it does rather than by the code it touched; the commit list in the
-release has the detail.
+and Linux and attaches them to a GitHub release whose notes are **this file's entry for that tag**,
+followed by the commits since the previous one (`.github/workflows/build.yml`; the tag's own message
+stands in when an entry is missing). Entries here are written for players, so a change is described
+by what it does rather than by the code it touched; the commit list in the release has the detail.
 
 The earliest entries were written from the tags' own messages after the fact.
+
+## v0.5.0 — 2026-09-08
+
+The land has a history now, and you can find your way around the town by typing.
+
+### What the ground was doing before
+
+- **A plot's page in the book shows the land itself, decade by decade**: the same square photographed
+  in 1993–2000, 2010, 2015, 2020 and today, with the plot's own boundary drawn on every one. A plot
+  that was forest in 1998 and a car park now says something its land value does not. The pictures
+  come from the orthophoto campaigns Maa-amet has flown since 1993; today's is the tile's own
+  photograph, so it always matches the world you are standing in.
+- **Click a year to see it properly.** It opens at the size of the screen, fetched at that size
+  rather than blown up, with the years along the bottom and the arrow keys to step between them.
+- **Pressing E on a building shows it too.** A building stands on a plot, and what the ground was
+  doing before it was built is the same question in both places — there is a button through to the
+  plot's page in the book.
+- Campaigns that did not fly over your plot are left out rather than shown blank, and a plot is
+  fetched once and remembered.
+
+### Finding a place
+
+- **`/` opens a find bar over the world.** Type and plots, buildings, companies and streets come
+  back with what they are and how far away. Enter points the arrow at one; Shift+Enter jumps.
+  Pointing is the default on purpose — this is a game about walking a square kilometre.
+- **The plot list has a search field** that narrows it as you type: an address, a cadastral number,
+  or a company registered on the plot. A page holds 120 of a few hundred plots, so this is how you
+  reach the ones past the letter A.
+- **The plot list is ordered by name**, and ordered the way you read it: Aeru tn 9 comes before
+  Aeru tn 10. Click any column heading to sort by it instead — area, value, price, owner, yield, or
+  nearest first, which is what the list used to be.
+- Searching knows the register writes streets two ways: "Aeru tn" and "Aeru tänav" are the same
+  street, and either finds either. Estonian letters fold, so a keyboard without them still works.
+
+### Elsewhere
+
+- **A building's year now says "in use since".** The register records the year a building was taken
+  into use — in practice the year of its use permit, which can be long after it was built. Madruse
+  tn 4 stands in the 2010 photograph and has a permit dated 2015. There is no better year in the
+  register, so the game stops implying one.
+- The load no longer prints a warning for every building and parcel it places.
+- Under the floor: the national elevation sheets can now be read by the game itself rather than by
+  the Python pipeline — the first piece of making a new place without a service behind it.
+- [docs/historical-imagery.md](docs/historical-imagery.md) writes down what else is available:
+  orthophotos for nearly every year since 1993, map series back to 1866, and Maa-amet's archive of
+  5.5 million aerial photographs.
 
 ## v0.4.1 — 2026-09-08
 
