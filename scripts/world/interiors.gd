@@ -53,6 +53,8 @@ func _exit_tree() -> void:
 ## One door per real building of the origin layer, or of a streamed tile's root when given
 ## (outbuildings and huts excluded).
 func attach_doors(scope: Node = null) -> void:
+	if scope == null and world and world.filling:
+		return   # the origin layer's buildings are still arriving; the world calls again when they stand
 	var layer: Node = scope if scope else (world.get_node("EraLayers").get_node_or_null(GameState.current_era) if world else null)
 	if layer == null or not is_instance_valid(layer):
 		return

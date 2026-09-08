@@ -44,6 +44,43 @@ static var threaded := true
 var is_built := false
 var _job: BuildJob
 
+# The worker threads all report back in the same frame (a tile's 500 jobs finish within a few
+# hundred milliseconds of each other), and each mesh, its collider and its draw calls cost the main
+# thread a millisecond or two: that landed as one 1.3-2 s frame. The finished jobs queue here and a
+# few milliseconds' worth are applied per frame instead.
+const APPLY_BUDGET_USEC := 5000
+static var _apply_queue: Array = []
+static var _apply_hooked := false
+
+
+static func _queue_apply(job) -> void:
+	var tree := Engine.get_main_loop()
+	if not threaded or DisplayServer.get_name() == "headless" or not (tree is SceneTree):
+		var node = job.owner.get_ref()
+		if node and is_instance_valid(node):
+			node._apply(job)
+		return
+	_apply_queue.append(job)
+	_drain()
+
+
+static func _drain() -> void:
+	var t0 := Time.get_ticks_usec()
+	while not _apply_queue.is_empty() and Time.get_ticks_usec() - t0 < APPLY_BUDGET_USEC:
+		var job = _apply_queue.pop_front()
+		var node = job.owner.get_ref()
+		if node and is_instance_valid(node):
+			node._apply(job)
+	var tree := Engine.get_main_loop()
+	if not _apply_queue.is_empty() and not _apply_hooked and tree is SceneTree:
+		_apply_hooked = true
+		tree.process_frame.connect(_drain_next, CONNECT_ONE_SHOT)
+
+
+static func _drain_next() -> void:
+	_apply_hooked = false
+	_drain()
+
 
 func _ready() -> void:
 	if polygon.size() < 3 and _model().is_empty():
@@ -179,9 +216,7 @@ class BuildJob:
 		call_deferred("_done")
 
 	func _done() -> void:
-		var node = owner.get_ref()
-		if node and is_instance_valid(node):
-			node._apply(self)
+		FootprintBuilding._queue_apply(self)
 
 	func _ground_at(xz: Vector2) -> float:
 		return float(grounds.get(xz, NAN))

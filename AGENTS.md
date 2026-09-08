@@ -147,6 +147,15 @@ its design documents in the repo root describe that version.
 - Godot `-s` tool scripts run without autoloads: static helpers used by tools take paths, not `Sites`.
 - Water patches from `extract_features.py` are bounding rectangles; long ditches become slabs over
   land. Basins are carved only where the DTM was flat, but the surface still covers the rectangle.
+- Loading a world hands the player the ground first and fills the rest in behind them: the era scene
+  is parsed on a loader thread, its `Buildings` and `Parcels` enter the tree nearest-first a few
+  milliseconds a frame (`EraController.detach_heavy` / `fill_pending`, the same path the streamer
+  uses for neighbour tiles), finished building meshes are applied on a per-frame budget
+  (`FootprintBuilding._queue_apply`), and a downloaded tile's vegetation is scattered after the fade
+  lifts. Anything that walks the whole layer (doors, tenant signs, `_building_blocks`) must therefore
+  skip its pass while `world.filling` and run again on `world.era_filled`, or it will scan a growing
+  tree over and over and miss what arrives late. `data/vegetation.ok` marks a tile whose greenery
+  stands; the runtime scatter never rewrites `terrain_assets.tres` (`save_assets` false), only `make tile` does.
 
 ## Tests
 `tools/godot/*_test.tscn`: boot (autoloads, the layer, offline ledger, save), site (every pack:

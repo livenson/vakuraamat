@@ -60,6 +60,20 @@ static func has_region_data(tile_dir: String) -> bool:
 	return FileAccess.file_exists(tile_dir + "/data/terrain3d_00_00.res")
 
 
+## Written by scatter once the tile's trees, bushes and grass are in the saved region. The ground
+## is saved before them (import), so this marks the difference between a built tile and a bald one
+## whose scatter was interrupted; the world scatters again when it is missing.
+static func has_vegetation(tile_dir: String) -> bool:
+	return FileAccess.file_exists(tile_dir + "/data/vegetation.ok")
+
+
+static func mark_vegetated(tile_dir: String) -> void:
+	var f := FileAccess.open(tile_dir + "/data/vegetation.ok", FileAccess.WRITE)
+	if f:
+		f.store_line(Time.get_datetime_string_from_system())
+		f.close()
+
+
 func _tick(stage: String, f: float) -> void:
 	PerfLog.mark("terrain %s %d%%" % [stage, int(f * 100)])
 	progress.emit(stage, f)
@@ -380,7 +394,11 @@ func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Arr
 ## the loaded assets, so the tool captures it before the node enters the tree).
 ## `loc` other than (0,0): a streamed neighbour region; the mesh assets are already set up by the
 ## origin, only that region is populated and its file cached.
-func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value: int = 1798, keep_textures: Array = [], loc: Vector2i = Vector2i.ZERO, mask: Image = null) -> Array:
+## `save_assets` false: only the region data is written back, the tile's terrain_assets.tres is left
+## alone. The world scatters a downloaded tile with the game already running, from whatever assets
+## the tile shipped; a save from there would put that (mesh assets only) over the textured file the
+## import wrote. `make tile` saves.
+func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value: int = 1798, keep_textures: Array = [], loc: Vector2i = Vector2i.ZERO, mask: Image = null, save_assets: bool = true) -> Array:
 	var assets: Terrain3DAssets = terrain.assets
 	var texture_list: Array = keep_textures if not keep_textures.is_empty() else assets.texture_list.duplicate()
 	var origin := Vector3(loc.x * terrain.region_size, 0.0, loc.y * terrain.region_size)
@@ -402,6 +420,9 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 		ma.cast_shadows = 1 if r.shadows else 0
 		assets.set_mesh_asset(i, ma)
 		terrain.instancer.clear_by_mesh(i)
+	if loc == Vector2i.ZERO:
+		# the scatter can run with the world on screen: the ground keeps its textures throughout
+		assets.texture_list = texture_list
 	var region: Terrain3DRegion = terrain.data.get_region(loc)
 	var ctrl: Image = region.get_control_map() if region else terrain.data.control_maps[0]
 	var size := ctrl.get_width()
@@ -469,7 +490,8 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 		await _tick("done", 1.0)
 		return counts
 	terrain.data.save_directory(tile_dir + "/data")
-	assets.texture_list = texture_list
-	ResourceSaver.save(assets, tile_dir + "/terrain_assets.tres")
+	if save_assets:
+		ResourceSaver.save(assets, tile_dir + "/terrain_assets.tres")
+	mark_vegetated(tile_dir)
 	await _tick("done", 1.0)
 	return counts

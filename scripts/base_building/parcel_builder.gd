@@ -15,12 +15,16 @@ func setup(w: Node3D) -> void:
 	Ledger.parcel_changed.connect(func(_t): refresh())
 	if w.streamer:
 		w.streamer.tile_ready.connect(func(_loc: Vector2i, root: Node3D): _sign_buildings(root))
+	# the origin layer's buildings arrive over the first seconds: sign them all once they stand
+	w.era_filled.connect(func(layer: EraController):
+		_signed = _sign_buildings(layer)
+		refresh())
 	refresh()
 
 
 func refresh() -> void:
-	if world == null or world.terrain == null or world.terrain.data == null:
-		return
+	if world == null or world.terrain == null or world.terrain.data == null or world.filling:
+		return   # the layer is still filling: _building_blocks would walk a growing tree every time
 	if not _signed:
 		_signed = _sign_buildings()
 	var seen := {}

@@ -16,8 +16,6 @@ class_name TileStreamer
 extends Node3D
 
 const AMBIENT := ["Buildings", "Roads", "Parcels", "Traffic", "Village"]
-const STAGGERED := ["Buildings", "Parcels"]   # groups whose members enter the tree a few ms a frame
-const FILL_BUDGET_USEC := 8000                 # per frame, for the staggered members (each builds its mesh and collision in _ready)
 
 signal tile_ready(loc: Vector2i, root: Node3D)     # after _load, and again when set_era re-instances a tile's Era
 signal tile_unloaded(loc: Vector2i)                 # before the root is freed; tiles[loc].root is still valid
@@ -286,7 +284,7 @@ func _layout_of(pack: String) -> Dictionary:
 ## scene shows only those: two exteriors of one house left its windows opaque from inside.
 static func trim_to_tile(era_node: Node, tile_size: float) -> int:
 	var dropped := 0
-	for group_name in STAGGERED:
+	for group_name in EraController.STAGGERED:
 		var group: Node = era_node.get_node_or_null(group_name)
 		if group == null:
 			continue
@@ -314,7 +312,7 @@ func _set_tile_era(loc: Vector2i, era_id: String) -> void:
 		return
 	var scene: PackedScene = await _era_scene(root, str(t.pack), era_id)
 	if scene != null:
-		await _fill_era(root, scene, loc)
+		await _fill_era(root, scene)
 
 
 ## The pack's era scene, a text file with hundreds of nodes: parsed on a loader thread and polled
@@ -340,10 +338,10 @@ func _era_scene(root: Node3D, pack: String, era_id: String) -> PackedScene:
 
 
 ## The era's ambient nodes under the tile root; story nodes are dropped before _ready. The heavy
-## groups enter empty and their members are added back a few milliseconds a frame, so a city tile
-## (hundreds of buildings, each building its mesh and collision in _ready) no longer costs one
-## two-second frame and a stalled GPU fence.
-func _fill_era(root: Node3D, scene: PackedScene, loc: Vector2i) -> void:
+## groups enter empty and their members are added back a few milliseconds a frame
+## (EraController.fill_pending), so a city tile (hundreds of buildings, each building its mesh and
+## collision in _ready) no longer costs one two-second frame and a stalled GPU fence.
+func _fill_era(root: Node3D, scene: PackedScene) -> void:
 	var t_scene := Time.get_ticks_msec()
 	var node: Node3D = scene.instantiate()
 	PerfLog.mark("instantiate %d ms" % (Time.get_ticks_msec() - t_scene))
@@ -353,32 +351,12 @@ func _fill_era(root: Node3D, scene: PackedScene, loc: Vector2i) -> void:
 			c.free()
 	node.name = "Era"
 	trim_to_tile(node, size)
-	var pending: Array = []   # [group, member]
-	for group in node.get_children():
-		if group.name in STAGGERED:
-			for m in group.get_children():
-				group.remove_child(m)
-				pending.append([group, m])
+	var pending: Array = node.detach_heavy() if node is EraController else []
 	root.add_child(node)
-	var t0 := Time.get_ticks_usec()
-	var alive := true
-	for i in pending.size():
-		alive = is_instance_valid(node) and node.is_inside_tree()
-		if not alive:
-			for j in range(i, pending.size()):
-				pending[j][1].free()   # the tile was unloaded meanwhile
-			break
-		var t_m := Time.get_ticks_usec()
-		pending[i][0].add_child(pending[i][1])
-		if Time.get_ticks_usec() - t_m > 25000:
-			PerfLog.mark("slow member %s/%s %d ms" % [pending[i][0].name, pending[i][1].name, (Time.get_ticks_usec() - t_m) / 1000])
-		if Time.get_ticks_usec() - t0 > FILL_BUDGET_USEC:
-			await get_tree().process_frame
-			t0 = Time.get_ticks_usec()
-	if alive and is_instance_valid(node) and node.is_inside_tree():
-		PerfLog.mark("tile era filled %s (%d members)" % [loc, pending.size()])
-		if node is EraController:
-			node.activate()
+	if node is EraController:
+		node.activate()   # the empty groups snap in no time; the members snap as they arrive
+		var player: Node3D = world.get_node_or_null("Player") if world else null
+		await node.fill_pending(pending, player.global_position if player else root.global_position)
 
 
 func set_era(era_id: String) -> void:

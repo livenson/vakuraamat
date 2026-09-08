@@ -5,6 +5,8 @@ extends Node3D
 
 const FADE_TIME := 1.2
 
+signal era_filled(layer: EraController)   # the layer's staggered buildings and parcels all stand
+
 @onready var terrain: Terrain3D = $Terrain3D
 @onready var sky: Sky3D = $Sky3D
 @onready var player: CharacterBody3D = $Player
@@ -21,6 +23,7 @@ var _screenshot_frame := 240
 var _frames := 0
 var _ready_done := false            # screenshots and the clock wait for the terrain build
 var _era_nodes: Dictionary = {}     # era_id -> EraController
+var filling := false                # the active layer's buildings and parcels are still arriving
 var _spawn := Vector3(512, 0, 512)  # from the site manifest "start.spawn" (tile metres)
 
 
@@ -104,6 +107,8 @@ func _ready() -> void:
 	interiors.name = "Interiors"
 	add_child(interiors)
 	interiors.setup(self)
+	if _needs_vegetation(tile_dir):
+		_green_after_fill(tile_dir)   # not awaited: the tile greens over while the player stands on it
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--screenshot="):
 			_screenshot_path = a.trim_prefix("--screenshot=")
@@ -247,9 +252,15 @@ func apply_era(era: EraDefinition, first_visit: bool) -> void:
 	for id in _era_nodes:
 		_era_nodes[id].deactivate()
 	var node: EraController = _era_nodes.get(era.id)
+	var pending: Array = []
 	if node == null:
-		node = load(era.scene_path).instantiate()
+		var scene: PackedScene = await _era_scene(era.scene_path)
+		if scene == null:
+			push_error("era scene missing: %s" % era.scene_path)
+			return
+		node = scene.instantiate()
 		TileStreamer.trim_to_tile(node, float(terrain.region_size))
+		pending = node.detach_heavy()   # buildings and parcels arrive over the next frames
 		layers.add_child(node)
 		_era_nodes[era.id] = node
 	node.activate()
@@ -264,6 +275,40 @@ func apply_era(era: EraDefinition, first_visit: bool) -> void:
 		var tw2 := create_tween()
 		tw2.tween_property(fade, "color:a", 0.0, FADE_TIME * 0.5)
 		await tw2.finished
+	if not pending.is_empty():
+		filling = true
+		_fill_layer(node, pending)   # not awaited: the town fills in around the player who already stands in it
+
+
+## The era layer's text scene (hundreds of nodes) parsed on a loader thread, so the loading screen
+## keeps drawing while it is read.
+func _era_scene(path: String) -> PackedScene:
+	if not ResourceLoader.exists(path):
+		return null
+	if ResourceLoader.has_cached(path):
+		return ResourceLoader.load(path, "PackedScene")
+	var t0 := Time.get_ticks_msec()
+	if ResourceLoader.load_threaded_request(path, "PackedScene") != OK:
+		return ResourceLoader.load(path, "PackedScene")
+	while ResourceLoader.load_threaded_get_status(path) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+		await get_tree().process_frame
+	if ResourceLoader.load_threaded_get_status(path) != ResourceLoader.THREAD_LOAD_LOADED:
+		return null
+	PerfLog.mark("era scene %s parsed in %d ms" % [path.get_file(), Time.get_ticks_msec() - t0])
+	return ResourceLoader.load_threaded_get(path)
+
+
+## The layer's buildings and parcels, nearest the player first, a few milliseconds a frame. Doors
+## are attached again at the end: the ones added after Interiors' first pass have none yet.
+func _fill_layer(node: EraController, pending: Array) -> void:
+	await node.fill_pending(pending, player.global_position, EraController.ARRIVAL_BUDGET_USEC)
+	filling = false
+	if is_instance_valid(node) and node.is_inside_tree():
+		_push_out_of_buildings(node)
+		var ins: Node = get_node_or_null("Interiors")
+		if ins:
+			ins.attach_doors()
+	era_filled.emit(node)
 
 
 func _set_drape(era: EraDefinition) -> void:
@@ -294,8 +339,9 @@ func _enter_tree() -> void:
 	t3d.data_directory = dir + "/data"
 
 
-## First visit to a downloaded tile: import the heightmap/orthophoto and scatter vegetation
-## into the live Terrain3D, saving the region data for next time. Shows progress on the fade.
+## First visit to a downloaded tile: import the heightmap and the orthophoto into the live
+## Terrain3D and save the region data. Only the ground the player stands on: the vegetation is
+## scattered afterwards by _scatter_vegetation, with the world already on screen. Progress on the fade.
 func _build_terrain(tile_dir: String) -> void:
 	var label := Label.new()
 	label.set_anchors_preset(Control.PRESET_CENTER)
@@ -304,21 +350,52 @@ func _build_terrain(tile_dir: String) -> void:
 	label.add_theme_font_size_override("font_size", 28)
 	label.add_theme_color_override("font_color", Color(0.85, 0.68, 0.25))
 	fade.add_child(label)
-	var builder := TerrainBuilder.new()
-	builder.yielding = true
-	builder.tree = get_tree()
+	var builder := _builder()
 	builder.progress.connect(func(stage: String, f: float): label.text = "%s\n%s  %d%%" % [tr("UI_BUILDING_GROUND"), stage, int(f * 100)])
-	var layout := Sites.layout()
-	var ok: bool = await builder.import(terrain, tile_dir, layout)
-	if ok:
-		var mask := TerrainBuilder.footprint_mask(Sites.path("buildings.json"), terrain.region_size, TerrainBuilder.road_mask(Sites.path("roads.json"), terrain.region_size))
-		await builder.scatter(terrain, tile_dir, layout.get("exclusions", []) + TerrainBuilder.water_exclusions(Sites.path(str(Sites.get_value("water", "")))), 1798, [], Vector2i.ZERO, mask)
+	await builder.import(terrain, tile_dir, Sites.layout())
 	# let Terrain3D rebuild its clipmap and collision around the camera before anyone is placed on it
 	terrain.set_camera(player.camera)
 	terrain.data.update_maps()
 	for i in 3:
 		await get_tree().process_frame
 	label.queue_free()
+
+
+## Does this tile still need its trees, bushes and grass? A tile built before the marker existed
+## carries its instances in the saved region: mark it instead of scattering it again.
+func _needs_vegetation(tile_dir: String) -> bool:
+	if not TerrainBuilder.has_inputs(tile_dir) or TerrainBuilder.has_vegetation(tile_dir):
+		return false
+	var region: Terrain3DRegion = terrain.data.get_region(Vector2i.ZERO) if terrain.data else null
+	if region and not region.get_instances().is_empty():
+		TerrainBuilder.mark_vegetated(tile_dir)
+		return false
+	return true
+
+
+## The town first, the greenery after it: both cost the main thread, and a building beside the
+## player is worth more than the grass across the tile.
+func _green_after_fill(tile_dir: String) -> void:
+	if filling:
+		await era_filled
+	await _scatter_vegetation(tile_dir)
+
+
+func _builder() -> TerrainBuilder:
+	var builder := TerrainBuilder.new()
+	builder.yielding = true
+	builder.tree = get_tree()
+	return builder
+
+
+## The tile's trees, bushes and grass, scattered with the world already on screen (a bald tile
+## greens over a couple of seconds instead of holding the loading screen). Runs on a tile whose
+## marker is missing, so an interrupted scatter is picked up on the next visit.
+func _scatter_vegetation(tile_dir: String) -> void:
+	var layout := Sites.layout()
+	var mask := TerrainBuilder.footprint_mask(Sites.path("buildings.json"), terrain.region_size, TerrainBuilder.road_mask(Sites.path("roads.json"), terrain.region_size))
+	var exclusions: Array = layout.get("exclusions", []) + TerrainBuilder.water_exclusions(Sites.path(str(Sites.get_value("water", ""))))
+	await _builder().scatter(terrain, tile_dir, exclusions, 1798, terrain.assets.texture_list.duplicate(), Vector2i.ZERO, mask, false)
 
 
 func _configure_sky() -> void:

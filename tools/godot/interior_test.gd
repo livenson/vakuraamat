@@ -25,6 +25,9 @@ func _ready() -> void:
 	add_child(world)
 	await get_tree().process_frame
 	await get_tree().create_timer(1.0).timeout
+	if world.filling:
+		await world.era_filled   # the layer's buildings arrive over the first frames; doors follow them
+		await get_tree().process_frame
 	var interiors: Interiors = world.get_node_or_null("Interiors")
 	_check(interiors != null and Interiors.instance == interiors, "no Interiors node")
 	var layer: Node = world.get_node("EraLayers").get_node_or_null(GameState.current_era)
