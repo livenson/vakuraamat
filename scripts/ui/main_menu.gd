@@ -151,6 +151,20 @@ func _entry(key: String, detail: String, cb: Callable) -> Button:
 func _enter_world() -> void:
 	if Locator.ground_is_coarse(Sites.active):
 		await Locator.take_refined(Sites.active)
+	# The tile the world starts on cannot be swapped from under a running world: World never unloads
+	# it and site_changed drops the registries while its era scene is already standing. So an
+	# out-of-date pack is rebuilt here, on the doorstep, where nothing is instanced yet.
+	if Sites.is_stale(Sites.active):
+		var sheet := _progress_sheet(Sites.display_name(Sites.active), "MENU_REFRESHING", "MENU_REFRESH_NOTE")
+		var cb := func(text: String, f: float): sheet.get_meta("stage").call(text, f)
+		Locator.progress.connect(cb)
+		var r: Dictionary = await Locator.refresh_pack(Sites.active, false)
+		Locator.progress.disconnect(cb)
+		if r.get("ok", false):
+			Sites.reload_active()
+		if is_instance_valid(sheet):
+			sheet.queue_free()
+			_page.process_mode = Node.PROCESS_MODE_INHERIT
 	get_tree().change_scene_to_file("res://scenes/world/world.tscn")
 
 
@@ -515,7 +529,7 @@ func _create(name: String, x: float, y: float, id_override: String = "") -> void
 ## A modal sheet over the page: the heading, a note on what is fetched, the stage line, a bar and the
 ## elapsed time. Blocks the page (input and focus) while it is up; `stage(text, f)` advances it,
 ## `fail(error)` turns it into an error notice with a Close button that thaws the page.
-func _progress_sheet(name: String) -> Control:
+func _progress_sheet(name: String, head_key := "MENU_GENERATING", note_key := "MENU_CREATE_NOTE") -> Control:
 	var page := _page
 	page.process_mode = Node.PROCESS_MODE_DISABLED
 	get_viewport().gui_release_focus()
@@ -539,9 +553,9 @@ func _progress_sheet(name: String) -> Control:
 	var col := VBoxContainer.new()
 	col.add_theme_constant_override("separation", 10)
 	panel.add_child(col)
-	var head := BookTheme.label(tr("MENU_GENERATING") % name, "HeadLabel", col)
+	var head := BookTheme.label(tr(head_key) % name, "HeadLabel", col)
 	head.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	var note := BookTheme.label(tr("MENU_CREATE_NOTE"), "DetailLabel", col)
+	var note := BookTheme.label(tr(note_key), "DetailLabel", col)
 	note.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var gap := Control.new()
 	gap.custom_minimum_size = Vector2(0, 8)

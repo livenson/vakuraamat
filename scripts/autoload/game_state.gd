@@ -21,14 +21,20 @@ func _ready() -> void:
 	reload()
 
 
-## (Re)load the registries from the active site pack. The parsed-pack caches go with them: a pack
-## reinstalled under the player (Locator.take_refined) would otherwise answer from the old files.
-func reload() -> void:
+## Drop every cache holding a pack's parsed files. A pack reinstalled under the player
+## (Locator.take_refined, Locator.refresh_pack) is written to the same paths these are keyed on, so
+## without this the game keeps answering from the files it read before. The one list of them.
+func forget_caches() -> void:
 	Parcels.forget()
 	Tenants.forget()
 	News.forget()
 	Departures.forget()
 	PlaceSearch.forget()
+
+
+## (Re)load the registries from the active site pack.
+func reload() -> void:
+	forget_caches()
 	eras.clear()
 	Sites.load_dir(Sites.data_dir("eras"), eras)
 	print("[GameState] site %s: %d layer(s)" % [Sites.active, eras.size()])

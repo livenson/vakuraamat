@@ -97,6 +97,7 @@ func _process(delta: float) -> void:
 		return
 	_timer = 0.5
 	_update(world.player.global_position)
+	_refresh_stale()
 
 
 ## Request every neighbour within reach of `pos`; drop tiles left far behind.
@@ -400,6 +401,72 @@ func _hide_haze(loc: Vector2i) -> void:
 	if _haze != null and _haze.has(loc):
 		_haze[loc].queue_free()
 		_haze.erase(loc)
+
+
+var _refreshing := false
+
+
+## A tile whose pack an older pipeline built is loaded first and rebuilt afterwards - the place is
+## complete either way, and holding the player at the edge for a rebuild they did not ask for would
+## be a worse trade than a minute of the map's older colours. One at a time, behind the fetch queue.
+func _refresh_stale() -> void:
+	if _refreshing or _loading or _busy or not _queue.is_empty():
+		return
+	var now := Time.get_ticks_msec() / 1000.0
+	for loc in tiles:
+		if loc == Vector2i.ZERO or not is_ready(loc) or not Sites.is_stale(str(tiles[loc].pack)):
+			continue
+		if now >= float(tiles[loc].get("refresh_at", 0.0)):
+			_refreshing = true
+			await refresh_tile(loc)
+			_refreshing = false
+			return
+
+
+## Rebuild a standing tile's pack in place and swap the result in. A refresh rewrites the pack's
+## register files and leaves user://tiles alone, so no Terrain3D region is added or removed: the
+## swap costs a scene re-instance rather than the second-long region churn of an unload, and the
+## ground the player can see never blinks.
+##
+## The tile stays usable for the whole fetch and is marked "loading" only for the moment of the
+## swap. Even that moment is refused while the player is standing in the tile - guard() would put
+## them back at its edge and hold them there - or is inside a room that the era scene owns.
+## Returns true when the swap happened.
+func refresh_tile(loc: Vector2i) -> bool:
+	if loc == Vector2i.ZERO or not is_ready(loc) or world == null:
+		return false   # the origin tile is the active pack: the menu refreshes that one on the way in
+	if not _may_swap(loc):
+		return false
+	var t: Dictionary = tiles[loc]
+	var pack: String = t.pack
+	print("[Tiles] refreshing %s at %s" % [pack, loc])
+	var r: Dictionary = await Locator.refresh_pack(pack)
+	if not tiles.has(loc) or tiles[loc] != t:
+		return false   # unloaded while the service worked
+	if not r.get("ok", false):
+		t.refresh_at = Time.get_ticks_msec() / 1000.0 + RETRY_S
+		print("[Tiles] %s not refreshed: %s" % [pack, str(r.get("error", ""))])
+		return false
+	if not _may_swap(loc):
+		# the files on disk are new; the tile in front of them is not. The next tick tries again.
+		return false
+	# Everything hanging off the old root came out of files that have just been rewritten. _load
+	# skips the region (it is still registered) and rebuilds the water and the era from the new ones.
+	t.state = "loading"
+	tile_unloaded.emit(loc)
+	if t.get("root"):
+		t.root.queue_free()
+		t.root = null
+	await _load(loc)
+	return is_ready(loc)
+
+
+## Whether a tile can be pulled down and rebuilt without the player noticing from the inside.
+func _may_swap(loc: Vector2i) -> bool:
+	if Interiors.instance and Interiors.instance.inside:
+		return false   # the room around them is an instance of the scene about to be replaced
+	var player: Node3D = world.player
+	return player == null or tile_of(player.global_position) != loc
 
 
 func _unload(loc: Vector2i) -> void:

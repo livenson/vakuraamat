@@ -401,6 +401,63 @@ func take_refined(id: String) -> bool:
 	return true
 
 
+## Rebuild a pack that an older pipeline built, and put the result in place. The registers are
+## re-fetched and the ground is not, so nothing under user://tiles changes and the caller can swap
+## the pack into a running world without touching a Terrain3D region.
+##
+## Returns {ok, id, error}. The caller is responsible for whatever is holding the old data: a
+## streamed tile re-instances its era, the active pack goes through Sites.reload_active().
+func refresh_pack(id: String, quiet: bool = true) -> Dictionary:
+	var m := Sites.manifest_for(id)
+	var t: Dictionary = m.get("terrain", {})
+	var c: Array = t.get("center", []) if typeof(t) == TYPE_DICTIONARY else []
+	if c.size() != 2:
+		return {"ok": false, "id": id, "error": "no centre in the manifest"}
+	# Never start the service for this. A pack built by an older pipeline is a complete, playable
+	# place; the refresh is an improvement, and it must not cost a service launch on the way in.
+	if not await service_alive():
+		return {"ok": false, "id": id, "error": "the tile service is not running"}
+	var r := await fetch_pack(id, str(m.get("description", id)), float(c[0]), float(c[1]), int(t.get("size", 1024)), _eras_of(id), -1, [], true, quiet)
+	if not r.get("ok", false):
+		return r
+	# The service hands back the zip it has if a restart lost the job, so the pack that just landed
+	# may still be the old one. Believe the stamp, not the request.
+	Sites.scan()
+	if Sites.pack_version(id) < Sites.PACK_VERSION:
+		return {"ok": false, "id": id, "error": "the pack is still stamped %d" % Sites.pack_version(id)}
+	forget_pack(id)
+	print("[Locator] %s refreshed to pipeline %d" % [id, Sites.pack_version(id)])
+	return {"ok": true, "id": id, "error": ""}
+
+
+## Drop everything read from a pack's files. Every cache here is keyed on the path, which an
+## in-place refresh does not change, and Parcels keys its merged view on which tiles are standing
+## rather than on what is in them - so without this the game keeps serving the pack it had.
+## GameState.forget_caches() is the one place that knows the five registry caches; the era scenes
+## are re-parsed here because ResourceLoader would hand back the instance it already has.
+func forget_pack(id: String) -> void:
+	GameState.forget_caches()
+	var dir := DirAccess.open(Sites.path_in(id, "scenes"))
+	if dir == null:
+		return
+	for f in dir.get_files():
+		if f.ends_with(".tscn"):
+			ResourceLoader.load(Sites.path_in(id, "scenes/" + f), "PackedScene", ResourceLoader.CACHE_MODE_REPLACE)
+
+
+## The years a pack already carries, as the service wants them ("2026" or "1939,2026"). Taken from
+## the pack's own scenes rather than from GameState, which knows only the active site's.
+func _eras_of(id: String) -> String:
+	var years: Array[String] = []
+	var dir := DirAccess.open(Sites.path_in(id, "scenes"))
+	if dir:
+		for f in dir.get_files():
+			if f.begins_with("era_") and f.ends_with(".tscn"):
+				years.append(f.trim_prefix("era_").trim_suffix(".tscn"))
+	years.sort()
+	return ",".join(years) if not years.is_empty() else "2026"
+
+
 ## Poll the job until it is done; "" on success, else the error text.
 func _wait_for_job(base: String, id: String, quiet: bool = false) -> String:
 	while true:
@@ -455,6 +512,7 @@ func install_zip(zip_path: String, id: String, site_only: bool = false) -> bool:
 		out.close()
 	z.close()
 	if site_only:
+		Sites.scan()
 		return true
 	# a fresh tile: any stale region data from an earlier download must go
 	var old_data := ProjectSettings.globalize_path(Sites.USER_TILES + tile + "/data")
@@ -462,4 +520,5 @@ func install_zip(zip_path: String, id: String, site_only: bool = false) -> bool:
 		for f in DirAccess.get_files_at(old_data):
 			DirAccess.remove_absolute(old_data + "/" + f)
 	print("[Locator] installed pack %s (%d files)" % [id, files.size()])
+	Sites.scan()   # a pack that has just appeared on disk: until this, Sites resolves its files under res://
 	return true
