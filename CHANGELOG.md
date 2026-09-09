@@ -8,6 +8,58 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
+## v0.7.0 — 2026-09-09
+
+**One plot is the one every view is about.** The registers have always described a graph — plot,
+building, company, owner — and the book showed it as four flat tables. Choose a plot now, from a row
+in the book or a right click on the map, and it lights everywhere at once: its own row and the
+companies registered on it are marked, its boundary stands on the ground as a low curtain of light,
+and a dashed band arcs through the air to each thing the registers tie it to. Choose it again and
+the marks go out.
+
+Three kinds of tie, all of them read out of files the pack already held. Two units under one
+*kinnistu* number are one registered immovable — Kapteni tn 3 and 3a. A building whose register row
+names more than one unit stands over a boundary and ties those units together. And the companies on
+two plots can share an owner. Each link says which of the three tied it, and a plot tied twice over
+says both. In Kvissentali that is 29 plots tied to another, where the owner rule alone found 8.
+
+A note the page makes a point of: a shared owner is an owner of *the companies* in the Business
+Register. The cadastre does not say the land itself is jointly held, and the plot page says so
+rather than letting you assume otherwise. The register's people are never named — a pack stores them
+only as hashed ids, and none of them reaches the screen.
+
+**The map's layers are laid on the ground you are standing on.** The debug map has coloured plots by
+sector, company health and founding year for a while; choosing a layer used to leave nothing behind
+when you closed it. Now the town is colour-coded around you in the same colours, with its key in the
+corner, and **I** steps through the layers without opening the map at all. It is one baked picture
+laid over the ground rather than anything built out of geometry, so it follows every slope exactly
+and costs nothing to draw — 67 frames a second in the survey view against 68 with no layer at all. A
+plot with no company on it is left as the real ground rather than washed grey.
+
+**The find bar answers when you choose a result.** `/` opened it and typing listed the places, but
+Enter did nothing at all — the results were listening for a key the text field had already eaten.
+Arrows and Enter now work, and the results are buttons, so the mouse can pick one too. Its
+placeholder was also mangled: the English read *" ettevõte või tänav"* where it should have read
+"An address, a company or a street".
+
+**A company the register has struck off no longer colours a plot.** Lootsi tn 14 showed red for a
+business in trouble while its page correctly said no company was registered there; the layer was
+taking a closed company as the plot's own. Three Kvissentali plots now read as the empty ones they
+are, and on two more the live company gets its colour back from the closed one beside it. A plot
+whose companies are all struck off is headed *Formerly registered here*, which is what the register
+says.
+
+And the same company is described the same way wherever you meet it — the book's plot page, the K
+overlay and a building's register sheet each used to name a different subset of what the register
+publishes.
+
+**The news is gone.** The N panel carried the region's headlines and official notices. Of the 62 it
+held in Kvissentali — the only place that ever had any — 43 came from one publisher's feed, and
+exactly one named a plot. It was a national front page in a game about one square kilometre, it was
+the only thing here that goes stale, and it stood on three publishers' goodwill in a project meant
+to be open source. What goes with it is the only forward-looking thing the game had; if it returns
+it should return as the planning and auction notices alone, on the plot page of the plot they name.
+
 ## v0.6.2 — 2026-09-09
 
 The Locations page draws Estonia. The places it suggests used to be a list of names with a pair of
