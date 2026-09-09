@@ -674,7 +674,7 @@ func _refresh_codes() -> void:
 		if not rows.is_empty():
 			lines.append("   " + tr("UI_CODES_TENANT") + ":")
 			for t in rows:
-				lines.append("      " + _company_line(t))
+				lines.append("      " + Tenants.headline(t) + ("   " + Tenants.facts(t) if Tenants.facts(t) != "" else ""))
 	var links := Reporter.links_for(pos, interactor.target, layer)
 	if links.has("etak_id"):
 		lines.append(tr("UI_CODES_BUILDING") + ": ETAK %d   %s" % [int(links.etak_id), str(links.get("ehr", ""))])
@@ -685,20 +685,6 @@ func _refresh_codes() -> void:
 		lines.append(tr("UI_CODES_TARGET") + ": %s  %s" % [interactor.target.name, str(interactor.target.get_path())])
 	codes_label.text = "\n".join(lines)
 	_draw_parcel(u)
-
-
-## One line about a company: name · sector · employees · turnover class · health.
-static func _company_line(t: Dictionary) -> String:
-	var bits: Array[String] = [str(t.get("name", ""))]
-	if t.get("sector"):
-		bits.append(TranslationServer.translate("SECTOR_" + str(t.sector).to_upper()))
-	if t.get("employees") != null and int(t.employees) > 0:
-		bits.append(TranslationServer.translate("UI_EMPLOYEES") % int(t.employees))
-	if t.get("turnover") != null and int(t.turnover) > 0:
-		bits.append(TranslationServer.translate("UI_TURNOVER") % BookTheme.money(int(t.turnover)))
-	if t.get("health") and str(t.health) != "sound":
-		bits.append(TranslationServer.translate("HEALTH_" + str(t.health).to_upper()))
-	return " · ".join(bits)
 
 
 ## B: open the book at the plot under the player's feet.

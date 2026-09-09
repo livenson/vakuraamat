@@ -287,15 +287,17 @@ func _fill_plot() -> void:
 	if rows.is_empty():
 		body.add_child(_lbl(tr("UI_BOOK_NONE_REGISTERED"), 14))
 	else:
-		body.add_child(_lbl(tr("UI_BOOK_REGISTERED_HERE"), 15, GOLD))
+		# a plot whose companies are all struck off has none registered on it: say that, rather than
+		# heading a list of closed firms with "registered here"
+		var live := rows.any(func(t): return str(t.get("status", "")) == "R")
+		body.add_child(_lbl(tr("UI_BOOK_REGISTERED_HERE") if live else tr("UI_BOOK_FORMERLY_HERE"), 15, GOLD))
 		for t in rows:
-			var status := "" if t.get("status") == "R" else "  (%s)" % tr("UI_TENANT_INACTIVE")
 			var crow := HBoxContainer.new()
 			crow.add_theme_constant_override("separation", 10)
 			body.add_child(crow)
-			crow.add_child(_lbl("   %s, %s, %s %s%s" % [t.get("name", ""), t.get("legal_form", ""), tr("UI_SINCE"), t.get("since", ""), status], 14))
+			crow.add_child(_lbl("   " + Tenants.headline(t), 14))
 			_link_button(crow, str(t.get("link", "")), tr("UI_BOOK_IN_THE_REGISTER"))
-			var facts := _company_facts(t)
+			var facts := Tenants.facts(t)
 			if facts != "":
 				body.add_child(_lbl("      " + facts, 13, BookTheme.FADED if str(t.get("health", "")) != "distressed" else BookTheme.RUBRIC))
 	_fill_links(body, str(p.tunnus))
@@ -494,29 +496,6 @@ func _sort_companies(rows: Array) -> void:
 			return str(a.get("name", "")).to_lower() < str(b.get("name", "")).to_lower()
 		return kb < ka if _co_desc else ka < kb)
 
-
-## What the register and the Tax Board say about a company, on one line.
-func _company_facts(t: Dictionary) -> String:
-	var bits: Array[String] = []
-	if t.get("emtak") and t.emtak.get("text"):
-		bits.append(str(t.emtak.text))
-	elif t.get("sector"):
-		bits.append(tr("SECTOR_" + str(t.sector).to_upper()))
-	if t.get("employees") != null and int(t.employees) > 0:
-		bits.append(tr("UI_EMPLOYEES") % int(t.employees))
-	if t.get("turnover") != null and int(t.turnover) > 0:
-		bits.append(tr("UI_TURNOVER") % BookTheme.money(int(t.turnover)))
-	if t.get("taxes") != null and int(t.taxes) > 0:
-		bits.append(tr("UI_TAXES") % BookTheme.money(int(t.taxes)))
-	if t.get("board_size") != null:
-		bits.append(tr("UI_BOARD") % int(t.board_size))
-	if t.get("owner_managed") == true:
-		bits.append(tr("UI_OWNER_MANAGED"))
-	if t.get("capital") != null and float(t.capital) >= 2500.0:
-		bits.append(tr("UI_CAPITAL") % BookTheme.money(int(t.capital)))
-	if t.get("health") and str(t.health) != "sound":
-		bits.append(tr("HEALTH_" + str(t.health).to_upper()))
-	return " · ".join(bits)
 
 
 # ---------------------------------------------------------------- the place itself

@@ -72,12 +72,15 @@ static func legend(mode: String) -> Array:
 	return out
 
 
-## The company that stands for a parcel: the biggest by employees, then by turnover, among active rows.
+## The company that stands for a parcel: the biggest by employees, then by turnover, among the rows
+## the register still calls registered. A company struck off does not colour a plot - it would read
+## as a business in trouble where the truth is that there is no business, and on a plot with a live
+## company beside a struck-off one it took the plot's colour away from the firm actually there.
 static func dominant(rows: Array) -> Dictionary:
 	var best := {}
 	var best_key := -1.0
 	for t in rows:
-		if str(t.get("status", "R")) != "R" and not best.is_empty():
+		if str(t.get("status", "R")) != "R":
 			continue
 		var key := float(t.get("employees", 0) if t.get("employees") != null else 0) * 1000000.0 + float(t.get("turnover", 0) if t.get("turnover") != null else 0)
 		if key > best_key or best.is_empty():

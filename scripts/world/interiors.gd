@@ -1006,16 +1006,16 @@ static func register_sheet(b: FootprintBuilding) -> String:
 		lines.append("EHR " + b.ehr)
 	lines.append("")
 	lines.append(TranslationServer.translate("UI_SHEET_TENANTS"))
-	var rows: Array = Tenants.of(Sites.pack_of(b), b.tunnus).filter(func(t): return str(t.get("status", "")) == "R")
+	# every row the plot's page shows, described the same way: a sheet that named fewer of the
+	# register's facts than the book did was the same company answering two different questions
+	var rows: Array = Tenants.of(Sites.pack_of(b), b.tunnus)
 	if rows.is_empty():
 		lines.append(TranslationServer.translate("UI_SHEET_NO_TENANTS"))
 	for t in rows:
-		var facts: Array[String] = [str(t.get("name", ""))]
-		if t.get("sector"):
-			facts.append(TranslationServer.translate("SECTOR_" + str(t.sector).to_upper()))
-		if t.get("employees") != null and int(t.employees) > 0:
-			facts.append(TranslationServer.translate("UI_EMPLOYEES") % int(t.employees))
-		lines.append("  " + " · ".join(facts))
+		lines.append("  " + Tenants.headline(t))
+		var facts := Tenants.facts(t)
+		if facts != "":
+			lines.append("    " + facts)
 	var p := Parcels.by_tunnus(b.tunnus)
 	if not p.is_empty():
 		lines.append("")

@@ -294,3 +294,4 @@ UI_LINK_NONE,Register ei seo seda maatükki ühegi teisega,The registers tie thi
 UI_LINK_WHY_OWNER,ühiseid omanikke: %d,owners in common: %d
 UI_LINK_WHY_REGISTRY,sama kinnistu,the same registered immovable
 UI_LINK_WHY_BUILDING,ühine hoone,a building stands on both
+UI_BOOK_FORMERLY_HERE,Varem siia registreeritud,Formerly registered here
