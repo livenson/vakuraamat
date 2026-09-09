@@ -1,5 +1,8 @@
 # Vakuraamat
 
+[![Latest release](https://img.shields.io/github/v/release/livenson/vakuraamat?label=download&sort=semver)](https://github.com/livenson/vakuraamat/releases/latest)
+[![Builds](https://img.shields.io/badge/builds-macOS%20%C2%B7%20Windows%20%C2%B7%20Linux-blue)](https://github.com/livenson/vakuraamat/releases/latest)
+
 A digital twin of a square kilometre of Estonia, to walk through and ask questions of. The cadastral
 plots are the real ones, with their official 2022 taxation values; the buildings are the ones in the
 Building Register, with the roofs Maa-amet measured; the companies are the ones registered at each
@@ -7,11 +10,48 @@ address; every tree stands where the laser scan found it. Every building has a d
 inside. Built from Maa-amet (Estonian Land and Spatial Development Board), Building Register and
 Business Register open data with Godot 4.7, GDScript and Terrain3D.
 
+**[⬇ Download the latest release](https://github.com/livenson/vakuraamat/releases/latest)** — a
+ready-to-play build for macOS, Windows or Linux. No Godot, no Python, nothing else to install.
+
 | | |
 |---|---|
 | ![The front page](docs/screenshots/menu.jpg) The front page: the plate of your square kilometre | ![The plots](docs/screenshots/plots.jpg) The book (Tab): the cadastre with purpose, area, taxation value and ownership |
 | ![A Kvissentali street](docs/screenshots/street.jpg) A Kvissentali street: the Building Register's houses on the cadastre's plots | ![Inside a company's building](docs/screenshots/shop.jpg) Inside a company's building: rooms, furniture by use, windows onto the street |
 | ![The news](docs/screenshots/news.jpg) The news (N): the region's real headlines and official notices | ![Debug map](docs/screenshots/map.jpg) The map (M): plots, companies, street names and house numbers on the orthophoto |
+
+## Install and play
+
+1. Open the **[latest release](https://github.com/livenson/vakuraamat/releases/latest)** and download
+   the zip for your platform (about 420–450 MB — the packs carry their terrain, models and textures):
+
+   | Platform | File | Run |
+   |---|---|---|
+   | macOS (Apple silicon and Intel) | `Vakuraamat-<version>-macos.zip` | `Vakuraamat.app` |
+   | Windows | `Vakuraamat-<version>-windows.zip` | `Vakuraamat.exe` |
+   | Linux (x86-64) | `Vakuraamat-<version>-linux.zip` | `./Vakuraamat.x86_64` |
+
+2. Unzip it, keeping the files together — the executable, its `.pck` and the `tile_service` sidecar
+   next to it are one build.
+3. Run it. On **macOS** the app is not notarised, so the first launch needs one of:
+
+   ```sh
+   xattr -dr com.apple.quarantine Vakuraamat.app     # or: right-click the app and choose Open
+   ```
+
+   On **Linux**, mark it executable if the unzip did not: `chmod +x Vakuraamat.x86_64`.
+4. Pick a place on the front page. Two worlds ship with the build — **Kvissentali** (a Tartu suburb)
+   and **Palupera** (rural) — and *Locations* turns any Estonian address into a new square kilometre
+   in a couple of minutes over the network, because the build carries the whole data pipeline as a
+   sidecar executable. Worlds you make and the data they download live under the game's user
+   directory, not in the app.
+
+Nothing else is needed to play: no Godot, no Python, no account, no data download beyond the zip.
+What changed in each build is in [CHANGELOG.md](CHANGELOG.md).
+
+### Controls
+
+WASD move, E interact, Tab the book, B this plot, N news, J journal, M map, K codes, F fly,
+T teleport, H home, F8 report, Esc menu.
 
 ## What you do
 
@@ -35,31 +75,30 @@ Business Register open data with Godot 4.7, GDScript and Terrain3D.
 - **Anywhere in Estonia:** *Locations* in the menu turns an address into a playable square kilometre
   in a couple of minutes, and the neighbouring tiles stream in as you walk.
 
-## Play
+## Run from source
 
-Builds for macOS, Windows and Linux are on the [releases page](https://github.com/livenson/vakuraamat/releases)
-(GitHub Actions, `.github/workflows/build.yml`): unzip and run; the macOS app is not notarised, so
-run `xattr -dr com.apple.quarantine Vakuraamat.app` once or right-click and Open. A build plays the
-shipped packs and carries the tile service as a sidecar executable, so *Locations* turns any Estonian
-address into a world from the build itself (its packs and downloads live under the game's user
-directory).
-
-From the source tree:
+For developing on the game, or for making packs outside the game. Tested on macOS; `make setup`
+installs its tools with Homebrew, and on Linux the same four (Godot 4.7.2, Blender, uv, git-lfs)
+work if installed by hand.
 
 ```sh
+git clone https://github.com/livenson/vakuraamat.git && cd vakuraamat
 make setup                        # Homebrew tools (godot, blender, uv, git-lfs), the pipeline's Python venv, LFS pull, first Godot import
 make tile                         # Maa-amet data for Palupera and its terrain (~10 min, network); SITE=<id> for another pack
 make news-local SITE=kvissentali  # optional: today's regional headlines and official notices into the pack
 tools/play.sh                     # the tile service plus the game; tools/play.sh -- --site=kvissentali --windowed
 ```
 
-WASD move, E interact, Tab the book, B this plot, N news, J journal, M map, K codes, F fly,
-T teleport, H home, F8 report, Esc menu. `make test` runs the headless suite.
+`make test` runs the headless suite; `make validate` checks the packs.
 
 The shipped packs already carry their companies; `make tenants SITE=<id>` refreshes them and, on the
 first run, downloads about 460 MB of Business Register and Tax Board open data into `data_raw/`
 (cached for a week; worlds created from the menu do the same through the tile service). `make mcp`
 builds the Sketchfab MCP server for Claude Code (token in `sketchfab.token`).
+
+Releases are built by GitHub Actions (`.github/workflows/build.yml`): pushing an annotated `v*` tag
+exports the three platforms, bundles the tile-service sidecar with each, and attaches them to a
+GitHub release whose notes are this tag's `CHANGELOG.md` entry.
 
 ## Data sources and how they become a place
 
@@ -135,8 +174,8 @@ Ametlikud Teadaanded are saying about it. See [docs/custom-sites.md](docs/custom
   each dataset is converted; [docs/visual-upgrade-plan.md](docs/visual-upgrade-plan.md): rendering steps and their status.
 - [docs/history/](docs/history/): the design, plan and language notes of the historical three-era game,
   which lives on at the tag `v0.9-historical`.
-- [CHANGELOG.md](CHANGELOG.md): what changed in each release. A release is an annotated `v*` tag;
-  pushing it builds the three platforms and attaches them to a GitHub release.
+- [CHANGELOG.md](CHANGELOG.md): what changed in each release (see *Run from source* above for how
+  a `v*` tag becomes the three builds).
 
 ## Licence of the data
 
