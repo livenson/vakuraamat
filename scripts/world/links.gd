@@ -1,7 +1,8 @@
 # What one cadastral unit is tied to, read out of the pack files that are already there: the
 # companies registered on it (tenants.json), the buildings that stand on it (buildings.json, whose
-# rows name their unit in `cadastral`), and the other units whose companies share an owner with its
-# own (the Business Register's people files, kept as hashes).
+# rows name their unit in `cadastral`), and the other units tied to it by any of three rules the
+# registers carry - the companies on both share an owner, both units belong to the same registered
+# immovable, or one building stands on both.
 #
 # The hashes never leave this file. `of()` returns counts and cadastral numbers - the register's
 # owners are natural persons and the pack stores them only as ids so that a link can be drawn
@@ -15,12 +16,14 @@ extends RefCounted
 
 static var _owners: Dictionary = {}   # tenants.json path -> {owner hash: Array of tunnus}
 static var _blds: Dictionary = {}     # buildings.json path -> {tunnus: Array of rows}
+static var _registry: Dictionary = {}  # parcels.json path -> {kinnistu number: Array of tunnus}
 
 
 ## Everything one unit is linked to. Every key is always present; an unknown unit answers empty.
 ##   {tunnus, pack, at: Vector3, address, companies: Array, parcels: Array, buildings: Array}
-## A `parcels` row is {tunnus, pack, address, at: Vector3, shared: int} - `shared` counts the owners
-## the two units' companies have in common, never which.
+## A `parcels` row is {tunnus, pack, address, at: Vector3, kinds: Array, shared: int}: `kinds` names
+## why the two are tied ("owner", "registry", "building") and `shared` counts the owners their
+## companies have in common, never which.
 static func of(tunnus: String) -> Dictionary:
 	var out := {"tunnus": tunnus, "pack": "", "at": Vector3.ZERO, "address": "",
 		"companies": [], "parcels": [], "buildings": []}
@@ -42,32 +45,70 @@ static func of(tunnus: String) -> Dictionary:
 static func forget() -> void:
 	_owners.clear()
 	_blds.clear()
+	_registry.clear()
 
 
-## The other units whose companies share an owner with this one's, nearest first. Only units on a
-## tile standing right now can be pointed at, so the rest are left out.
+## The other units this one is tied to, by any of three rules the registers actually carry:
+##   "owner"    - the companies on both share an owner (the Business Register's people files)
+##   "registry" - both units are part of the same registered immovable (the same kinnistu number)
+##   "building" - one building stands on both (its `cadastral` names them together)
+## A unit tied by more than one rule appears once, carrying every reason. Only units on a tile
+## standing right now can be pointed at, so the rest are left out.
 static func _siblings(pack: String, tunnus: String) -> Array:
-	var index := _owner_index(pack)
+	var why := {}      # other tunnus -> {kind: true}
+	var shared := {}   # and, for the owner rule, how many owners the two have in common
 	var mine: Array = []
 	for t in Tenants.of(pack, tunnus):
 		for h in t.get("owners", []):
 			if not mine.has(str(h)):
 				mine.append(str(h))
-	var shared := {}
+	var owners := _owner_index(pack)
 	for h in mine:
-		for other in index.get(h, []):
+		for other in owners.get(h, []):
 			if str(other) != tunnus:
+				why.get_or_add(str(other), {})["owner"] = true
 				shared[str(other)] = int(shared.get(str(other), 0)) + 1
+	var u := Parcels.by_tunnus(tunnus)
+	for other in _registry_index(pack).get(_kinnistu(u), []):
+		if str(other) != tunnus:
+			why.get_or_add(str(other), {})["registry"] = true
+	for b in _blds_of(pack).get(tunnus, []):
+		for c in b.get("cadastral", []):
+			if str(c) != tunnus:
+				why.get_or_add(str(c), {})["building"] = true
 	var out: Array = []
-	for other in shared:
+	for other in why:
 		var v := Parcels.by_tunnus(str(other))
 		if v.is_empty():
 			continue   # its tile is not standing: nothing to point at
 		out.append({"tunnus": str(other), "pack": str(v.get("pack", pack)),
 			"address": str(v.get("address", "")),
 			"at": Vector3(float(v.get("x", 0.0)), 0.0, float(v.get("z", 0.0))),
-			"shared": int(shared[other])})
+			"kinds": why[other].keys(),
+			"shared": int(shared.get(other, 0))})
 	return out
+
+
+## The registered immovable a unit belongs to, or "" when the register names none. `land_registry`
+## is a number, except where it carries the word "korteriomand" instead - apartment ownership, which
+## is a form and not a property: taking that as a number would tie thirty unrelated flats together.
+static func _kinnistu(u: Dictionary) -> String:
+	var v := str(u.get("land_registry", "") if u.get("land_registry") != null else "")
+	return v if v.is_valid_int() else ""
+
+
+## Kinnistu number -> the units that make up that one registered immovable. Built once per file.
+static func _registry_index(pack: String) -> Dictionary:
+	var path := Sites.path_in(pack if pack != "" else Sites.active, "parcels.json")
+	if _registry.has(path):
+		return _registry[path]
+	var index := {}
+	for u in Parcels.units(pack):
+		var key := _kinnistu(u)
+		if key != "":
+			index.get_or_add(key, []).append(str(u.get("tunnus", "")))
+	_registry[path] = index
+	return index
 
 
 ## Owner hash -> the units whose companies that person owns, for one pack. Built once per file.
@@ -90,21 +131,28 @@ static func _owner_index(pack: String) -> Dictionary:
 	return index
 
 
+## Unit -> the register's building rows standing on it, keyed on every entry of `cadastral`, which
+## is how a building straddling a boundary ties its two units together. Built once per file.
+static func _blds_of(pack: String) -> Dictionary:
+	var path := Sites.path_in(pack if pack != "" else Sites.active, "buildings.json")
+	if _blds.has(path):
+		return _blds[path]
+	var by_tunnus := {}
+	if FileAccess.file_exists(path):
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+		var rows: Array = parsed.get("buildings", []) if typeof(parsed) == TYPE_DICTIONARY else []
+		for b in rows:
+			for c in b.get("cadastral", []):
+				by_tunnus.get_or_add(str(c), []).append(b)
+	_blds[path] = by_tunnus
+	return by_tunnus
+
+
 ## The buildings standing on a unit, in world metres. buildings.json is in the pack's own tile
 ## metres, so the tile's offset is added the way Parcels.all does it.
 static func _buildings_on(pack: String, tunnus: String, offset: Vector3) -> Array:
-	var path := Sites.path_in(pack if pack != "" else Sites.active, "buildings.json")
-	if not _blds.has(path):
-		var by_tunnus := {}
-		if FileAccess.file_exists(path):
-			var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
-			var rows: Array = parsed.get("buildings", []) if typeof(parsed) == TYPE_DICTIONARY else []
-			for b in rows:
-				for c in b.get("cadastral", []):
-					by_tunnus.get_or_add(str(c), []).append(b)
-		_blds[path] = by_tunnus
 	var out: Array = []
-	for b in _blds[path].get(tunnus, []):
+	for b in _blds_of(pack).get(tunnus, []):
 		var poly: Array = []
 		for q in b.get("polygon", []):
 			poly.append([float(q[0]) + offset.x, float(q[1]) + offset.z])

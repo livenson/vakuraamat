@@ -285,10 +285,12 @@ BTN_FOCUS,Näita seoseid,Show links
 BTN_FOCUS_TIP,Tõsta see maatükk ja sellega seotu esile igal lehel ja maastikul,Highlight this plot and what it is linked to on every page and on the ground
 UI_LINK_HEAD,Seosed,Linked
 UI_LINK_BUILDINGS,Hooneid sellel maatükil: %d,Buildings on this plot: %d
-UI_LINK_OWNERS,Sama omanikuga maatükke: %d,Plots sharing an owner: %d
-UI_LINK_OWNERS_NONE,Ükski teine maatükk ei jaga siinsete ettevõtete omanikku,No other plot shares an owner with the companies here
 UI_LINK_OWNERS_NOTE,Ühine omanik on äriregistri järgi siinsete ettevõtete omanik; maa ise ei ole registri järgi ühisomandis,The shared owner is an owner of the companies here in the Business Register; the register does not say the land itself is jointly held
-UI_LINK_SHARED,ühiseid omanikke: %d,owners in common: %d
 UI_FOCUS_ON,Seosed: %s,Links: %s
 UI_FOCUS_CLEARED,Seosed kustutatud,Links cleared
 UI_MORE_COMPANIES,"… ja veel %d","… and %d more"
+UI_LINK_PLOTS,Seotud maatükke: %d,Linked plots: %d
+UI_LINK_NONE,Register ei seo seda maatükki ühegi teisega,The registers tie this plot to no other
+UI_LINK_WHY_OWNER,ühiseid omanikke: %d,owners in common: %d
+UI_LINK_WHY_REGISTRY,sama kinnistu,the same registered immovable
+UI_LINK_WHY_BUILDING,ühine hoone,a building stands on both

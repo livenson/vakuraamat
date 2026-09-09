@@ -1000,7 +1000,7 @@ func _hover_card_lines(title: String, tunnus: String, pack: String) -> Array:
 	if not l.buildings.is_empty():
 		out.append([tr("UI_LINK_BUILDINGS") % l.buildings.size(), 11, BookTheme.FADED])
 	if not l.parcels.is_empty():
-		out.append([tr("UI_LINK_OWNERS") % l.parcels.size(), 11, BookTheme.BLUE])
+		out.append([tr("UI_LINK_PLOTS") % l.parcels.size(), 11, BookTheme.BLUE])
 	return out
 
 

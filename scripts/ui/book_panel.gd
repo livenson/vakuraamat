@@ -316,9 +316,10 @@ func _fill_links(body: Node, tunnus: String) -> void:
 	if not l.buildings.is_empty():
 		body.add_child(_lbl("   " + tr("UI_LINK_BUILDINGS") % l.buildings.size(), 14))
 	if l.parcels.is_empty():
-		body.add_child(_lbl("   " + tr("UI_LINK_OWNERS_NONE"), 14, BookTheme.FADED))
+		body.add_child(_lbl("   " + tr("UI_LINK_NONE"), 14, BookTheme.FADED))
 		return
-	body.add_child(_lbl("   " + tr("UI_LINK_OWNERS") % l.parcels.size(), 14))
+	body.add_child(_lbl("   " + tr("UI_LINK_PLOTS") % l.parcels.size(), 14))
+	var by_owner := false
 	for s in l.parcels:
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
@@ -331,8 +332,23 @@ func _fill_links(body: Node, tunnus: String) -> void:
 		var other: String = str(s.tunnus)
 		b.pressed.connect(func(): open_parcel(other))
 		row.add_child(b)
-		row.add_child(_lbl(tr("UI_LINK_SHARED") % int(s.shared), 13, BookTheme.FADED))
-	body.add_child(_lbl("   " + tr("UI_LINK_OWNERS_NOTE"), 12, BookTheme.FADED))
+		row.add_child(_lbl(_why(s), 13, BookTheme.FADED))
+		by_owner = by_owner or ("owner" in s.get("kinds", []))
+	# the caveat belongs to the owner rule alone: the other two are the cadastre's own statements
+	if by_owner:
+		body.add_child(_lbl("   " + tr("UI_LINK_OWNERS_NOTE"), 12, BookTheme.FADED))
+
+
+## Why two plots are tied, in the register's terms. A plot can be tied by more than one rule, and
+## then it says all of them - "same registered immovable, a building on both" is a real answer.
+func _why(s: Dictionary) -> String:
+	var bits: Array[String] = []
+	for kind in s.get("kinds", []):
+		match str(kind):
+			"owner": bits.append(tr("UI_LINK_WHY_OWNER") % int(s.get("shared", 0)))
+			"registry": bits.append(tr("UI_LINK_WHY_REGISTRY"))
+			"building": bits.append(tr("UI_LINK_WHY_BUILDING"))
+	return ", ".join(bits)
 
 
 # ------------------------------------------------------- the plot over the years

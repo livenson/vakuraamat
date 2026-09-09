@@ -6,7 +6,12 @@ extends Node
 
 const FOCUS := "79514:036:0090"     # the one Kvissentali plot with two owner-linked neighbours
 const SIBLING := "79514:036:0085"
-const NO_LINKS := "79514:036:0006"  # buildings, companies, but nobody else's owner
+const NO_LINKS := "79514:036:0006"  # buildings, companies, but nothing tying it to another plot
+const REG_A := "79301:001:0371"     # Pootsmani tn 30 and 28: one registered immovable, two units
+const REG_B := "79301:001:0373"
+const BOTH_A := "79514:036:0060"    # Lootsi tänav T21 and T19: one kinnistu and one building over both
+const BOTH_B := "79514:036:0066"
+const FLAT := "79501:002:0167"      # Aeru tn 1, whose land_registry is the word "korteriomand"
 
 var _failed := false
 
@@ -32,8 +37,23 @@ func _ready() -> void:
 	var sibs: Array = l.parcels.map(func(p): return str(p.tunnus))
 	_check(sibs.size() == 2 and SIBLING in sibs, "%s links to %s, expected two including %s" % [FOCUS, sibs, SIBLING])
 	for p in l.parcels:
+		_check("owner" in p.kinds, "a plot linked to %s does not say why" % FOCUS)
 		_check(int(p.shared) >= 1, "a linked plot shares no owner with %s" % FOCUS)
 		_check(p.at is Vector3, "a linked plot has no place to point at")
+
+	# the cadastre's own two rules, which is where most of the graph lives: one registered immovable
+	# made of two units, and one building standing over a boundary
+	_check(_kinds_between(REG_A, REG_B) == ["registry"],
+			"%s and %s are one kinnistu, got %s" % [REG_A, REG_B, _kinds_between(REG_A, REG_B)])
+	var both := _kinds_between(BOTH_A, BOTH_B)
+	_check("registry" in both and "building" in both,
+			"%s and %s share a kinnistu and a building, got %s" % [BOTH_A, BOTH_B, both])
+	_check(int(Links.of(REG_A).parcels[0].shared) == 0, "a kinnistu link claims owners in common")
+
+	# and the trap under that rule: land_registry carries the word "korteriomand" for a flat, which
+	# is a form of ownership and not a property. Reading it as a number ties thirty flats together.
+	_check(Links.of(FLAT).parcels.is_empty(),
+			"%s is tied to %d plots through the word korteriomand" % [FLAT, Links.of(FLAT).parcels.size()])
 
 	# the link runs both ways, or the ribbon would only exist from one end
 	var back: Array = Links.of(SIBLING).parcels.map(func(p): return str(p.tunnus))
@@ -61,9 +81,19 @@ func _ready() -> void:
 	_check(_clean(built), "an owner id reached the caller")
 
 	if not _failed:
-		print("[links] PASSED: %s → %d companies, %d buildings, %d plots sharing an owner; no owner id leaves"
+		print("[links] PASSED: %s → %d companies, %d buildings, %d linked plots; kinnistu and shared-building links hold, korteriomand ties nothing, no owner id leaves"
 				% [FOCUS, l.companies.size(), l.buildings.size(), l.parcels.size()])
 		get_tree().quit(0)
+
+
+## Why two plots are tied, as the answer for the first names the second. Empty when they are not.
+func _kinds_between(a: String, b: String) -> Array:
+	for p in Links.of(a).parcels:
+		if str(p.tunnus) == b:
+			var kinds: Array = p.kinds.duplicate()
+			kinds.sort()
+			return kinds
+	return []
 
 
 ## True when nothing anywhere in the value is an owner id or a key that would hold one.
