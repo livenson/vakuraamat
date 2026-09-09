@@ -65,7 +65,7 @@ the menu and packs the result as a zip the game installs under `user://`.
 |---|---|
 | `heightmap.r32`, `ortho.jpg`, `canopy.r32`, `trees.json` | `scripts/worldgen/terrain_builder.gd` (also at runtime for downloaded tiles) |
 | `data/terrain3d_00_00.res` | Terrain3D |
-| `buildings.json` | `scripts/world/footprint_building.gd` (walls, roofs, windows, chimneys), `scripts/world/interiors.gd` (rooms, furniture), the debug map (house numbers) |
+| `buildings.json` | `scripts/world/footprint_building.gd` (walls, roofs, windows, chimneys), `scripts/world/interiors.gd` (rooms), the debug map (house numbers) |
 | `roads.json` | `scripts/world/road_network.gd` (ribbons, kerbs, street lights), the traffic graph, the debug map (street names) |
 | `parcels.json` | `scripts/world/parcels.gd` (the book, the find bar, the map arrow), `parcel_kit.gd`, `parcel_marks.gd`, the K overlay |
 | `market.json` | the book's Place page: the 2022 taxation-value medians per purpose |

@@ -16,7 +16,7 @@ ready-to-play build for macOS, Windows or Linux. No Godot, no Python, nothing el
 | | |
 |---|---|
 | ![The front page](docs/screenshots/menu.jpg) The front page: the plate of your square kilometre | ![The plots](docs/screenshots/plots.jpg) The book (Tab): the cadastre with purpose, area, taxation value and ownership |
-| ![A Kvissentali street](docs/screenshots/street.jpg) A Kvissentali street: the Building Register's houses on the cadastre's plots | ![Inside a company's building](docs/screenshots/shop.jpg) Inside a company's building: rooms, furniture by use, windows onto the street |
+| ![A Kvissentali street](docs/screenshots/street.jpg) A Kvissentali street: the Building Register's houses on the cadastre's plots | ![Inside a company's building](docs/screenshots/shop.jpg) Inside a company's building: rooms, stairs and windows onto the real street |
 | ![The news](docs/screenshots/news.jpg) The news (N): the region's real headlines and official notices | ![Debug map](docs/screenshots/map.jpg) The map (M): plots, companies, street names and house numbers on the orthophoto |
 
 ## Install and play
@@ -67,7 +67,7 @@ T teleport, H home, F8 report, Esc menu.
   register publishes for that stop, and a bus turns up to run it. Kvissentali is the end of lines 8
   and 10; Palupera gets one a day to Elva, Otepää, Puka and Valga.
 - **Walk in:** every real building has a door; inside is generated from its footprint and register
-  data (storeys, rooms, stairs, window rhythm) and furnished by use.
+  data (storeys, rooms, stairs, window rhythm), and the windows look out at the real street.
 - **Know your tenants:** every company carries what the Business Register and the Tax Board publish:
   activity, staff, turnover, taxes, board and owner structure, a health flag. The map (M) colours the
   plots by sector, employees, health, founding year or shared owners; the book has a Companies page;

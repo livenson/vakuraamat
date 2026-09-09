@@ -195,8 +195,6 @@ NOTICE_GUIDE_SET,Teejuht: %s,Guiding you to %s
 NOTICE_GUIDE_ARRIVED,Kohal: %s,You are at %s
 UI_PROMPT_SWITCH_ON,Lülita sisse,Switch on
 UI_PROMPT_SWITCH_OFF,Lülita välja,Switch off
-UI_PROMPT_CARRY,Tõsta,Carry
-UI_PROMPT_DROP,Pane maha,Put down
 UI_PROMPT_READ,Loe,Read
 UI_NO_REGISTER,Registris seda hoonet ei ole (laserskaneeringu massiiv).,Not in the register (a shape from the laser scan).
 UI_LAMP,Lamp,Lamp

@@ -1,5 +1,5 @@
 # Headless check of enterable interiors on Kvissentali: doors attach to the real buildings, entering hides
-# the exterior and generates floors, walls, a light and furniture, the player stands inside the footprint,
+# the exterior and generates floors, walls and a light, the player stands inside the footprint,
 # leaving restores the exterior, and walking out through the door gap leaves too.
 #   godot --headless --path . res://tools/godot/interior_test.tscn
 extends Node
@@ -51,7 +51,7 @@ func _ready() -> void:
 	_check(root.find_children("*", "OmniLight3D", false, false).size() >= 1, "no light inside")
 	_check(root.find_children("*", "MeshInstance3D", true, false).size() >= 6, "too few interior meshes")
 	_check(root.find_children("*", "StaticBody3D", false, false).size() >= 3, "interior colliders missing")
-	# rooms: a building over 60 m² is partitioned, every split has exactly one doorway, furniture keeps clear
+	# rooms: a building over 60 m² is partitioned and every split has exactly one doorway
 	var area := Interiors._area(b.polygon)
 	_check(area > 60.0, "test building too small for rooms: %.0f m²" % area)
 	var splits: int = root.get_meta("splits", 0)
@@ -59,11 +59,6 @@ func _ready() -> void:
 	_check(splits >= 2, "only %d partition walls for %.0f m²" % [splits, area])
 	_check(dws.size() == splits, "doorways %d != partitions %d" % [dws.size(), splits])
 	_check(root.find_children("Partition_*", "MeshInstance3D", false, false).size() >= splits, "partition meshes missing")
-	var floor0: float = root.get_meta("floor0")
-	for n in root.get_children():
-		if n.has_meta("piece") and absf(n.position.y - floor0) < 0.01:
-			for d in dws:
-				_check(Vector2(n.position.x, n.position.z).distance_to(d) >= 1.0, "furniture in a doorway")
 	var local := b.to_local(world.player.global_position)
 	_check(Geometry2D.is_point_in_polygon(Vector2(local.x, local.z), b.polygon), "player not inside the footprint: %s" % local)
 	_check(not b._mesh_node.visible and b._body_node.collision_layer == 0, "exterior still shown or solid")

@@ -20,7 +20,6 @@ const SURVEY_REFRESH_S := 0.5   # how often the flown-over buildings are re-coll
 
 var target: Interactable = null
 var blocked := false
-var carrying: Node = null   # the Carryable held (E puts it down)
 var _lit: FootprintBuilding = null   # the building outlined for the current target
 var _survey: Array = []             # [FootprintBuilding, centre, radius] of every building standing
 var _survey_age := 0.0
@@ -193,10 +192,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	if blocked:
 		return
 	if not event.is_action_pressed("interact"):
-		return
-	if carrying and is_instance_valid(carrying):
-		carrying.drop()
-		get_viewport().set_input_as_handled()
 		return
 	if target == null:
 		return

@@ -1,7 +1,8 @@
 # Interiors you can walk into. Every real building gets a BuildingDoor; the first time the player steps
 # in, an interior is generated from the footprint: a floor slab per storey, inner walls with window
-# openings on the exterior's rhythm and a gap at the door, a ceiling, a ramp between storeys, a warm
-# light and furniture by use (Kenney Furniture Kit models when vendored, coloured boxes otherwise).
+# openings on the exterior's rhythm and a gap at the door, a ceiling, a ramp between storeys and a
+# warm light. The rooms are left empty: the shell is deterministic geometry, and the furniture that
+# used to fill it never sat convincingly (Furnisher, removed).
 # While inside, the exterior mesh and collider hide, so the openings look out at the real street.
 class_name Interiors
 extends Node3D
@@ -24,7 +25,6 @@ const MIN_ROOM := 9.0
 const MAX_DEPTH := 3
 const DOOR_W := 0.95
 const DOOR_END := 0.6        # a doorway keeps this far from a wall's ends
-const CLEAR := 1.2           # furniture keeps this far from doorways and the ramp
 
 static var instance: Interiors
 
@@ -32,7 +32,6 @@ var world: Node3D
 var inside: FootprintBuilding = null
 var _interiors: Dictionary = {}     # building instance id -> Node3D
 var _doors: Array = []
-var _furnisher := Furnisher.new()   # the furniture plans, placement and annealing (scripts/world/furnisher.gd)
 
 
 func setup(w: Node3D) -> void:
@@ -137,11 +136,7 @@ func enter(b: FootprintBuilding, player: Node3D) -> void:
 	root.visible = true
 	_set_colliders(root, true)
 	inside = b
-	var pieces := 0
-	for c in root.find_children("*", "Node3D", true, false):
-		if c.has_meta("piece"):
-			pieces += 1
-	print("[interiors] inside %s: %d rooms, %d pieces" % [_door_label(b), root.find_children("Partition_*", "MeshInstance3D", false, false).size() + 1, pieces])
+	print("[interiors] inside %s: %d rooms" % [_door_label(b), root.find_children("Partition_*", "MeshInstance3D", false, false).size() + 1])
 	var f: Dictionary = b.door_frame()
 	var n: Vector3 = f.n
 	var spot: Vector3 = b.to_global(f.pos - n.normalized() * 1.4 + Vector3.UP * (float(root.get_meta("floor0")) + 0.2))
@@ -277,8 +272,7 @@ func _build(b: FootprintBuilding) -> Node3D:
 		if not top:
 			_ramp(root, ramp_room.poly, ramp_edge, y0, fh, wall_mat, "home" if b.kind == "dwelling" else "")
 		var storey_rooms: Array = rooms if k == 0 else upper
-		for idx in storey_rooms.size():
-			var room: Dictionary = storey_rooms[idx]
+		for room: Dictionary in storey_rooms:
 			for spot in _lamp_spots(room.poly):
 				var light := OmniLight3D.new()
 				light.position = Vector3(spot.x, y0 + minf(2.2, fh - 0.6), spot.y)
@@ -291,18 +285,6 @@ func _build(b: FootprintBuilding) -> Node3D:
 				light.shadow_enabled = false
 				root.add_child(light)
 				_fixture(root, light)
-			var avoid: Array = room.doorways.duplicate()
-			var skip: Array = []
-			if k == 0:
-				avoid.append(door_pt)
-			if room.poly == ramp_room.poly:
-				var rr := _ramp_rect(ramp_room.poly, ramp_edge, fh)
-				if not top:
-					skip.append(ramp_edge)
-					avoid.append(rr[0])
-				if k > 0 or not top:
-					avoid.append(landing.get_center())
-			_furnisher.furnish(root, room.poly, y0, str(room.role), "%d_%d_%d" % [b.building_id, k, idx], skip, avoid)
 	return root
 
 
@@ -873,11 +855,24 @@ func _ramp(root: Node3D, poly: PackedVector2Array, edge: int, y0: float, fh: flo
 	root.add_child(rail)
 
 
-# ---------------------------------------------------------------- furniture
+# ---------------------------------------------------------------- helpers
 
-## The bounds of a model's meshes in its own frame (no tree needed); see Furnisher.
+## The bounds of a model's meshes in its own frame, no tree needed: the exports put the origin
+## anywhere, so anything fitting a model to a real size measures it first (stairs here, the kit
+## cars, the parcel kits, the figures).
 static func _bounds(n: Node3D) -> AABB:
-	return Furnisher._bounds(n)
+	var out := AABB()
+	var first := true
+	for mi in n.find_children("*", "MeshInstance3D", true, false):
+		var xf := Transform3D.IDENTITY
+		var p: Node = mi
+		while p != n and p is Node3D:
+			xf = p.transform * xf
+			p = p.get_parent()
+		var b: AABB = xf * mi.get_aabb()
+		out = b if first else out.merge(b)
+		first = false
+	return out
 
 
 ## Lamp positions: the centroid for small rooms, a 9 m grid of points inside the polygon for halls.

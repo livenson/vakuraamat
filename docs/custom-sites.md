@@ -123,9 +123,6 @@ until the pack is installed or the job fails with its error and a Close button.
 The debug map (M) lays its text out without overlaps: street names along their longest stretch (from
 `roads.json`), house numbers at the buildings (from `buildings.json` addresses), then the points'
 labels nearest the player; every point keeps its dot, and the dot under the mouse shows its name.
-Rooms are furnished from role plans (`Interiors.PLANS`): an anchored group on the longest wall, a
-piece across from it, wall runs, free-standing islands and grids that repeat to fill large rooms,
-and corner pieces; the Kenney models are scaled to life size from their bounds.
 `tools/godot/menu_shot.tscn` screenshots the menu (`--locations` for the second page, `--creating`
 or `--failed` for the sheet).
 
@@ -170,10 +167,10 @@ storey on the register's floor count, inner walls with window openings on the ex
 gap at the door, a ceiling, a ramp between storeys with an open landing), partitions it into rooms (a
 deterministic split of the floor plan by use: living room, kitchen and bedrooms in a dwelling, a reception
 and offices, a salesroom with a back room; every partition wall has a doorway with a lintel, every room its
-lamp, the ramp keeps to the largest room and no cut lands next to the entrance) and furnishes each room by
-its role: shop counters and shelves where a company is registered, desks for offices, a bed, table
-and sofa in dwellings, benches and cabinets in workshops. Pieces are Kenney Furniture Kit models
-(CC0, `assets/vendor/kenney_furniture_kit`). While inside, the exterior mesh and its collider hide so
+lamp, the ramp keeps to the largest room and no cut lands next to the entrance). The rooms stand
+empty: the shell is deterministic geometry from the register, while the furniture that used to fill
+it (role plans, Kenney kit models, an annealing pass) never sat convincingly and was removed.
+While inside, the exterior mesh and its collider hide so
 the openings look out at the real street; E at the door or simply walking out through it restores
 the exterior. `--enter="<address part>"` (or `<address part>@<degrees>` to turn after stepping in) starts a
 screenshot run inside a building; the door's hover text shows the register's use, year and storeys.
@@ -189,15 +186,12 @@ Interaction components after Cogito's patterns (MIT, credited in `THIRD_PARTY.md
 - `SwingDoor`: the leaf on every building door; E swings it away from you, you step through, it
   closes by itself after five seconds.
 - `LightSwitch`: the shade under every interior lamp; E turns that lamp off and on.
-- `Carryable`: cardboard boxes in storage rooms, halls and workshops are rigid bodies you pick up
-  with E, carry in front of you and put down with E again (they drop if they get stuck).
 - `BuildingInfo`: any wall of a real building answers to the crosshair with the register's use, year
   and storeys; E opens the register sheet. Laser-massing shapes say they are not in the register.
 - `Readable`: the notice board beside the entrance opens a page of the book with the building's
   register row, its tenants and its plot's owner (`UiManager.show_sheet`).
 
-Bathrooms (toilet, bathtub, sink and mirror, Kenney models from Poly Pizza) are one room of every
-home; boats (Quaternius, Google and jeremy models from Poly Pizza) moor where the orthophoto shows them
+Boats (Quaternius, Google and jeremy models from Poly Pizza) moor where the orthophoto shows them
 (`boats_2026.json` from the feature pass: bright hulls beside the tile's low, treeless water, with
 their heading) and along the long side of every still-water patch over 300 m²; the parked bicycle is the Google model.
 Playgrounds are built from the Poly Pizza swing, slide, seesaw, jungle gym, monkey bars, trampoline
