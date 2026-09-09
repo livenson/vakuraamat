@@ -98,6 +98,10 @@ func _ready() -> void:
 	links.name = "LinkMarks"
 	add_child(links)
 	links.setup(self)
+	var views := InfoViews.new()
+	views.name = "InfoViews"
+	add_child(views)
+	views.setup(self)
 	var interiors := Interiors.new()
 	interiors.name = "Interiors"
 	add_child(interiors)
@@ -143,6 +147,10 @@ func _ready() -> void:
 				if ins and ins.inside:
 					ins.exit(player)
 					player.set_pose(player.global_position, player.rotation.y + PI, 0.0))
+		elif a.begins_with("--layer="):
+			# the map's layer on the ground: --layer=sector|health|age. Through the UI, not straight
+			# at the node, so the legend and the map agree with what the ground is showing.
+			get_tree().create_timer(2.0).timeout.connect(ui.set_map_mode.bind(a.trim_prefix("--layer=")))
 		elif a.begins_with("--focus="):
 			# light a plot and its links without opening anything: composes with --open=
 			get_tree().create_timer(2.0).timeout.connect(ui.focus_parcel.bind(a.trim_prefix("--focus=")))

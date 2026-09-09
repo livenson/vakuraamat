@@ -66,6 +66,14 @@ uniform vec2 ortho_origin = vec2(0.0, 0.0);
 uniform float ortho_extent = 1024.0;
 uniform float ortho_strength : hint_range(0.0, 1.0) = 1.0;
 uniform vec4 ortho_tint : source_color = vec4(1.0);           // era colour cast (sepia for old maps)
+// The info view: one baked image per tile, a colour per cadastral unit in the chosen layer, laid
+// over the ground the same world-aligned way the orthophoto is. Its own origin and extent, because
+// the player can be standing on a streamed neighbour while the orthophoto still belongs to the
+// site's own tile. info_mix is what the view fades in on.
+uniform sampler2D info_texture : source_color, filter_linear, repeat_disable;
+uniform vec2 info_origin = vec2(0.0, 0.0);
+uniform float info_extent = 1024.0;
+uniform float info_mix : hint_range(0.0, 1.0) = 0.0;
 uniform float detail_near : hint_range(0.0, 500.0) = 40.0;   // full detail texture inside this distance
 uniform float detail_far : hint_range(0.0, 2000.0) = 400.0;  // pure orthophoto beyond this
 uniform float detail_contrast : hint_range(0.0, 2.0) = 1.0;  // how strongly detail luminance modulates the ortho
@@ -381,6 +389,14 @@ void fragment() {
 	float far_t = smoothstep(detail_near, detail_far, dist);
 	vec3 ortho_final = mix(near_rgb, ortho_rgb, far_t);
 	ALBEDO = mix(base_rgb, ortho_final, ortho_mix);
+	// the info view over the top: the layer's colour where a unit was painted, the ground itself
+	// everywhere else. Alpha carries "this pixel belongs to a plot", so the gaps stay the real place.
+	if (info_mix > 0.0) {
+		vec2 info_uv = (uv * _vertex_spacing - info_origin) / info_extent;
+		vec4 info = texture(info_texture, info_uv);
+		float inside = float(all(greaterThanEqual(info_uv, vec2(0.0))) && all(lessThanEqual(info_uv, vec2(1.0))));
+		ALBEDO = mix(ALBEDO, info.rgb, info.a * info_mix * inside);
+	}
 	ROUGHNESS = clamp(roughness + roughness_bias, 0.0, 1.0);
 	SPECULAR = specular_amount;
 	// Repack final normal map value.

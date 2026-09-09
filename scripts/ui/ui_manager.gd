@@ -20,6 +20,7 @@ var compass: Control
 var marker: Control
 var era_label: Label
 var keys_label: Label
+var legend_card: PanelContainer     # the ground layer's key, while one is showing
 var _notice_tween: Tween
 
 
@@ -169,6 +170,43 @@ func focus_parcel(tunnus: String) -> void:
 	show_notice(tr("UI_FOCUS_ON") % _focus.address)
 
 
+## The layer both views share. The map draws it as fills, circles or lines; the ground takes the
+## ones that are a colour per plot, so choosing a layer on the map and closing it leaves the town
+## colour-coded around you.
+func set_map_mode(which: String) -> void:
+	_map_mode = which
+	var views: Node = world.get_node_or_null("InfoViews") if world else null
+	if views:
+		views.set_mode(_map_mode)
+	_refresh_legend()
+
+
+## The key to the layer on the ground: one row per class, the same colours and the same words the
+## map's own legend uses. Hidden whenever the ground is showing nothing.
+func _refresh_legend() -> void:
+	if legend_card == null:
+		return
+	for c in legend_card.get_children():
+		c.queue_free()
+	legend_card.visible = _map_mode in InfoViews.FILLS
+	if not legend_card.visible:
+		return
+	var box := VBoxContainer.new()
+	box.add_theme_constant_override("separation", 3)
+	legend_card.add_child(box)
+	BookTheme.label(tr("UI_MAP_MODE_" + _map_mode.to_upper()), "DetailLabel", box)
+	for item in MapPalette.legend(_map_mode):
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		box.add_child(row)
+		var swatch := ColorRect.new()
+		swatch.color = item[1]
+		swatch.custom_minimum_size = Vector2(11, 11)
+		swatch.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(swatch)
+		BookTheme.label(tr(str(item[0])), "DetailLabel", row)
+
+
 ## Jump to a plot: the game's teleport, the same as T and a click on the map.
 func teleport_to(tunnus: String) -> void:
 	var p := Parcels.by_tunnus(tunnus)
@@ -296,6 +334,15 @@ func _build_hud() -> void:
 	keys_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	keys_label.custom_minimum_size = Vector2(820, 0)
 	keys_label.text = tr("UI_KEYS")
+	# the ground layer's key, on the right so it never sits under the crosshair's readout
+	legend_card = PanelContainer.new()
+	legend_card.add_theme_stylebox_override("panel", BookTheme.page_box(true, 10))
+	legend_card.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_RIGHT, Control.PRESET_MODE_MINSIZE, 16)
+	legend_card.grow_horizontal = Control.GROW_DIRECTION_BEGIN
+	legend_card.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	legend_card.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	legend_card.visible = false
+	hud.add_child(legend_card)
 	hover_label = _label(hud, 18)
 	_below_crosshair(hover_label, 620, 40)
 	hover_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -502,6 +549,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		_toggle(journal, _fill_journal)
 	elif event.is_action_pressed("debug_map"):
 		_toggle(debug_map, _fill_debug_map)
+	elif event.is_action_pressed("info_view"):
+		# step through the layers the ground can show, without opening the map for it
+		var fills: Array = ["off"] + InfoViews.FILLS
+		var at := fills.find(_map_mode)
+		set_map_mode(str(fills[(at + 1) % fills.size()] if at >= 0 else fills[1]))
+		show_notice(tr("UI_MAP_MODE") + ": " + tr("UI_MAP_MODE_" + _map_mode.to_upper()))
 	elif event.is_action_pressed("language"):
 		var next := "en" if TranslationServer.get_locale().begins_with("et") else "et"
 		TranslationServer.set_locale(next)
@@ -773,7 +826,7 @@ func _fill_debug_map() -> void:
 	var bm := Button.new()
 	bm.text = tr("UI_MAP_MODE") + ": " + tr("UI_MAP_MODE_" + _map_mode.to_upper())
 	bm.pressed.connect(func():
-		_map_mode = MapPalette.MODES[(MapPalette.MODES.find(_map_mode) + 1) % MapPalette.MODES.size()]
+		set_map_mode(MapPalette.MODES[(MapPalette.MODES.find(_map_mode) + 1) % MapPalette.MODES.size()])
 		_fill_debug_map())
 	row.add_child(bm)
 	var hint := Label.new()
@@ -1271,7 +1324,7 @@ func _debug_open_with_argument(which: String) -> bool:
 	var arg := which.substr(head.length() + 1)
 	match head:
 		"map":   # the map in a company mode: --open=map:sector|size|health|age|owners
-			_map_mode = arg
+			set_map_mode(arg)
 			_toggle(debug_map, _fill_debug_map)
 		"hover":   # the map with the slip held over one plot: --open=hover:<tunnus>
 			_map_hover_plot = arg
