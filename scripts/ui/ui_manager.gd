@@ -1,5 +1,5 @@
 # All in-game UI, built in code: HUD (place, clock), notices, the vakuraamat book
-# (BookPanel, Tab), the place's news (NewsPanel, N), the journal, the K codes overlay, the debug map,
+# (BookPanel, Tab), the journal, the K codes overlay, the debug map,
 # the pause menu and F8 reports. Opening any panel frees the mouse and blocks gameplay input.
 extends CanvasLayer
 
@@ -33,7 +33,6 @@ var codes_label: Label            # K: cadastral number, building codes, road, r
 var book: BookPanel              # Tab: what the registers say about this place
 var _guide: Dictionary = {}      # {tunnus, pos, label}: the plot the HUD arrow points at
 var _focus: Dictionary = {}      # {tunnus, address, parcels, buildings}: the plot lit in every view
-var news_panel: NewsPanel        # N: the town feed
 var find_bar: FindBar            # /: find an address, a company or a street in the town
 var codes_on := false
 var _codes_lines: MeshInstance3D = null
@@ -95,14 +94,6 @@ func _ready() -> void:
 	find_bar.go.connect(func(_t: String, pos: Vector2, label: String):
 		_close()
 		jump_to_point(pos, label))
-	news_panel = NewsPanel.new()
-	add_child(news_panel)
-	news_panel.setup()
-	_center_panel(news_panel)
-	news_panel.show_parcel.connect(func(t):
-		_close()
-		book.open_parcel(t)
-		_open(book))
 	pause.custom_minimum_size = Vector2(600, 0)
 	debug_map.custom_minimum_size = Vector2(1180, 840)
 	_center_panel(debug_map)
@@ -541,8 +532,6 @@ func _unhandled_input(event: InputEvent) -> void:
 			_close()
 			find_bar.open_at(Vector2(player.global_position.x, player.global_position.z))
 			_open(find_bar)
-	elif event.is_action_pressed("news"):
-		_toggle(news_panel, news_panel.fill)
 	elif event.is_action_pressed("plot_here"):
 		_plot_here()
 	elif event.is_action_pressed("journal"):
@@ -606,7 +595,7 @@ func show_sheet(title: String, text: String, tunnus: String = "") -> void:
 
 
 func _filler_for(p: Control) -> Callable:
-	var fillers := {book: book.fill, news_panel: news_panel.fill, report_panel: _fill_report, debug_map: _fill_debug_map, pause: _fill_pause}
+	var fillers := {book: book.fill, report_panel: _fill_report, debug_map: _fill_debug_map, pause: _fill_pause}
 	return fillers.get(p, _fill_journal)
 
 
@@ -1358,7 +1347,6 @@ func debug_open(which: String) -> void:
 		"companies":
 			book.tabs.current_tab = 2
 			_toggle(book, book.fill)
-		"news": _toggle(news_panel, news_panel.fill)
 		"menu": _toggle(pause, _fill_pause)
 
 

@@ -1,5 +1,5 @@
 # Parcel boundaries drawn on the ground. Nothing is marked by default - the K overlay draws the unit
-# you stand on - but the book, the find bar and the news feed ask for one to be lit up when they
+# you stand on - but the book and the find bar ask for one to be lit up when they
 # send you to it. Reads the origin tile's parcels.json polygons.
 class_name ParcelMarks
 extends Node3D
@@ -14,7 +14,7 @@ func setup(w: Node3D) -> void:
 	world = w
 
 
-## Briefly light up one parcel: where the book, the find bar or a news item has just sent you.
+## Briefly light up one parcel: where the book or the find bar has just sent you.
 func flash(tunnus: String) -> void:
 	if _flash:
 		_flash.queue_free()

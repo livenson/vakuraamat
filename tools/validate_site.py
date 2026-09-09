@@ -227,14 +227,19 @@ def validate(site, rep, root=ROOT):
                 rep.err(f"{who}: unknown sector {t.get('sector')!r}")
         if tenants["tenants"] and not any(t.get("match") == "exact" for t in tenants["tenants"]):
             rep.warn("tenants.json: no tenant matched a parcel or building")
-    news = load_json("news.json", ("events",))
-    if news:
-        for e in news["events"]:
-            if not (e.get("id") and e.get("kind") in ("news", "official", "macro") and e.get("title") and e.get("url")):
-                rep.err(f"news.json {e.get('id')}: needs id, kind news|official|macro, title and url")
-            for k in ("avaldaja", "andmeandja", "adressaat", "kinnitatud_sisu", "body", "description"):
-                if k in e:
-                    rep.err(f"news.json {e.get('id')}: must not store {k}")
+            for k, v in t.items():
+                if isinstance(v, str) and (re.search(r"[\w.+-]+@[\w-]+\.[\w.]+", v) or re.search(r"\+372\s?\d{6,}", v)):
+                    rep.err(f"{who}: {k} looks like a contact ({v[:30]})")
+            for h in t.get("owners") or []:
+                if not re.fullmatch(r"[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|\d{6,}", str(h)):
+                    rep.err(f"{who}: owners must be register hashes, got {str(h)[:20]!r}")
+            if t.get("health") not in (None, "sound", "watch", "distressed"):
+                rep.err(f"{who}: health must be sound, watch or distressed")
+            if t.get("sector") not in (None, "farm", "industry", "construction", "trade", "transport", "hospitality", "media", "finance",
+                                       "property", "services", "public", "culture"):
+                rep.err(f"{who}: unknown sector {t.get('sector')!r}")
+        if tenants["tenants"] and not any(t.get("match") == "exact" for t in tenants["tenants"]):
+            rep.warn("tenants.json: no tenant matched a parcel or building")
     stops = load_json("stops.json", ("stops",))
     stop_ids = {str(x.get("id")) for x in stops["stops"]} if stops else set()
     dep = load_json("departures.json", ("attribution", "source", "fetched", "stops", "routes"))

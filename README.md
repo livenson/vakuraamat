@@ -17,7 +17,7 @@ ready-to-play build for macOS, Windows or Linux. No Godot, no Python, nothing el
 |---|---|
 | ![The front page](docs/screenshots/menu.jpg) The front page: the plate of your square kilometre | ![The plots](docs/screenshots/plots.jpg) The book (Tab): the cadastre with purpose, area, taxation value and ownership |
 | ![A Kvissentali street](docs/screenshots/street.jpg) A Kvissentali street: the Building Register's houses on the cadastre's plots | ![Inside a company's building](docs/screenshots/shop.jpg) Inside a company's building: rooms, stairs and windows onto the real street |
-| ![The news](docs/screenshots/news.jpg) The news (N): the region's real headlines and official notices | ![Debug map](docs/screenshots/map.jpg) The map (M): plots, companies, street names and house numbers on the orthophoto |
+| ![Debug map](docs/screenshots/map.jpg) The map (M): plots, companies, street names and house numbers on the orthophoto | ![The plot over the years](docs/screenshots/home.jpg) A plot over the years: every orthophoto flown over it since 1993 |
 
 ## Install and play
 
@@ -50,7 +50,7 @@ What changed in each build is in [CHANGELOG.md](CHANGELOG.md).
 
 ### Controls
 
-WASD move, E interact, Tab the book, B this plot, N news, J journal, M map, K codes, F fly,
+WASD move, E interact, Tab the book, B this plot, J journal, M map, I layer, K codes, F fly,
 T teleport, H home, F8 report, Esc menu.
 
 ## What you do
@@ -61,8 +61,6 @@ T teleport, H home, F8 report, Esc menu.
   the plot's square out of every orthophoto flown over it since 1993. **B** opens the plot under your
   feet; *Place* is the pack itself, what it holds and where every figure came from.
 - **Fly (F):** from the air the crosshair names the building under it, up to six hundred metres out.
-- **The news (N):** the region's real headlines and the official notices - planning procedures,
-  auctions, bankruptcy proceedings - that name this place's streets, settlements or companies.
 - **The buses are the real ones:** the shelter's board carries the timetable the public transport
   register publishes for that stop, and a bus turns up to run it. Kvissentali is the end of lines 8
   and 10; Palupera gets one a day to Elva, Otepää, Puka and Valga.
@@ -85,7 +83,6 @@ work if installed by hand.
 git clone https://github.com/livenson/vakuraamat.git && cd vakuraamat
 make setup                        # Homebrew tools (godot, blender, uv, git-lfs), the pipeline's Python venv, LFS pull, first Godot import
 make tile                         # Maa-amet data for Palupera and its terrain (~10 min, network); SITE=<id> for another pack
-make news-local SITE=kvissentali  # optional: today's regional headlines and official notices into the pack
 tools/play.sh                     # the tile service plus the game; tools/play.sh -- --site=kvissentali --windowed
 ```
 
@@ -121,7 +118,6 @@ flowchart LR
   PRIA[PRIA field register WFS: fields and declared crops]
   OSM[OpenStreetMap: bus stops]
   GTFS[Public transport register: lines, times, route geometry]
-  RSS[ERR and Postimees RSS, Ametlikud Teadaanded]
   PH[Poly Haven CC0 textures]
   SKF[Sketchfab and Poly Pizza CC BY models: cars, lamps, shelters, trees, farm props]
 
@@ -141,10 +137,9 @@ flowchart LR
 
   TILE & TJ & RJ & BJ --> IMP[import_terrain.gd: control map, scatter, measured trees] --> REG[(Terrain3D region)]
   BJ & RJ & PJ & WJ --> GEN[gen_era_scenes.py] --> SCN[(scenes/era_2026.tscn)]
-  RSS --> NF[news_feeder.py] --> NJ[(news.json)]
 
   REG & SCN & TEX & FJ & SJ & SKF --> GAME[Godot: terrain, buildings, interiors, roads, parcels, traffic, crops, bus stops]
-  PJ & TEJ & MJ & NJ --> BOOK[The book: the cadastre, the companies, the place] --> GAME
+  PJ & TEJ & MJ --> BOOK[The book: the cadastre, the companies, the place] --> GAME
   DJ --> BUS[Shelter timetables and the buses that keep them] --> GAME
 ```
 
@@ -156,8 +151,7 @@ are in [docs/data-pipeline.md](docs/data-pipeline.md). Licences and attribution 
 
 Every place is a site pack under `sites/<id>/`: Kvissentali (Tartu) is the first, Palupera the rural
 second. `make site` and `make tile` make one from an EPSG:3301 centre; the tile service does the
-same for any point from inside the game, and `make news-local SITE=<id>` fetches what the press and
-Ametlikud Teadaanded are saying about it. See [docs/custom-sites.md](docs/custom-sites.md).
+same for any point from inside the game. See [docs/custom-sites.md](docs/custom-sites.md).
 
 ## Development
 

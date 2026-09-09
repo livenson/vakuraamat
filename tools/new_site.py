@@ -28,8 +28,8 @@ PACK_VERSION = 2
 sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar
-CREDIT_ET = 'Maa maksustamishind 2022: Maakataster, Maa- ja Ruumiamet. Ettevõtted: Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0). Teated: Ametlikud Teadaanded (ainult pealkiri ja link). Uudised: ERR ja Postimees (pealkirjad ja lingid).'
-CREDIT_EN = 'Land values 2022: the cadastre, Maa- ja Ruumiamet. Companies: e-Business Register open data, Centre of Registers and Information Systems (CC BY 4.0). Notices: Official Announcements (title and link only). News: ERR and Postimees (headlines and links).'
+CREDIT_ET = 'Maa maksustamishind 2022: Maakataster, Maa- ja Ruumiamet. Ettevõtted: Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0).'
+CREDIT_EN = 'Land values 2022: the cadastre, Maa- ja Ruumiamet. Companies: e-Business Register open data, Centre of Registers and Information Systems (CC BY 4.0).'
 
 # ---------------------------------------------------------------- EPSG:3301 (L-EST97) -> WGS84
 A_GRS80 = 6378137.0

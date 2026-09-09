@@ -43,7 +43,7 @@ if getattr(sys, "frozen", False):
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the repository, or the bundle directory of the frozen sidecar (tools/service/build.sh)
 import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads, fetch_stops, fetch_tenants, fetch_fields, market  # noqa: E402
-import fetch_tile, fetch_departures, news_feeder, validate_site  # noqa: E402
+import fetch_tile, fetch_departures, validate_site  # noqa: E402
 MIN_FREE_BYTES = 2 * 1024 ** 3   # a job needs raw sheets, the workspace and the zip: refuse under 2 GB
 ORTHO_BYTES = 6 * 1024 ** 2      # the WMS orthophoto JPEG (4096 px) and the small historical maps
 GEOCODER = "https://inaadress.maaamet.ee/inaadress/gazetteer?results=8&features=EHAK,TANAV,KATASTRIYKSUS,EHITISHOONE&address="
@@ -318,7 +318,7 @@ def run_job(job):
 
 def refine_job(job, ws):
     """What a pack does not need to be walked in, fetched after it is playable: the 1 m ground
-    model in place of the 5 m one, the measured trees, and the news. Each has a budget, the zip is
+    model in place of the 5 m one and the measured trees. Each has a budget, the zip is
     rewritten when they are in, and /status reports `refined`; the game downloads the pack again on
     its next visit to the place and rebuilds the tile from the finer ground."""
     sid = job["id"]
@@ -337,10 +337,6 @@ def refine_job(job, ws):
         rstage("bus departures (public transport register)")
         # the national GTFS is one 52 MB zip for the whole country, cached a week like the register dumps
         with_deadline(f"{sid}: departures", 300, fetch_departures.fetch, sid, root=ws)
-        rstage("news (RSS, Ametlikud Teadaanded)")
-        # the notices feed is two national XML documents with a 180 s socket timeout each: generous
-        # here because nothing waits on it any more, where it used to hold the pack for eight minutes
-        with_deadline(f"{sid}: news", 420, news_feeder.main, ["--site", sid, "--root", ws, "--once"])
         rstage("packing")
         write_zip(sid, ws)
         if ok:

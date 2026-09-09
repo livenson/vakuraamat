@@ -19,17 +19,18 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   regenerated from data on every machine, and a save is only where you were standing.
 - The cadastre is read through `Parcels`: `units(pack)` is one pack's own file in its local metres,
   `all()` is every tile standing right now in world metres (a streamed neighbour's x/z shifted by its
-  tile offset), `by_tunnus()` finds one. Companies through `Tenants.of(pack, tunnus)`, headlines and
-  notices through `News.all()`. All three cache per file and are dropped by `GameState.reload()`.
+  tile offset), `by_tunnus()` finds one. Companies through `Tenants.of(pack, tunnus)`, and what ties
+  a unit to another through `Links.of(tunnus)`. All cache per file and are dropped by
+  `GameState.reload()`.
 - Every third-party file gets a row in `THIRD_PARTY.md` in the same commit (the project will be
   open source). Prefer CC0/MIT. Nothing from Fab/Megascans. Data files carry `attribution`.
 - Site content lives in `sites/<id>/`: `site.json` (manifest), `layout.json` (positions),
   `scenes.json` (the layer), `data/eras/era_2026.tres`, `parcels.json`, `buildings.json`,
-  `tenants.json`, `market.json`, `news.json`, `roads.json`, `stops.json`, `departures.json`, `strings.csv`. `make scenes SITE=<id>`
+  `tenants.json`, `market.json`, `roads.json`, `stops.json`, `departures.json`, `strings.csv`. `make scenes SITE=<id>`
   regenerates `sites/<id>/scenes/*.tscn`; do not hand-edit those scenes. Engine code (`scripts/`,
   `scenes/`) must not reference a site by name; go through `Sites` (manifest, `data_dir`, `layout`, `tile`).
-- Real names: the companies are real (legal persons only). News and notices are stored as headline,
-  source, date and link, never as full text.
+- Real names: the companies are real (legal persons only). The register's natural persons are never
+  named: they exist in a pack only as the hashed ids `Links` groups plots by, and never reach the UI.
 - Playtest loop: reports from F8 land in `user://reports/` (feed.log); `python3 tools/dev.py reload|restart|replay|
   teleport|screenshot` talks to the running debug game through `user://dev/commands.jsonl`
   (`DevChannel` autoload). See `docs/dev-loop.md`.
@@ -41,18 +42,18 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
 - Country data adapters: `tools/pipeline/sources.py` (Estonia implemented; add a class per country).
 - A pack for a new place is built in two passes. The job ships what the place needs to be walked in
   (the 5 m ground model, 4 MB a sheet against 75 MB for the 1 m one; the register, cadastre, roads,
-  tenants), then `refine_job` fetches the 1 m ground, the measured trees and the news in the
+  tenants), then `refine_job` fetches the 1 m ground, the measured trees and the departures in the
   background and rewrites the zip. The tile's `terrain_meta.json` carries `dtm_res_m`; while it says
   5, `Locator.take_refined` takes the finished pack the next time the place is entered from the menu
   (the install clears the region data, so the ground is rebuilt from the finer model on the way in).
   Every stage that reaches a national service goes through `with_deadline`: an optional layer may
-  never hold the pack (the notices feed alone held it for eight minutes). Per-building register
+  never hold the pack (the notices feed, since removed, once held it for eight minutes). Per-building register
   lookups go through `fetch_buildings.prefetch_ehr` (a few threads sharing one rate limit), never one
   after another.
 - Buildings come from `tools/pipeline/fetch_buildings.py` (ETAK polygons + Building Register attributes +
   Geo3D LOD2 roofs) into `sites/<id>/buildings.json`; parcels with land values from `fetch_parcels.py`,
-  tenants from `fetch_tenants.py`, the valuation medians from `market.py`, the headlines and official
-  notices from `news_feeder.py`, the bus lines and departure times from `fetch_departures.py`.
+  tenants from `fetch_tenants.py`, the valuation medians from `market.py`, the bus lines and
+  departure times from `fetch_departures.py`.
 - The tile service holds the pipeline modules in memory from the moment it started: after changing
   anything under `tools/pipeline/`, restart it (`pkill -f tools/tile_service.py`, then `tools/play.sh`
   or `make service`) or the next pack is built by the old code. Cached `.slim` register files are
@@ -91,7 +92,7 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   tools; scenes that need autoloads run as `godot --headless --path . res://tools/godot/<test>.tscn`.
 - zsh does not word-split unquoted variables: when looping over argument strings use `${=args}`.
 - Screenshots for visual checks: `godot --path . res://scenes/world/world.tscn -- --screenshot=/abs.png
-  --frames=400 --spawn=x,z,yaw --open=journal|map|menu|book|place|news|companies --enter="<address part>"`;
+  --frames=400 --spawn=x,z,yaw --open=journal|map|menu|book|place|companies --enter="<address part>"`;
   add `--site=<id>` for another pack.
 
 ## Conventions and pitfalls

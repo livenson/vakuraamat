@@ -377,7 +377,7 @@ static func ground_is_coarse(id: String) -> bool:
 	return typeof(m) == TYPE_DICTIONARY and float(m.get("dtm_res_m", 1.0)) > 1.0
 
 
-## Take the refined pack (1 m ground, measured trees, news) when the service has it ready. The
+## Take the refined pack (1 m ground, measured trees) when the service has it ready. The
 ## install clears the tile's region data, so the world rebuilds the ground from the finer model on
 ## the way in. Returns true when something was installed. Quiet and quick when the service is down:
 ## the coarse ground is a complete world, not a placeholder.
@@ -396,7 +396,7 @@ func take_refined(id: String) -> bool:
 	if not dl.ok or not install_zip(zip_path, id):
 		return false
 	if id == Sites.active:
-		Sites.reload_active()   # the pack's own files changed under it (news, trees, the meta)
+		Sites.reload_active()   # the pack's own files changed under it (trees, the meta)
 	print("[Locator] %s: the 1 m ground model replaced the 5 m one; the tile is rebuilt on the way in" % id)
 	return true
 

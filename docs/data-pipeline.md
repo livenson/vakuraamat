@@ -25,9 +25,7 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | e-Business Register open data (daily CSV, CC BY 4.0) | companies matched to the tile's addresses | `tools/pipeline/fetch_tenants.py` | `sites/<id>/tenants.json` |
 | e-Business Register general data, persons and shareholders (daily JSON dumps, CC BY 4.0) | EMTAK activity and the sector, share capital, web address, annual-report employee counts, deletion date; board and shareholder counts and hashed ids (structure only, no names) | `tools/pipeline/register_extra.py` (slimmed once per download into `data_raw/ariregister/*.slim.jsonl`) | the same rows in `tenants.json` |
 | Tax Board "tasutud maksud" quarterly open data (EMTA) | taxes paid, turnover and employees per company per quarter, the activity sector | `register_extra.py` (`data_raw/emta/`) | `tenants.json`: `employees`, `turnover`, `taxes`, `quarters`, `health` |
-| Ametlikud Teadaanded bankruptcy proceedings | notices naming one of the tile's companies (registry code or name) | `tools/news_feeder.py` | `news.json` events on the company's parcel |
 | Maa-amet in-ADS gazetteer | address and place search | `tools/tile_service.py` (`/geocode`) | menu results |
-| ERR and Postimees RSS, Ametlikud Teadaanded | regional headlines, planning and auction notices | `tools/news_feeder.py` | `sites/<id>/news.json` |
 | Poly Haven (CC0) | ground and facade PBR textures | `tools/pipeline/fetch_polyhaven.py` | `assets/terrain/textures/`, `assets/textures/buildings/` |
 | Sketchfab (CC BY, via the MCP server, `make mcp`) and Poly Pizza (CC0 / CC BY) models | cars, street lamps, benches, bus shelters, the spruce and juniper, hay bales, tractor, farm plants; playground, boats, bathroom and stairs | downloaded, split with `tools/blender/split_glb.py`, listed in `assets/vendor/sketchfab/CREDITS.md` | `assets/vendor/sketchfab/`, `assets/vendor/polypizza/`, `assets/models/trees/spruce_src.glb` |
 
@@ -73,7 +71,6 @@ the menu and packs the result as a zip the game installs under `user://`.
 | `departures.json` | `scripts/world/departures.gd`: the shelter's timetable board and its E sheet, and `bus_service.gd`, which puts a bus on the route at each departure |
 | `fields_2026.json` | `scripts/world/crops.gd`: rows of cereal, rape, potato, legume or maize plants on each declared field; grassland and fallow stay as the ground shows them |
 | `tenants.json` | `scripts/world/tenants.gd`, name plates, interiors (use of a building), the book |
-| `news.json` | `scripts/world/news.gd` -> `scripts/ui/news_panel.gd` |
 | `scenes/era_2026.tscn` | `scripts/era/era_controller.gd` |
 
 ## Requirements (macOS)
@@ -121,7 +118,6 @@ bake). Large stable binaries (models, textures, addon binaries) are tracked with
 | `make trees` | `assets/models/trees/*.glb`, `*_lod.tscn`, impostor atlases | Blender Sapling presets; a vendored `<name>_src.glb` (the Sketchfab spruce) wins over the generated tree and is merged, pruned and baked the same way |
 | `make props` | boundary stone, figures, prepared vegetation scenes | Blender scripts in `tools/blender` |
 | `make validate` | report | every `sites/*/` (no Godot) |
-| `make news-local SITE=<id>` | `sites/<id>/news.json` | ERR and Postimees RSS, Ametlikud Teadaanded |
 | `make departures SITE=<id>` | `sites/<id>/departures.json` | the register's GTFS (needs `make stops` first) |
 | `make test`, `make lint` | the headless suite; gdlint, ruff, shellcheck | |
 
@@ -191,7 +187,7 @@ scripts/world/                       terrain, buildings, interiors, roads, parce
 scripts/ui/                          the book theme, panels, HUD, menu
 tools/pipeline/                      the fetchers and derivations
 tools/godot/                         headless tools and tests
-tools/dev.py, tools/tile_service.py, tools/news_feeder.py
+tools/dev.py, tools/tile_service.py
 data_raw/                            downloads and intermediates (git-ignored)
 ```
 
@@ -209,7 +205,7 @@ pipeline, rasterio, pyogrio, shapely, pyproj, the template pack and the rules in
 in `dist/`. The CI build puts it beside the game (inside `Vakuraamat.app/Contents/MacOS` on macOS);
 an exported game starts it with `--workspace user://service --raw-dir user://service/data_raw`, so
 the Locations page works without the repository. From the source tree the game and `tools/play.sh`
-run `tools/tile_service.py` with the venv's Python instead. The service runs the fetch, the news
+run `tools/tile_service.py` with the venv's Python instead. The service runs the fetch, the
 feeder and the validation in-process (no subprocesses), and every download cache (sheets, register
 dumps, Tax Board, LOD2, trees) lives under one raw directory (`VAKURAAMAT_RAW_DIR`).
 

@@ -72,7 +72,7 @@ BUILD_NO_MATERIALS,Materjali ei jätku.,Not enough materials.
 BUILD_COST,Hind: %s,Cost: %s
 UI_DEBUG_MAP,Silumiskaart,Debug map
 UI_DEBUG_MAP_HINT,"Klõps kaardil: teleport. Parem klõps: seosed. Hiir näitab, mida register kohast ütleb. M sulgeb.",Click the map to teleport. Right click for links. Hover to read what the register says. M closes.
-UI_KEYS,E tegutse   Tab vakuraamat   / otsi   B maatükk siin   N uudised   J päevik   L keel   M kaart   I kiht   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   Tab vakuraamat   / find   B this plot   N news   J journal   L language   M map   I layer   K codes   F fly   T teleport   H home   F8 report   Esc menu
+UI_KEYS,E tegutse   Tab vakuraamat   / otsi   B maatükk siin   J päevik   L keel   M kaart   I kiht   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   Tab vakuraamat   / find   B this plot   J journal   L language   M map   I layer   K codes   F fly   T teleport   H home   F8 report   Esc menu
 MENU_SITE,Asukoht,Location
 UI_BUILDING_GROUND,Maa ehitatakse laserandmetest...,Building the ground from the laser data...
 MENU_NEW_LOCATION,Uus asukoht...,New location...
@@ -170,8 +170,6 @@ UI_IN_USE_SINCE,kasutusel alates %d,in use since %d
 UI_BOOK_SOURCES,"Kõik siinsed arvud on avaandmed, nagu registrid need annavad.","Every figure here is open data, as the registers give it."
 UI_SINCE,alates,since
 UI_TENANT_INACTIVE,ei tegutse,inactive
-UI_NEWS,Uudised,News
-UI_NEWS_EMPTY,Veel ei ole midagi juhtunud.,Nothing has happened yet.
 UI_CODES_TENANT,Üürnikud,Tenants
 UI_CODES_OWNER,Omanik,Owner
 BTN_LINK,Ava link,Open link

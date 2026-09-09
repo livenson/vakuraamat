@@ -579,8 +579,6 @@ func _attributions() -> Array:
 			continue
 		for line in _lines_of(parsed.get("attribution", "")):
 			seen[line] = true
-	for line in _lines_of(News.attribution()):
-		seen[line] = true
 	return seen.keys()
 
 

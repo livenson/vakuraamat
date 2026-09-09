@@ -36,7 +36,6 @@ make site SITE=kvissentali NAME="Kvissentali" CENTER="657600 6477150"
 make tile SITE=kvissentali      # Maa-amet DTM, nDSM, orthophoto; Terrain3D import; vegetation; buildings,
                                 # parcels with land values, tenants, market, roads; scenes; validation  (~10 min, network)
 godot --path . -- --site=kvissentali
-make news-local SITE=kvissentali  # optional: the region's headlines and official notices
 ```
 
 `make site` writes a working town pack: a landmark near the spawn, the real footprints, roads,
@@ -103,9 +102,9 @@ last either way. *Place* is the pack itself: where it is, when its data
 was fetched, how many plots, buildings and companies it holds, the median taxation value per square
 metre by purpose (`market.json`), and every attribution its files carry.
 
-**B** opens the plot you are standing on, **N** the news, **K** the codes overlay, **/** the find
+**B** opens the plot you are standing on, **I** the ground layer, **K** the codes overlay, **/** the find
 bar. `--open=book`, `--open=plots:<text>`, `--open=plot:<tunnus>#<n>`, `--open=companies`,
-`--open=place` and `--open=news` all work with `--screenshot`.
+`--open=place`, `--open=focus:<tunnus>` and `--layer=<mode>` all work with `--screenshot`.
 
 ## The book: how the menus look
 
@@ -269,20 +268,6 @@ register link. Only legal persons are kept; sole proprietors carry a person's na
 so their premises can stand empty in the game. `--stats` prints the match statistics and the
 unmatched street numbers, which is the loop for tuning the normaliser. Kvissentali matches about
 260 companies, four in five exactly; Palupera about 30.
-
-### News: the town feed
-
-`make news-local` (or `tools/news_feeder.py --once`) pulls the region's headlines (ERR items tagged Eesti,
-Tartu Postimees and Lõuna-Eesti Postimees for Tartu county, ERR alone elsewhere) and Official
-Announcements of the planning and auction kinds whose address names the pack's settlement or
-municipality, and posts them into the town through the `post_event` reducer with the publisher's
-token. Only the headline or a composed notice title, the source, the date and the link are stored;
-notice bodies, publishers and addressees never are, and person-directed notice kinds are not fetched
-at all. The items are written to `sites/<id>/news.json` (ignored by git)
-play. State lives in `data_raw/news/<town>.json` so reruns only add new items; `--dry-run` prints
-them. Feeds and area names come from `parcels.json`'s `summary`; `sites/<id>/news_config.json` can
-override `feeds`, `names` and `notice_types`. For a standing feed, a launchd job or cron line running
-`make news-local SITE=<id>` every 15 minutes is enough.
 
 ### Buses: the register's own timetable
 
@@ -471,7 +456,7 @@ where a register says nothing the line is absent. Everything a pack places in th
 regenerated from data on every machine; a save holds only where you were standing.
 
 Every data source a pack uses gets a row in `THIRD_PARTY.md`; the Maa-amet attribution is
-shown in the menu and must stay, and the codex names the register, notice and news sources.
+shown in the menu and must stay, and the codex names the register sources.
 
 ## The Locations page: search, estimate, storage
 
@@ -526,8 +511,6 @@ quarters), `taxes`, `employees_hist`, `quarters`, `board_size`, `shareholders`, 
 shown), `deleted`, `report_overdue` and `health` (sound, watch, distressed). The register dumps are
 slimmed once per download; a tile job then takes seconds.
 `python3 tools/pipeline/fetch_tenants.py --site <id> --stats` prints the sector histogram.
-The news panel reads the pack's `news.json` (the tile service writes one per world).
-
 The debug map (M) has a company layer: the Layer button cycles sector, employees, health, founded
 and shared owners (`scripts/ui/map_palette.gd`, legend in the corner; `--open=map:<mode>` for a
 screenshot). The K overlay and the plot sheet list each tenant's activity, staff, turnover, taxes,
