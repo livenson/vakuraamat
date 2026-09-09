@@ -27,6 +27,7 @@ func _ready() -> void:
 func forget_caches() -> void:
 	Parcels.forget()
 	Tenants.forget()
+	Links.forget()
 	News.forget()
 	Departures.forget()
 	PlaceSearch.forget()

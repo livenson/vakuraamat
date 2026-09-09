@@ -31,6 +31,7 @@ var report_panel: PanelContainer
 var codes_label: Label            # K: cadastral number, building codes, road, registry links
 var book: BookPanel              # Tab: what the registers say about this place
 var _guide: Dictionary = {}      # {tunnus, pos, label}: the plot the HUD arrow points at
+var _focus: Dictionary = {}      # {tunnus, address, parcels, buildings}: the plot lit in every view
 var news_panel: NewsPanel        # N: the town feed
 var find_bar: FindBar            # /: find an address, a company or a street in the town
 var codes_on := false
@@ -42,6 +43,9 @@ var _tile_ortho: Dictionary = {}      # pack id -> ImageTexture of its orthophot
 var _map_layers: Dictionary = {}      # pack id -> {streets, numbers} read from roads.json and buildings.json
 var _map_layout: Dictionary = {}      # the last label layout of the debug map (see _lay_out_map)
 var _map_hover := Vector2(-1, -1)     # mouse position over the debug map canvas
+var _map_hover_plot := ""             # checks: hold the slip over this plot (--open=hover:<tunnus>)
+var _hover_key := ""                  # the place the slip is about, so it is written once, not per frame
+var _hover_lines: Array = []          # [text, size, colour] of the slip under the mouse
 var _map_mode := "off"                # company layer of the debug map: off, sector, size, health, age, owners (MapPalette.MODES)
 var _open_panel: Control = null
 
@@ -70,6 +74,7 @@ func _ready() -> void:
 			marks.flash(t))
 	book.guide.connect(guide_to)
 	book.teleport.connect(teleport_to)
+	book.focus.connect(focus_parcel)
 	find_bar = FindBar.new()
 	add_child(find_bar)
 	find_bar.setup()
@@ -139,6 +144,29 @@ func guide_to(tunnus: String) -> void:
 	_guide = {"tunnus": tunnus, "pos": pos + Vector3(0, 1.5, 0), "label": str(p.address)}
 	_close()
 	show_notice(tr("NOTICE_GUIDE_SET") % str(p.address))
+
+
+## Light one plot and everything the registers tie it to, in the book, on the map and on the ground
+## (again on the same plot: clear it). What was resolved is kept here rather than looked up again:
+## the HUD line is rebuilt every frame and Parcels.by_tunnus walks the standing tiles.
+func focus_parcel(tunnus: String) -> void:
+	if _focus == null:
+		_focus = {}
+	if tunnus == "" or _focus.get("tunnus", "") == tunnus:
+		var had := not _focus.is_empty()
+		_focus = {}
+		EventBus.parcel_focused.emit("")
+		if had:
+			show_notice(tr("UI_FOCUS_CLEARED"))
+		return
+	var l := Links.of(tunnus)
+	if l.pack == "":
+		return   # not on a tile standing right now
+	var linked: Array = l.parcels.map(func(s): return str(s.tunnus))
+	_focus = {"tunnus": tunnus, "address": str(l.address) if str(l.address) != "" else tunnus,
+		"links": linked, "buildings": l.buildings.size()}
+	EventBus.parcel_focused.emit(tunnus)
+	show_notice(tr("UI_FOCUS_ON") % _focus.address)
 
 
 ## Jump to a plot: the game's teleport, the same as T and a click on the map.
@@ -382,6 +410,8 @@ func _refresh_era_label() -> void:
 	var obj := _objective()
 	if obj != "":
 		era_label.text += "\n" + obj
+	if _focus != null and not _focus.is_empty():
+		era_label.text += "\n" + tr("UI_FOCUS_ON") % str(_focus.address)
 	if world.streamer and world.streamer.has_method("loading_status"):
 		var busy: String = world.streamer.loading_status()
 		if busy != "":
@@ -804,6 +834,7 @@ func _draw_debug_map(c: Control) -> void:
 		_lay_out_map(origin, side, loc, pack, pp)
 	if _map_mode != "off":
 		_draw_company_layer(c, origin, side, pack, font)
+	_draw_focus_layer(c, origin, side, pack)
 	for d in _map_layout.dots:
 		c.draw_circle(d.pos, 4, d.col)
 		c.draw_circle(d.pos, 4, Color.BLACK, false, 1.0)
@@ -816,20 +847,8 @@ func _draw_debug_map(c: Control) -> void:
 		else:
 			c.draw_string(font, l.pos + Vector2(1, 1), l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.size, Color(0, 0, 0, 0.8))
 			c.draw_string(font, l.pos, l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.size, l.col)
-	# the point under the mouse: its label on a slip of paper, on top of everything
-	var near: Dictionary = {}
-	var best := 12.0
-	for d in _map_layout.dots:
-		var dist: float = d.pos.distance_to(_map_hover)
-		if dist < best:
-			best = dist
-			near = d
-	if not near.is_empty():
-		var w := font.get_string_size(near.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 13).x
-		var box := Rect2(near.pos + Vector2(10, -20), Vector2(w + 12, 22))
-		c.draw_rect(box, BookTheme.PAGE)
-		c.draw_rect(box, BookTheme.INK, false, 1.0)
-		c.draw_string(font, box.position + Vector2(6, 15), near.text, HORIZONTAL_ALIGNMENT_LEFT, -1, 13, BookTheme.INK)
+	# what is under the mouse, on a slip of paper, on top of everything
+	_draw_hover_card(c, origin, side, pack, font)
 	# the player and heading
 	var fwd := -player.global_transform.basis.z
 	c.draw_line(pp, pp + Vector2(fwd.x, fwd.z) * 18, Color.WHITE, 2.0)
@@ -843,6 +862,146 @@ func _draw_debug_map(c: Control) -> void:
 	var tile_text := "tile %d,%d  %s" % [loc.x, loc.y, pack if pack != "" else "(not loaded)"]
 	c.draw_string(font, origin + Vector2(11, 19), tile_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color.BLACK)
 	c.draw_string(font, origin + Vector2(10, 18), tile_text, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, GOLD)
+
+
+## The focused plot and what it is linked to, drawn in every layer mode including "off": the plot
+## itself filled and outlined, the plots sharing an owner outlined, and a line to each of them.
+func _draw_focus_layer(c: Control, origin: Vector2, side: float, pack: String) -> void:
+	if _focus == null or _focus.is_empty():
+		return
+	var k := side / 1024.0
+	var linked: Array = _focus.get("links", [])
+	var mine := Vector2.ZERO
+	var others: Array[Vector2] = []
+	for pr in _map_layer(pack).get("parcels", []):
+		var is_focus: bool = str(pr.tunnus) == str(_focus.tunnus)
+		if not is_focus and not (str(pr.tunnus) in linked):
+			continue
+		var pts := PackedVector2Array()
+		for q in pr.poly:
+			pts.append(origin + Vector2(float(q[0]), float(q[1])) * k)
+		if pts.size() < 3:
+			continue
+		pts.append(pts[0])
+		# a town plot is thirty pixels across on a map of a square kilometre, so the mark has to be
+		# heavier than the boundary it draws: a dark backing stroke, then the blue over it
+		if is_focus:
+			mine = origin + Vector2(pr.at) * k
+			c.draw_colored_polygon(pts, Color(BookTheme.BLUE, 0.45))
+			c.draw_polyline(pts, Color(BookTheme.INK, 0.8), 4.0)
+			c.draw_polyline(pts, Color(BookTheme.PAGE_LIGHT, 0.95), 2.0)
+		else:
+			others.append(origin + Vector2(pr.at) * k)
+			c.draw_colored_polygon(pts, Color(BookTheme.BLUE, 0.22))
+			c.draw_polyline(pts, Color(BookTheme.INK, 0.7), 3.0)
+			c.draw_polyline(pts, Color(BookTheme.BLUE.lightened(0.4), 0.95), 1.5)
+	if mine == Vector2.ZERO:
+		return
+	for o in others:
+		c.draw_line(mine, o, Color(BookTheme.INK, 0.7), 4.0)
+		c.draw_line(mine, o, Color(BookTheme.PAGE_LIGHT, 0.9), 2.0)
+		c.draw_circle(o, 5.0, Color(BookTheme.BLUE, 0.95))
+		c.draw_circle(o, 5.0, BookTheme.PAGE_LIGHT, false, 1.5)
+	c.draw_circle(mine, 7.0, Color(BookTheme.BLUE, 0.95))
+	c.draw_circle(mine, 7.0, BookTheme.PAGE_LIGHT, false, 2.0)
+
+
+## What the register says about the place under the mouse, as a slip of paper: whatever the nearest
+## point is called, then the plot it stands on - its use, its size, its 2022 value, the companies
+## registered on it and what it is linked to. Hovering bare ground answers with the plot too, which
+## is the whole point: the coloured shapes on this map used to say nothing at all.
+##
+## The map redraws every frame, so the text is built only when the plot under the mouse changes.
+func _draw_hover_card(c: Control, origin: Vector2, side: float, pack: String, font: Font) -> void:
+	if _map_hover_plot != "":
+		for pr in _map_layer(pack).get("parcels", []):
+			if str(pr.tunnus) == _map_hover_plot:
+				_map_hover = origin + Vector2(pr.at) * (side / 1024.0)
+				break
+	if _map_hover.x < 0:
+		return
+	var near: Dictionary = {}
+	var best := 12.0
+	for d in _map_layout.dots:
+		var dist: float = d.pos.distance_to(_map_hover)
+		if dist < best:
+			best = dist
+			near = d
+	var at := (_map_hover - origin) / (side / 1024.0)   # tile metres
+	var tunnus := ""
+	for pr in _map_layer(pack).get("parcels", []):
+		var poly := PackedVector2Array()
+		for q in pr.poly:
+			poly.append(Vector2(float(q[0]), float(q[1])))
+		if poly.size() >= 3 and Geometry2D.is_point_in_polygon(at, poly):
+			tunnus = str(pr.tunnus)
+			break
+	var title := str(near.get("text", "")) if not near.is_empty() else ""
+	var key := "%s|%s" % [title, tunnus]
+	if key == "|":
+		return
+	if _hover_key != key:
+		_hover_key = key
+		_hover_lines = _hover_card_lines(title, tunnus, pack)
+	if _hover_lines.is_empty():
+		return
+	var w := 0.0
+	for line in _hover_lines:
+		w = maxf(w, font.get_string_size(str(line[0]), HORIZONTAL_ALIGNMENT_LEFT, -1, int(line[1])).x)
+	var anchor: Vector2 = near.pos if not near.is_empty() else _map_hover
+	var size := Vector2(w + 16, 8.0 + _hover_lines.size() * 16.0)
+	var pos := anchor + Vector2(12, -12)
+	if pos.x + size.x > origin.x + side:
+		pos.x = anchor.x - size.x - 12
+	if pos.y + size.y > origin.y + side:
+		pos.y = origin.y + side - size.y
+	var box := Rect2(pos, size)
+	c.draw_rect(box, Color(BookTheme.PAGE, 0.96))
+	c.draw_rect(box, BookTheme.INK, false, 1.0)
+	var y := pos.y + 16.0
+	for line in _hover_lines:
+		c.draw_string(font, Vector2(pos.x + 8, y), str(line[0]), HORIZONTAL_ALIGNMENT_LEFT, -1, int(line[1]), line[2])
+		y += 16.0
+
+
+## The lines of the slip: [text, size, colour]. Nothing a register does not carry is written, so a
+## plot with no companies simply has fewer lines.
+func _hover_card_lines(title: String, tunnus: String, pack: String) -> Array:
+	var out: Array = []
+	if title != "":
+		out.append([title, 14, BookTheme.INK])
+	if tunnus == "":
+		return out
+	var u := Parcels.by_tunnus(tunnus)
+	if u.is_empty():
+		for pr in _map_layer(pack).get("parcels", []):
+			if str(pr.tunnus) == tunnus:
+				out.append([tunnus, 12, BookTheme.FADED])
+				return out
+		return out
+	var address := str(u.get("address", ""))
+	if address != "" and address != title:
+		out.append([address, 13 if title == "" else 12, BookTheme.INK if title == "" else BookTheme.FADED])
+	var purpose := tr("PURPOSE_" + Parcels.purpose_of(u))
+	out.append(["%s, %d m²" % [purpose if not purpose.begins_with("PURPOSE_") else "", int(u.get("area", 0))], 12, BookTheme.FADED])
+	var value = u.get("land_value")
+	if value != null and float(value) > 0:
+		out.append([tr("UI_BOOK_COL_VALUE") + ": " + BookTheme.money(int(float(value))), 12, BookTheme.FADED])
+	var rows := Tenants.of(pack, tunnus)
+	for t in rows.slice(0, 3):
+		var bits := str(t.get("name", ""))
+		var emp = t.get("employees")
+		if emp != null and int(emp) > 0:
+			bits += "   " + tr("UI_EMPLOYEES") % int(emp)
+		out.append([bits, 12, BookTheme.RUBRIC if str(t.get("health", "")) == "distressed" else BookTheme.INK])
+	if rows.size() > 3:
+		out.append([tr("UI_MORE_COMPANIES") % (rows.size() - 3), 11, BookTheme.FADED])
+	var l := Links.of(tunnus)
+	if not l.buildings.is_empty():
+		out.append([tr("UI_LINK_BUILDINGS") % l.buildings.size(), 11, BookTheme.FADED])
+	if not l.parcels.is_empty():
+		out.append([tr("UI_LINK_OWNERS") % l.parcels.size(), 11, BookTheme.BLUE])
+	return out
 
 
 ## The company layer: parcels filled by their dominant tenant (sector, health, founding age), dots
@@ -1073,6 +1232,22 @@ func _tile_texture(loc: Vector2i, pack: String) -> Texture2D:
 func _debug_map_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		_map_hover = event.position
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_RIGHT:
+		# the plot under the cursor becomes the focused one; bare ground clears the focus
+		var f := _map_frame(_debug_canvas)
+		var at: Vector2 = (event.position - f[0]) / f[1] * 1024.0
+		var pack := str(world.streamer.tiles.get(_debug_bg_tile, {}).get("pack", Sites.active)) if world.streamer else Sites.active
+		var hit := ""
+		for pr in _map_layer(pack).get("parcels", []):
+			var poly := PackedVector2Array()
+			for q in pr.poly:
+				poly.append(Vector2(float(q[0]), float(q[1])))
+			if poly.size() >= 3 and Geometry2D.is_point_in_polygon(at, poly):
+				hit = str(pr.tunnus)
+				break
+		focus_parcel(hit if hit != "" and hit != str(_focus.get("tunnus", "")) else "")
+		_debug_canvas.queue_redraw()
+		return
 	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
 		var f := _map_frame(_debug_canvas)
 		var local: Vector2 = (event.position - f[0]) / f[1] * 1024.0
@@ -1087,33 +1262,52 @@ func _debug_map_input(event: InputEvent) -> void:
 
 
 ## Debug hook for verification runs: open a panel by name.
+## The forms that carry an argument after the colon. True when `which` was one of them. A cadastral
+## number has colons of its own, so the argument is everything after the first one.
+func _debug_open_with_argument(which: String) -> bool:
+	if not which.contains(":"):
+		return false   # "map" on its own is the plain map, not the map in mode ""
+	var head := which.get_slice(":", 0)
+	var arg := which.substr(head.length() + 1)
+	match head:
+		"map":   # the map in a company mode: --open=map:sector|size|health|age|owners
+			_map_mode = arg
+			_toggle(debug_map, _fill_debug_map)
+		"hover":   # the map with the slip held over one plot: --open=hover:<tunnus>
+			_map_hover_plot = arg
+			_toggle(debug_map, _fill_debug_map)
+		"focus":   # light a plot and its links, opening nothing: --open=focus:<tunnus>
+			focus_parcel(arg)
+		"find":   # the find bar with a query typed in: --open=find:<text>
+			find_bar.open_at(Vector2(player.global_position.x, player.global_position.z))
+			_open(find_bar)
+			find_bar.debug_type(arg)
+		"goto":   # the find bar, and the first result chosen: --open=goto:<text>
+			find_bar.open_at(Vector2(player.global_position.x, player.global_position.z))
+			_open(find_bar)
+			find_bar.debug_type(arg)
+			get_tree().create_timer(1.0).timeout.connect(func(): find_bar.debug_pick(false))
+		"plots":   # the book's plot list, filtered: --open=plots:<text>
+			book.tabs.current_tab = 0
+			book.debug_filter(arg)
+			_open(book)
+		"plot":   # the book open on one plot: --open=plot:<tunnus>[#<year index>]
+			var at := arg.split("#")   # #0 also opens the plot's oldest photograph large, for checks
+			book.open_parcel(at[0])
+			_open(book)
+			if at.size() > 1:
+				get_tree().create_timer(4.0).timeout.connect(func(): book.debug_enlarge(int(at[1])))
+		"companies":   # the company list sorted by one column: --open=companies:<name|sector|employees|turnover|address>
+			book.tabs.current_tab = 2
+			book.debug_sort_companies(arg)
+			_open(book)
+		_:
+			return false
+	return true
+
+
 func debug_open(which: String) -> void:
-	if which.begins_with("map:"):   # the map in a company mode: --open=map:sector|size|health|age|owners
-		_map_mode = which.trim_prefix("map:")
-		_toggle(debug_map, _fill_debug_map)
-		return
-	if which.begins_with("find:"):   # the find bar with a query typed in: --open=find:<text>
-		find_bar.open_at(Vector2(player.global_position.x, player.global_position.z))
-		_open(find_bar)
-		find_bar.debug_type(which.trim_prefix("find:"))
-		return
-	if which.begins_with("plots:"):   # the book's plot list, filtered: --open=plots:<text>
-		book.tabs.current_tab = 0
-		book.debug_filter(which.trim_prefix("plots:"))
-		_open(book)
-		return
-	if which.begins_with("plot:"):   # the book open on one plot: --open=plot:<tunnus>[#<year index>]
-		var arg := which.trim_prefix("plot:")
-		var at := arg.split("#")      # #0 also opens the plot's oldest photograph large, for checks
-		book.open_parcel(at[0])
-		_open(book)
-		if at.size() > 1:
-			get_tree().create_timer(4.0).timeout.connect(func(): book.debug_enlarge(int(at[1])))
-		return
-	if which.begins_with("companies:"):   # the company list sorted by one column: --open=companies:<name|sector|employees|turnover|address>
-		book.tabs.current_tab = 2
-		book.debug_sort_companies(which.trim_prefix("companies:"))
-		_open(book)
+	if _debug_open_with_argument(which):
 		return
 	match which:
 		"journal": _toggle(journal, _fill_journal)

@@ -71,7 +71,7 @@ BUILD_NO_MONEY,Raha ei jätku.,Not enough money.
 BUILD_NO_MATERIALS,Materjali ei jätku.,Not enough materials.
 BUILD_COST,Hind: %s,Cost: %s
 UI_DEBUG_MAP,Silumiskaart,Debug map
-UI_DEBUG_MAP_HINT,Klõps kaardil: teleport. Hiir punkti kohal näitab nime. M sulgeb.,Click the map to teleport. Hover a dot for its name. M closes.
+UI_DEBUG_MAP_HINT,"Klõps kaardil: teleport. Parem klõps: seosed. Hiir näitab, mida register kohast ütleb. M sulgeb.",Click the map to teleport. Right click for links. Hover to read what the register says. M closes.
 UI_KEYS,E tegutse   Tab vakuraamat   / otsi   B maatükk siin   N uudised   J päevik   L keel   M kaart   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   Tab vakuraamat   / find   B this plot   N news   J journal   L language   M map   K codes   F fly   T teleport   H home   F8 report   Esc menu
 MENU_SITE,Asukoht,Location
 UI_BUILDING_GROUND,Maa ehitatakse laserandmetest...,Building the ground from the laser data...
@@ -281,3 +281,14 @@ UI_BUS_NEXT,Järgmised väljumised,Next departures
 UI_BUS_IN_MIN,%d min pärast,in %d min
 UI_BUS_NO_SERVICE,Selle peatuse sõiduplaani registris ei ole.,The register has no timetable for this stop.
 UI_BOOK_LOADING,Laadin…,Loading…
+BTN_FOCUS,Näita seoseid,Show links
+BTN_FOCUS_TIP,Tõsta see maatükk ja sellega seotu esile igal lehel ja maastikul,Highlight this plot and what it is linked to on every page and on the ground
+UI_LINK_HEAD,Seosed,Linked
+UI_LINK_BUILDINGS,Hooneid sellel maatükil: %d,Buildings on this plot: %d
+UI_LINK_OWNERS,Sama omanikuga maatükke: %d,Plots sharing an owner: %d
+UI_LINK_OWNERS_NONE,Ükski teine maatükk ei jaga siinsete ettevõtete omanikku,No other plot shares an owner with the companies here
+UI_LINK_OWNERS_NOTE,Ühine omanik on äriregistri järgi siinsete ettevõtete omanik; maa ise ei ole registri järgi ühisomandis,The shared owner is an owner of the companies here in the Business Register; the register does not say the land itself is jointly held
+UI_LINK_SHARED,ühiseid omanikke: %d,owners in common: %d
+UI_FOCUS_ON,Seosed: %s,Links: %s
+UI_FOCUS_CLEARED,Seosed kustutatud,Links cleared
+UI_MORE_COMPANIES,"… ja veel %d","… and %d more"

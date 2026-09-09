@@ -100,6 +100,22 @@ static func theme() -> Theme:
 	th.set_color("font_pressed_color", "RowButton", INK)
 	th.set_color("font_hover_pressed_color", "RowButton", INK)
 	th.set_constant("align_to_largest_stylebox", "RowButton", 0)
+	# the marked rows: the one plot the whole book is about, and the plots it is linked to. Same
+	# margins as a plain Button so marking a row never moves a column.
+	th.set_type_variation("FocusRow", "Button")
+	var focus_row := _flat(PAGE_DARK, Color.TRANSPARENT, 0, 0, 14, 7)
+	focus_row.border_width_left = 3
+	focus_row.border_color = BLUE
+	var linked_row := _flat(Color.TRANSPARENT, Color.TRANSPARENT, 0, 0, 14, 7)
+	linked_row.border_width_left = 3
+	linked_row.border_color = Color(BLUE, 0.45)
+	th.set_type_variation("LinkedRow", "Button")
+	for st in ["normal", "hover", "pressed", "focus", "disabled"]:
+		th.set_stylebox(st, "FocusRow", focus_row)
+		th.set_stylebox(st, "LinkedRow", linked_row)
+	for v in ["FocusRow", "LinkedRow"]:
+		for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_hover_pressed_color"]:
+			th.set_color(c, v, BLUE)   # a marked row stays a row you can act on
 	# option buttons and their menus
 	th.set_stylebox("panel", "PopupMenu", page_box(true, 6))
 	th.set_stylebox("hover", "PopupMenu", _flat(PAGE_DARK))

@@ -103,6 +103,9 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
 - World flags for checks: `--examine="<address part>"` opens a building's register sheet (E on its
   wall), `--open=find:<text>` and `--open=plots:<text>` open the find bar and the book's plot list
   with a query typed in, `--open=plot:<tunnus>#<n>` opens the plot page and enlarges the nth picture of its history,
+  `--open=goto:<text>` types a query into the find bar **and chooses the first result**,
+  `--focus=<tunnus>` (or `--open=focus:<tunnus>`) lights a plot and everything the registers tie it to,
+  `--open=hover:<tunnus>` holds the debug map's slip open over one plot,
   `--hour=<h>` sets the time of day (street lights and windows light after
   18:30), `--fly` starts in the air for a survey.
 - Data sources, make targets and the terrain pipeline are documented in `docs/data-pipeline.md`; the

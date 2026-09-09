@@ -94,6 +94,10 @@ func _ready() -> void:
 	marks.name = "ParcelMarks"
 	add_child(marks)
 	marks.setup(self)
+	var links := LinkMarks.new()
+	links.name = "LinkMarks"
+	add_child(links)
+	links.setup(self)
 	var interiors := Interiors.new()
 	interiors.name = "Interiors"
 	add_child(interiors)
@@ -139,6 +143,9 @@ func _ready() -> void:
 				if ins and ins.inside:
 					ins.exit(player)
 					player.set_pose(player.global_position, player.rotation.y + PI, 0.0))
+		elif a.begins_with("--focus="):
+			# light a plot and its links without opening anything: composes with --open=
+			get_tree().create_timer(2.0).timeout.connect(ui.focus_parcel.bind(a.trim_prefix("--focus=")))
 		elif a.begins_with("--open="):
 			get_tree().create_timer(2.0).timeout.connect(ui.debug_open.bind(a.trim_prefix("--open=")))
 

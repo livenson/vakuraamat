@@ -11,6 +11,7 @@ extends PanelContainer
 signal show_parcel(tunnus: String)
 signal guide(tunnus: String)      # point the HUD arrow at a plot
 signal teleport(tunnus: String)   # jump to a plot
+signal focus(tunnus: String)      # light this plot and what it is linked to, in every view
 
 const GOLD := BookTheme.BLUE   # the accent of the book: a heading, a name, a number that matters
 const MAX_ROWS := 120
@@ -46,10 +47,13 @@ var _sector_filter := ""
 var _co_sort := "employees"
 var _co_desc := true
 var _pages: Dictionary = {}
+var _focus := ""                  # the plot lit everywhere, and
+var _linked: Dictionary = {}      # the plots it is linked to, as a set, so a row can ask in one step
 
 
 func setup(w: Node3D) -> void:
 	world = w
+	EventBus.parcel_focused.connect(_on_focused)
 	theme = BookTheme.theme()
 	custom_minimum_size = Vector2(980, 640)
 	visible = false
@@ -93,6 +97,26 @@ func open_parcel(tunnus: String) -> void:
 	_selected = tunnus
 	tabs.current_tab = 1
 	fill()
+
+
+## The focus changed somewhere - a row here, the map, the key in the world. The pages are rebuilt
+## whole on every refresh, so remembering the set is all the marking needs.
+func _on_focused(tunnus: String) -> void:
+	if _linked == null:
+		_linked = {}
+	_focus = tunnus
+	_linked.clear()
+	for p in Links.of(tunnus).parcels:
+		_linked[str(p.tunnus)] = true
+	if visible:
+		fill()
+
+
+## The type variation that marks a row: the focused plot, one linked to it, or neither.
+func _row_mark(tunnus: String) -> String:
+	if tunnus != "" and tunnus == _focus:
+		return "FocusRow"
+	return "LinkedRow" if _linked != null and _linked.has(tunnus) else ""
 
 
 # ---------------------------------------------------------------- the cadastre
@@ -164,10 +188,12 @@ func _fill_plots() -> void:
 		n += 1
 		var b := Button.new()
 		b.text = "%s" % p.address if p.address != "" else p.tunnus
-		b.flat = true
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		b.tooltip_text = p.tunnus
 		var tunnus: String = p.tunnus
+		var mark := _row_mark(tunnus)
+		b.flat = mark == ""
+		b.theme_type_variation = mark
 		b.pressed.connect(func(): open_parcel(tunnus))
 		grid.add_child(b)
 		grid.add_child(_lbl(_purpose(Parcels.purpose_of(p)), 13))
@@ -272,11 +298,41 @@ func _fill_plot() -> void:
 			var facts := _company_facts(t)
 			if facts != "":
 				body.add_child(_lbl("      " + facts, 13, BookTheme.FADED if str(t.get("health", "")) != "distressed" else BookTheme.RUBRIC))
+	_fill_links(body, str(p.tunnus))
 	var lrow := HBoxContainer.new()
 	body.add_child(lrow)
 	_link_button(lrow, str(p.get("link", "")), tr("UI_BOOK_IN_THE_REGISTER"))
 	_fill_plot_history(body, p.tunnus)
 	show_parcel.emit(p.tunnus)
+
+
+## What else the registers tie this plot to: the buildings standing on it, and the plots whose
+## companies share an owner with its own. The owners are people, and the pack keeps them as ids, so
+## the page counts them and names the land - never the person. The land itself is not jointly held:
+## the cadastre says only who the form of ownership is, which is why the note is there.
+func _fill_links(body: Node, tunnus: String) -> void:
+	var l := Links.of(tunnus)
+	body.add_child(_lbl(tr("UI_LINK_HEAD"), 15, GOLD))
+	if not l.buildings.is_empty():
+		body.add_child(_lbl("   " + tr("UI_LINK_BUILDINGS") % l.buildings.size(), 14))
+	if l.parcels.is_empty():
+		body.add_child(_lbl("   " + tr("UI_LINK_OWNERS_NONE"), 14, BookTheme.FADED))
+		return
+	body.add_child(_lbl("   " + tr("UI_LINK_OWNERS") % l.parcels.size(), 14))
+	for s in l.parcels:
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 8)
+		body.add_child(row)
+		row.add_child(_lbl("      ", 14))
+		var b := Button.new()
+		b.theme_type_variation = "TextButton"
+		b.text = str(s.address) if str(s.address) != "" else str(s.tunnus)
+		b.tooltip_text = str(s.tunnus)
+		var other: String = str(s.tunnus)
+		b.pressed.connect(func(): open_parcel(other))
+		row.add_child(b)
+		row.add_child(_lbl(tr("UI_LINK_SHARED") % int(s.shared), 13, BookTheme.FADED))
+	body.add_child(_lbl("   " + tr("UI_LINK_OWNERS_NOTE"), 12, BookTheme.FADED))
 
 
 # ------------------------------------------------------- the plot over the years
@@ -374,7 +430,8 @@ func _fill_companies() -> void:
 	for r in shown.slice(0, MAX_ROWS):
 		var nb := Button.new()
 		nb.text = str(r.get("name", ""))
-		nb.theme_type_variation = "TextButton"
+		var co_mark := _row_mark(str(r.get("tunnus", "")))
+		nb.theme_type_variation = co_mark if co_mark != "" else "TextButton"
 		nb.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		nb.clip_text = true
 		nb.custom_minimum_size = Vector2(280, 0)
@@ -608,6 +665,12 @@ func _nav_buttons(tunnus: String) -> HBoxContainer:
 	t.tooltip_text = tr("BTN_TELEPORT_TIP")
 	t.pressed.connect(func(): teleport.emit(tunnus))
 	h.add_child(t)
+	var f := Button.new()
+	f.theme_type_variation = "TextButton"
+	f.text = tr("BTN_FOCUS")
+	f.tooltip_text = tr("BTN_FOCUS_TIP")
+	f.pressed.connect(func(): focus.emit(tunnus))
+	h.add_child(f)
 	return h
 
 
