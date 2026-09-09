@@ -158,7 +158,7 @@ UI_SHEET_OPEN_PLOT,Ava krunt vakuraamatus,Open the plot in the book
 UI_BOOK_FIND_PLACEHOLDER,Otsi aadressi või ettevõtet,Find an address or a company
 UI_BOOK_NO_MATCH,Midagi ei vasta otsingule "%s".,Nothing matches "%s".
 UI_FIND_PLOTS_ON,%d krunti,%d plots
-UI_FIND_PLACEHOLDER,Aadress, ettevõte või tänav,An address, a company or a street
+UI_FIND_PLACEHOLDER,"Aadress, ettevõte või tänav","An address, a company or a street"
 UI_FIND_HINT,Nooled valivad · Enter juhatab · Shift+Enter hüppab · Esc sulgeb,Arrows choose · Enter points the way · Shift+Enter jumps · Esc closes
 UI_FIND_NOTHING,Selles linnas ei leidu midagi sellist.,Nothing like that in this town.
 UI_FIND_KIND_PLOT,krunt,plot

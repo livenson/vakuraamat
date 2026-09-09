@@ -29,6 +29,10 @@ func setup() -> void:
 	_edit.placeholder_text = tr("UI_FIND_PLACEHOLDER")
 	_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_edit.text_changed.connect(_on_typed)
+	# the arrows and Enter belong to the result list, not to the caret: a LineEdit accepts both in its
+	# own gui_input (Enter becomes text_submitted), so _unhandled_key_input never saw them and nothing
+	# could be chosen. Taking them here, before the LineEdit does, is what makes the bar answer.
+	_edit.gui_input.connect(_on_edit_input)
 	v.add_child(_edit)
 	_list = VBoxContainer.new()
 	_list.add_theme_constant_override("separation", 2)
@@ -50,6 +54,12 @@ func debug_type(text: String) -> void:
 	_on_typed(text)
 
 
+## Checks: choose the first result without a keyboard (--open=goto:<text>), the regression this
+## bar needed - typing always worked, choosing did not.
+func debug_pick(jump: bool) -> void:
+	_pick(jump)
+
+
 func _on_typed(text: String) -> void:
 	_results = PlaceSearch.find(text, _near, MAX_SHOWN)
 	_at = 0
@@ -65,9 +75,24 @@ func _redraw() -> void:
 	_hint.text = tr("UI_FIND_HINT")
 	for i in _results.size():
 		var r: Dictionary = _results[i]
+		# each result is a row you can click as well as arrow onto: it reads like a list of places,
+		# so the mouse expects it to answer
+		var row := Button.new()
+		row.theme_type_variation = "RowButton"
+		row.custom_minimum_size = Vector2(0, 26)
+		BookTheme.hand(row)
+		var at := i
+		row.pressed.connect(func():
+			_at = at
+			_pick(Input.is_key_pressed(KEY_SHIFT)))
+		_list.add_child(row)
 		var line := HBoxContainer.new()
 		line.add_theme_constant_override("separation", 10)
-		_list.add_child(line)
+		line.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		line.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		line.offset_left = 8
+		line.offset_right = -8
+		row.add_child(line)
 		var mark := BookTheme.label("›" if i == _at else " ", "DetailLabel", line)
 		mark.custom_minimum_size = Vector2(14, 0)
 		var name := BookTheme.label(str(r.label), "ProseLabel", line)
@@ -81,9 +106,17 @@ func _redraw() -> void:
 		BookTheme.label("%d m" % int(_near.distance_to(r.pos)), "DetailLabel", line)
 
 
-func _unhandled_key_input(event: InputEvent) -> void:
+## The line's own keys, taken before the LineEdit reads them.
+func _on_edit_input(event: InputEvent) -> void:
+	if _step(event):
+		_edit.accept_event()
+
+
+## Arrows walk the results, Enter picks one; true when the event was ours. Shared by the line and by
+## the panel, so the bar still answers when focus has wandered off the LineEdit.
+func _step(event: InputEvent) -> bool:
 	if not (event is InputEventKey and event.pressed) or not visible:
-		return
+		return false
 	match event.keycode:
 		KEY_DOWN:
 			_at = mini(_at + 1, maxi(0, _results.size() - 1))
@@ -94,8 +127,13 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		KEY_ENTER, KEY_KP_ENTER:
 			_pick(event.shift_pressed)
 		_:
-			return
-	get_viewport().set_input_as_handled()
+			return false
+	return true
+
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if _step(event):
+		get_viewport().set_input_as_handled()
 
 
 func _pick(jump: bool) -> void:
