@@ -506,6 +506,7 @@ func _street_lights(terrain: Terrain3D) -> void:
 	head_mat.emission = Color(1.0, 0.85, 0.6)
 	head_mat.emission_energy_multiplier = 0.0
 	var side := 1.0
+	var cells: Dictionary = {}   # Vector2i -> {poles, heads}: transforms, one MultiMesh each per cell
 	for r in roads:
 		if str(r.get("kind", "road")) != "street":
 			continue
@@ -530,35 +531,26 @@ func _street_lights(terrain: Terrain3D) -> void:
 					if lamp_scene and lamp_bounds.size.y > 0.01:
 						# the vendored lamp: its height fitted to LAMP_HEIGHT, its -X arm turned over the road
 						var k := LAMP_HEIGHT / lamp_bounds.size.y
-						var model: Node3D = lamp_scene.instantiate()
-						model.scale = Vector3.ONE * k
-						model.position = Vector3(-(lamp_bounds.position.x + lamp_bounds.size.x) * k, -lamp_bounds.position.y * k, -(lamp_bounds.position.z + lamp_bounds.size.z * 0.5) * k)
-						var turn := Node3D.new()
-						turn.add_child(model)
-						turn.position = base
-						turn.rotation.y = atan2(toward.x, toward.y) + PI / 2.0
-						add_child(turn)
+						var model_xf := Transform3D(Basis.from_scale(Vector3.ONE * k), Vector3(-(lamp_bounds.position.x + lamp_bounds.size.x) * k, -lamp_bounds.position.y * k, -(lamp_bounds.position.z + lamp_bounds.size.z * 0.5) * k))
+						var turn_xf := Transform3D(Basis(Vector3.UP, atan2(toward.x, toward.y) + PI / 2.0), base)
+						_lamp_cell(cells, at).poles.append(turn_xf * model_xf)
 						arm = toward * maxf(lamp_bounds.size.x * k - 0.2, 0.3)
 						head_mesh.size = Vector3(0.3, 0.08, 0.2)
 					else:
-						var pole := MeshInstance3D.new()
-						pole.mesh = pole_mesh
-						pole.material_override = pole_mat
-						pole.position = base + Vector3(0, LAMP_HEIGHT / 2.0, 0)
-						add_child(pole)
-					var head := MeshInstance3D.new()   # the glowing lamp itself, also over the model's head
-					head.mesh = head_mesh
-					head.material_override = head_mat
-					head.position = base + Vector3(arm.x, LAMP_HEIGHT - 0.1, arm.y)
-					head.rotation.y = -atan2(dir.y, dir.x)
-					add_child(head)
+						_lamp_cell(cells, at).poles.append(Transform3D(Basis(), base + Vector3(0, LAMP_HEIGHT / 2.0, 0)))
+					# the glowing lamp itself, also over the model's head
+					var head_pos := base + Vector3(arm.x, LAMP_HEIGHT - 0.1, arm.y)
+					_lamp_cell(cells, at).heads.append(Transform3D(Basis(Vector3.UP, -atan2(dir.y, dir.x)), head_pos))
 					var lamp := OmniLight3D.new()
-					lamp.position = head.position - Vector3(0, 0.25, 0)
+					lamp.position = head_pos - Vector3(0, 0.25, 0)
 					lamp.light_color = Color(1.0, 0.82, 0.55)
 					lamp.light_energy = 2.2
 					lamp.omni_range = 16.0
 					lamp.omni_attenuation = 1.2
 					lamp.shadow_enabled = false
+					lamp.distance_fade_enabled = true   # a street has hundreds: only the near ones light the ground
+					lamp.distance_fade_begin = LIGHT_FADE
+					lamp.distance_fade_length = 30.0
 					lamp.visible = false
 					add_child(lamp)
 					_lamps.append(lamp)
@@ -566,6 +558,44 @@ func _street_lights(terrain: Terrain3D) -> void:
 				side = -side
 			acc += seg
 	_head_mat = head_mat
+	var pole_draw: Mesh = MeshMerge.baked(LAMP_MODEL) if lamp_scene and lamp_bounds.size.y > 0.01 else pole_mesh
+	for cell: Vector2i in cells:
+		_lamp_multimesh(pole_draw, null if pole_draw != pole_mesh else pole_mat, cells[cell].poles, POLE_RANGE, true)
+		_lamp_multimesh(head_mesh, head_mat, cells[cell].heads, HEAD_RANGE, false)
+
+
+# Street lights drawn as MultiMeshes, one per LAMP_CELL square and part, so a city tile's 600
+# lamps are a few dozen draw calls that still cull by cell (they were 1900 nodes, each drawn).
+const LAMP_CELL := 128.0
+const POLE_RANGE := 450.0    # a pole is a hairline beyond this
+const HEAD_RANGE := 900.0    # the lit heads string along the streets at night
+const LIGHT_FADE := 110.0    # lights that reach the ground; the heads carry the look beyond
+
+
+static func _lamp_cell(cells: Dictionary, at: Vector2) -> Dictionary:
+	var c := Vector2i(floori(at.x / LAMP_CELL), floori(at.y / LAMP_CELL))
+	if not cells.has(c):
+		cells[c] = {"poles": [], "heads": []}
+	return cells[c]
+
+
+func _lamp_multimesh(mesh: Mesh, mat: Material, xforms: Array, range_end: float, shadows: bool) -> void:
+	if xforms.is_empty():
+		return
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = mesh
+	mm.instance_count = xforms.size()
+	for i in xforms.size():
+		mm.set_instance_transform(i, xforms[i])
+	var mmi := MultiMeshInstance3D.new()
+	mmi.multimesh = mm
+	if mat:
+		mmi.material_override = mat
+	mmi.visibility_range_end = range_end
+	if not shadows:
+		mmi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	add_child(mmi)
 
 
 var _head_mat: StandardMaterial3D = null
