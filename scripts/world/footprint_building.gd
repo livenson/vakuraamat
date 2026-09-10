@@ -636,12 +636,7 @@ func _details() -> void:
 	if polygon.size() > 0:
 		c /= polygon.size()
 	if chimney:
-		var box := CSGBox3D.new()
-		box.size = Vector3(0.6, 1.6, 0.6)
-		var m := StandardMaterial3D.new()
-		m.albedo_color = Color(0.5, 0.32, 0.26)
-		box.material = m
-		box.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var box := _detail_mesh("chimney")
 		box.position = Vector3(c.x + 1.5, top + 0.3, c.y)
 		if not model.is_empty():
 			# on the LOD2 roof: at its highest vertex, nudged towards the centre, sunk half a metre in
@@ -657,29 +652,56 @@ func _details() -> void:
 			call_deferred("_settle_chimney", box)   # the highest vertex may be a spike or a dormer: drop to the roof there
 		add_child(box)
 	if solar:
-		var panel := CSGBox3D.new()
-		panel.size = Vector3(minf(6.0, maxf(2.0, _extent().x * 0.4)), 0.08, minf(3.0, maxf(1.0, _extent().y * 0.3)))
-		var pm := StandardMaterial3D.new()
-		pm.albedo_color = Color(0.08, 0.1, 0.2)
-		pm.metallic = 0.6
-		pm.roughness = 0.2
-		panel.material = pm
-		panel.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		var panel := _detail_mesh("solar")
+		panel.scale = Vector3(minf(6.0, maxf(2.0, _extent().x * 0.4)), 0.08, minf(3.0, maxf(1.0, _extent().y * 0.3)))
 		panel.position = Vector3(c.x - 1.0, top + 0.2, c.y)
 		add_child(panel)
 	if well:
-		var ring := CSGTorus3D.new()
-		ring.inner_radius = 0.6
-		ring.outer_radius = 0.95
-		ring.sides = 12
-		ring.ring_sides = 6
-		var rm := StandardMaterial3D.new()
-		rm.albedo_color = Color(0.55, 0.53, 0.5)
-		ring.material = rm
+		var ring := _detail_mesh("well")
 		var ext := _extent()
-		ring.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 		ring.position = Vector3(c.x + ext.x / 2 + 4.0, 0.3, c.y + ext.y / 2 + 2.0)
 		add_child(ring)
+
+
+# The small register-driven props share their meshes and materials (a city tile has 500 chimneys;
+# as CSG shapes each was its own mesh, material and draw call, rebuilt on the main thread) and
+# vanish beyond DETAIL_RANGE, where a chimney is a pixel.
+const DETAIL_RANGE := 300.0
+const CHIMNEY_SIZE := Vector3(0.6, 1.6, 0.6)
+static var _detail: Dictionary = {}   # kind -> [Mesh, Material]
+
+
+func _detail_mesh(kind: String) -> MeshInstance3D:
+	if not _detail.has(kind):
+		var mesh: Mesh
+		var mat := StandardMaterial3D.new()
+		match kind:
+			"chimney":
+				var b := BoxMesh.new()
+				b.size = CHIMNEY_SIZE
+				mesh = b
+				mat.albedo_color = Color(0.5, 0.32, 0.26)
+			"solar":
+				mesh = BoxMesh.new()   # unit box, scaled to the roof per building
+				mat.albedo_color = Color(0.08, 0.1, 0.2)
+				mat.metallic = 0.6
+				mat.roughness = 0.2
+			"well":
+				var t := TorusMesh.new()
+				t.inner_radius = 0.6
+				t.outer_radius = 0.95
+				t.rings = 12
+				t.ring_segments = 6
+				mesh = t
+				mat.albedo_color = Color(0.55, 0.53, 0.5)
+		_detail[kind] = [mesh, mat]
+	var mi := MeshInstance3D.new()
+	mi.name = "Detail_" + kind
+	mi.mesh = _detail[kind][0]
+	mi.material_override = _detail[kind][1]
+	mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+	mi.visibility_range_end = DETAIL_RANGE
+	return mi
 
 
 func _extent() -> Vector2:
@@ -1003,13 +1025,13 @@ func set_exterior_visible(on: bool) -> void:
 	if _body_node:
 		_body_node.collision_layer = 1 if on else 0
 	for c in get_children():
-		if c is CSGShape3D:
+		if c is MeshInstance3D and c.name.begins_with("Detail_"):
 			c.visible = on
 
 
 ## A chimney placed at the model's highest vertex may hang in the air where the roof is lower:
 ## cast down at its spot against this building's collider and sink it half a metre into the roof.
-func _settle_chimney(box: CSGBox3D) -> void:
+func _settle_chimney(box: MeshInstance3D) -> void:
 	if not is_inside_tree() or _body_node == null or not is_instance_valid(box):
 		return
 	var space := get_world_3d().direct_space_state
@@ -1021,5 +1043,5 @@ func _settle_chimney(box: CSGBox3D) -> void:
 	if hit.is_empty() or hit.collider != _body_node:
 		return
 	var local := to_local(hit.position)
-	box.position.y = local.y + box.size.y * 0.5 - 0.5
+	box.position.y = local.y + CHIMNEY_SIZE.y * 0.5 - 0.5
 

@@ -16,7 +16,16 @@ var _st := SurfaceTool.new()
 var _colors: Array[Color] = []
 
 
+const RANGE := 250.0   # hedges, benches and swings are specks beyond this; the orthophoto shows the plot
+static var _mat: StandardMaterial3D   # one vertex-coloured material for every kit, so kits batch
+
+
 func _ready() -> void:
+	_build()
+	MeshMerge.set_range(self, RANGE)
+
+
+func _build() -> void:
 	if polygon.size() < 3:
 		return
 	if kit in ["hedge", "fence", "solar", "playground", "court", "park", "farm", "kiosk"]:
@@ -47,10 +56,11 @@ func _ready() -> void:
 	var mi := MeshInstance3D.new()
 	var mesh: ArrayMesh = _st.commit()
 	mi.mesh = mesh
-	var mat := StandardMaterial3D.new()
-	mat.vertex_color_use_as_albedo = true
-	mat.roughness = 0.85
-	mi.material_override = mat
+	if _mat == null:
+		_mat = StandardMaterial3D.new()
+		_mat.vertex_color_use_as_albedo = true
+		_mat.roughness = 0.85
+	mi.material_override = _mat
 	add_child(mi)
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
@@ -186,7 +196,7 @@ func _model(name: String, at: Vector2, length: float, yaw: float, root: String =
 	var path := root + name + ".glb"
 	if not ResourceLoader.exists(path):
 		return false
-	var model: Node3D = (load(path) as PackedScene).instantiate()
+	var model: Node3D = MeshMerge.instance(path)
 	var b: AABB = Interiors._bounds(model)
 	var longest := maxf(b.size.x, b.size.z)
 	if longest < 0.0001:
