@@ -54,6 +54,13 @@ func setup(w: Node3D) -> void:
 		if a == "--no-stream":
 			enabled = false
 	Locator.progress.connect(func(text: String, _f: float): _stage = text)
+	Locator.starter_changed.connect(func(state: String, f: float):
+		if state == "downloading":
+			_stage = tr("UI_STARTER_DOWNLOADING") % int(f * 100.0)
+		elif state == "installing":
+			_stage = tr("UI_STARTER_INSTALLING"))
+	if Locator.starter_covers(Sites.active):
+		Locator.starter_ensure()   # not awaited: the places around arrive while the player looks at this one
 
 
 func pack_for(loc: Vector2i) -> String:
@@ -155,6 +162,14 @@ func _pump() -> void:
 		for e in GameState.eras_in_order():
 			years.append(str(e.id).rsplit("_", true, 1)[-1])
 		var eras := ",".join(years) if not years.is_empty() else "2026"
+		if Locator.starter_has(pack) and await Locator.starter_ensure() and Sites.available.has(pack):
+			# one of the starter places around a shipped pack: downloaded with the rest of them
+			if tiles.has(loc) and tiles[loc].state == "fetching":
+				tiles[loc].state = "loading"
+				await _load(loc)
+			_busy = false
+			_pump()
+			return
 		print("[Tiles] fetching %s for tile %s (%d, %d)" % [pack, loc, cx, cy])
 		Locator.job_owner = "stream"   # the background backfill waits: someone is standing at this edge
 		var r: Dictionary = await Locator.fetch_pack(pack, "Tile %d %d" % [cx, cy], cx, cy, int(size), eras)

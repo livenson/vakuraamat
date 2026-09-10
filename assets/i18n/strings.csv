@@ -293,3 +293,5 @@ UI_LINK_WHY_OWNER,ühiseid omanikke: %d,owners in common: %d
 UI_LINK_WHY_REGISTRY,sama kinnistu,the same registered immovable
 UI_LINK_WHY_BUILDING,ühine hoone,a building stands on both
 UI_BOOK_FORMERLY_HERE,Varem siia registreeritud,Formerly registered here
+UI_STARTER_DOWNLOADING,"ümbruse kohad: allalaadimine %d%%","the places around: downloading %d%%"
+UI_STARTER_INSTALLING,"ümbruse kohad: lahtipakkimine","the places around: unpacking"

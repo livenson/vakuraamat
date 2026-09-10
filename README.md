@@ -157,7 +157,9 @@ are in [docs/data-pipeline.md](docs/data-pipeline.md). Licences and attribution 
 ## Custom locations
 
 Every place is a site pack under `sites/<id>/`: Kvissentali (Tartu) is the first, Palupera the rural
-second. `make site` and `make tile` make one from an EPSG:3301 centre; the tile service does the
+second, Pirita (Tallinn, by the sea) the third. A build ships all three with their ground baked, and the
+first visit to Kvissentali or Pirita downloads the tiles around them in one go from the GitHub release
+(`tools/starter_places.py`). `make site` and `make tile` make one from an EPSG:3301 centre; the tile service does the
 same for any point from inside the game. See [docs/custom-sites.md](docs/custom-sites.md).
 
 ## Development

@@ -86,6 +86,18 @@ jobs:
         run: |
           godot --headless --path . --import || true
           godot --headless --path . --import || true
+      - name: "Bake the shipped places' ground (region data and vegetation, so a first launch does not build them)"
+        run: |
+          # assets/terrain/*/data is generated, not committed: made here from the committed inputs,
+          # exactly as make tile does, and exported with the pack (the presets include vegetation.ok)
+          for d in sites/*/; do
+            s=$(basename "$d")
+            t=$(python -c "import json,sys; print(json.load(open(sys.argv[1]))['terrain'].get('tile', sys.argv[2]))" "$d/site.json" "$s")
+            godot --headless --path . -s res://tools/godot/import_terrain.gd -- --site="$s" --tile="$t"
+            godot --headless --path . -s res://tools/godot/scatter_vegetation.gd -- --site="$s" --tile="$t"
+            test -f "assets/terrain/$t/data/terrain3d_00_00.res" && test -f "assets/terrain/$t/data/vegetation.ok" || { echo "$s: the ground did not bake"; exit 1; }
+          done
+          godot --headless --path . --import || true
       - name: Export ${{ matrix.preset }}
         run: |
           mkdir -p "$(dirname '${{ matrix.path }}')"

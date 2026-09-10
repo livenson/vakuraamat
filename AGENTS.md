@@ -8,7 +8,7 @@ A Godot 4.7 (GDScript) digital twin of real Estonian ground, built from Maa-amet
 Building Register with LOD2 roofs, the companies registered at each address (Business Register),
 real roads, and every orthophoto flown over the place since 1993. You walk or fly through it and
 ask the registers what is around you. Every place is a **site pack** under `sites/<id>/`
-(Kvissentali is the first, Palupera the rural second); the engine reads the active pack through the
+(Kvissentali is the first, Palupera the rural second, Pirita the seaside third); the engine reads the active pack through the
 `Sites` autoload and never names a site. Authoring guide: `docs/custom-sites.md`.
 Two earlier versions are tags: the historical three-era game is `v0.9-historical`, and the
 present-day economy game (buying, renting, a shared SpacetimeDB town ledger) ends at `v0.5.1`.
@@ -87,6 +87,16 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   channel, traffic, streaming, interiors, search, links); `make lint` (the same checks as GitHub:
   gdlint with `.gdlintrc`, ruff with `ruff.toml`, shellcheck, actionlint when installed);
   `make export` for a macOS build.
+- Starter places: `python3 tools/starter_places.py build` (with the tile service running) makes the 8
+  tiles around each shipped place, repacks them without stale files and writes
+  `assets/data/starter_places.json`; `... publish` uploads the zip to the GitHub release the manifest
+  names. The game downloads it once (`Locator.starter_ensure`, started when a covered place loads and
+  awaited by `TileStreamer._pump` before any service job for one of its tiles). Rebuild and publish a
+  new tag whenever `PACK_VERSION` rises or a shipped place is added.
+- Shipped packs' ground is baked by CI before the export (import_terrain.gd + scatter_vegetation.gd per
+  `sites/*`); `assets/terrain/*/data` stays uncommitted. After `make site` on a new pack, `make tile`
+  fetches the buildings: re-run `tools/new_site.py --id <id> --force` and `make scenes`, or the layer
+  keeps the massing boxes (`make validate` warns).
 - New location: `make site SITE=<id> NAME="..." CENTER="<easting> <northing>"` then `make tile SITE=<id>`
   (fetches DTM/nDSM/orthophoto, builds terrain, derives buildings and water,
   generates scenes, validates). `make validate` is pure python and fast; run it after editing a pack.

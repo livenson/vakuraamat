@@ -1,0 +1,31 @@
+{
+ "tag": "places-2026-09-10",
+ "url": "https://github.com/livenson/vakuraamat/releases/download/places-2026-09-10/starter-places.zip",
+ "sha256": "f1aed0f33af563943b436df809b145286a3fc8d3c95e7f38d19e0641891a30b8",
+ "bytes": 126599505,
+ "pipeline": 3,
+ "built": "2026-09-10",
+ "places": {
+  "kvissentali": [
+   "t656576_6478174",
+   "t657600_6478174",
+   "t658624_6478174",
+   "t656576_6477150",
+   "t658624_6477150",
+   "t656576_6476126",
+   "t657600_6476126",
+   "t658624_6476126"
+  ],
+  "pirita": [
+   "t546076_6593224",
+   "t547100_6593224",
+   "t548124_6593224",
+   "t546076_6592200",
+   "t548124_6592200",
+   "t546076_6591176",
+   "t547100_6591176",
+   "t548124_6591176"
+  ]
+ },
+ "attribution": "Maa- ja Ruumiamet; Ehitisregister; Äriregistri avaandmed (CC BY 4.0); Maksu- ja Tolliamet; bus stops © OpenStreetMap contributors (ODbL); Ühistranspordiregistri avaandmed; PRIA. Each pack's files carry their own attribution."
+}

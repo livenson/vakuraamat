@@ -555,6 +555,16 @@ func _wait_for_job(base: String, id: String, quiet: bool = false) -> String:
 ## region data under user://tiles is what the player is standing on.
 func install_zip(zip_path: String, id: String, site_only: bool = false) -> bool:
 	var t0 := Time.get_ticks_usec()
+	if not extract_zip(zip_path, id, site_only):
+		return false
+	var t1 := Time.get_ticks_usec()
+	Sites.scan()   # a pack that has just appeared on disk: until this, Sites resolves its files under res://
+	PerfLog.mark("install %s: unzip %d ms, scan %d ms" % [id, (t1 - t0) / 1000, (Time.get_ticks_usec() - t1) / 1000])
+	return true
+
+
+## The file work of install_zip, safe on a worker thread (ZIPReader and FileAccess only; no Sites).
+static func extract_zip(zip_path: String, id: String, site_only: bool = false) -> bool:
 	var z := ZIPReader.new()
 	if z.open(zip_path) != OK:
 		return false
@@ -585,10 +595,7 @@ func install_zip(zip_path: String, id: String, site_only: bool = false) -> bool:
 		out.store_buffer(z.read_file(f))
 		out.close()
 	z.close()
-	var t1 := Time.get_ticks_usec()
 	if site_only:
-		Sites.scan()
-		PerfLog.mark("install %s: unzip %d ms, scan %d ms" % [id, (t1 - t0) / 1000, (Time.get_ticks_usec() - t1) / 1000])
 		return true
 	# a fresh tile: any stale region data from an earlier download must go
 	var old_data := ProjectSettings.globalize_path(Sites.USER_TILES + tile + "/data")
@@ -596,6 +603,143 @@ func install_zip(zip_path: String, id: String, site_only: bool = false) -> bool:
 		for f in DirAccess.get_files_at(old_data):
 			DirAccess.remove_absolute(old_data + "/" + f)
 	print("[Locator] installed pack %s (%d files)" % [id, files.size()])
-	Sites.scan()   # a pack that has just appeared on disk: until this, Sites resolves its files under res://
-	PerfLog.mark("install %s: unzip %d ms, scan %d ms" % [id, (t1 - t0) / 1000, (Time.get_ticks_usec() - t1) / 1000])
 	return true
+
+
+# ---------------------------------------------------------------- starter places
+# The tiles around the shipped places, published once as one zip on a GitHub release
+# (tools/starter_places.py) and named in res://assets/data/starter_places.json. A first boot fetches
+# that one file from GitHub instead of having the tile service make sixteen places from the national
+# services, and the tile streamer finds the tiles installed like any other pack.
+const STARTER_MANIFEST := "res://assets/data/starter_places.json"
+const STARTER_ZIP := "user://cache/starter-places.zip"
+signal starter_changed(state: String, fraction: float)   # "downloading", "installing", "installed", "failed"
+var starter_state := ""
+var _starter_manifest: Dictionary = {}
+
+
+func _starter() -> Dictionary:
+	if _starter_manifest.is_empty() and FileAccess.file_exists(STARTER_MANIFEST):
+		var m = JSON.parse_string(FileAccess.get_file_as_string(STARTER_MANIFEST))
+		_starter_manifest = m if typeof(m) == TYPE_DICTIONARY else {}
+	return _starter_manifest
+
+
+## Every tile the starter bundle carries.
+func starter_packs() -> Array:
+	var out: Array = []
+	var places: Dictionary = _starter().get("places", {})
+	for site in places:
+		out.append_array(places[site])
+	return out
+
+
+## Is `site` one of the places whose surroundings the bundle carries?
+func starter_covers(site: String) -> bool:
+	return _starter().get("places", {}).has(site)
+
+
+## Is the pack `id` one the bundle can supply?
+func starter_has(id: String) -> bool:
+	return id in starter_packs()
+
+
+## Download, check and install the bundle, once; concurrent callers wait for the first. True when
+## every tile of it is installed afterwards. Packs already installed and current are left as they are.
+func starter_ensure() -> bool:
+	var packs := starter_packs()
+	if packs.is_empty() or starter_state == "failed":
+		return false   # once failed, the tile service makes the tiles for the rest of the session
+	Sites.scan()
+	var missing: Array = packs.filter(func(id): return not Sites.available.has(id))
+	if missing.is_empty():
+		starter_state = "installed"
+		return true
+	if starter_state in ["downloading", "installing"]:
+		while starter_state in ["downloading", "installing"]:
+			await starter_changed
+		return starter_state == "installed"
+	return await _starter_fetch() and await _starter_install(missing)
+
+
+## The bundle on disk and matching its checksum (downloaded when it is not).
+func _starter_fetch() -> bool:
+	var m := _starter()
+	var sha := str(m.get("sha256", ""))
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cache"))
+	if FileAccess.file_exists(STARTER_ZIP) and FileAccess.get_sha256(STARTER_ZIP) == sha:
+		return true
+	if not await _starter_download(str(m.get("url", "")), int(m.get("bytes", 0))):
+		return _starter_fail("download failed")
+	if FileAccess.get_sha256(STARTER_ZIP) != sha:
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(STARTER_ZIP))
+		return _starter_fail("the download does not match its checksum")
+	return true
+
+
+## Unpack the `missing` tiles from the bundle on a worker thread, then rescan the packs.
+func _starter_install(missing: Array) -> bool:
+	_set_starter("installing", 0.0)
+	var done := [0]
+	var t0 := Time.get_ticks_msec()
+	var task := WorkerThreadPool.add_task(func():
+		var outer := ZIPReader.new()
+		if outer.open(STARTER_ZIP) != OK:
+			return
+		for id: String in missing:
+			var inner := "user://cache/%s.zip" % id
+			var f := FileAccess.open(inner, FileAccess.WRITE)
+			if f == null:
+				continue
+			f.store_buffer(outer.read_file(id + ".zip"))
+			f.close()
+			if Locator.extract_zip(inner, id):
+				done[0] += 1
+		outer.close(), false, "starter places")
+	while not WorkerThreadPool.is_task_completed(task):
+		await get_tree().process_frame
+	WorkerThreadPool.wait_for_task_completion(task)
+	Sites.scan()
+	print("[Locator] starter places: %d of %d tiles installed in %d ms" % [done[0], missing.size(), Time.get_ticks_msec() - t0])
+	if done[0] < missing.size():
+		return _starter_fail("%d tiles did not install" % (missing.size() - done[0]))
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(STARTER_ZIP))   # the tiles are unpacked; the bundle is not needed again
+	_set_starter("installed", 1.0)
+	return true
+
+
+func _starter_download(url: String, expected: int) -> bool:
+	if url == "":
+		return false
+	var r := HTTPRequest.new()
+	r.download_file = STARTER_ZIP
+	r.use_threads = true
+	r.timeout = 0.0   # a hundred megabytes on a slow line: no overall deadline
+	add_child(r)
+	_set_starter("downloading", 0.0)
+	if r.request(url) != OK:
+		r.queue_free()
+		return false
+	var finished := [false, 0, 0]
+	r.request_completed.connect(func(result: int, code: int, _h, _b):
+		finished[0] = true
+		finished[1] = result
+		finished[2] = code, CONNECT_ONE_SHOT)
+	while not finished[0]:
+		await get_tree().create_timer(0.5).timeout
+		var total := r.get_body_size() if r.get_body_size() > 0 else expected
+		if total > 0:
+			_set_starter("downloading", clampf(float(r.get_downloaded_bytes()) / total, 0.0, 1.0))
+	r.queue_free()
+	return finished[1] == HTTPRequest.RESULT_SUCCESS and finished[2] >= 200 and finished[2] < 300
+
+
+func _starter_fail(why: String) -> bool:
+	push_warning("[Locator] starter places: " + why + " (the tile service makes the tiles instead)")
+	_set_starter("failed", 0.0)
+	return false
+
+
+func _set_starter(state: String, fraction: float) -> void:
+	starter_state = state
+	starter_changed.emit(state, fraction)

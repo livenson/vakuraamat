@@ -37,7 +37,8 @@ func _ready() -> void:
 			if FileAccess.file_exists("res://assets/terrain/%s/terrain_meta.json" % Sites.tile()):
 				_check(era.texture() != null, "%s: %s has no terrain texture (make era-maps)" % [site, era.id])
 		var units := Parcels.units(site)
-		_check(units.size() > 10, "%s: parcels.json has %d units" % [site, units.size()])
+		# a shipped pack is a chosen place; a downloaded tile may be mostly sea (Pirita's north-west has 2)
+		_check(units.size() > (0 if Sites.is_user_pack(site) else 10), "%s: parcels.json has %d units" % [site, units.size()])
 		var companies := 0
 		for u in units:
 			companies += Tenants.of(site, str(u.get("tunnus", ""))).size()

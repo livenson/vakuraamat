@@ -232,3 +232,16 @@ build expects - see **Packs that know how old they are** in `docs/custom-sites.m
 site files and leaves `user://tiles` alone, so a running world can swap the pack in without adding
 or removing a Terrain3D region.
 
+## Starter places
+
+A fresh build ships Kvissentali, Palupera and Pirita with their ground baked by CI, so entering them
+builds nothing. The tiles around Kvissentali and Pirita come as one download instead of sixteen tile
+service jobs: `tools/starter_places.py build` asks the running service for each neighbour (refreshing a
+stale cached pack, making a missing one, waiting for its 1 m ground), drops files the current pipeline
+no longer writes, checks the `PACK_VERSION` stamp and writes `build/starter-places.zip` and
+`assets/data/starter_places.json` (release URL, sha256, the tile ids per place). `publish` uploads the
+zip to a `places-<date>` release with `gh` (not a `v*` tag, so no build runs). In the game,
+`Locator.starter_ensure` downloads it once (no timeout, progress on the HUD's tile line), checks the
+sha256, unpacks the tiles on a worker thread and rescans the packs; the tile streamer waits for it before
+asking the service for one of its tiles. A failed download falls back to the service for the session.
+
