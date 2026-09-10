@@ -18,7 +18,7 @@ var georef: TerrainGeoref
 var streamer: TileStreamer          # neighbouring tiles around this pack's tile (endless map)
 var _water_mat: ShaderMaterial
 var _screenshot_path := ""
-var _fx := ["sdfgi", "ssao", "ssil", "fog", "glow", "grade"]   # --fx=a,b,c limits the effects (measurement)
+var _fx := ["sdfgi", "ssao", "ssil", "fog", "glow", "grade"]   # "softsun": PCSS sun, 2.3 ms of 16 on the GPU   # --fx=a,b,c limits the effects (measurement)
 var _screenshot_frame := 240
 var _frames := 0
 var _ready_done := false            # screenshots and the clock wait for the terrain build
@@ -141,6 +141,11 @@ func _ready() -> void:
 		elif a.begins_with("--fx="):
 			_fx = Array(a.trim_prefix("--fx=").split(",", false))
 			_configure_environment()
+		elif a.begins_with("--scale3d="):
+			# measurement: --scale3d=<mode>:<scale>, mode 0 bilinear, 1 FSR1, 2 FSR2, 3 MetalFX spatial, 4 MetalFX temporal
+			var sc := a.trim_prefix("--scale3d=").split(":")
+			get_viewport().scaling_3d_mode = int(sc[0]) as Viewport.Scaling3DMode
+			get_viewport().scaling_3d_scale = float(sc[1]) if sc.size() > 1 else 1.0
 		elif a.begins_with("--enter="):
 			get_tree().create_timer(2.5).timeout.connect(enter_building.bind(a.trim_prefix("--enter=")))
 		elif a.begins_with("--examine="):
@@ -436,6 +441,8 @@ func _configure_environment() -> void:
 	env.volumetric_fog_enabled = "fog" in _fx
 	env.glow_enabled = "glow" in _fx
 	env.adjustment_enabled = "grade" in _fx
+	if sky.sun:
+		sky.sun.light_angular_distance = 0.5 if "softsun" in _fx else 0.0   # 0.5 turns on the costly soft-shadow filter
 	env.sdfgi_cascades = 4
 	env.sdfgi_min_cell_size = 0.5
 	env.sdfgi_use_occlusion = true

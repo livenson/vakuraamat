@@ -22,6 +22,8 @@ var _yaw := 0.0
 var _frames: Dictionary = {}  # phase -> Array of frame ms
 var _phys: Dictionary = {}    # phase -> Array of physics ms (per second samples)
 var _dc: Dictionary = {}      # phase -> Array of draw calls (per frame)
+var _gpu_t: Dictionary = {}   # phase -> Array of GPU ms (0 where the driver has no timestamps: Metal)
+var _gpu: Dictionary = {}     # phase -> Array of render CPU ms (frame setup + the viewport's render submission)
 var _last_usec := 0
 var _walk: Dictionary = {}    # the walk's check: from, to, the building's centre
 
@@ -40,6 +42,7 @@ func setup(world: Node) -> void:
 	_world = world
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 	Engine.max_fps = 0
+	RenderingServer.viewport_set_measure_render_time(world.get_viewport().get_viewport_rid(), true)
 	world.player.input_enabled = false
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 	if is_off("tcol"):
@@ -58,6 +61,8 @@ func _begin(phase: String) -> void:
 	_frames[phase] = []
 	_phys[phase] = []
 	_dc[phase] = []
+	_gpu[phase] = []
+	_gpu_t[phase] = []
 	_last_usec = Time.get_ticks_usec()
 	PerfLog.mark("bench " + phase)
 	if phase == "walk":
@@ -86,6 +91,10 @@ func _process(delta: float) -> void:
 	_last_usec = now
 	_dc[_phase].append(Performance.get_monitor(Performance.RENDER_TOTAL_DRAW_CALLS_IN_FRAME))
 	_phys[_phase].append(Performance.get_monitor(Performance.TIME_PHYSICS_PROCESS) * 1000.0)
+	# the CPU side of rendering (culling, draw-call setup): what draw-call savings buy, and unlike
+	# the frame rate it does not depend on whether macOS is presenting the window
+	_gpu_t[_phase].append(RenderingServer.viewport_get_measured_render_time_gpu(_world.get_viewport().get_viewport_rid()))
+	_gpu[_phase].append(RenderingServer.get_frame_setup_time_cpu() + RenderingServer.viewport_get_measured_render_time_cpu(_world.get_viewport().get_viewport_rid()))
 	_t += delta
 	var p: CharacterBody3D = _world.player
 	if _phase == "turn":
@@ -108,6 +117,13 @@ func _finish() -> void:
 		"time": Time.get_datetime_string_from_system(), "args": " ".join(OS.get_cmdline_user_args())}
 	for phase: String in _frames:
 		out[phase] = _summary(_frames[phase], _phys[phase], _dc[phase])
+		var g: Array = _gpu[phase].duplicate()
+		g.sort()
+		out[phase]["render_cpu_p50"] = snappedf(g[g.size() / 2], 0.01)
+		out[phase]["render_cpu_p90"] = snappedf(g[g.size() * 9 / 10], 0.01)
+		var gt: Array = _gpu_t[phase].duplicate()
+		gt.sort()
+		out[phase]["gpu_p50"] = snappedf(gt[gt.size() / 2], 0.01)
 	if _walk.has("to"):
 		var from: Vector3 = _walk.from
 		var to: Vector3 = _walk.to
