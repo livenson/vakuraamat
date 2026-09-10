@@ -27,7 +27,7 @@ from PIL import Image
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CACHE = os.path.join(ROOT, "data_raw", "polyhaven")
 API = "https://api.polyhaven.com/files/"
-UA = {"User-Agent": "vakuraamat-pipeline/1.0 (+https://github.com/ilja/vakuraamat)"}
+UA = {"User-Agent": "vakuraamat-pipeline/1.0 (+https://github.com/livenson/vakuraamat)"}
 
 # game name -> Poly Haven slug
 SETS = {

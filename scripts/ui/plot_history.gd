@@ -3,8 +3,8 @@
 # talks to). A plot that was forest in 1998 and a car park now says something its land value does
 # not, so the book shows the plot's own square in each of them.
 #
-# The newest picture costs nothing: it is a crop of the tile's own ortho.jpg. The older ones are one
-# WMS request each, kept in user://cache/plots so a plot is fetched once and never again. A campaign
+# Every picture is one WMS request - the campaigns from `ajalooline`, today's from `fotokaart` -
+# kept in user://cache/plots so a plot is fetched once and never again. A campaign
 # that did not fly over this square answers with a blank white square, which is what `_has_ground`
 # is for; that is remembered too, so an uncovered plot is not asked about twice.
 class_name PlotHistory

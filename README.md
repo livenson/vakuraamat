@@ -58,7 +58,8 @@ T teleport, H home, F8 report, Esc menu.
 - **The book (Tab):** the cadastre as a sortable, searchable list - address, purpose, area, the 2022
   taxation value, the form of ownership - and a plot's own page: its land registry number, when it
   was entered in the cadastre, the companies registered there, a link into the register itself, and
-  the plot's square out of every orthophoto flown over it since 1993. **B** opens the plot under your
+  the plot's square from each national orthophoto campaign since 1993 (1993-2000, 2005, 2010, 2015,
+  2020) and from today's. **B** opens the plot under your
   feet; *Place* is the pack itself, what it holds and where every figure came from.
 - **Fly (F):** from the air the crosshair names the building under it, up to six hundred metres out.
 - **The buses are the real ones:** the shelter's board carries the timetable the public transport
@@ -111,6 +112,8 @@ flowchart LR
     ETAKB[ETAK building polygons]
     ETAKR[ETAK roads]
     ADS[in-ADS gazetteer]
+    HIST[Historical orthophoto WMS: 1993-2020 campaigns]
+    ADM[County outlines, ETAK standing water]
   end
   EHR[Building Register: year, storeys, materials, addresses]
   ARI[e-Business Register: companies by address, activity, capital, structure]
@@ -118,6 +121,7 @@ flowchart LR
   PRIA[PRIA field register WFS: fields and declared crops]
   OSM[OpenStreetMap: bus stops]
   GTFS[Public transport register: lines, times, route geometry]
+  IPAPI[ip-api.com: 'Use my location', city level]
   PH[Poly Haven CC0 textures]
   SKF[Sketchfab and Poly Pizza CC BY models: cars, lamps, shelters, trees, farm props]
 
@@ -134,13 +138,16 @@ flowchart LR
   TILE --> EF[extract_features.py] --> WJ[(water and massing)]
   PH --> PHF[fetch_polyhaven.py] --> TEX[(ground and facade textures)]
   ADS --> TS[tile_service.py: any point in Estonia] --> FT
+  ADM --> FO[fetch_outline.py] --> EST[(assets/data/estonia.json: the menu's locator map)]
 
   TILE & TJ & RJ & BJ --> IMP[import_terrain.gd: control map, scatter, measured trees] --> REG[(Terrain3D region)]
-  BJ & RJ & PJ & WJ --> GEN[gen_era_scenes.py] --> SCN[(scenes/era_2026.tscn)]
+  BJ & RJ & PJ & WJ --> GEN[gen_era_scenes.py] --> SCN[(sites/id/scenes/era_2026.tscn)]
 
   REG & SCN & TEX & FJ & SJ & SKF --> GAME[Godot: terrain, buildings, interiors, roads, parcels, traffic, crops, bus stops]
   PJ & TEJ & MJ --> BOOK[The book: the cadastre, the companies, the place] --> GAME
   DJ --> BUS[Shelter timetables and the buses that keep them] --> GAME
+  HIST & ORTHO --> PH2[plot_history.gd: a plot's square per campaign, fetched live] --> BOOK
+  ADS & IPAPI --> LOC[locator.gd: New location, Use my location] --> TS
 ```
 
 The full table of sources, tools, outputs and readers, the make targets and the pipeline internals
@@ -162,8 +169,9 @@ same for any point from inside the game. See [docs/custom-sites.md](docs/custom-
 - [docs/data-pipeline.md](docs/data-pipeline.md): sources, requirements, make targets, terrain
   pipeline, world mapping, quirks and the repository layout.
 - [docs/tv-streaming.md](docs/tv-streaming.md): playing on an Android TV over the home network.
-- [docs/historical-imagery.md](docs/historical-imagery.md): a brainstorm — the orthophotos back to
-  1993 and the Fotoladu photograph archive, and five ways they could sit in the game. Not built.
+- [docs/historical-imagery.md](docs/historical-imagery.md): the orthophotos back to 1993 and the
+  Fotoladu photograph archive, and five ways they could sit in the game; the plot page's pictures
+  over the years (option 4) are built, the rest is a brainstorm.
 - [docs/maaamet-data-reference.md](docs/maaamet-data-reference.md): what Maa-amet publishes and how
   each dataset is converted; [docs/visual-upgrade-plan.md](docs/visual-upgrade-plan.md): rendering steps and their status.
 - [docs/history/](docs/history/): the design, plan and language notes of the historical three-era game,
@@ -173,7 +181,12 @@ same for any point from inside the game. See [docs/custom-sites.md](docs/custom-
 
 ## Licence of the data
 
-Maa-amet open data, free for commercial use with attribution ("Map data: Maa- ja Ruumiamet, 2026",
-also in every `terrain_meta.json`); companies from the e-Business Register open data (CC BY 4.0) and
-the Tax Board's quarterly figures; bus stops from OpenStreetMap (ODbL); farmed fields from PRIA.
-Everything vendored is listed in `THIRD_PARTY.md`.
+Maa-amet open data - the ground, the orthophotos, the cadastre, ETAK, the Geo3D roofs and trees -
+free for commercial use with attribution ("Map data: Maa- ja Ruumiamet (Estonian Land and Spatial
+Development Board), 2026", also in every `terrain_meta.json`); buildings' attributes from the
+Building Register (EHR); companies from the e-Business Register open data (CC BY 4.0) and the Tax
+Board's quarterly figures; bus stops from OpenStreetMap (ODbL: `stops.json` stays under it); lines
+and times from the public transport register's open data; farmed fields from PRIA. The optional "Use
+my location" asks ip-api.com for a city-level point (free for non-commercial use). Every pack file
+carries its own `attribution`, and the book's *Place* page prints them. Everything vendored is listed
+in `THIRD_PARTY.md`.

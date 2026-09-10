@@ -567,17 +567,22 @@ func _fill_values(body: Node) -> void:
 		grid.add_child(_num(tr("UI_BOOK_OF_PLOTS") % int(v.get("n", 0))))
 
 
-## Every "attribution" line the pack's data files carry, once each.
+## Every "attribution" line the pack's data files carry, once each: the credits THIRD_PARTY.md says
+## the game owes (the bus stops' OpenStreetMap credit is an ODbL condition), from the files that
+## drew on each source. The tile's measured trees credit theirs as "source".
 func _attributions() -> Array:
 	var seen := {}
-	for file in ["parcels.json", "buildings.json", "tenants.json", "roads.json", "market.json"]:
-		var path := Sites.path(file)
-		if not FileAccess.file_exists(path):
+	var files := ["parcels.json", "buildings.json", "tenants.json", "roads.json", "market.json",
+		"stops.json", "departures.json", "fields_2026.json"]
+	var paths: Array = files.map(func(f): return [Sites.path(f), "attribution"])
+	paths.append([Sites.tile_dir() + "/trees.json", "source"])
+	for pk in paths:
+		if not FileAccess.file_exists(pk[0]):
 			continue
-		var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+		var parsed = JSON.parse_string(FileAccess.get_file_as_string(pk[0]))
 		if typeof(parsed) != TYPE_DICTIONARY:
 			continue
-		for line in _lines_of(parsed.get("attribution", "")):
+		for line in _lines_of(parsed.get(pk[1], "")):
 			seen[line] = true
 	return seen.keys()
 

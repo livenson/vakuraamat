@@ -7,8 +7,8 @@ adapter, not a second pipeline. `for_point(x, y, crs)` returns the adapter cover
     python3 tools/pipeline/sources.py --list
     python3 tools/pipeline/sources.py --check 657600 6477150
 
-Implemented: Estonia (Maa-amet DTM 1 m, nDSM, orthophoto WMS, historical maps WMS, in-ADS gazetteer,
-ETAK + Building Register + Geo3D LOD2 buildings, Geo3D single trees). The rest of the world has a
+Implemented: Estonia (Maa-amet DTM 5 m and 1 m, nDSM, orthophoto WMS, in-ADS gazetteer, the cadastre,
+ETAK + Building Register + Geo3D LOD2 buildings, ETAK roads and water, Geo3D single trees). The rest of the world has a
 documented plan and no code yet (see docs/custom-sites.md, "Other countries").
 """
 import argparse, os, sys
