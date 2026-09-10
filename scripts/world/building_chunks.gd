@@ -216,19 +216,23 @@ func _put(cell: Vector2i, merged: Array, members: Array, occ: Array = []) -> voi
 			continue
 		mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, pair[1])
 		mesh.surface_set_material(mesh.get_surface_count() - 1, pair[0])
-	var cmi: MeshInstance3D = e.mi
-	if cmi == null:
-		cmi = MeshInstance3D.new()
-		cmi.name = "Cell_%d_%d" % [cell.x, cell.y]
-		cmi.visibility_range_begin = NEAR
-		add_child(cmi)
-		e.mi = cmi
+	# a fresh node for every merge, its mesh set before it enters the tree: swapping the mesh of an
+	# instance that has visibility children makes the renderer walk them, and a hidden child is not
+	# in its list ("dep_instance->array_index == -1", a line per child, on every rebuilt cell)
+	var old: MeshInstance3D = e.mi
+	var cmi := MeshInstance3D.new()
+	cmi.name = "Cell_%d_%d" % [cell.x, cell.y]
+	cmi.visibility_range_begin = NEAR
 	cmi.mesh = mesh
+	add_child(cmi)
+	e.mi = cmi
 	for w in members:
 		var fb = w.get_ref()
 		if fb and is_instance_valid(fb) and fb.far_mesh_node():
 			var mi: MeshInstance3D = fb.far_mesh_node()
 			mi.visibility_parent = mi.get_path_to(cmi)
+	if old and is_instance_valid(old):
+		old.queue_free()   # its buildings point at the new cell now
 	if occ.size() == 2 and not (occ[0] as PackedVector3Array).is_empty():
 		var oi: OccluderInstance3D = e.get("occ")
 		if oi == null:
