@@ -1,0 +1,92 @@
+{
+ "attribution": "Maakataster (maa maksustamishind 2022): Maa- ja Ruumiamet",
+ "source": "derived from maks_hind",
+ "fetched": "2026-09-10",
+ "valuation_year": 2022,
+ "county": "Harju maakond",
+ "settlement": "Pirita linnaosa",
+ "municipality": "Tallinn",
+ "by_purpose": {
+  "ARIMAA": {
+   "median_eur_m2": 150.0,
+   "p25": 106.34,
+   "p75": 214.21,
+   "n": 22,
+   "total_area": 152306,
+   "total_value": 15597414
+  },
+  "ELAMUMAA": {
+   "median_eur_m2": 228.15,
+   "p25": 193.33,
+   "p75": 240.55,
+   "n": 99,
+   "total_area": 130452,
+   "total_value": 23451314
+  },
+  "MAATULUNDUSMAA": {
+   "median_eur_m2": 10.0,
+   "p25": 10.0,
+   "p75": 10.0,
+   "n": 10,
+   "total_area": 189744,
+   "total_value": 2076113
+  },
+  "SIHTOTSTARBETA_MAA": {
+   "median_eur_m2": 10.0,
+   "p25": 10.0,
+   "p75": 10.0,
+   "n": 4,
+   "total_area": 115459,
+   "total_value": 1154590
+  },
+  "TOOTMISMAA": {
+   "median_eur_m2": 224.29,
+   "p25": 158.55,
+   "p75": 233.24,
+   "n": 14,
+   "total_area": 42578,
+   "total_value": 4692214
+  },
+  "TRANSPORDIMAA": {
+   "median_eur_m2": 10.0,
+   "p25": 10.0,
+   "p75": 10.0,
+   "n": 28,
+   "total_area": 265963,
+   "total_value": 2659630
+  },
+  "UHISKONDLIKE_EHITISTE_MAA": {
+   "median_eur_m2": 83.23,
+   "p25": 65.08,
+   "p75": 110.41,
+   "n": 5,
+   "total_area": 47178,
+   "total_value": 2559785
+  },
+  "ULDKASUTATAV_MAA": {
+   "median_eur_m2": 10.0,
+   "p25": 10.0,
+   "p75": 10.0,
+   "n": 21,
+   "total_area": 1024883,
+   "total_value": 10248830
+  },
+  "VEEKOGUDE_MAA": {
+   "median_eur_m2": 58.31,
+   "p25": 58.31,
+   "p75": 58.31,
+   "n": 1,
+   "total_area": 3555,
+   "total_value": 207278
+  },
+  "all": {
+   "median_eur_m2": 167.83,
+   "p25": 10.0,
+   "p75": 230.06,
+   "n": 204,
+   "total_area": 1972118,
+   "total_value": 62647168
+  }
+ },
+ "transactions": null
+}

@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bjg14lxe62a12"
+
+[deps]
+
+files=["res://sites/pirita/strings.et.translation", "res://sites/pirita/strings.en.translation"]
+
+source_file="res://sites/pirita/strings.csv"
+dest_files=["res://sites/pirita/strings.et.translation", "res://sites/pirita/strings.en.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

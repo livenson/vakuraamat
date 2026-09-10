@@ -1,0 +1,13 @@
+keys,et,en
+SITE_PIRITA,Pirita,Pirita
+SITE_PIRITA_SUBTITLE,"Pirita: päris maa, päris väärtused.","Pirita: real plots, real values."
+ERA_2026_NAME,Aasta 2026,The year 2026
+LOC_LANDMARK,Maamärk,The landmark
+LOC_FARMSTEAD,Talu,The farmstead
+EX_LANDMARK_2026,Pirita: siit algab sinu raamat.,Pirita: your book starts here.
+CODEX_REAL_TITLE,Päris,Real
+CODEX_REAL,"Maa: Pirita, Maa- ja Ruumiameti kõrgusandmed, ortofoto, hooned, katastriüksused ja maa väärtused, meetri täpsusega.","The ground: Pirita, from the Land Board's elevation data, orthophoto, buildings, cadastral units and land values, to the metre."
+CODEX_INVENTED_TITLE,Välja mõeldud,Invented
+CODEX_INVENTED,"Majade seinad ja katused on taastatud ehitisregistri mõõtude ja Maa-ameti LOD2 mudeli järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.","The walls and roofs are reconstructed from the Building Register's measurements and Maa-amet's LOD2 model; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one."
+CODEX_DATA_TITLE,Andmed,Data
+CODEX_DATA,"Kaardiandmed: Maa- ja Ruumiamet 2026. Maa maksustamishind 2022: Maakataster, Maa- ja Ruumiamet. Ettevõtted: Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0).","Map data: Maa- ja Ruumiamet 2026. Land values 2022: the cadastre, Maa- ja Ruumiamet. Companies: e-Business Register open data, Centre of Registers and Information Systems (CC BY 4.0)."
