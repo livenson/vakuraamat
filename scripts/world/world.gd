@@ -130,6 +130,11 @@ func _ready() -> void:
 				player.set_pose(player.global_position, player.rotation.y, deg_to_rad(float(parts[4])))
 		elif a == "--fly":
 			player.flying = true   # checks of the survey view (the crosshair's reach, the outline)
+		elif a == "--bench":
+			var bench := Bench.new()   # a fixed route for before/after performance numbers
+			bench.name = "Bench"
+			add_child(bench)
+			bench.setup(self)
 		elif a.begins_with("--hour="):
 			if sky and sky.tod:
 				sky.tod.current_time = float(a.trim_prefix("--hour="))

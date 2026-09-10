@@ -23,7 +23,7 @@ func _ready() -> void:
 	var args := OS.get_cmdline_user_args()
 	_caps = DisplayServer.get_name() != "headless"
 	for a in args:
-		if a.begins_with("--screenshot=") or a.begins_with("--frames="):
+		if a.begins_with("--screenshot=") or a.begins_with("--frames=") or a == "--bench":
 			_caps = false
 	if _caps:
 		_cap(true)

@@ -20,6 +20,12 @@ var _sec_max := 0.0
 var _sec_start := 0.0
 var _marks: Array[String] = []        # marks left during the frame now running
 var _prev_marks: Array[String] = []   # marks of the frame that just ended
+# pipeline compilations (4.4+ monitors) at the start of the last frame: a SPIKE names the ones it
+# paid for, so a shader compiled on first sight shows as "compiled draw 3" instead of "no marks"
+const PIPELINES := {"canvas": Performance.PIPELINE_COMPILATIONS_CANVAS, "mesh": Performance.PIPELINE_COMPILATIONS_MESH,
+	"surface": Performance.PIPELINE_COMPILATIONS_SURFACE, "draw": Performance.PIPELINE_COMPILATIONS_DRAW,
+	"specialization": Performance.PIPELINE_COMPILATIONS_SPECIALIZATION}
+var _pipelines: Dictionary = {}
 
 
 func _ready() -> void:
@@ -69,6 +75,11 @@ func _process(_delta: float) -> void:
 	_last_usec = now
 	_prev_marks = _marks
 	_marks = []
+	for k: String in PIPELINES:
+		var n := int(Performance.get_monitor(PIPELINES[k]))
+		if n > int(_pipelines.get(k, n)):
+			_prev_marks.append("compiled %s %d" % [k, n - int(_pipelines[k])])
+		_pipelines[k] = n
 	_sec_frames += 1
 	_sec_sum += ms
 	_sec_max = maxf(_sec_max, ms)

@@ -109,6 +109,12 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   `--open=hover:<tunnus>` holds the debug map's slip open over one plot,
   `--hour=<h>` sets the time of day (street lights and windows light after
   18:30), `--fly` starts in the air for a survey.
+- Performance numbers: `--bench` (with `--windowed --site=<id>`) turns once at street level, flies 2 km
+  north at 120 m across the next tiles, uncapped, then quits; the summary is printed as `[bench]` lines
+  and written to `user://logs/bench.json`, and PerfLog's SPIKE lines name what ran (tile loads, slow
+  members, traffic ticks, pipeline compilations). `--bench-off=traffic,details,doors,tcol` switches a
+  system off to bisect a hitch. Compare before/after on the same site (the Tartu city tile
+  `t659065_6472705` has cached neighbours to the north).
 - Data sources, make targets and the terrain pipeline are documented in `docs/data-pipeline.md`; the
   README only links there. Keep the README short.
 - Poly Pizza downloads cannot be scripted (403 on the file host); the user saves the glb by hand into
