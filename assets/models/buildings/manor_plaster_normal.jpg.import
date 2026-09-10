@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bncqcjyww58f7"
-path="res://.godot/imported/manor_plaster_normal.jpg-4998e99f430c65191b1446239ade054a.ctex"
+path.s3tc="res://.godot/imported/manor_plaster_normal.jpg-4998e99f430c65191b1446239ade054a.s3tc.ctex"
+path.etc2="res://.godot/imported/manor_plaster_normal.jpg-4998e99f430c65191b1446239ade054a.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "70e795b6a4ec85297c10bdec1fabb162"
@@ -14,17 +16,17 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/buildings/manor_plaster_normal.jpg"
-dest_files=["res://.godot/imported/manor_plaster_normal.jpg-4998e99f430c65191b1446239ade054a.ctex"]
+dest_files=["res://.godot/imported/manor_plaster_normal.jpg-4998e99f430c65191b1446239ade054a.s3tc.ctex", "res://.godot/imported/manor_plaster_normal.jpg-4998e99f430c65191b1446239ade054a.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=0
+compress/normal_map=1
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1

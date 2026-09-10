@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cfkeh832i86qd"
-path="res://.godot/imported/man_work_male_worksuit01_normal.jpg-2e82b391d87ef50c9fa2835722dd66b2.ctex"
+path.s3tc="res://.godot/imported/man_work_male_worksuit01_normal.jpg-2e82b391d87ef50c9fa2835722dd66b2.s3tc.ctex"
+path.etc2="res://.godot/imported/man_work_male_worksuit01_normal.jpg-2e82b391d87ef50c9fa2835722dd66b2.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "7100ec70e1471b66f4c6409ef421bb1d"
@@ -14,17 +16,17 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/man_work_male_worksuit01_normal.jpg"
-dest_files=["res://.godot/imported/man_work_male_worksuit01_normal.jpg-2e82b391d87ef50c9fa2835722dd66b2.ctex"]
+dest_files=["res://.godot/imported/man_work_male_worksuit01_normal.jpg-2e82b391d87ef50c9fa2835722dd66b2.s3tc.ctex", "res://.godot/imported/man_work_male_worksuit01_normal.jpg-2e82b391d87ef50c9fa2835722dd66b2.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=0
+compress/normal_map=1
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1

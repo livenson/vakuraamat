@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bfm7vxixh8roy"
-path="res://.godot/imported/woman_elegant_female_elegantsuit01_normal.jpg-79ec6d335ab3b2ba01b6cd8043349b78.ctex"
+path.s3tc="res://.godot/imported/woman_elegant_female_elegantsuit01_normal.jpg-79ec6d335ab3b2ba01b6cd8043349b78.s3tc.ctex"
+path.etc2="res://.godot/imported/woman_elegant_female_elegantsuit01_normal.jpg-79ec6d335ab3b2ba01b6cd8043349b78.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "7ef9e8586e4b86c6d1246aaa49af6991"
@@ -14,17 +16,17 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/woman_elegant_female_elegantsuit01_normal.jpg"
-dest_files=["res://.godot/imported/woman_elegant_female_elegantsuit01_normal.jpg-79ec6d335ab3b2ba01b6cd8043349b78.ctex"]
+dest_files=["res://.godot/imported/woman_elegant_female_elegantsuit01_normal.jpg-79ec6d335ab3b2ba01b6cd8043349b78.s3tc.ctex", "res://.godot/imported/woman_elegant_female_elegantsuit01_normal.jpg-79ec6d335ab3b2ba01b6cd8043349b78.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=0
+compress/normal_map=1
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1

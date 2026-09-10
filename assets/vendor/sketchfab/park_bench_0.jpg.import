@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d123lydd8kw0p"
-path="res://.godot/imported/park_bench_0.jpg-c5ea886c715e07a91b6695b83b1c2d34.ctex"
+path.s3tc="res://.godot/imported/park_bench_0.jpg-c5ea886c715e07a91b6695b83b1c2d34.s3tc.ctex"
+path.etc2="res://.godot/imported/park_bench_0.jpg-c5ea886c715e07a91b6695b83b1c2d34.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "95a55a88be5ca9b09329c718adebed44"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/park_bench_0.jpg"
-dest_files=["res://.godot/imported/park_bench_0.jpg-c5ea886c715e07a91b6695b83b1c2d34.ctex"]
+dest_files=["res://.godot/imported/park_bench_0.jpg-c5ea886c715e07a91b6695b83b1c2d34.s3tc.ctex", "res://.godot/imported/park_bench_0.jpg-c5ea886c715e07a91b6695b83b1c2d34.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

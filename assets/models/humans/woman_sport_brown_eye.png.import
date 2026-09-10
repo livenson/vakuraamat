@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bm7813d7vcuin"
-path="res://.godot/imported/woman_sport_brown_eye.png-e280367f51a2503e476600b2a37c744e.ctex"
+path.s3tc="res://.godot/imported/woman_sport_brown_eye.png-e280367f51a2503e476600b2a37c744e.s3tc.ctex"
+path.etc2="res://.godot/imported/woman_sport_brown_eye.png-e280367f51a2503e476600b2a37c744e.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "1b93ce1fc9dfa16177a6d61005cdb4fd"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/woman_sport_brown_eye.png"
-dest_files=["res://.godot/imported/woman_sport_brown_eye.png-e280367f51a2503e476600b2a37c744e.ctex"]
+dest_files=["res://.godot/imported/woman_sport_brown_eye.png-e280367f51a2503e476600b2a37c744e.s3tc.ctex", "res://.godot/imported/woman_sport_brown_eye.png-e280367f51a2503e476600b2a37c744e.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

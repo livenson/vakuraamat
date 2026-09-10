@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cwy8xky33fy3t"
-path="res://.godot/imported/car_offroad_Image_22.png-0c0f3f170b97ad84adde0419ae01f9c4.ctex"
+path.s3tc="res://.godot/imported/car_offroad_Image_22.png-0c0f3f170b97ad84adde0419ae01f9c4.s3tc.ctex"
+path.etc2="res://.godot/imported/car_offroad_Image_22.png-0c0f3f170b97ad84adde0419ae01f9c4.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "8c3c90c8b4f9e3f84a2f45f10fef1dc0"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/car_offroad_Image_22.png"
-dest_files=["res://.godot/imported/car_offroad_Image_22.png-0c0f3f170b97ad84adde0419ae01f9c4.ctex"]
+dest_files=["res://.godot/imported/car_offroad_Image_22.png-0c0f3f170b97ad84adde0419ae01f9c4.s3tc.ctex", "res://.godot/imported/car_offroad_Image_22.png-0c0f3f170b97ad84adde0419ae01f9c4.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

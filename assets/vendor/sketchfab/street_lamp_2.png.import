@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d2hvqop41kjsy"
-path="res://.godot/imported/street_lamp_2.png-f6d9de6144c2b4a556c7dd18efbb96f8.ctex"
+path.s3tc="res://.godot/imported/street_lamp_2.png-f6d9de6144c2b4a556c7dd18efbb96f8.s3tc.ctex"
+path.etc2="res://.godot/imported/street_lamp_2.png-f6d9de6144c2b4a556c7dd18efbb96f8.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "1e97bf11e3e7978e970e276ce5a26439"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/street_lamp_2.png"
-dest_files=["res://.godot/imported/street_lamp_2.png-f6d9de6144c2b4a556c7dd18efbb96f8.ctex"]
+dest_files=["res://.godot/imported/street_lamp_2.png-f6d9de6144c2b4a556c7dd18efbb96f8.s3tc.ctex", "res://.godot/imported/street_lamp_2.png-f6d9de6144c2b4a556c7dd18efbb96f8.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

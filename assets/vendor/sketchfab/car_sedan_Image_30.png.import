@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://x4xhpuyhqjyp"
-path="res://.godot/imported/car_sedan_Image_30.png-69fcc6a1142081a3a97deaef656d478a.ctex"
+path.s3tc="res://.godot/imported/car_sedan_Image_30.png-69fcc6a1142081a3a97deaef656d478a.s3tc.ctex"
+path.etc2="res://.godot/imported/car_sedan_Image_30.png-69fcc6a1142081a3a97deaef656d478a.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "497de13a72e290650b10136203026a07"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/car_sedan_Image_30.png"
-dest_files=["res://.godot/imported/car_sedan_Image_30.png-69fcc6a1142081a3a97deaef656d478a.ctex"]
+dest_files=["res://.godot/imported/car_sedan_Image_30.png-69fcc6a1142081a3a97deaef656d478a.s3tc.ctex", "res://.godot/imported/car_sedan_Image_30.png-69fcc6a1142081a3a97deaef656d478a.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

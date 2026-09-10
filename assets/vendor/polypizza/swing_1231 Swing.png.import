@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://k8ajr72cqhly"
-path="res://.godot/imported/swing_1231 Swing.png-650bf47b1a24cfd3e0717f006b705ad1.ctex"
+path.s3tc="res://.godot/imported/swing_1231 Swing.png-650bf47b1a24cfd3e0717f006b705ad1.s3tc.ctex"
+path.etc2="res://.godot/imported/swing_1231 Swing.png-650bf47b1a24cfd3e0717f006b705ad1.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "758296b5540de8b793477477041e6d4a"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/polypizza/swing_1231 Swing.png"
-dest_files=["res://.godot/imported/swing_1231 Swing.png-650bf47b1a24cfd3e0717f006b705ad1.ctex"]
+dest_files=["res://.godot/imported/swing_1231 Swing.png-650bf47b1a24cfd3e0717f006b705ad1.s3tc.ctex", "res://.godot/imported/swing_1231 Swing.png-650bf47b1a24cfd3e0717f006b705ad1.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

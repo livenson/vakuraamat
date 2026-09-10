@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://decpxs2rglv42"
-path="res://.godot/imported/woman_elegant_shoes02_diffuse.png-4410055d8a31034ec283274ea53b5f6e.ctex"
+path.s3tc="res://.godot/imported/woman_elegant_shoes02_diffuse.png-4410055d8a31034ec283274ea53b5f6e.s3tc.ctex"
+path.etc2="res://.godot/imported/woman_elegant_shoes02_diffuse.png-4410055d8a31034ec283274ea53b5f6e.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "0b58813c388422d0b3af4e238f520f1e"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/woman_elegant_shoes02_diffuse.png"
-dest_files=["res://.godot/imported/woman_elegant_shoes02_diffuse.png-4410055d8a31034ec283274ea53b5f6e.ctex"]
+dest_files=["res://.godot/imported/woman_elegant_shoes02_diffuse.png-4410055d8a31034ec283274ea53b5f6e.s3tc.ctex", "res://.godot/imported/woman_elegant_shoes02_diffuse.png-4410055d8a31034ec283274ea53b5f6e.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

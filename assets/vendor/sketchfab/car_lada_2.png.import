@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b2awqt6r8yhnn"
-path="res://.godot/imported/car_lada_2.png-b37d63162682b647e7b71c4fa408c014.ctex"
+path.s3tc="res://.godot/imported/car_lada_2.png-b37d63162682b647e7b71c4fa408c014.s3tc.ctex"
+path.etc2="res://.godot/imported/car_lada_2.png-b37d63162682b647e7b71c4fa408c014.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "f3ecfb8b98e3a7e5959ae15343218674"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/car_lada_2.png"
-dest_files=["res://.godot/imported/car_lada_2.png-b37d63162682b647e7b71c4fa408c014.ctex"]
+dest_files=["res://.godot/imported/car_lada_2.png-b37d63162682b647e7b71c4fa408c014.s3tc.ctex", "res://.godot/imported/car_lada_2.png-b37d63162682b647e7b71c4fa408c014.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

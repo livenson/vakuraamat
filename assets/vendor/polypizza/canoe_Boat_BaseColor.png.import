@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dmrqwq6mcv8vr"
-path="res://.godot/imported/canoe_Boat_BaseColor.png-8b4fb2e484cd4ce44a87f11c28fd6b94.ctex"
+path.s3tc="res://.godot/imported/canoe_Boat_BaseColor.png-8b4fb2e484cd4ce44a87f11c28fd6b94.s3tc.ctex"
+path.etc2="res://.godot/imported/canoe_Boat_BaseColor.png-8b4fb2e484cd4ce44a87f11c28fd6b94.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "8b8ada5b166cdef2a513bd9c22fb953d"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/polypizza/canoe_Boat_BaseColor.png"
-dest_files=["res://.godot/imported/canoe_Boat_BaseColor.png-8b4fb2e484cd4ce44a87f11c28fd6b94.ctex"]
+dest_files=["res://.godot/imported/canoe_Boat_BaseColor.png-8b4fb2e484cd4ce44a87f11c28fd6b94.s3tc.ctex", "res://.godot/imported/canoe_Boat_BaseColor.png-8b4fb2e484cd4ce44a87f11c28fd6b94.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bye6e18kwysd2"
-path="res://.godot/imported/neon_open_3.png-aa83f4537449fbbed26d7002cdd8406c.ctex"
+path.s3tc="res://.godot/imported/neon_open_3.png-aa83f4537449fbbed26d7002cdd8406c.s3tc.ctex"
+path.etc2="res://.godot/imported/neon_open_3.png-aa83f4537449fbbed26d7002cdd8406c.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "3e65ffdf257c18594721500549d79585"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/neon_open_3.png"
-dest_files=["res://.godot/imported/neon_open_3.png-aa83f4537449fbbed26d7002cdd8406c.ctex"]
+dest_files=["res://.godot/imported/neon_open_3.png-aa83f4537449fbbed26d7002cdd8406c.s3tc.ctex", "res://.godot/imported/neon_open_3.png-aa83f4537449fbbed26d7002cdd8406c.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

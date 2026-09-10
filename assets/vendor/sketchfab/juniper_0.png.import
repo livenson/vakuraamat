@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://devo1pnvxc2vy"
-path="res://.godot/imported/juniper_0.png-c19fc5c7ce374d6570327e2b67ba64ba.ctex"
+path.s3tc="res://.godot/imported/juniper_0.png-c19fc5c7ce374d6570327e2b67ba64ba.s3tc.ctex"
+path.etc2="res://.godot/imported/juniper_0.png-c19fc5c7ce374d6570327e2b67ba64ba.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "204d911f93c78f21306448134dd0a09f"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/juniper_0.png"
-dest_files=["res://.godot/imported/juniper_0.png-c19fc5c7ce374d6570327e2b67ba64ba.ctex"]
+dest_files=["res://.godot/imported/juniper_0.png-c19fc5c7ce374d6570327e2b67ba64ba.s3tc.ctex", "res://.godot/imported/juniper_0.png-c19fc5c7ce374d6570327e2b67ba64ba.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

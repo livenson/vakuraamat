@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://iwgbdfxwtqsj"
-path="res://.godot/imported/manor_rooftiles_color.jpg-edca6dab4dc2439dd8659d586f9cc7ce.ctex"
+path.s3tc="res://.godot/imported/manor_rooftiles_color.jpg-edca6dab4dc2439dd8659d586f9cc7ce.s3tc.ctex"
+path.etc2="res://.godot/imported/manor_rooftiles_color.jpg-edca6dab4dc2439dd8659d586f9cc7ce.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "83add28da1e852250d797f5ac6377f77"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/buildings/manor_rooftiles_color.jpg"
-dest_files=["res://.godot/imported/manor_rooftiles_color.jpg-edca6dab4dc2439dd8659d586f9cc7ce.ctex"]
+dest_files=["res://.godot/imported/manor_rooftiles_color.jpg-edca6dab4dc2439dd8659d586f9cc7ce.s3tc.ctex", "res://.godot/imported/manor_rooftiles_color.jpg-edca6dab4dc2439dd8659d586f9cc7ce.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

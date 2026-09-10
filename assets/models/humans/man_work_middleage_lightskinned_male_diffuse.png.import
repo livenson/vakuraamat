@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bser0ysl63i8d"
-path="res://.godot/imported/man_work_middleage_lightskinned_male_diffuse.png-ba7aa7aaa57ed801c642329a81344783.ctex"
+path.s3tc="res://.godot/imported/man_work_middleage_lightskinned_male_diffuse.png-ba7aa7aaa57ed801c642329a81344783.s3tc.ctex"
+path.etc2="res://.godot/imported/man_work_middleage_lightskinned_male_diffuse.png-ba7aa7aaa57ed801c642329a81344783.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "6ecc39d6f9d8ebba28cbb29d1e07b495"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/man_work_middleage_lightskinned_male_diffuse.png"
-dest_files=["res://.godot/imported/man_work_middleage_lightskinned_male_diffuse.png-ba7aa7aaa57ed801c642329a81344783.ctex"]
+dest_files=["res://.godot/imported/man_work_middleage_lightskinned_male_diffuse.png-ba7aa7aaa57ed801c642329a81344783.s3tc.ctex", "res://.godot/imported/man_work_middleage_lightskinned_male_diffuse.png-ba7aa7aaa57ed801c642329a81344783.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

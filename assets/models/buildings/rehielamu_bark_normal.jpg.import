@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://rgk838qmkq6f"
-path="res://.godot/imported/rehielamu_bark_normal.jpg-43af4e5de8e31f16fefd3d21733ffdbf.ctex"
+path.s3tc="res://.godot/imported/rehielamu_bark_normal.jpg-43af4e5de8e31f16fefd3d21733ffdbf.s3tc.ctex"
+path.etc2="res://.godot/imported/rehielamu_bark_normal.jpg-43af4e5de8e31f16fefd3d21733ffdbf.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "050ea0881e385fee5492a700c29e443e"
@@ -14,17 +16,17 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/buildings/rehielamu_bark_normal.jpg"
-dest_files=["res://.godot/imported/rehielamu_bark_normal.jpg-43af4e5de8e31f16fefd3d21733ffdbf.ctex"]
+dest_files=["res://.godot/imported/rehielamu_bark_normal.jpg-43af4e5de8e31f16fefd3d21733ffdbf.s3tc.ctex", "res://.godot/imported/rehielamu_bark_normal.jpg-43af4e5de8e31f16fefd3d21733ffdbf.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=0
+compress/normal_map=1
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1

@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://crvp2os8hj17i"
-path="res://.godot/imported/billboard_overhang_0.jpg-c24068a96e09635f038fcf66edd29f61.ctex"
+path.s3tc="res://.godot/imported/billboard_overhang_0.jpg-c24068a96e09635f038fcf66edd29f61.s3tc.ctex"
+path.etc2="res://.godot/imported/billboard_overhang_0.jpg-c24068a96e09635f038fcf66edd29f61.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "16051168e3b6a79c2830d21381461d3f"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/billboard_overhang_0.jpg"
-dest_files=["res://.godot/imported/billboard_overhang_0.jpg-c24068a96e09635f038fcf66edd29f61.ctex"]
+dest_files=["res://.godot/imported/billboard_overhang_0.jpg-c24068a96e09635f038fcf66edd29f61.s3tc.ctex", "res://.godot/imported/billboard_overhang_0.jpg-c24068a96e09635f038fcf66edd29f61.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

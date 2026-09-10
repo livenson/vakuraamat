@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cmc17wl6kpckp"
-path="res://.godot/imported/pine_conifer_sprigs.png-8dbf0214e891dfd017a34055f97dde4d.ctex"
+path.s3tc="res://.godot/imported/pine_conifer_sprigs.png-8dbf0214e891dfd017a34055f97dde4d.s3tc.ctex"
+path.etc2="res://.godot/imported/pine_conifer_sprigs.png-8dbf0214e891dfd017a34055f97dde4d.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "e55c4432dd9e6833d653fbc8eba2298b"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/trees/pine_conifer_sprigs.png"
-dest_files=["res://.godot/imported/pine_conifer_sprigs.png-8dbf0214e891dfd017a34055f97dde4d.ctex"]
+dest_files=["res://.godot/imported/pine_conifer_sprigs.png-8dbf0214e891dfd017a34055f97dde4d.s3tc.ctex", "res://.godot/imported/pine_conifer_sprigs.png-8dbf0214e891dfd017a34055f97dde4d.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

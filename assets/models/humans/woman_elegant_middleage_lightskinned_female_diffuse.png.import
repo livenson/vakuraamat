@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cmap5yjk54lxj"
-path="res://.godot/imported/woman_elegant_middleage_lightskinned_female_diffuse.png-4ce4a629485016b8c8f5c31e472a5f36.ctex"
+path.s3tc="res://.godot/imported/woman_elegant_middleage_lightskinned_female_diffuse.png-4ce4a629485016b8c8f5c31e472a5f36.s3tc.ctex"
+path.etc2="res://.godot/imported/woman_elegant_middleage_lightskinned_female_diffuse.png-4ce4a629485016b8c8f5c31e472a5f36.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "667a1c4fc4478d768c3e4fca644a2321"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/woman_elegant_middleage_lightskinned_female_diffuse.png"
-dest_files=["res://.godot/imported/woman_elegant_middleage_lightskinned_female_diffuse.png-4ce4a629485016b8c8f5c31e472a5f36.ctex"]
+dest_files=["res://.godot/imported/woman_elegant_middleage_lightskinned_female_diffuse.png-4ce4a629485016b8c8f5c31e472a5f36.s3tc.ctex", "res://.godot/imported/woman_elegant_middleage_lightskinned_female_diffuse.png-4ce4a629485016b8c8f5c31e472a5f36.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

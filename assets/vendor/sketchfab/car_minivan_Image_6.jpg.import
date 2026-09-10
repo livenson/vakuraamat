@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://qrwu6kbcnt4n"
-path="res://.godot/imported/car_minivan_Image_6.jpg-22d60a6d70d2b3e8e68941e9e296c76d.ctex"
+path.s3tc="res://.godot/imported/car_minivan_Image_6.jpg-22d60a6d70d2b3e8e68941e9e296c76d.s3tc.ctex"
+path.etc2="res://.godot/imported/car_minivan_Image_6.jpg-22d60a6d70d2b3e8e68941e9e296c76d.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "ad4096d54d7fd9c4312e0ae1215416fd"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/car_minivan_Image_6.jpg"
-dest_files=["res://.godot/imported/car_minivan_Image_6.jpg-22d60a6d70d2b3e8e68941e9e296c76d.ctex"]
+dest_files=["res://.godot/imported/car_minivan_Image_6.jpg-22d60a6d70d2b3e8e68941e9e296c76d.s3tc.ctex", "res://.godot/imported/car_minivan_Image_6.jpg-22d60a6d70d2b3e8e68941e9e296c76d.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://batxbqy4rfkcq"
-path="res://.godot/imported/tenniscourt_TennisCourt_BaseColor.png-74adff5a9e2d5da64443c6d90cf62b45.ctex"
+path.s3tc="res://.godot/imported/tenniscourt_TennisCourt_BaseColor.png-74adff5a9e2d5da64443c6d90cf62b45.s3tc.ctex"
+path.etc2="res://.godot/imported/tenniscourt_TennisCourt_BaseColor.png-74adff5a9e2d5da64443c6d90cf62b45.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "9fa7cd8aa1c369f5fa8bdc5963ef1a25"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/polypizza/tenniscourt_TennisCourt_BaseColor.png"
-dest_files=["res://.godot/imported/tenniscourt_TennisCourt_BaseColor.png-74adff5a9e2d5da64443c6d90cf62b45.ctex"]
+dest_files=["res://.godot/imported/tenniscourt_TennisCourt_BaseColor.png-74adff5a9e2d5da64443c6d90cf62b45.s3tc.ctex", "res://.godot/imported/tenniscourt_TennisCourt_BaseColor.png-74adff5a9e2d5da64443c6d90cf62b45.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

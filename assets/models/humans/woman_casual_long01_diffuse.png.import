@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bwasoy7rfmycw"
-path="res://.godot/imported/woman_casual_long01_diffuse.png-5d6931a19e4e0c493749bc75468b466d.ctex"
+path.s3tc="res://.godot/imported/woman_casual_long01_diffuse.png-5d6931a19e4e0c493749bc75468b466d.s3tc.ctex"
+path.etc2="res://.godot/imported/woman_casual_long01_diffuse.png-5d6931a19e4e0c493749bc75468b466d.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "f8dab2dcf04ba57e7ca132d01605337e"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/woman_casual_long01_diffuse.png"
-dest_files=["res://.godot/imported/woman_casual_long01_diffuse.png-5d6931a19e4e0c493749bc75468b466d.ctex"]
+dest_files=["res://.godot/imported/woman_casual_long01_diffuse.png-5d6931a19e4e0c493749bc75468b466d.s3tc.ctex", "res://.godot/imported/woman_casual_long01_diffuse.png-5d6931a19e4e0c493749bc75468b466d.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bgwt88dgyldfi"
-path="res://.godot/imported/man_old_shoes02_diffuse.png-a4588e81e6ad438c2c430c8f6652249a.ctex"
+path.s3tc="res://.godot/imported/man_old_shoes02_diffuse.png-a4588e81e6ad438c2c430c8f6652249a.s3tc.ctex"
+path.etc2="res://.godot/imported/man_old_shoes02_diffuse.png-a4588e81e6ad438c2c430c8f6652249a.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "0b58813c388422d0b3af4e238f520f1e"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/man_old_shoes02_diffuse.png"
-dest_files=["res://.godot/imported/man_old_shoes02_diffuse.png-a4588e81e6ad438c2c430c8f6652249a.ctex"]
+dest_files=["res://.godot/imported/man_old_shoes02_diffuse.png-a4588e81e6ad438c2c430c8f6652249a.s3tc.ctex", "res://.godot/imported/man_old_shoes02_diffuse.png-a4588e81e6ad438c2c430c8f6652249a.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

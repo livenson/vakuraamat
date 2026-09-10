@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dhpruatdfw5a5"
-path="res://.godot/imported/hay_bales_0.png-349be8b843d1c7e0968b50cccdef9254.ctex"
+path.s3tc="res://.godot/imported/hay_bales_0.png-349be8b843d1c7e0968b50cccdef9254.s3tc.ctex"
+path.etc2="res://.godot/imported/hay_bales_0.png-349be8b843d1c7e0968b50cccdef9254.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "d8b2c53c836bd9a1f779c02b648d48f8"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/hay_bales_0.png"
-dest_files=["res://.godot/imported/hay_bales_0.png-349be8b843d1c7e0968b50cccdef9254.ctex"]
+dest_files=["res://.godot/imported/hay_bales_0.png-349be8b843d1c7e0968b50cccdef9254.s3tc.ctex", "res://.godot/imported/hay_bales_0.png-349be8b843d1c7e0968b50cccdef9254.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

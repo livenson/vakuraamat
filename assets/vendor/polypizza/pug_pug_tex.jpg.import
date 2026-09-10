@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://hixdlj77a88a"
-path="res://.godot/imported/pug_pug_tex.jpg-2d357b6ccd4b5eb8322717b287420fcf.ctex"
+path.s3tc="res://.godot/imported/pug_pug_tex.jpg-2d357b6ccd4b5eb8322717b287420fcf.s3tc.ctex"
+path.etc2="res://.godot/imported/pug_pug_tex.jpg-2d357b6ccd4b5eb8322717b287420fcf.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "41f8c59d4401d3b4c7342697cef21232"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/polypizza/pug_pug_tex.jpg"
-dest_files=["res://.godot/imported/pug_pug_tex.jpg-2d357b6ccd4b5eb8322717b287420fcf.ctex"]
+dest_files=["res://.godot/imported/pug_pug_tex.jpg-2d357b6ccd4b5eb8322717b287420fcf.s3tc.ctex", "res://.godot/imported/pug_pug_tex.jpg-2d357b6ccd4b5eb8322717b287420fcf.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

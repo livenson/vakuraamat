@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://d1j3p5vuid2iq"
-path="res://.godot/imported/man_casual_eyebrow001.png-1a5cf8db4e1b7ef7b287c95f0465962e.ctex"
+path.s3tc="res://.godot/imported/man_casual_eyebrow001.png-1a5cf8db4e1b7ef7b287c95f0465962e.s3tc.ctex"
+path.etc2="res://.godot/imported/man_casual_eyebrow001.png-1a5cf8db4e1b7ef7b287c95f0465962e.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "67bd4a6045281c2f8aa7f28610223c5c"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/man_casual_eyebrow001.png"
-dest_files=["res://.godot/imported/man_casual_eyebrow001.png-1a5cf8db4e1b7ef7b287c95f0465962e.ctex"]
+dest_files=["res://.godot/imported/man_casual_eyebrow001.png-1a5cf8db4e1b7ef7b287c95f0465962e.s3tc.ctex", "res://.godot/imported/man_casual_eyebrow001.png-1a5cf8db4e1b7ef7b287c95f0465962e.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

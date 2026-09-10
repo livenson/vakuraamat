@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dyoj4ug27mwpw"
-path="res://.godot/imported/woman_casual_young_lightskinned_female_diffuse.png-d2e3ce8920f77b481980be7b13c3de73.ctex"
+path.s3tc="res://.godot/imported/woman_casual_young_lightskinned_female_diffuse.png-d2e3ce8920f77b481980be7b13c3de73.s3tc.ctex"
+path.etc2="res://.godot/imported/woman_casual_young_lightskinned_female_diffuse.png-d2e3ce8920f77b481980be7b13c3de73.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "299e2769f0e0badfa873e71ac17e302e"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/woman_casual_young_lightskinned_female_diffuse.png"
-dest_files=["res://.godot/imported/woman_casual_young_lightskinned_female_diffuse.png-d2e3ce8920f77b481980be7b13c3de73.ctex"]
+dest_files=["res://.godot/imported/woman_casual_young_lightskinned_female_diffuse.png-d2e3ce8920f77b481980be7b13c3de73.s3tc.ctex", "res://.godot/imported/woman_casual_young_lightskinned_female_diffuse.png-d2e3ce8920f77b481980be7b13c3de73.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

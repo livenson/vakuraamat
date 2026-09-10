@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b7iw3u2hfuegs"
-path="res://.godot/imported/rowboat_1391 Rowboat.png-c26a053882a7b00edeb14f9a2174e4fb.ctex"
+path.s3tc="res://.godot/imported/rowboat_1391 Rowboat.png-c26a053882a7b00edeb14f9a2174e4fb.s3tc.ctex"
+path.etc2="res://.godot/imported/rowboat_1391 Rowboat.png-c26a053882a7b00edeb14f9a2174e4fb.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "dbd9ca94bc7f61eb0db8f5754575c7dd"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/polypizza/rowboat_1391 Rowboat.png"
-dest_files=["res://.godot/imported/rowboat_1391 Rowboat.png-c26a053882a7b00edeb14f9a2174e4fb.ctex"]
+dest_files=["res://.godot/imported/rowboat_1391 Rowboat.png-c26a053882a7b00edeb14f9a2174e4fb.s3tc.ctex", "res://.godot/imported/rowboat_1391 Rowboat.png-c26a053882a7b00edeb14f9a2174e4fb.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

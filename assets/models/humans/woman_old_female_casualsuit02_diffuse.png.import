@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://3rv3rcbsc6ni"
-path="res://.godot/imported/woman_old_female_casualsuit02_diffuse.png-92839ed18e31ff0f77adce69480a85ed.ctex"
+path.s3tc="res://.godot/imported/woman_old_female_casualsuit02_diffuse.png-92839ed18e31ff0f77adce69480a85ed.s3tc.ctex"
+path.etc2="res://.godot/imported/woman_old_female_casualsuit02_diffuse.png-92839ed18e31ff0f77adce69480a85ed.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "0633d8f67f0fce571bc8b3df7c77d5d4"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/woman_old_female_casualsuit02_diffuse.png"
-dest_files=["res://.godot/imported/woman_old_female_casualsuit02_diffuse.png-92839ed18e31ff0f77adce69480a85ed.ctex"]
+dest_files=["res://.godot/imported/woman_old_female_casualsuit02_diffuse.png-92839ed18e31ff0f77adce69480a85ed.s3tc.ctex", "res://.godot/imported/woman_old_female_casualsuit02_diffuse.png-92839ed18e31ff0f77adce69480a85ed.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

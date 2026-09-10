@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dgt3wtesff5yq"
-path="res://.godot/imported/man_old_short02_diffuse.png-83ca9596d2925f58b510c5317b21dffb.ctex"
+path.s3tc="res://.godot/imported/man_old_short02_diffuse.png-83ca9596d2925f58b510c5317b21dffb.s3tc.ctex"
+path.etc2="res://.godot/imported/man_old_short02_diffuse.png-83ca9596d2925f58b510c5317b21dffb.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "17bc1aa93e3f7f86971c3c45159cb802"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/man_old_short02_diffuse.png"
-dest_files=["res://.godot/imported/man_old_short02_diffuse.png-83ca9596d2925f58b510c5317b21dffb.ctex"]
+dest_files=["res://.godot/imported/man_old_short02_diffuse.png-83ca9596d2925f58b510c5317b21dffb.s3tc.ctex", "res://.godot/imported/man_old_short02_diffuse.png-83ca9596d2925f58b510c5317b21dffb.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

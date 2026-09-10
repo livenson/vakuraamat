@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bt4dmmmdfj5ff"
-path="res://.godot/imported/farmhouse_1938_rooftiles_color.jpg-332d2b8ee551bceabacff4bd5537e6e4.ctex"
+path.s3tc="res://.godot/imported/farmhouse_1938_rooftiles_color.jpg-332d2b8ee551bceabacff4bd5537e6e4.s3tc.ctex"
+path.etc2="res://.godot/imported/farmhouse_1938_rooftiles_color.jpg-332d2b8ee551bceabacff4bd5537e6e4.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "83add28da1e852250d797f5ac6377f77"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/buildings/farmhouse_1938_rooftiles_color.jpg"
-dest_files=["res://.godot/imported/farmhouse_1938_rooftiles_color.jpg-332d2b8ee551bceabacff4bd5537e6e4.ctex"]
+dest_files=["res://.godot/imported/farmhouse_1938_rooftiles_color.jpg-332d2b8ee551bceabacff4bd5537e6e4.s3tc.ctex", "res://.godot/imported/farmhouse_1938_rooftiles_color.jpg-332d2b8ee551bceabacff4bd5537e6e4.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

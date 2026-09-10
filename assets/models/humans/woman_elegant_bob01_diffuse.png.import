@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://de3mvtpppfn1t"
-path="res://.godot/imported/woman_elegant_bob01_diffuse.png-8dabb8be63e8a068da90caa4d0ec4f12.ctex"
+path.s3tc="res://.godot/imported/woman_elegant_bob01_diffuse.png-8dabb8be63e8a068da90caa4d0ec4f12.s3tc.ctex"
+path.etc2="res://.godot/imported/woman_elegant_bob01_diffuse.png-8dabb8be63e8a068da90caa4d0ec4f12.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "d575ea3f5d24f7707052ce4836efbcf1"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/woman_elegant_bob01_diffuse.png"
-dest_files=["res://.godot/imported/woman_elegant_bob01_diffuse.png-8dabb8be63e8a068da90caa4d0ec4f12.ctex"]
+dest_files=["res://.godot/imported/woman_elegant_bob01_diffuse.png-8dabb8be63e8a068da90caa4d0ec4f12.s3tc.ctex", "res://.godot/imported/woman_elegant_bob01_diffuse.png-8dabb8be63e8a068da90caa4d0ec4f12.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

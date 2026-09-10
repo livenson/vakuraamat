@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://npitpjs5j3g2"
-path="res://.godot/imported/farmhouse_1938_woodsiding_normal.jpg-c96dd2a9c771dc9a30a47f1c2b5246ff.ctex"
+path.s3tc="res://.godot/imported/farmhouse_1938_woodsiding_normal.jpg-c96dd2a9c771dc9a30a47f1c2b5246ff.s3tc.ctex"
+path.etc2="res://.godot/imported/farmhouse_1938_woodsiding_normal.jpg-c96dd2a9c771dc9a30a47f1c2b5246ff.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "bd337cc15ff8b5c4f489f23af93514cc"
@@ -14,17 +16,17 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/buildings/farmhouse_1938_woodsiding_normal.jpg"
-dest_files=["res://.godot/imported/farmhouse_1938_woodsiding_normal.jpg-c96dd2a9c771dc9a30a47f1c2b5246ff.ctex"]
+dest_files=["res://.godot/imported/farmhouse_1938_woodsiding_normal.jpg-c96dd2a9c771dc9a30a47f1c2b5246ff.s3tc.ctex", "res://.godot/imported/farmhouse_1938_woodsiding_normal.jpg-c96dd2a9c771dc9a30a47f1c2b5246ff.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
 compress/rdo_quality_loss=0.0
 compress/hdr_compression=1
-compress/normal_map=0
+compress/normal_map=1
 compress/channel_pack=0
 mipmaps/generate=true
 mipmaps/limit=-1

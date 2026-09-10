@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cyhxtxqqkrs3r"
-path="res://.godot/imported/spruce_src_0.png-22bcd20083c1962c812e7d8e6c3051a0.ctex"
+path.s3tc="res://.godot/imported/spruce_src_0.png-22bcd20083c1962c812e7d8e6c3051a0.s3tc.ctex"
+path.etc2="res://.godot/imported/spruce_src_0.png-22bcd20083c1962c812e7d8e6c3051a0.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "c0794414c8c34addea4eb6b39916adc2"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/trees/spruce_src_0.png"
-dest_files=["res://.godot/imported/spruce_src_0.png-22bcd20083c1962c812e7d8e6c3051a0.ctex"]
+dest_files=["res://.godot/imported/spruce_src_0.png-22bcd20083c1962c812e7d8e6c3051a0.s3tc.ctex", "res://.godot/imported/spruce_src_0.png-22bcd20083c1962c812e7d8e6c3051a0.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

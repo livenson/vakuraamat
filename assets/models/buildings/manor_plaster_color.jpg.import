@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://gf1ge0n0id84"
-path="res://.godot/imported/manor_plaster_color.jpg-02a72531278ef3286710dc17a264021c.ctex"
+path.s3tc="res://.godot/imported/manor_plaster_color.jpg-02a72531278ef3286710dc17a264021c.s3tc.ctex"
+path.etc2="res://.godot/imported/manor_plaster_color.jpg-02a72531278ef3286710dc17a264021c.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "d3ea1bb6bd622efb2d971c7b2978c74f"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/buildings/manor_plaster_color.jpg"
-dest_files=["res://.godot/imported/manor_plaster_color.jpg-02a72531278ef3286710dc17a264021c.ctex"]
+dest_files=["res://.godot/imported/manor_plaster_color.jpg-02a72531278ef3286710dc17a264021c.s3tc.ctex", "res://.godot/imported/manor_plaster_color.jpg-02a72531278ef3286710dc17a264021c.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

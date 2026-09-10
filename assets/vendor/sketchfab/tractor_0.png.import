@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://lq2o4vlymabx"
-path="res://.godot/imported/tractor_0.png-2879be65165f89594b77b415507b6e1f.ctex"
+path.s3tc="res://.godot/imported/tractor_0.png-2879be65165f89594b77b415507b6e1f.s3tc.ctex"
+path.etc2="res://.godot/imported/tractor_0.png-2879be65165f89594b77b415507b6e1f.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "953c240c7c2c9226be95bf87ae8e2420"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/tractor_0.png"
-dest_files=["res://.godot/imported/tractor_0.png-2879be65165f89594b77b415507b6e1f.ctex"]
+dest_files=["res://.godot/imported/tractor_0.png-2879be65165f89594b77b415507b6e1f.s3tc.ctex", "res://.godot/imported/tractor_0.png-2879be65165f89594b77b415507b6e1f.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

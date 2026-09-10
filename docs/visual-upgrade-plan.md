@@ -39,6 +39,10 @@ screenshot; 2 because the user named trees as the worst; 3–6 as time allows.
 - [x] 4 water (ponds detected from flat DTM patches; own ripple shader with sky reflection; no addon)
 - [~] 5 ground decals: skipped for now; the 25 cm orthophoto already carries roads and yards, decals add little until buildings are final
 - [x] 6 building textures (ambientCG plaster/wood/tiles/rock/bark, box-projected UVs in the Blender scripts)
+- [x] 7 performance quick wins (2026-09-10, `--bench`): traffic spawns from memory, flying pick and building
+  apply budgeted, shared door meshes, nearer vegetation, Jolt, VRAM-compressed model textures. Toomemägi:
+  video memory 2.1 -> 1.4 GB, street draw calls -11%; Tartu survey flight: frames over 100 ms 21 -> 4.
+  Next: per-class visibility ranges and occluders, lamp MultiMesh, MetalFX, merged far-view building chunks
 
 ## Result
 

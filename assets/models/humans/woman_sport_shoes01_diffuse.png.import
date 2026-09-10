@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dn0xjqyn7rfe5"
-path="res://.godot/imported/woman_sport_shoes01_diffuse.png-4daf856bcac644afb4f90b55fb1ba767.ctex"
+path.s3tc="res://.godot/imported/woman_sport_shoes01_diffuse.png-4daf856bcac644afb4f90b55fb1ba767.s3tc.ctex"
+path.etc2="res://.godot/imported/woman_sport_shoes01_diffuse.png-4daf856bcac644afb4f90b55fb1ba767.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "b6d0cb81f63d6a21d1dd579e19dd94ee"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/woman_sport_shoes01_diffuse.png"
-dest_files=["res://.godot/imported/woman_sport_shoes01_diffuse.png-4daf856bcac644afb4f90b55fb1ba767.ctex"]
+dest_files=["res://.godot/imported/woman_sport_shoes01_diffuse.png-4daf856bcac644afb4f90b55fb1ba767.s3tc.ctex", "res://.godot/imported/woman_sport_shoes01_diffuse.png-4daf856bcac644afb4f90b55fb1ba767.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

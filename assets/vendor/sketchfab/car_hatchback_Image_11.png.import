@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://sq7eq3n4q77w"
-path="res://.godot/imported/car_hatchback_Image_11.png-b85d76a0b0211219549d0d32160c4263.ctex"
+path.s3tc="res://.godot/imported/car_hatchback_Image_11.png-b85d76a0b0211219549d0d32160c4263.s3tc.ctex"
+path.etc2="res://.godot/imported/car_hatchback_Image_11.png-b85d76a0b0211219549d0d32160c4263.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "5676d264ccafaf5bdecdfd9f5441779e"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/car_hatchback_Image_11.png"
-dest_files=["res://.godot/imported/car_hatchback_Image_11.png-b85d76a0b0211219549d0d32160c4263.ctex"]
+dest_files=["res://.godot/imported/car_hatchback_Image_11.png-b85d76a0b0211219549d0d32160c4263.s3tc.ctex", "res://.godot/imported/car_hatchback_Image_11.png-b85d76a0b0211219549d0d32160c4263.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

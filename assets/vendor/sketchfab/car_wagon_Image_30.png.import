@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://fh6adv8h5lym"
-path="res://.godot/imported/car_wagon_Image_30.png-3905dd34e48c97c1263859a43905f65d.ctex"
+path.s3tc="res://.godot/imported/car_wagon_Image_30.png-3905dd34e48c97c1263859a43905f65d.s3tc.ctex"
+path.etc2="res://.godot/imported/car_wagon_Image_30.png-3905dd34e48c97c1263859a43905f65d.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "497de13a72e290650b10136203026a07"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/car_wagon_Image_30.png"
-dest_files=["res://.godot/imported/car_wagon_Image_30.png-3905dd34e48c97c1263859a43905f65d.ctex"]
+dest_files=["res://.godot/imported/car_wagon_Image_30.png-3905dd34e48c97c1263859a43905f65d.s3tc.ctex", "res://.godot/imported/car_wagon_Image_30.png-3905dd34e48c97c1263859a43905f65d.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

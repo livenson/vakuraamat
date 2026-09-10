@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bphtnclyl77pd"
-path="res://.godot/imported/woman_sport_eyebrow001.png-465849548dfcc7d3dcfe7cae5f6b1132.ctex"
+path.s3tc="res://.godot/imported/woman_sport_eyebrow001.png-465849548dfcc7d3dcfe7cae5f6b1132.s3tc.ctex"
+path.etc2="res://.godot/imported/woman_sport_eyebrow001.png-465849548dfcc7d3dcfe7cae5f6b1132.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "67bd4a6045281c2f8aa7f28610223c5c"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/woman_sport_eyebrow001.png"
-dest_files=["res://.godot/imported/woman_sport_eyebrow001.png-465849548dfcc7d3dcfe7cae5f6b1132.ctex"]
+dest_files=["res://.godot/imported/woman_sport_eyebrow001.png-465849548dfcc7d3dcfe7cae5f6b1132.s3tc.ctex", "res://.godot/imported/woman_sport_eyebrow001.png-465849548dfcc7d3dcfe7cae5f6b1132.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

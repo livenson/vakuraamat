@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://b03hegstaoq6b"
-path="res://.godot/imported/woman_sport_ponytail01_diffuse.png-44066200667c561f8496147863a059c9.ctex"
+path.s3tc="res://.godot/imported/woman_sport_ponytail01_diffuse.png-44066200667c561f8496147863a059c9.s3tc.ctex"
+path.etc2="res://.godot/imported/woman_sport_ponytail01_diffuse.png-44066200667c561f8496147863a059c9.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "b9f0285ceab6d1e36631b39858d1853e"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/woman_sport_ponytail01_diffuse.png"
-dest_files=["res://.godot/imported/woman_sport_ponytail01_diffuse.png-44066200667c561f8496147863a059c9.ctex"]
+dest_files=["res://.godot/imported/woman_sport_ponytail01_diffuse.png-44066200667c561f8496147863a059c9.s3tc.ctex", "res://.godot/imported/woman_sport_ponytail01_diffuse.png-44066200667c561f8496147863a059c9.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

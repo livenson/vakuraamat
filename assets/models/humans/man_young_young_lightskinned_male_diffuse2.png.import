@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dkn3iim7vqu63"
-path="res://.godot/imported/man_young_young_lightskinned_male_diffuse2.png-b2d0a76e47b443f2af6a1327a7f56308.ctex"
+path.s3tc="res://.godot/imported/man_young_young_lightskinned_male_diffuse2.png-b2d0a76e47b443f2af6a1327a7f56308.s3tc.ctex"
+path.etc2="res://.godot/imported/man_young_young_lightskinned_male_diffuse2.png-b2d0a76e47b443f2af6a1327a7f56308.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "05c310db9aa5ad6a603e744d15a3a55a"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/man_young_young_lightskinned_male_diffuse2.png"
-dest_files=["res://.godot/imported/man_young_young_lightskinned_male_diffuse2.png-b2d0a76e47b443f2af6a1327a7f56308.ctex"]
+dest_files=["res://.godot/imported/man_young_young_lightskinned_male_diffuse2.png-b2d0a76e47b443f2af6a1327a7f56308.s3tc.ctex", "res://.godot/imported/man_young_young_lightskinned_male_diffuse2.png-b2d0a76e47b443f2af6a1327a7f56308.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

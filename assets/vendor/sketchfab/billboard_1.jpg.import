@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://yc3a5vb3ts0v"
-path="res://.godot/imported/billboard_1.jpg-dbbed5ca319d35b3e6e029ab2f034c24.ctex"
+path.s3tc="res://.godot/imported/billboard_1.jpg-dbbed5ca319d35b3e6e029ab2f034c24.s3tc.ctex"
+path.etc2="res://.godot/imported/billboard_1.jpg-dbbed5ca319d35b3e6e029ab2f034c24.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "ba9ea94c71a8902adcf75fe90d0e2421"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/billboard_1.jpg"
-dest_files=["res://.godot/imported/billboard_1.jpg-dbbed5ca319d35b3e6e029ab2f034c24.ctex"]
+dest_files=["res://.godot/imported/billboard_1.jpg-dbbed5ca319d35b3e6e029ab2f034c24.s3tc.ctex", "res://.godot/imported/billboard_1.jpg-dbbed5ca319d35b3e6e029ab2f034c24.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

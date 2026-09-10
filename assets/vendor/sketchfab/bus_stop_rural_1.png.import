@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bjhfpkppga17"
-path="res://.godot/imported/bus_stop_rural_1.png-4b9ab7df22c4cdd7ac5d8258a54bd0ca.ctex"
+path.s3tc="res://.godot/imported/bus_stop_rural_1.png-4b9ab7df22c4cdd7ac5d8258a54bd0ca.s3tc.ctex"
+path.etc2="res://.godot/imported/bus_stop_rural_1.png-4b9ab7df22c4cdd7ac5d8258a54bd0ca.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "f41d938ca9779643cf46a2543b12c928"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/sketchfab/bus_stop_rural_1.png"
-dest_files=["res://.godot/imported/bus_stop_rural_1.png-4b9ab7df22c4cdd7ac5d8258a54bd0ca.ctex"]
+dest_files=["res://.godot/imported/bus_stop_rural_1.png-4b9ab7df22c4cdd7ac5d8258a54bd0ca.s3tc.ctex", "res://.godot/imported/bus_stop_rural_1.png-4b9ab7df22c4cdd7ac5d8258a54bd0ca.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

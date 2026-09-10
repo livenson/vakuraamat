@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://bpcks3ip3pcsu"
-path="res://.godot/imported/man_work_short03_diffuse.png-2ff301784cfbef8246dbf6de81a801a4.ctex"
+path.s3tc="res://.godot/imported/man_work_short03_diffuse.png-2ff301784cfbef8246dbf6de81a801a4.s3tc.ctex"
+path.etc2="res://.godot/imported/man_work_short03_diffuse.png-2ff301784cfbef8246dbf6de81a801a4.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "7c87acee24e891aa021e1d5729861f86"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/models/humans/man_work_short03_diffuse.png"
-dest_files=["res://.godot/imported/man_work_short03_diffuse.png-2ff301784cfbef8246dbf6de81a801a4.ctex"]
+dest_files=["res://.godot/imported/man_work_short03_diffuse.png-2ff301784cfbef8246dbf6de81a801a4.s3tc.ctex", "res://.godot/imported/man_work_short03_diffuse.png-2ff301784cfbef8246dbf6de81a801a4.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0

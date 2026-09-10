@@ -3,9 +3,11 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://c2fnqupy06v76"
-path="res://.godot/imported/seesaw_Sew-Saw_BaseColor.png-af494552ba9c06bd2e0b5ddf648f4e33.ctex"
+path.s3tc="res://.godot/imported/seesaw_Sew-Saw_BaseColor.png-af494552ba9c06bd2e0b5ddf648f4e33.s3tc.ctex"
+path.etc2="res://.godot/imported/seesaw_Sew-Saw_BaseColor.png-af494552ba9c06bd2e0b5ddf648f4e33.etc2.ctex"
 metadata={
-"vram_texture": false
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
+"vram_texture": true
 }
 generator_parameters={
 "md5": "decb807edd4121d8b8eea0df6151811b"
@@ -14,11 +16,11 @@ generator_parameters={
 [deps]
 
 source_file="res://assets/vendor/polypizza/seesaw_Sew-Saw_BaseColor.png"
-dest_files=["res://.godot/imported/seesaw_Sew-Saw_BaseColor.png-af494552ba9c06bd2e0b5ddf648f4e33.ctex"]
+dest_files=["res://.godot/imported/seesaw_Sew-Saw_BaseColor.png-af494552ba9c06bd2e0b5ddf648f4e33.s3tc.ctex", "res://.godot/imported/seesaw_Sew-Saw_BaseColor.png-af494552ba9c06bd2e0b5ddf648f4e33.etc2.ctex"]
 
 [params]
 
-compress/mode=0
+compress/mode=2
 compress/high_quality=false
 compress/lossy_quality=0.7
 compress/uastc_level=0
