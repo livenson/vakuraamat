@@ -153,12 +153,12 @@ func _ready() -> void:
 			get_viewport().scaling_3d_mode = int(sc[0]) as Viewport.Scaling3DMode
 			get_viewport().scaling_3d_scale = float(sc[1]) if sc.size() > 1 else 1.0
 		elif a.begins_with("--enter="):
-			get_tree().create_timer(2.5).timeout.connect(enter_building.bind(a.trim_prefix("--enter=")))
+			_when_filled(2.5, enter_building.bind(a.trim_prefix("--enter=")))
 		elif a.begins_with("--examine="):
-			get_tree().create_timer(4.0).timeout.connect(examine_building.bind(a.trim_prefix("--examine=")))
+			_when_filled(4.0, examine_building.bind(a.trim_prefix("--examine=")))
 		elif a == "--leave":
 			# checks: after --enter, step back out and turn to face the door from the street
-			get_tree().create_timer(4.0).timeout.connect(func():
+			_when_filled(4.0, func():
 				var ins: Node = get_node_or_null("Interiors")
 				if ins and ins.inside:
 					ins.exit(player)
@@ -166,12 +166,22 @@ func _ready() -> void:
 		elif a.begins_with("--layer="):
 			# the map's layer on the ground: --layer=sector|health|age. Through the UI, not straight
 			# at the node, so the legend and the map agree with what the ground is showing.
-			get_tree().create_timer(2.0).timeout.connect(ui.set_map_mode.bind(a.trim_prefix("--layer=")))
+			_when_filled(2.0, ui.set_map_mode.bind(a.trim_prefix("--layer=")))
 		elif a.begins_with("--focus="):
 			# light a plot and its links without opening anything: composes with --open=
-			get_tree().create_timer(2.0).timeout.connect(ui.focus_parcel.bind(a.trim_prefix("--focus=")))
+			_when_filled(2.0, ui.focus_parcel.bind(a.trim_prefix("--focus=")))
 		elif a.begins_with("--open="):
-			get_tree().create_timer(2.0).timeout.connect(ui.debug_open.bind(a.trim_prefix("--open=")))
+			_when_filled(2.0, ui.debug_open.bind(a.trim_prefix("--open=")))
+
+
+## A check flag's action (--enter, --open, --layer...): `delay` seconds in, and not before the
+## layer's buildings and parcels stand - on a city tile the fill outlasts any fixed delay, and a
+## door or a plot that has not arrived yet cannot be entered or opened.
+func _when_filled(delay: float, action: Callable) -> void:
+	await get_tree().create_timer(delay).timeout
+	if filling:
+		await era_filled
+	action.call()
 
 
 ## The report named by --report=, for the first world of this process only: a world entered later
