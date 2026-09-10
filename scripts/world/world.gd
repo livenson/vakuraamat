@@ -332,6 +332,7 @@ func _enter_tree() -> void:
 	var assets_path := dir + "/terrain_assets.tres"
 	if ResourceLoader.exists(assets_path):
 		t3d.assets = load(assets_path)
+		TerrainBuilder.apply_ranges(t3d.assets)
 	if TerrainBuilder.has_inputs(dir) and not TerrainBuilder.has_region_data(dir):
 		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir + "/data"))   # Terrain3D needs it to create its data object
 	t3d.data_directory = dir + "/data"

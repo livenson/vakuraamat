@@ -24,12 +24,12 @@ const MATERIALS := [
 # scaled so the model (MODEL_HEIGHT m tall) matches the measured canopy height.
 const MODEL_HEIGHT := {"tree_birch": 18.8, "tree_pine": 20.7, "tree_spruce": 4.3, "tree_juniper": 4.3, "tree_juniper_dead": 5.6}
 const RULES := [
-	{"scene": "tree_pine", "ids": [2], "height": Vector2(13.0, 40.0), "per_100m2": 1.6, "scale": Vector2(0.9, 1.1), "range": 1200.0, "lod": [110.0, 1200.0], "shadows": true},
-	{"scene": "tree_spruce", "ids": [2], "height": Vector2(3.0, 40.0), "per_100m2": 1.3, "scale": Vector2(0.9, 1.1), "range": 1200.0, "lod": [110.0, 1200.0], "shadows": true},
-	{"scene": "tree_birch", "ids": [2], "height": Vector2(6.0, 18.0), "per_100m2": 1.4, "scale": Vector2(0.85, 1.15), "range": 1200.0, "lod": [110.0, 1200.0], "shadows": true},
-	{"scene": "tree_juniper", "ids": [2], "height": Vector2(3.0, 8.0), "per_100m2": 0.8, "scale": Vector2(0.85, 1.15), "range": 500.0, "shadows": true},
-	{"scene": "tree_juniper_dead", "ids": [2], "height": Vector2(3.0, 40.0), "per_100m2": 0.08, "scale": Vector2(0.85, 1.15), "range": 400.0, "shadows": true},
-	{"scene": "bush_jello", "ids": [2], "height": Vector2(0.8, 3.0), "per_100m2": 3.0, "scale": Vector2(0.8, 1.6), "range": 250.0, "shadows": true},
+	{"scene": "tree_pine", "ids": [2], "height": Vector2(13.0, 40.0), "per_100m2": 1.6, "scale": Vector2(0.9, 1.1), "range": 800.0, "lod": [110.0, 800.0], "shadows": true},
+	{"scene": "tree_spruce", "ids": [2], "height": Vector2(3.0, 40.0), "per_100m2": 1.3, "scale": Vector2(0.9, 1.1), "range": 800.0, "lod": [110.0, 800.0], "shadows": true},
+	{"scene": "tree_birch", "ids": [2], "height": Vector2(6.0, 18.0), "per_100m2": 1.4, "scale": Vector2(0.85, 1.15), "range": 800.0, "lod": [110.0, 800.0], "shadows": true},
+	{"scene": "tree_juniper", "ids": [2], "height": Vector2(3.0, 8.0), "per_100m2": 0.8, "scale": Vector2(0.85, 1.15), "range": 180.0, "shadows": true},
+	{"scene": "tree_juniper_dead", "ids": [2], "height": Vector2(3.0, 40.0), "per_100m2": 0.08, "scale": Vector2(0.85, 1.15), "range": 150.0, "shadows": true},
+	{"scene": "bush_jello", "ids": [2], "height": Vector2(0.8, 3.0), "per_100m2": 3.0, "scale": Vector2(0.8, 1.6), "range": 120.0, "shadows": false},
 	{"scene": "bush_brush", "ids": [0, 2], "height": Vector2(0.0, 3.0), "per_100m2": 0.5, "scale": Vector2(0.8, 1.6), "range": 150.0, "shadows": false},
 	{"scene": "grass_card", "ids": [0, 1], "per_100m2": 45.0, "scale": Vector2(0.7, 1.3), "range": 80.0, "shadows": false},
 	{"scene": "grass_tuft", "ids": [0, 1], "per_100m2": 6.0, "scale": Vector2(0.8, 1.4), "range": 60.0, "shadows": false},
@@ -392,6 +392,31 @@ func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Arr
 ## `exclusions` are [x, z, r] circles kept clear. Returns instance counts per rule.
 ## `keep_textures`: the ground texture list to write back (headless initialisation drops it from
 ## the loaded assets, so the tool captures it before the node enters the tree).
+## Draw distances and shadows from RULES onto a tile's mesh assets, by name. The world calls it on
+## every tile it loads, so a change to the table reaches packs and cached tiles built before it
+## (their terrain_assets.tres keeps whatever ranges were current when `make tile` wrote it).
+static func apply_ranges(assets: Terrain3DAssets) -> void:
+	if assets == null:
+		return
+	for ma: Terrain3DMeshAsset in assets.mesh_list:
+		for r: Dictionary in RULES:
+			if r.scene == ma.name:
+				_apply_rule(ma, r)
+				break
+
+
+static func _apply_rule(ma: Terrain3DMeshAsset, r: Dictionary) -> void:
+	if r.has("lod"):
+		ma.last_lod = 1
+		ma.lod0_range = r.lod[0]
+		ma.lod1_range = r.lod[1]
+		ma.last_shadow_lod = 0
+	else:
+		ma.last_lod = 0
+		ma.lod0_range = r.range
+	ma.cast_shadows = 1 if r.shadows else 0
+
+
 ## `loc` other than (0,0): a streamed neighbour region; the mesh assets are already set up by the
 ## origin, only that region is populated and its file cached.
 ## `save_assets` false: only the region data is written back, the tile's terrain_assets.tres is left
@@ -409,15 +434,7 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 		ma.id = i
 		var scene_path: String = "res://assets/models/trees/%s_lod.tscn" % r.scene.trim_prefix("tree_") if r.has("lod") else "res://assets/vegetation/%s.tscn" % r.scene
 		ma.scene_file = load(scene_path)
-		if r.has("lod"):
-			ma.last_lod = 1
-			ma.lod0_range = r.lod[0]
-			ma.lod1_range = r.lod[1]
-			ma.last_shadow_lod = 0
-		else:
-			ma.last_lod = 0
-			ma.lod0_range = r.range
-		ma.cast_shadows = 1 if r.shadows else 0
+		_apply_rule(ma, r)
 		assets.set_mesh_asset(i, ma)
 		terrain.instancer.clear_by_mesh(i)
 	if loc == Vector2i.ZERO:
