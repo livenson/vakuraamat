@@ -118,6 +118,13 @@ def validate(site, rep, root=ROOT):
         rep.warn(f"terrain tile not fetched yet: {tile_dir} (make tile SITE={site})")
     elif not os.path.exists(os.path.join(tile_dir, "data", "terrain3d_00_00.res")):
         rep.warn(f"terrain region data not built: make tile SITE={site}")
+    # `make site` before `make tile` scaffolds the layer with the nDSM massing boxes (no buildings.json
+    # yet); once the real buildings are fetched the scaffold has to be redone or they never show
+    sc_path = os.path.join(site_dir, "scenes.json")
+    if os.path.exists(os.path.join(site_dir, "buildings.json")) and os.path.exists(sc_path):
+        types = [n.get("type") for e in json.load(open(sc_path)).get("eras", {}).values() for n in e.get("nodes", [])]
+        if "village" in types and "footprints" not in types:
+            rep.warn(f"scenes.json draws massing boxes though buildings.json exists: python3 tools/new_site.py --id {site} --force, then make scenes SITE={site}")
     key(m.get("name_key"), "site.json name_key")
     key(m.get("subtitle_key"), "site.json subtitle_key")
 

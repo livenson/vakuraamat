@@ -75,7 +75,12 @@ static func mark_vegetated(tile_dir: String) -> void:
 
 
 func _tick(stage: String, f: float) -> void:
-	PerfLog.mark("terrain %s %d%%" % [stage, int(f * 100)])
+	# PerfLog looked up, not named: `-s` tool scripts (import_terrain.gd, make tile) run without the
+	# autoloads, and naming one stopped this script compiling there
+	var tree_now := Engine.get_main_loop() as SceneTree
+	var perf: Node = tree_now.root.get_node_or_null("PerfLog") if tree_now else null
+	if perf:
+		perf.mark("terrain %s %d%%" % [stage, int(f * 100)])
 	progress.emit(stage, f)
 	if yielding and tree:
 		await tree.process_frame
