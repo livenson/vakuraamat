@@ -1,6 +1,6 @@
 {
   "id": "kvissentali",
-  "pipeline": 2,
+  "pipeline": 3,
   "name_key": "SITE_KVISSENTALI",
   "subtitle_key": "SITE_KVISSENTALI_SUBTITLE",
   "description": "Kvissentali: generated site pack (blocks deed, letter, well, keepsake, bell, grafts, seed 34750).",

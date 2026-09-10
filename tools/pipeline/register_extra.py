@@ -268,8 +268,14 @@ def health_of(status, quarters, report_overdue):
     """sound | watch | distressed from the register status, the tax quarters and the report deadline."""
     if status in ("N", "L"):
         return "distressed"
+    # a year of taxes published as zero while people are employed. A blank is not a zero: the Tax
+    # Board leaves both tax columns empty where it publishes no amount (127k of 440k rows, among them
+    # every municipal kindergarten and school, whose taxes the city pays), and the file writes real
+    # zeros as 0. Payroll taxes count too: an employer paying them is not paying nothing.
     recent = quarters[-4:]
-    if len(recent) == 4 and all((q["taxes"] or 0) == 0 for q in recent) and any((q["employees"] or 0) > 0 for q in recent):
+    published = [q for q in recent if q["taxes"] is not None or q["labour"] is not None]
+    if (len(published) == 4 and all((q["taxes"] or 0) + (q["labour"] or 0) == 0 for q in published)
+            and any((q["employees"] or 0) > 0 for q in recent)):
         return "distressed"
     if report_overdue:
         return "watch"

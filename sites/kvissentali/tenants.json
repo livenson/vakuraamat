@@ -8,7 +8,7 @@
 "tasutud_maksud_kaesolev_aasta.csv": "2026-09-06",
 "tasutud_maksud_varasemad_aastad.csv": "2026-09-06"
 },
-"fetched": "2026-09-06",
+"fetched": "2026-09-10",
 "register_date": "2026-09-05",
 "ehak": [
 "8151",
@@ -48,7 +48,7 @@
 },
 "with_emtak": 257,
 "with_tax": 166,
-"elapsed_s": 41.2
+"elapsed_s": 2.7
 },
 "tenants": [
 {
@@ -10807,7 +10807,7 @@ null,
 ],
 "deleted": null,
 "report_overdue": false,
-"health": "distressed"
+"health": "sound"
 },
 {
 "registry_code": "17469971",
@@ -20824,7 +20824,7 @@ null,
 ],
 "deleted": null,
 "report_overdue": false,
-"health": "distressed"
+"health": "sound"
 },
 {
 "registry_code": "80628400",

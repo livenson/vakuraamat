@@ -52,14 +52,30 @@ def test_holder_id():
         check(register_extra.holder_id(v) is None, f"holder_id kept a placeholder as an id: {v!r}")
 
 
+def test_health_blank_is_not_zero():
+    """A blank in the Tax Board's file is an amount it does not publish, not a zero.
+
+    Tartu Lasteaed Rõõmumaa, a city kindergarten with 58 staff, has both tax columns empty every
+    quarter (the city pays its taxes) and was painted "distressed" on the map's company-health layer.
+    """
+    def q(taxes, labour, staff):
+        return {"year": 2025, "q": 1, "taxes": taxes, "labour": labour, "turnover": None, "employees": staff}
+    h = register_extra.health_of
+    check(h("R", [q(None, None, 58)] * 4, False) == "sound", "blank tax columns with staff read as distressed")
+    check(h("R", [q(0, 0, 3)] * 4, False) == "distressed", "a year of published zero taxes with staff is no longer distressed")
+    check(h("R", [q(0, 900, 3)] * 4, False) == "sound", "an employer paying only payroll taxes reads as distressed")
+    check(h("L", [], False) == "distressed", "a company in liquidation is not distressed")
+
+
 def main():
     test_holder_id()
+    test_health_blank_is_not_zero()
     if failures:
         print("[pipeline] FAILED:")
         for f in failures:
             print("   ", f)
         return 1
-    print("[pipeline] PASSED: holder ids stay opaque, stable and linkable")
+    print("[pipeline] PASSED: holder ids stay opaque, stable and linkable; a blank tax column is not a zero")
     return 0
 
 

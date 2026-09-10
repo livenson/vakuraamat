@@ -16,7 +16,7 @@ const DEFAULT_SITE := "palupera"
 ## Which pipeline this build expects a pack to have been built by. Mirrors PACK_VERSION in
 ## tools/new_site.py, which writes it into every pack's site.json; validate_site.py fails if the two
 ## drift. A pack stamped with less than this is rebuilt (Locator.refresh_stale).
-const PACK_VERSION := 2
+const PACK_VERSION := 3
 
 var available: Array[String] = []
 var active := ""
