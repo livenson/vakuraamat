@@ -170,6 +170,10 @@ func _apply(job: BuildJob) -> void:
 		body.add_child(shape)
 		add_child(body)
 	_hull_arrays = [job.arrays[0], job.arrays[1]]   # walls and roof: the outline's hull (set_highlight)
+	_far = []   # walls, roof, windows with their materials: what the far view merges (BuildingChunks)
+	for i in mini(3, job.arrays.size()):
+		if not job.arrays[i].is_empty():
+			_far.append([mats[i], job.arrays[i]])
 	is_built = true
 	# the era lit its windows before this mesh existed: hand it this one
 	var p: Node = get_parent()
@@ -177,6 +181,9 @@ func _apply(job: BuildJob) -> void:
 		p = p.get_parent()
 	if p and p.windows_collected:
 		p.register_windows(mi)
+	var far := BuildingChunks.of(self)
+	if far:
+		far.add(self)   # the layer's merged far view takes this building in
 	built.emit()
 
 
@@ -811,10 +818,24 @@ func _window_material() -> StandardMaterial3D:
 		return m)
 
 
+## The building's own mesh (walls, roof, windows, trim), which the far view hands over to.
+func far_mesh_node() -> MeshInstance3D:
+	return _mesh_node
+
+
+## [material, arrays] of the walls, roof and windows in the building's space, for the far view.
+func far_arrays() -> Array:
+	return _far
+
+
+var _far: Array = []
+
+
 func _trim_material() -> StandardMaterial3D:
 	var dwelling := kind == "dwelling"
 	return _shared("trim:%s" % dwelling, func() -> StandardMaterial3D:
 		var m := StandardMaterial3D.new()
+		m.resource_name = "Trim"   # left out of the far view (BuildingChunks)
 		m.albedo_color = Color(0.93, 0.92, 0.88) if dwelling else Color(0.3, 0.22, 0.16)
 		m.roughness = 0.8
 		return m)
