@@ -86,7 +86,9 @@ func _process(_delta: float) -> void:
 	_sec_max = maxf(_sec_max, ms)
 	var nodes := int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
 	var mem := Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0
-	if ms >= SPIKE_MS:
+	# a frame the cap made long is not a spike: unfocused, the window runs at 10 FPS (100 ms frames)
+	var capped := Engine.max_fps > 0 and ms <= 1000.0 / Engine.max_fps + 15.0
+	if ms >= SPIKE_MS and not capped:
 		_file.store_line("%s SPIKE %.0f ms | %s | %s | %s" % [_stamp(), ms, _where(), ", ".join(_prev_marks) if not _prev_marks.is_empty() else "no marks", _anatomy(nodes, mem)])
 		_file.flush()
 	elif not _prev_marks.is_empty():

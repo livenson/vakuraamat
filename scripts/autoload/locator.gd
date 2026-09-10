@@ -551,6 +551,7 @@ func _wait_for_job(base: String, id: String, quiet: bool = false) -> String:
 ## `site_only` leaves the tile alone - a refresh rebuilds the registers, not the ground, and the
 ## region data under user://tiles is what the player is standing on.
 func install_zip(zip_path: String, id: String, site_only: bool = false) -> bool:
+	var t0 := Time.get_ticks_usec()
 	var z := ZIPReader.new()
 	if z.open(zip_path) != OK:
 		return false
@@ -581,8 +582,10 @@ func install_zip(zip_path: String, id: String, site_only: bool = false) -> bool:
 		out.store_buffer(z.read_file(f))
 		out.close()
 	z.close()
+	var t1 := Time.get_ticks_usec()
 	if site_only:
 		Sites.scan()
+		PerfLog.mark("install %s: unzip %d ms, scan %d ms" % [id, (t1 - t0) / 1000, (Time.get_ticks_usec() - t1) / 1000])
 		return true
 	# a fresh tile: any stale region data from an earlier download must go
 	var old_data := ProjectSettings.globalize_path(Sites.USER_TILES + tile + "/data")
@@ -591,4 +594,5 @@ func install_zip(zip_path: String, id: String, site_only: bool = false) -> bool:
 			DirAccess.remove_absolute(old_data + "/" + f)
 	print("[Locator] installed pack %s (%d files)" % [id, files.size()])
 	Sites.scan()   # a pack that has just appeared on disk: until this, Sites resolves its files under res://
+	PerfLog.mark("install %s: unzip %d ms, scan %d ms" % [id, (t1 - t0) / 1000, (Time.get_ticks_usec() - t1) / 1000])
 	return true
