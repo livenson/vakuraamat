@@ -95,7 +95,10 @@ jobs:
             t=$(python -c "import json,sys; print(json.load(open(sys.argv[1]))['terrain'].get('tile', sys.argv[2]))" "$d/site.json" "$s")
             godot --headless --path . -s res://tools/godot/import_terrain.gd -- --site="$s" --tile="$t"
             godot --headless --path . -s res://tools/godot/scatter_vegetation.gd -- --site="$s" --tile="$t"
-            test -f "assets/terrain/$t/data/terrain3d_00_00.res" && test -f "assets/terrain/$t/data/vegetation.ok" || { echo "$s: the ground did not bake"; exit 1; }
+            if [ ! -f "assets/terrain/$t/data/terrain3d_00_00.res" ] || [ ! -f "assets/terrain/$t/data/vegetation.ok" ]; then
+              echo "$s: the ground did not bake"
+              exit 1
+            fi
           done
           godot --headless --path . --import || true
       - name: Export ${{ matrix.preset }}
