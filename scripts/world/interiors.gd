@@ -578,6 +578,7 @@ func _slab(root: Node3D, poly: PackedVector2Array, y: float, mat: Material, up: 
 		var cs := CollisionShape3D.new()
 		var shape := ConcavePolygonShape3D.new()
 		shape.set_faces(shape_pts)
+		shape.backface_collision = true
 		cs.shape = shape
 		body.add_child(cs)
 		root.add_child(body)

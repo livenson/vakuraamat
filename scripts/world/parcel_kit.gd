@@ -55,7 +55,9 @@ func _ready() -> void:
 	var body := StaticBody3D.new()
 	body.collision_layer = 1
 	var shape := CollisionShape3D.new()
-	shape.shape = mesh.create_trimesh_shape()
+	var trimesh := mesh.create_trimesh_shape()
+	trimesh.backface_collision = true   # Jolt collides with front faces only unless told otherwise
+	shape.shape = trimesh
 	body.add_child(shape)
 	add_child(body)
 

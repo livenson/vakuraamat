@@ -165,6 +165,7 @@ func _apply(job: BuildJob) -> void:
 		var shape := CollisionShape3D.new()
 		var concave := ConcavePolygonShape3D.new()
 		concave.set_faces(job.solid)   # walls and roof only: sills, casings and trim snagged a player walking along a wall
+		concave.backface_collision = true   # the LOD2 faces are wound either way; Jolt ignores a back face without this
 		shape.shape = concave
 		body.add_child(shape)
 		add_child(body)

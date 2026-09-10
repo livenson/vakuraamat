@@ -109,12 +109,18 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   `--open=hover:<tunnus>` holds the debug map's slip open over one plot,
   `--hour=<h>` sets the time of day (street lights and windows light after
   18:30), `--fly` starts in the air for a survey.
-- Performance numbers: `--bench` (with `--windowed --site=<id>`) turns once at street level, flies 2 km
+- Performance numbers: `--bench` (with `--windowed --site=<id>`) turns once at street level, walks at the
+  nearest building (the summary's `moved_m`, `to_centre_m`, `above_ground_m` and `user://logs/bench_walk.png`
+  show that floors and walls still hold the player), flies 2 km
   north at 120 m across the next tiles, uncapped, then quits; the summary is printed as `[bench]` lines
   and written to `user://logs/bench.json`, and PerfLog's SPIKE lines name what ran (tile loads, slow
   members, traffic ticks, pipeline compilations). `--bench-off=traffic,details,doors,tcol` switches a
-  system off to bisect a hitch. Compare before/after on the same site (the Tartu city tile
-  `t659065_6472705` has cached neighbours to the north).
+  system off to bisect a hitch. Compare before/after on the same site, alternating runs: a laptop's
+  FPS drifts 20-30% as it heats, draw calls and hitch counts do not. Use a pack that has been entered as the
+  origin (`toomemagi`); a tile only ever streamed as a neighbour has no `terrain_assets.tres` and renders
+  Terrain3D's checkerboard when launched with `--site`.
+- Physics is Jolt. Concave colliders set `backface_collision = true`: Jolt ignores the back of a face
+  otherwise, and the LOD2 walls are wound either way (the player walked through them).
 - Data sources, make targets and the terrain pipeline are documented in `docs/data-pipeline.md`; the
   README only links there. Keep the README short.
 - Poly Pizza downloads cannot be scripted (403 on the file host); the user saves the glb by hand into

@@ -1,12 +1,15 @@
 # A fixed route for before/after performance numbers (--bench): once the layer stands, turn
-# once on the spot at street level, then fly north at survey height across the next tiles, then
-# quit. Frame pacing is uncapped (no vsync, no frame cap) so the numbers are the game's own
+# once on the spot at street level, walk at the nearest building for a few seconds (a check that
+# floors and walls still hold the player: the walk's distance, how near the wall it stopped and
+# the height above the ground are in the summary), then fly north at survey height across the
+# next tiles, then quit. Frame pacing is uncapped (no vsync, no frame cap) so the numbers are the game's own
 # cost, not the screen's. The summary goes to stdout and user://logs/bench.json; PerfLog keeps
 # its per-second lines and SPIKE marks as usual, each phase marked in them.
 class_name Bench
 extends Node
 
 const TURN_S := 12.0          # street level: one full turn
+const WALK_S := 10.0          # street level: towards the nearest building's wall
 const FLY_S := 40.0           # survey flight
 const FLY_HEIGHT := 120.0     # metres above the ground at the start of the flight
 const FLY_SPEED := 50.0       # m/s north (-Z): 2 km, two tile edges from a pack's centre
@@ -20,6 +23,8 @@ var _frames: Dictionary = {}  # phase -> Array of frame ms
 var _phys: Dictionary = {}    # phase -> Array of physics ms (per second samples)
 var _dc: Dictionary = {}      # phase -> Array of draw calls (per frame)
 var _last_usec := 0
+var _walk: Dictionary = {}    # the walk's check: from, to, the building's centre
+
 
 
 ## --bench-off=traffic,details,doors,tcol switches a system off for a bisecting run: ambient
@@ -55,7 +60,19 @@ func _begin(phase: String) -> void:
 	_dc[phase] = []
 	_last_usec = Time.get_ticks_usec()
 	PerfLog.mark("bench " + phase)
+	if phase == "walk":
+		var p: CharacterBody3D = _world.player
+		var target := _nearest_building(p.global_position)
+		_walk = {"from": p.global_position, "centre": target}
+		p.set_pose(p.global_position, atan2(-(target.x - p.global_position.x), -(target.z - p.global_position.z)), 0.0)
+		p.input_enabled = true
+		Input.action_press("move_forward")
 	if phase == "fly":
+		# where the walk ended, for a look: user://logs/bench_walk.png
+		_world.get_viewport().get_texture().get_image().save_png("user://logs/bench_walk.png")
+		Input.action_release("move_forward")
+		_world.player.input_enabled = false
+		_walk["to"] = _world.player.global_position
 		_world.player.flying = true
 		_start.y += FLY_HEIGHT
 
@@ -73,6 +90,9 @@ func _process(delta: float) -> void:
 	if _phase == "turn":
 		p.set_pose(p.global_position, _yaw + TAU * _t / TURN_S, 0.0)
 		if _t >= TURN_S:
+			_begin("walk")
+	elif _phase == "walk":
+		if _t >= WALK_S:
 			_begin("fly")
 	elif _phase == "fly":
 		p.velocity = Vector3.ZERO
@@ -87,11 +107,40 @@ func _finish() -> void:
 		"time": Time.get_datetime_string_from_system(), "args": " ".join(OS.get_cmdline_user_args())}
 	for phase: String in _frames:
 		out[phase] = _summary(_frames[phase], _phys[phase], _dc[phase])
-		print("[bench] %s %s" % [phase, JSON.stringify(out[phase])])
+	if _walk.has("to"):
+		var from: Vector3 = _walk.from
+		var to: Vector3 = _walk.to
+		var c: Vector3 = _walk.centre
+		var ground: float = _world.terrain.data.get_height(to)
+		out.walk["moved_m"] = snappedf(Vector2(to.x - from.x, to.z - from.z).length(), 0.1)
+		out.walk["to_centre_m"] = snappedf(Vector2(c.x - to.x, c.z - to.z).length(), 0.1)
+		out.walk["above_ground_m"] = snappedf(to.y - ground, 0.01)
+	for phase: String in out:
+		if out[phase] is Dictionary:
+			print("[bench] %s %s" % [phase, JSON.stringify(out[phase])])
 	var f := FileAccess.open("user://logs/bench.json", FileAccess.WRITE)
 	f.store_string(JSON.stringify(out, "  "))
 	f.close()
 	get_tree().quit()
+
+
+## The centre of the nearest built building, at street height.
+static func _nearest_building(from: Vector3) -> Vector3:
+	var best := from + Vector3(0, 0, -20)
+	var best_d := INF
+	for id: int in FootprintBuilding.standing:
+		var b: FootprintBuilding = FootprintBuilding.standing[id]
+		if not b.is_built or b.polygon.is_empty():
+			continue
+		var mid := Vector2.ZERO
+		for q in b.polygon:
+			mid += q
+		var c := b.to_global(Vector3(mid.x / b.polygon.size(), 0.0, mid.y / b.polygon.size()))
+		var d := Vector2(c.x - from.x, c.z - from.z).length()
+		if d < best_d:
+			best_d = d
+			best = c
+	return best
 
 
 static func _summary(ms: Array, phys: Array, dc: Array) -> Dictionary:
