@@ -8,6 +8,20 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
+## v0.8.0 — 2026-09-10
+
+**Smoother, and a quicker start.**
+
+- **Fewer hitches.** Flying over a town no longer stutters as traffic appears, and the city renders with
+  about half the draw calls and a third less video memory (upscaling, merged far-off buildings,
+  occlusion).
+- **Pirita** joins Kvissentali and Palupera as a shipped place, by the sea in Tallinn.
+- **First launch builds nothing** for the shipped places, and the tiles around Kvissentali and Pirita
+  arrive in one download instead of being made one by one.
+- **Fixes:** municipal kindergartens and schools are no longer marked as companies in distress; a
+  place's name no longer grows each time it refreshes; the book's *Place* page credits every data
+  source, OpenStreetMap included.
+
 ## v0.7.0 — 2026-09-09
 
 **One plot is the one every view is about.** The registers have always described a graph — plot,
