@@ -26,14 +26,15 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   open source). Prefer CC0/MIT. Nothing from Fab/Megascans. Data files carry `attribution`.
 - Site content lives in `sites/<id>/`: `site.json` (manifest), `layout.json` (positions),
   `scenes.json` (the layer), `data/eras/era_2026.tres`, `parcels.json`, `buildings.json`,
-  `tenants.json`, `market.json`, `roads.json`, `stops.json`, `departures.json`, `strings.csv`. `make scenes SITE=<id>`
+  `tenants.json`, `market.json`, `roads.json`, `stops.json`, `departures.json`, `fields_2026.json`, `strings.csv`. `make scenes SITE=<id>`
   regenerates `sites/<id>/scenes/*.tscn`; do not hand-edit those scenes. Engine code (`scripts/`,
   `scenes/`) must not reference a site by name; go through `Sites` (manifest, `data_dir`, `layout`, `tile`).
 - Real names: the companies are real (legal persons only). The register's natural persons are never
   named: they exist in a pack only as the hashed ids `Links` groups plots by, and never reach the UI.
 - Playtest loop: reports from F8 land in `user://reports/` (feed.log); `python3 tools/dev.py reload|restart|replay|
   teleport|screenshot` talks to the running debug game through `user://dev/commands.jsonl`
-  (`DevChannel` autoload). See `docs/dev-loop.md`.
+  (`DevChannel` autoload); `python3 tools/dev.py nan` lists the 3D nodes whose transform or bounds
+  hold a NaN or inf (what breaks the renderer's sorting). See `docs/dev-loop.md`.
 - Pack files use `null`, not a missing key, for what a register does not say (71 of Kvissentali's
   211 buildings have no year), and `Dictionary.get(key, default)` only substitutes the default when
   the key is *absent*: `int(null)` then fails with "Nonexistent 'int' constructor" and takes the rest
@@ -80,14 +81,15 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   terrain_builder.gd is the model's own height; instances scale to the canopy height, up to 6x.
 - Releases: add the entry to `CHANGELOG.md`, then `git tag -a vX.Y.Z` with the same summary as its
   message and push the tag; `.github/workflows/build.yml` builds the three platforms and makes the
-  GitHub release from the tag's message plus the commits since the previous tag.
+  GitHub release whose notes are the tag's `CHANGELOG.md` entry (the tag's message when there is
+  none), followed by the commits since the previous tag.
 - `make setup` once; `make test` before every commit (validates every pack, boots every pack, dev
-  channel, traffic, streaming, interiors, search); `make lint`;
+  channel, traffic, streaming, interiors, search, links); `make lint` (the same checks as GitHub:
+  gdlint with `.gdlintrc`, ruff with `ruff.toml`, shellcheck, actionlint when installed);
   `make export` for a macOS build.
 - New location: `make site SITE=<id> NAME="..." CENTER="<easting> <northing>"` then `make tile SITE=<id>`
-  (fetches DTM/nDSM/orthophoto/historical maps, builds terrain, derives buildings and water,
+  (fetches DTM/nDSM/orthophoto, builds terrain, derives buildings and water,
   generates scenes, validates). `make validate` is pure python and fast; run it after editing a pack.
-  GitHub too: gdlint with `.gdlintrc`, ruff with `ruff.toml`, shellcheck); `make export` for a macOS build.
 - Godot headless scripts: `godot --headless --path . -s res://tools/godot/<tool>.gd` for SceneTree
   tools; scenes that need autoloads run as `godot --headless --path . res://tools/godot/<test>.tscn`.
 - zsh does not word-split unquoted variables: when looping over argument strings use `${=args}`.
@@ -115,7 +117,10 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   north at 120 m across the next tiles, uncapped, then quits; the summary is printed as `[bench]` lines
   and written to `user://logs/bench.json`, and PerfLog's SPIKE lines name what ran (tile loads, slow
   members, traffic ticks, pipeline compilations). `--bench-off=traffic,details,doors,tcol` switches a
-  system off to bisect a hitch. Compare before/after on the same site, alternating runs: a laptop's
+  system off to bisect a hitch. `--scale3d=<mode>:<scale>` overrides the 3D upscaler (mode 0 bilinear,
+  1 FSR1, 2 FSR2, 3 MetalFX spatial, 4 MetalFX temporal) and `--fx=a,b,c` limits the environment
+  effects to the ones named (`sdfgi`, `ssao`, `ssil`, `fog`, `glow`, `grade`; `softsun` adds the soft
+  sun shadows, which are off by default). Compare before/after on the same site, alternating runs: a laptop's
   FPS drifts 20-30% as it heats, draw calls and hitch counts do not. Use a pack that has been entered as the
   origin (`toomemagi`); a tile only ever streamed as a neighbour has no `terrain_assets.tres` and renders
   Terrain3D's checkerboard when launched with `--site`.
@@ -223,4 +228,5 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
 `tools/godot/*_test.tscn`: parse, geotiff, search, boot (autoloads, the layer, the cadastre, a save
 round-trip), site (every pack: registry, layer scene, translations, plots, companies), userpack,
 devchannel, traffic, streaming (a synthetic neighbour tile, and the merged offset-aware `Parcels.all()`
-over both), interior. Keep them green. `tools/validate_site.py` checks pack references without Godot.
+over both), interior, links (what `Links` ties a plot to, read from the pack files with no world, and
+that an owner hash never leaves `links.gd`). Keep them green. `tools/validate_site.py` checks pack references without Godot.

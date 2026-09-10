@@ -39,7 +39,10 @@ Every report becomes an event in the session; Claude reads the JSON and the scre
   `user://dev/results.log` (`tools/dev.py results`). Per file type:
   - `.gd`: the script re-reads its source and `reload(true)` keeps instance state (exported values,
     connections to renamed functions and changed autoload structure are the cases where it fails;
-    the result says "error N (restart needed)");
+    the result says "error N (restart needed)"). Never hot reload an autoload script
+    (`scripts/autoload/*.gd`: `dev_channel.gd`, `perf_log.gd`, `locator.gd` and the rest) while the
+    game runs; use `restart`. Reloading `dev_channel.gd` in the middle of its own command crashed the
+    game;
   - era `.tscn`: the cache entry is replaced and the current era layer is instanced again with the
     player where they stand (`make scenes` first when `scenes.json` changed);
   - anything under `sites/<id>/` (`.tres`, `strings.csv`, `site.json`, `parcels.json`): the pack is
@@ -47,7 +50,7 @@ Every report becomes an event in the session; Claude reads the JSON and the scre
   - shaders, textures, other resources: replaced in the cache.
 - **Restart at this spot**: `python3 tools/dev.py restart` makes the game write a report of where it
   is and relaunch itself on it. Use it after changes hot reload cannot take.
-- Also: `teleport x z [yaw]`, `era <id>`, `screenshot </abs.png>`, `codes`, `stats` (one line of frame counters: process and physics ms, draw calls, node and memory totals; poll it once a second to find a stall), `quit`.
+- Also: `teleport x z [yaw]`, `era <id>`, `screenshot </abs.png>`, `codes`, `stats` (one line of frame counters: process and physics ms, draw calls, node and memory totals; poll it once a second to find a stall), `nan` (the 3D nodes whose transform or bounds hold a NaN or inf: one of them breaks the renderer's sorting), `quit`.
 - Several games may run at once (a playtest plus a replay, plus the test suite). Each instance
   registers itself in `user://dev/instances/<pid>.json` and only executes commands addressed to its
   pid (`"pid": 0` means all). `tools/dev.py` targets the newest instance by default; `--pid <n>`
@@ -120,9 +123,27 @@ call. Two changes cut that (2026-09-08, `rahe_tn_24`, hour 14, same spawn):
   it. The reach stays at 400 m: 250 m measured no better and left a flying camera looking at a town
   with shadows only in the near gardens. Chimneys, solar panels and wells cast no shadow at all.
 
-Still on the table, in order: MultiMesh for the repeated props (a chimney is a CSG node and a draw
-call per house), merging each block's building shells into one mesh per material, occlusion culling
-(off today) with occluders baked from those merged meshes, and visibility ranges on the trim.
+All of what was next on the list has since been done: street lights are MultiMeshes, one per cell
+and part (`RoadNetwork`); chimneys, panels and wells share their meshes and vanish beyond 300 m
+(`FootprintBuilding.DETAIL_RANGE`); vendored models with many parts (cars, the bus, the parcel kits' models) are
+merged into one surface per material (`MeshMerge`); beyond 350 m buildings draw as merged 128 m
+cells (`BuildingChunks`), each also carrying its walls as an occluder, and occlusion culling is on
+(`project.godot`).
+
+## Render settings and measurement flags
+
+The 3D view renders at 0.75 scale and is upscaled with MetalFX temporal on macOS and FSR2 elsewhere
+(`project.godot`, `scaling_3d`); physics is Jolt. For before/after numbers the world takes:
+
+- `--bench` (with `--windowed --site=<id>`): a fixed route, turn, walk, a 2 km flight, uncapped;
+  the summary goes to `[bench]` lines and `user://logs/bench.json` (`scripts/world/bench.gd`).
+- `--bench-off=traffic,details,doors,tcol`: switch ambient traffic, the buildings' small props, the
+  doors or Terrain3D's collision off to bisect a hitch.
+- `--scale3d=<mode>:<scale>`: override the upscaler (0 bilinear, 1 FSR1, 2 FSR2, 3 MetalFX spatial,
+  4 MetalFX temporal).
+- `--fx=a,b,c`: only the named environment effects (`sdfgi`, `ssao`, `ssil`, `fog`, `glow`,
+  `grade`, all on by default); `softsun` adds the soft sun shadows (about 2.3 ms of a 16 ms frame on
+  the GPU), off by default.
 
 ## Limits
 

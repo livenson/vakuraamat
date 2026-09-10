@@ -39,7 +39,9 @@ godot --path . -- --site=kvissentali
 ```
 
 `make site` writes a working town pack: a landmark near the spawn, the real footprints, roads,
-parcels, traffic and a bicycle, and the codex strings. Everything else comes from `make tile`.
+parcels, traffic and a bicycle, and the codex strings. Everything else comes from `make tile`,
+except the bus stops, departures and PRIA fields: `make stops`, `make departures` and
+`python3 tools/pipeline/fetch_fields.py --site <id>` fetch those (the tile service runs all three).
 
 Choosing the centre: open the Maa-amet map (kaart.maaamet.ee), read the L-EST97 easting and
 northing of the point you want in the middle, or geocode an address with
@@ -75,7 +77,7 @@ Scripted equivalent: `curl -X POST :8765/tile -d '{"name":"Aakre","x":629807,"y"
 (shipped and installed, with Play / Continue), the packs already generated on the tile service
 (Install and play), suggested Estonian places to generate with one click
 (`assets/data/suggested_places.json`), a place search (address, place name, coordinates, or your IP
-location), and the friends section.
+location), and the storage section.
 
 The suggested places sit on a small map of the country (`EstoniaMap`, `scripts/ui/estonia_map.gd`):
 a ring for every place offered, a filled mark for a world you already have and a ringed one for the
@@ -140,13 +142,12 @@ or `--failed` for the sheet).
 - the tile's **nDSM** gives a measured height where the model is missing.
 
 The `footprints` node in `scenes.json` (`{"type": "footprints", "source": "buildings.json", "year":
-1938}`) places one `FootprintBuilding` per building whose first year of use is not later than the
-era's year (undated buildings only where `include_undated` is set, normally the newest era), so the
-1938 layer of a generated pack shows only the houses that stood in 1938. The node builds the LOD2
-mesh at runtime (walls and roof as two materials, a foundation skirt, a trimesh collider) or, without
-a model, extrudes the footprint to its measured height. Palupera uses real footprints in 2026 and its
-hand-placed manor, school and farm models in the older eras; generated packs use footprints in every
-era. `buildings_2026.json` (laser massing boxes, `village` node) remains as the fallback when the
+2026, "include_undated": true}`) places one `FootprintBuilding` per building whose first year of use
+is not later than the node's year (undated buildings only where `include_undated` is set). Every pack
+has one layer, `era_2026`; the older eras of the historical game are gone (tag `v0.9-historical`).
+The node builds the LOD2 mesh at runtime (walls and roof as two materials, a foundation skirt, a
+trimesh collider) or, without a model, extrudes the footprint to its measured height.
+`buildings_2026.json` (laser massing boxes, `village` node) remains as the fallback when the
 register is unreachable.
 
 The register's technical indicators shape each building: facade material sets the wall colour
@@ -163,10 +164,12 @@ are skipped so hand-placed models keep their spot.
 Every real building that is not an outbuilding gets a door on the wall the exterior draws it on.
 E at the door steps in: the first visit generates the interior from the footprint (a floor per
 storey on the register's floor count, inner walls with window openings on the exterior's rhythm and a
-gap at the door, a ceiling, a ramp between storeys with an open landing), partitions it into rooms (a
+gap at the door, a ceiling, a staircase between storeys with an open landing: in a dwelling the vendored Poly Pizza
+staircase model stretched to the run and rise, elsewhere box steps, both walked on one sloped collider),
+partitions it into rooms (a
 deterministic split of the floor plan by use: living room, kitchen and bedrooms in a dwelling, a reception
 and offices, a salesroom with a back room; every partition wall has a doorway with a lintel, every room its
-lamp, the ramp keeps to the largest room and no cut lands next to the entrance). The rooms stand
+lamp, the stairs keep to the largest room and no cut lands next to the entrance). The rooms stand
 empty: the shell is deterministic geometry from the register, while the furniture that used to fill
 it (role plans, Kenney kit models, an annealing pass) never sat convincingly and was removed.
 While inside, the exterior mesh and its collider hide so
@@ -250,7 +253,7 @@ names and the valued total for the tools that key on them. `make market` (also p
 derives `market.json`: median euros per m² per intended purpose, quartiles and counts, plus an `all`
 row. These are taxation values, not sale prices; if you export a table from Maa-amet's transaction
 statistics environment (https://www.maaruum.ee/kinnisvara/htraru/, XLSX only), `make market
-XLSX=<file>` joins it as `transactions`, which the game prefers when present. Older packs without
+XLSX=<file>` joins it as `transactions` (kept in the file; the game does not read it). Older packs without
 `land_value` still load; re-run `make parcels SITE=<id>` to add it.
 
 ### Tenants: real companies on real plots
@@ -337,7 +340,7 @@ first. Loading means: the Terrain3D region at the grid offset (built from the ti
 use, about 5 s, and cached as that tile's own `data/terrain3d_00_00.res`, so later visits take well
 under a second and the pack also works as an origin), the current era's ambient nodes (Buildings,
 Roads, Parcels, Traffic, Village; story nodes of neighbour packs are dropped) under an offset root
-that carries the pack id, and the ponds. Era switches swap the neighbours' content too. Tiles more
+that carries the pack id, and the ponds. Tiles more
 than one step from the player's tile are unloaded (memory only; the caches stay).
 
 Neighbour pack ids come from the tile centre in L-EST97 (`t<easting>_<northing>`), so tiles
@@ -348,18 +351,16 @@ disables streaming (screenshots, measurements). Nodes that read pack files must 
 through `Sites.path_in(Sites.pack_of(self), ...)` and sample the terrain in global space
 (`to_global`), because a streamed tile sits at an offset; `Parcels.at(pos)` already does.
 
-Known limits: the historical drapes (verst map, 1940 cadastral map) cover the origin tile only,
-neighbours show their orthophoto colour under the detail materials in every era; traffic agents
-stay inside their tile's road graph.
+Known limits: traffic agents stay inside their tile's road graph.
 
 ## Starting everything
 
 `tools/play.sh [--site=<id>] [--windowed]` (or `make play ARGS="..."`) starts the tile service
-(port 8765) and the world service (port 8766) if they are not running, keeps their logs under the
-user directory (`logs/tile_service.log`) and launches the game. The game
-also starts either service itself when it runs from the source tree and the configured URL is
-local (`Locator.spawn_local`), so `godot --path .` works too; exported builds need a service URL
-in `settings.cfg` (`[service] url`, `worlds_url`).
+(port 8765) if it is not running, keeps its log under the user directory (`logs/tile_service.log`)
+and launches the game. The tile service is the only service. The game also starts it itself when
+the configured URL is local (`Locator.spawn_local`): from the source tree with the venv's Python, so
+`godot --path .` works too, and in an exported build as the bundled sidecar. A remote service can
+be named in `settings.cfg` (`[service] url`).
 
 ## Water, fish, ground and people
 
@@ -393,20 +394,21 @@ clothes. Preview them with `godot --path . res://tools/godot/figure_preview.tscn
 |---|---|
 | positions in `layout.json` | `make scenes`; pads, exclusions and `buildings.json` also need `make tile` (or `make scatter`) |
 | `scenes.json` | `make scenes` |
-| `.ink` | `make ink` |
 | `strings.csv`, any `.tres` | `make import` (Godot re-imports the CSV into `.translation` files) |
 | anything | `make validate` (pure python) and `make test` (Godot; the site test boots every pack) |
 
-`make validate` catches unknown era, item, consequence and knot references, missing translation
-keys, ink files without the EXTERNAL block, objectives whose target node exists in no scene, and
-a start era without a register.
+`make validate` catches a manifest that does not match its directory, missing translation keys,
+anything but one present-day layer in `data/eras`, unknown era references, a missing layer scene or
+`parcels.json`, scene node types that are not part of the present-day game, tenant and departure rows
+that point at nothing or hold what they must not (a private person, a contact, a non-hash owner),
+malformed market rows, and a `PACK_VERSION` that differs between `tools/new_site.py` and `sites.gd`.
 
 ## site.json reference
 
 ```jsonc
 {
   "id": "kvissentali",                    // must equal the directory name
-  "pipeline": 1,                          // which pipeline built the pack; see "Packs that know how old they are"
+  "pipeline": 3,                          // which pipeline built the pack; see "Packs that know how old they are"
   "name_key": "SITE_KVISSENTALI",         // menu label
   "subtitle_key": "SITE_KVISSENTALI_SUBTITLE",
   "terrain": {
@@ -512,8 +514,10 @@ shown), `deleted`, `report_overdue` and `health` (sound, watch, distressed). The
 slimmed once per download; a tile job then takes seconds.
 `python3 tools/pipeline/fetch_tenants.py --site <id> --stats` prints the sector histogram.
 The debug map (M) has a company layer: the Layer button cycles sector, employees, health, founded
-and shared owners (`scripts/ui/map_palette.gd`, legend in the corner; `--open=map:<mode>` for a
-screenshot). The K overlay and the plot sheet list each tenant's activity, staff, turnover, taxes,
+and shared owners (`scripts/ui/map_palette.gd`; `--open=map:<mode>` for a screenshot). Sector,
+health and founded are also laid on the ground around you (`scripts/world/info_views.gd`, I cycles
+them without the map), with their key on the HUD's bottom right while one is showing
+(`UiManager.legend_card`). The K overlay and the plot sheet list each tenant's activity, staff, turnover, taxes,
 board and health; the book's Companies page lists the tile's companies by employees with a sector
 filter and click-to-sort headings (`--open=companies`, `--open=companies:<name|sector|employees|turnover|address>`
 for a screenshot of one order). Interiors take their use from the biggest tenant's sector.

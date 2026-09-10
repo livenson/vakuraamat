@@ -13,9 +13,10 @@ because the game already talks to it.**
 
 ### 1a. The historical WMS the pipeline already uses
 
-`https://kaart.maaamet.ee/wms/ajalooline` — the same service `fetch_tile.py` already calls for
-`era_1798_verst.png` and `era_1938_cadastral.png`. Its layer list turns out to be far richer than
-the two layers we take from it:
+`https://kaart.maaamet.ee/wms/ajalooline` — the service `fetch_tile.py` called for
+`era_1798_verst.png` and `era_1938_cadastral.png` in the historical three-era game (no pack asks for
+them now), and the one the plot page's pictures come from (option 4). Its layer list turns out to be
+far richer than the layers we take from it:
 
 | kind | layers | span |
 |---|---|---|
@@ -39,7 +40,7 @@ GET https://kaart.maaamet.ee/wms/ajalooline?SERVICE=WMS&VERSION=1.3.0&REQUEST=Ge
 
 Verified on the Toomemägi tile: `of1993-2000_10k` returned 238 KB of black-and-white aerial imagery,
 `of2007Tartu` 347 KB in colour, both exactly the tile's square, both with a small attribution mark in
-the corner. **This is the same shape of file the era drape already consumes**, so it needs no new
+the corner. **This is the same shape of file the ground drape already consumes**, so it needs no new
 machinery at all — only a way to choose which year is on the ground.
 
 ### 1b. Fotoladu — the photograph archive
@@ -108,11 +109,12 @@ same buildings, and the ground beneath changes: the block that was a field in 19
 was clear-cut, the car park that was a house.
 
 *How it would work:* the ground drape is already a texture the world sets (`world._set_drape`,
-`EraDefinition.texture()`), and the pack already fetches historical layers from this exact WMS. A
-year would be one more entry with a layer name; the fetch is one `GetMap` per tile.
+`EraDefinition.texture()`), and the plot page already fetches campaigns from this exact WMS. A
+year would be one more texture with a layer name; the fetch is one `GetMap` per tile. (The game is
+present day only now: there is one era, `era_2026`, and no era switch.)
 
-*Navigation:* a dial rather than a screen — hold a key and the year steps, the way the era switch
-already works, with the year shown where the date sits now.
+*Navigation:* a dial rather than a screen — hold a key and the year steps, with the year shown where
+the date sits now.
 
 *Strengths:* costs almost nothing, uses machinery that exists, and it is the option that speaks
 directly to a game about land. Works on every tile in the country with no per-place data.
@@ -167,17 +169,19 @@ and a car park now says something a number does not.
 *Weaknesses:* the smallest, quietest version. Nobody will discover it by accident.
 
 *As built:* `scripts/ui/plot_history.gd` and `scripts/ui/plot_thumb.gd`, shown by
-`BookPanel._fill_plot_history`. Five campaigns (1993-2000, 2005, 2010, 2015, 2020) plus a crop of
-the tile's own orthophoto as "today", each with the plot's boundary drawn on it. The newest costs
-nothing; the rest are one `GetMap` each, cached under `user://cache/plots`, so a plot fills in over
-a second the first time it is opened and instantly ever after. A campaign that did not fly over the
+`BookPanel._fill_plot_history`. Five campaigns from `ajalooline` (1993-2000, 2005, 2010, 2015,
+2020) plus "today" from the `fotokaart` WMS (layer `EESTIFOTO`, the service the tile's own orthophoto
+comes from), each with the plot's boundary drawn on it. Every picture is one live `GetMap` for the
+plot's square, cached under `user://cache/plots`, so a plot fills in over a second the first time it
+is opened and instantly ever after; in a city "today" can come from a finer flight than the tile
+texture. A campaign that did not fly over the
 square answers blank and is dropped — remembered, so it is not asked twice, but only when the
 service actually answered, never on a refused connection.
 
 ### Option 5 — photographs as things in the world
 
 A frame becomes an object: a marker where something was photographed, a postcard you can pick up, a
-plot you own showing you its own history when you buy it.
+plot showing you its own history when you stand on it. (Nothing in the game is owned or bought.)
 
 *Strengths:* the only version that is part of the game rather than beside it, and the one that could
 reward exploring.
@@ -191,7 +195,7 @@ that the imagery is worth looking at at all.
 ## 3. What this brainstorm suggests
 
 **Option 1 is the one to try first**, and it is almost embarrassingly cheap: the layers are on a WMS
-the pipeline already calls, in the format the drape already takes. It is a day's work to find out
+the game already calls, in the format the drape already takes. It is a day's work to find out
 whether watching the ground change under a fixed town is compelling or merely odd — and if it is
 odd, nothing was spent finding out.
 

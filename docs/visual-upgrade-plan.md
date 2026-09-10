@@ -20,7 +20,7 @@ free period ended 2024), HDR output and AreaLight3D (new in 4.7, irrelevant outd
 Spatial Gardener (overlaps Terrain3D's instancer).
 
 ## Method per step
-1. Verify the addon loads on 4.7.2 headless before integrating (as done for Terrain3D and inkgd).
+1. Verify the addon loads on 4.7.2 headless before integrating (as done for Terrain3D and, in the historical game, inkgd, which has since been removed).
 2. Integrate through the existing pipeline: trees and grass through `scatter_vegetation.gd`,
    ground through `ortho_drape.gdshader`, props through `gen_era_scenes.py`.
 3. Capture the same three views before and after (`tools/verify_spike.sh` style) and log FPS.
@@ -49,7 +49,10 @@ screenshot; 2 because the user named trees as the worst; 3–6 as time allows.
 
 ## Result
 
+These four pictures were taken in the historical game (2026-09-04, before tag `v0.9-historical`);
+three of them show its 1938 and 1798 eras, which have since been removed. The game is present day only.
+
 | | |
 |---|---|
-| ![Forest road after the tree and lighting steps](docs/screenshots/forest_road.jpg) trees, impostors, lighting | ![Manor with textures](docs/screenshots/manor_1938.jpg) building textures, levelled pad, glass windows |
-| ![Farm with pond](docs/screenshots/farm_1938.jpg) water, grass, grounded buildings | ![Barn-dwelling](docs/screenshots/barn_1798.jpg) 1798 barn-dwelling with straw and log textures |
+| ![Forest road after the tree and lighting steps](screenshots/forest_road.jpg) trees, impostors, lighting | ![Manor with textures](screenshots/manor_1938.jpg) building textures, levelled pad, glass windows |
+| ![Farm with pond](screenshots/farm_1938.jpg) water, grass, grounded buildings | ![Barn-dwelling](screenshots/barn_1798.jpg) 1798 barn-dwelling with straw and log textures |

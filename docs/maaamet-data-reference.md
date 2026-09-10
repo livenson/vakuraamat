@@ -52,7 +52,7 @@
 - Live OGC services: **WMS / WFS / WMTS / WCS**, consumable directly in QGIS
 
 ### 1.9 License
-Estonian Land Board Open Data License — **free for commercial and non-commercial use**, requires attribution (e.g. "Map data: Republic of Estonia Land and Spatial Development Board, [year]"), provided "as is," and the Land Board can request removal of attribution in writing. No royalties or per-seat fees. See `implementation-plan.md` section on licensing for the exact citation format to use in-game (credits screen) and in any store page.
+Estonian Land Board Open Data License — **free for commercial and non-commercial use**, requires attribution, provided "as is," and the Land Board can request removal of attribution in writing. No royalties or per-seat fees. The game's credit line is "Map data: Maa- ja Ruumiamet (Estonian Land and Spatial Development Board), {year}" (`ATTRIBUTION` in `tools/pipeline/fetch_tile.py`, written into every `terrain_meta.json`); `THIRD_PARTY.md` lists the credit for every other dataset. The original plan's licensing notes are in `docs/history/implementation-plan.md`.
 
 ---
 
@@ -68,10 +68,26 @@ Estonian Land Board Open Data License — **free for commercial and non-commerci
 ### 1.11 e-Business Register open data
 - The Centre of Registers and Information Systems publishes every legal person daily as CSV, XML
   and Parquet (CC BY 4.0): name, registry code, legal form, status, first entry date and the
-  registered address with its EHAK code and ADS address id. Detailed files (persons, shareholders,
-  annual reports) exist but are not used; personal identification numbers were removed in 2024.
+  registered address with its EHAK code and ADS address id. The detailed JSON dumps are used by
+  `tools/pipeline/register_extra.py`: general data (EMTAK activity, share capital, web address,
+  annual-report employee counts, deletion date), persons and shareholders (structure only: role
+  counts and the register's hashed ids, no names). Personal identification numbers were removed in 2024.
 - The ADS address id (`ads_adr_id`) matches the Building Register's `adrId` for the same address,
   which gives an exact company-to-building join without geocoding.
+
+### 1.12 Other datasets the pipeline uses
+- **Tax Board quarterly CSV** ("Tasutud maksud, käive ja töötajate arv", `ncfailid.emta.ee`): taxes
+  paid, turnover and employees per company per quarter, read by `register_extra.py` into `tenants.json`.
+- **Geo3D LOD2 buildings** (FileGDB per municipality, `andmetyyp=hooned_lod2`): roof and wall faces,
+  read by `tools/pipeline/fetch_buildings.py` into the `lod2` faces of `buildings.json`.
+- **Geo3D single trees** (LOD0 üksikpuud, GeoPackage per municipality): trunk position, height,
+  crown and conifer or deciduous for every laser-detected tree, read by `tools/pipeline/fetch_trees.py`
+  into `assets/terrain/<tile>/trees.json`.
+
+> **Sections 2 to 6 below are the original plan** of the historical three-era game (tag
+> `v0.9-historical`): QGIS and GDAL, 16-bit PNG heightmaps, hunting spawns, manors, era folders. They
+> are kept for reference; only 3.8 and 3.9 describe current steps. The current pipeline (rasterio,
+> a float32 `heightmap.r32`, no QGIS) is described in [data-pipeline.md](data-pipeline.md).
 
 ## 2. Target game artifacts
 
@@ -176,7 +192,6 @@ matches by ADS id, then by a normalised street + number key against parcel and b
 then by farm name. Precedence and statistics are in the module docstring; the file keeps `match`
 and `via` per company so the game and the validator can tell an exact tenant from a street neighbour.
 
-### 3.10 Feeds → town events
 ## 4. Recommended toolchain summary
 
 | Step | Tool |

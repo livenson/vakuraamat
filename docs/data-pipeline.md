@@ -9,9 +9,12 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | Source | What | Tool | Output |
 |---|---|---|---|
 | Maa-amet geoportal, 1 m DTM sheets (`dem_1m_geotiff`) | ground heights, EH2000 | `tools/pipeline/fetch_tile.py` | `assets/terrain/<tile>/heightmap.r32`, `terrain_meta.json` |
-| the same sheets at 5 m (`dem_5m_geotiff`, `--dem-res 5`) | the ground a new place ships with | `fetch_tile.py` | the same files, `dtm_res_m: 5` in the meta |
-| Maa-amet nDSM (1:2000 sheets) | canopy and object heights | `fetch_tile.py` | `assets/terrain/<tile>/canopy.r32` |
+| the same sheets at 5 m (`dem_5m_geotiff`, `--dem-res 5`) | the ground a new place ships with; the tile service fetches the 5 m model first and replaces it with the 1 m one in its refine pass (`--only-dem`) | `fetch_tile.py`, `tools/tile_service.py` | the same files, `dtm_res_m: 5` in the meta |
+| Maa-amet map sheet grids (`epk10T_SHP.zip`, `epk2T_SHP.zip`) | which 1:10 000 and 1:2000 sheets lie under the tile | `fetch_tile.py` (`GRID_ZIP`, `GRID2T_ZIP`) | cached in `data_raw/epk10T/`, `data_raw/epk2T/` |
+| Maa-amet nDSM (1:2000 sheets); the 1:20 000 CHM (`chm_geotiff`, trees only, coarser) where no nDSM exists | canopy and object heights | `fetch_tile.py` | `assets/terrain/<tile>/canopy.r32` |
 | Maa-amet WMS `fotokaart` (`EESTIFOTO`) | 25 cm orthophoto; and one plot's square at a time, at the size the book shows it, for the plot page's "today" | `fetch_tile.py`, `scripts/ui/plot_history.gd` | `assets/terrain/<tile>/ortho.jpg`, `user://cache/plots/<pack>/` |
+| Maa-amet historical orthophotos, WMS `ajalooline` (campaign layers `of1993-2000_10k`, `of2005`, `of2010`/`of2015`/`of2020` `aero`, `asulad`, `mets`) | the plot's own square in each campaign since 1993, fetched live when the book shows the plot | `scripts/ui/plot_history.gd` | `user://cache/plots/<pack>/` |
+| Maa-amet administrative division (`maakond_shp.zip`, county polygons) and the ETAK standing-water WFS `etak:e_202_seisuveekogu_a` (Võrtsjärv) | the outline of Estonia for the menu's locator map; credit "Haldusjaotus ja siseveekogud: Maa- ja Ruumiamet, Eesti topograafia andmekogu" | `tools/pipeline/fetch_outline.py` (run by hand, the file is committed) | `assets/data/estonia.json` |
 | Maa-amet Geo3D single trees (LOD0 üksikpuud) | every laser-detected tree: position, height, crown, conifer or deciduous | `tools/pipeline/fetch_trees.py` | `assets/terrain/<tile>/trees.json` |
 | ETAK topographic database, WFS `etak:e_401_hoone_ka` | building polygons and types | `tools/pipeline/fetch_buildings.py` | `sites/<id>/buildings.json` |
 | EHR, the Building Register (`livekluster.ehr.ee`) | year, storeys, purpose, facade and roof materials, heating, water, addresses | `fetch_buildings.py` | `sites/<id>/buildings.json` |
@@ -25,9 +28,10 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | e-Business Register open data (daily CSV, CC BY 4.0) | companies matched to the tile's addresses | `tools/pipeline/fetch_tenants.py` | `sites/<id>/tenants.json` |
 | e-Business Register general data, persons and shareholders (daily JSON dumps, CC BY 4.0) | EMTAK activity and the sector, share capital, web address, annual-report employee counts, deletion date; board and shareholder counts and hashed ids (structure only, no names) | `tools/pipeline/register_extra.py` (slimmed once per download into `data_raw/ariregister/*.slim.jsonl`) | the same rows in `tenants.json` |
 | Tax Board "tasutud maksud" quarterly open data (EMTA) | taxes paid, turnover and employees per company per quarter, the activity sector | `register_extra.py` (`data_raw/emta/`) | `tenants.json`: `employees`, `turnover`, `taxes`, `quarters`, `health` |
-| Maa-amet in-ADS gazetteer | address and place search | `tools/tile_service.py` (`/geocode`) | menu results |
+| Maa-amet in-ADS gazetteer | address and place search; the municipality under a point (reverse EHAK lookup) | `tools/tile_service.py` (`/geocode`), `scripts/autoload/locator.gd` (directly), `fetch_buildings.py` (which municipality's LOD2 and tree files to fetch) | menu results |
+| ip-api.com IP geolocation (optional, "Use my location" in the menu) | a coarse city-level point; free for non-commercial use, no key | `scripts/autoload/locator.gd` | the menu's suggested place |
 | Poly Haven (CC0) | ground and facade PBR textures | `tools/pipeline/fetch_polyhaven.py` | `assets/terrain/textures/`, `assets/textures/buildings/` |
-| Sketchfab (CC BY, via the MCP server, `make mcp`) and Poly Pizza (CC0 / CC BY) models | cars, street lamps, benches, bus shelters, the spruce and juniper, hay bales, tractor, farm plants; playground, boats, bathroom and stairs | downloaded, split with `tools/blender/split_glb.py`, listed in `assets/vendor/sketchfab/CREDITS.md` | `assets/vendor/sketchfab/`, `assets/vendor/polypizza/`, `assets/models/trees/spruce_src.glb` |
+| Sketchfab (CC BY, via the MCP server, `make mcp`) and Poly Pizza (CC0 / CC BY) models | cars, street lamps, benches, bus shelters, the spruce and juniper, hay bales, tractor, farm plants; playground, boats and stairs | downloaded, split with `tools/blender/split_glb.py`, listed in `assets/vendor/sketchfab/CREDITS.md` | `assets/vendor/sketchfab/`, `assets/vendor/polypizza/`, `assets/models/trees/spruce_src.glb` |
 
 Licences, attribution strings and fetch dates are in `THIRD_PARTY.md`. Endpoints and the per-country
 adapter interface are in `tools/pipeline/sources.py`; only Estonia is implemented.
@@ -54,8 +58,11 @@ adapter interface are in `tools/pipeline/sources.py`; only Estonia is implemente
    instancer, and saves `data/terrain3d_00_00.res` and `terrain_assets.tres`.
 6. **Validation** (`make validate`): `tools/validate_site.py` checks every pack without Godot.
 
-The tile service (`tools/tile_service.py`) runs steps 1 to 6 for any point in Estonia on request from
-the menu and packs the result as a zip the game installs under `user://`.
+The tile service (`tools/tile_service.py`) runs steps 1 to 4 and 6 for any point in Estonia on
+request from the menu (the terrain with the 5 m ground model; the registers including the bus stops
+and the PRIA fields) and packs the result as a zip the game installs under `user://`. It skips step 5:
+the game builds the Terrain3D region itself when it loads the tile. A refine pass after the pack is
+playable fetches the 1 m ground model, the measured trees and the departures and rewrites the zip.
 
 ## Where the game reads them
 
@@ -109,9 +116,11 @@ bake). Large stable binaries (models, textures, addon binaries) are tracked with
 | Target | Produces | Inputs |
 |---|---|---|
 | `make site SITE=<id> NAME=... CENTER=...` | `sites/<id>/` scaffold (manifest, layout, scenes.json, data, strings) | `tools/new_site.py`, the template pack |
-| `make tile SITE=<id>` | `assets/terrain/<tile>/*`, then features, registers, scenes and the import | `sites/<id>/site.json` (centre, size), the sources above |
+| `make tile SITE=<id>` | `assets/terrain/<tile>/*`, the measured trees and the import, then features, buildings, parcels, roads, market and tenants where missing, and the scenes (not the stops, departures or fields) | `sites/<id>/site.json` (centre, size), the sources above |
 | `make features SITE=<id>` | `buildings_2026.json`, `water_2026.json`, `anchors.json` | the tile's laser data and orthophoto |
 | `make buildings`, `roads`, `parcels`, `tenants`, `market`, `real-trees` | one JSON each, see the table above | WFS and register endpoints |
+| `make stops SITE=<id>` | `sites/<id>/stops.json` | Overpass, the pack's `roads.json` |
+| (no make target) `python3 tools/pipeline/fetch_fields.py --site <id>` | `sites/<id>/fields_2026.json` | the PRIA WFS |
 | `make scenes SITE=<id>` | `sites/<id>/scenes/era_2026.tscn` | `scenes.json`, `layout.json`, the JSONs |
 | `make import` | Terrain3D region data and assets | the tile's inputs |
 | `make scatter` | vegetation instances in the region file | control map, `canopy.r32`, layout exclusions |
@@ -119,7 +128,7 @@ bake). Large stable binaries (models, textures, addon binaries) are tracked with
 | `make props` | boundary stone, figures, prepared vegetation scenes | Blender scripts in `tools/blender` |
 | `make validate` | report | every `sites/*/` (no Godot) |
 | `make departures SITE=<id>` | `sites/<id>/departures.json` | the register's GTFS (needs `make stops` first) |
-| `make test`, `make lint` | the headless suite; gdlint, ruff, shellcheck | |
+| `make test`, `make lint` | the headless suite; gdlint, ruff, shellcheck and actionlint (skipped with a note when not installed) | |
 
 ## The terrain pipeline in detail
 
@@ -180,9 +189,10 @@ easting and northing so alignment can be checked against Maa-amet's map viewer.
 addons/terrain_3d/, addons/sky_3d/    vendored addons
 assets/terrain/<tile>/               heightmap.r32, canopy.r32, ortho.jpg, trees.json, terrain_meta.json, data/
 assets/terrain/ortho_drape.gdshader  the orthophoto drape
-assets/vendor/                       Kenney kits, forest vegetation, MakeHuman figures (see THIRD_PARTY.md)
+assets/vendor/                       Kenney car kit, forest vegetation, Sketchfab and Poly Pizza models (see THIRD_PARTY.md)
+assets/models/humans/                MakeHuman figures
 sites/<id>/                          site pack: site.json, layout.json, scenes.json, *.json registers, scenes/, strings.csv
-scripts/autoload/                    Sites, GameState, Locator, SaveManager, EventBus, Reporter, DevChannel
+scripts/autoload/                    PerfLog, EventBus, Sites, Locator, Reporter, DevChannel, SaveManager, GameState, WindowMode
 scripts/world/                       terrain, buildings, interiors, roads, parcels, traffic, figures
 scripts/ui/                          the book theme, panels, HUD, menu
 tools/pipeline/                      the fetchers and derivations
