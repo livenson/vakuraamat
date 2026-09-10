@@ -487,7 +487,10 @@ func refresh_pack(id: String, quiet: bool = true) -> Dictionary:
 	# place; the refresh is an improvement, and it must not cost a service launch on the way in.
 	if not await service_alive():
 		return {"ok": false, "id": id, "error": "the tile service is not running"}
-	var r := await fetch_pack(id, str(m.get("description", id)), float(c[0]), float(c[1]), int(t.get("size", 1024)), _eras_of(id), -1, [], true, quiet)
+	# the place's own name: the description is "<name>: generated site pack.", and sent whole it came
+	# back as the name of the refreshed pack, one suffix longer on every refresh
+	var place := str(m.get("description", id)).split(":")[0].strip_edges()
+	var r := await fetch_pack(id, place, float(c[0]), float(c[1]), int(t.get("size", 1024)), _eras_of(id), -1, [], true, quiet)
 	if not r.get("ok", false):
 		return r
 	# The service hands back the zip it has if a restart lost the job, so the pack that just landed

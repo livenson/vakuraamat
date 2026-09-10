@@ -213,7 +213,9 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
     half = size / 2
     pack = f"res://sites/{site}" if texture_mode == "import" else f"user://sites/{site}"   # where Godot will find the pack
     SITE_KEY = f"SITE_{site.upper()}"
-    name = name or site.capitalize()
+    # a refresh used to send the manifest's description back as the name, one ": generated ... pack."
+    # longer each time ("Riia tn 1: generated town pack.: generated site pack."): keep the place's name
+    name = re.split(r":\s*generated\b", name or "")[0].strip() or site.capitalize()
     strings = [["keys", "et", "en"], [SITE_KEY, name, name],
                [f"{SITE_KEY}_SUBTITLE", f"{name}: päris maa, päris väärtused.", f"{name}: real plots, real values."]]
 
