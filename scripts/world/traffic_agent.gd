@@ -25,6 +25,7 @@ var _wheels: Array[Node3D] = []
 var _t := 0.0
 var _speed_now := 0.0
 var _terrain: Terrain3D
+const RANGE := 250.0   # agents spawn within 220 m and go at 320: beyond this they are a few pixels
 
 
 ## Every model an agent can be made of, loading in the background (once per session).
@@ -76,6 +77,7 @@ func setup(g: RoadGraph, k: String, e: Dictionary, start_s: float, fwd: bool, se
 			_body = _make_car(year)
 		"cart":
 			_body = _make_cart()
+	MeshMerge.set_range(_body, RANGE)
 	add_child(_body)
 	_place(0.0)
 
@@ -354,9 +356,26 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 			model.rotation.y = PI / 2.0
 		holder.add_child(model)
 		return holder
+	var paint_i := r.randi() % BIKE_PAINTS.size()
+	if not _bike_frames.has(paint_i):
+		_bike_frames[paint_i] = _bike_frame(BIKE_PAINTS[paint_i])
+	var root: Node3D = MeshMerge.copy(_bike_frames[paint_i])
+	var crank: Node3D = root.get_node("Crank")
+	root.set_meta("crank", crank)
+	_bike_rider(root, with_rider, r, clothes)
+	return root
+
+
+const BIKE_PAINTS := [Color(0.12, 0.12, 0.14), Color(0.62, 0.1, 0.1), Color(0.15, 0.32, 0.6), Color(0.85, 0.85, 0.82), Color(0.2, 0.45, 0.3), Color(0.9, 0.55, 0.15)]
+static var _bike_frames: Dictionary = {}   # paint index -> merged frame template (wheels and crank kept apart to turn)
+
+
+## The frame, wheels and crank of a procedural bicycle in one paint, merged: about 50 tubes and
+## spokes drawn as a handful of meshes.
+static func _bike_frame(paint_color: Color) -> Node3D:
 	var root := Node3D.new()
 	var paint := StandardMaterial3D.new()
-	paint.albedo_color = [Color(0.12, 0.12, 0.14), Color(0.62, 0.1, 0.1), Color(0.15, 0.32, 0.6), Color(0.85, 0.85, 0.82), Color(0.2, 0.45, 0.3), Color(0.9, 0.55, 0.15)][r.randi() % 6]
+	paint.albedo_color = paint_color
 	paint.metallic = 0.35
 	paint.roughness = 0.3
 	var chrome := StandardMaterial3D.new()
@@ -398,10 +417,13 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 	root.add_child(saddle)
 	root.add_child(_bike_wheel(fa, chrome, rubber))
 	root.add_child(_bike_wheel(ra, chrome, rubber))
-	var crank := _bike_crank(bb, chrome, rubber)
-	root.add_child(crank)
-	root.set_meta("crank", crank)
+	root.add_child(_bike_crank(bb, chrome, rubber))
 	root.rotation.y = PI   # built with the handlebar at +Z; agents and the mounted player face -Z
+	MeshMerge.flatten(root, func(n): return n.name == "Wheel" or n.name == "Crank")
+	return root
+
+
+static func _bike_rider(root: Node3D, with_rider: bool, r: RandomNumberGenerator, clothes: Color) -> void:
 	if with_rider and HumanFigure.available():
 		var rider := HumanFigure.make(r, 2026)
 		rider.pose = "pedal"
@@ -421,7 +443,6 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 					var mat := StandardMaterial3D.new()
 					mat.albedo_color = clothes
 					mi.set_surface_override_material(si, mat)
-	return root
 
 
 const BIKE_MODEL := "res://assets/vendor/polypizza/bicycle.glb"
@@ -454,7 +475,7 @@ func _make_car(year: int) -> Node3D:
 	if not ResourceLoader.exists(path):
 		return _make_box_car(year)
 	var root := Node3D.new()
-	var model: Node3D = HumanFigure.scene(path).instantiate()
+	var model: Node3D = MeshMerge.instance(path, _is_wheel)
 	model.rotation.y = PI            # the kit's front is +Z; agents face -Z
 	model.scale = Vector3.ONE * CAR_SCALE
 	root.add_child(model)
@@ -469,7 +490,7 @@ func _make_sketchfab_car() -> Node3D:
 	var path := SKETCHFAB + name + ".glb"
 	if not ResourceLoader.exists(path):
 		return null
-	var model: Node3D = HumanFigure.scene(path).instantiate()
+	var model: Node3D = MeshMerge.instance(path, _is_wheel)
 	var b: AABB = Interiors._bounds(model)
 	var longest := maxf(b.size.x, b.size.z)
 	if longest < 0.01:
@@ -484,6 +505,10 @@ func _make_sketchfab_car() -> Node3D:
 	root.add_child(turn)
 	_tint_car(model, 2026)
 	return root
+
+
+static func _is_wheel(n: Node) -> bool:
+	return n.name.to_lower().begins_with("wheel")
 
 
 func _tint_car(model: Node3D, year: int) -> void:

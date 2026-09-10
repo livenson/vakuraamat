@@ -69,6 +69,7 @@ func setup(r: Dictionary, stops: Array, start_s: float = 0.0) -> void:
 		_next_call += 1
 	_body = _make_body()
 	if _body:
+		MeshMerge.set_range(_body, 800.0)   # a 12 m bus still reads from the air; beyond this it does not
 		add_child(_body)
 	_place(0.0)
 
@@ -157,7 +158,7 @@ const LENGTH_M := 12.0
 func _make_body() -> Node3D:
 	if not ResourceLoader.exists(MODEL):
 		return null
-	var model: Node3D = load(MODEL).instantiate()
+	var model: Node3D = MeshMerge.instance(MODEL)   # 536 parts drawn as one mesh per material
 	var b := Interiors._bounds(model)
 	var long_axis := maxf(b.size.x, b.size.z)
 	if long_axis <= 0.01:

@@ -68,6 +68,7 @@ func _begin(phase: String) -> void:
 		p.input_enabled = true
 		Input.action_press("move_forward")
 	if phase == "fly":
+		_census()
 		# where the walk ended, for a look: user://logs/bench_walk.png
 		_world.get_viewport().get_texture().get_image().save_png("user://logs/bench_walk.png")
 		Input.action_release("move_forward")
@@ -122,6 +123,52 @@ func _finish() -> void:
 	f.store_string(JSON.stringify(out, "  "))
 	f.close()
 	get_tree().quit()
+
+
+## What draws: every visible GeometryInstance3D in the tree grouped by the nearest ancestor with a
+## script (or a named container), with how many cast shadows and how many have no visibility range.
+## Printed as [census] lines, largest groups first: where the draw calls come from.
+func _census() -> void:
+	var groups: Dictionary = {}
+	var stack: Array[Node] = [get_tree().root]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		for c in n.get_children():
+			stack.append(c)
+		if not (n is GeometryInstance3D) or not (n as Node3D).is_visible_in_tree():
+			continue
+		var g := n as GeometryInstance3D
+		var owner_name := _owner_label(g)
+		var key := "%s/%s" % [owner_name, g.get_class()]
+		if not groups.has(key):
+			groups[key] = [0, 0, 0, 0]   # count, surfaces, shadow casters, without a range
+		var e: Array = groups[key]
+		e[0] += 1
+		if g is MeshInstance3D and (g as MeshInstance3D).mesh:
+			e[1] += (g as MeshInstance3D).mesh.get_surface_count()
+		elif g is MultiMeshInstance3D:
+			e[1] += 1
+		if g.cast_shadow != GeometryInstance3D.SHADOW_CASTING_SETTING_OFF:
+			e[2] += 1
+		if g.visibility_range_end <= 0.0:
+			e[3] += 1
+	var keys := groups.keys()
+	keys.sort_custom(func(a, b): return groups[a][1] > groups[b][1])
+	for k in keys.slice(0, 30):
+		var e: Array = groups[k]
+		print("[census] %-48s nodes %6d surfaces %6d shadows %6d no-range %6d" % [k, e[0], e[1], e[2], e[3]])
+
+
+static func _owner_label(n: Node) -> String:
+	var p: Node = n.get_parent()
+	while p:
+		var s: Script = p.get_script()
+		if s and s.get_global_name() != "":
+			return String(s.get_global_name())
+		if p.name in ["Buildings", "Parcels", "Village", "Traffic", "Roads"]:
+			return String(p.name)
+		p = p.get_parent()
+	return "?"
 
 
 ## The centre of the nearest built building, at street height.
