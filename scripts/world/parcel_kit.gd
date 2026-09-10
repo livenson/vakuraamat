@@ -20,6 +20,10 @@ const RANGE := 250.0   # hedges, benches and swings are specks beyond this; the 
 static var _mat: StandardMaterial3D   # one vertex-coloured material for every kit, so kits batch
 
 
+static func release() -> void:
+	_mat = null
+
+
 func _ready() -> void:
 	_build()
 	MeshMerge.set_range(self, RANGE)

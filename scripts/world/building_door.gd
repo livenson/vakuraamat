@@ -38,6 +38,10 @@ func setup(b: FootprintBuilding, f: Dictionary) -> void:
 static var _mats: Dictionary = {}
 
 
+static func release() -> void:
+	_mats.clear()
+
+
 ## Wood for a dwelling, painted steel for everything else: two materials shared by every door.
 static func _leaf_material(dwelling: bool) -> StandardMaterial3D:
 	if not _mats.has(dwelling):

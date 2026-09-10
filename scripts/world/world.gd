@@ -223,6 +223,15 @@ func restart_here() -> void:
 func _exit_tree() -> void:
 	if GameState.world == self:
 		GameState.world = null
+	# the session caches of shared meshes, materials and merged templates go with the world, while
+	# the renderer is still up (held past it, they crashed the quit)
+	MeshMerge.release()
+	HumanFigure.release()
+	TrafficAgent.release()
+	SwingDoor.release()
+	BuildingDoor.release()
+	ParcelKit.release()
+	FootprintBuilding.release_details()
 
 
 func _process(_delta: float) -> void:

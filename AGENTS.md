@@ -119,6 +119,14 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   FPS drifts 20-30% as it heats, draw calls and hitch counts do not. Use a pack that has been entered as the
   origin (`toomemagi`); a tile only ever streamed as a neighbour has no `terrain_assets.tres` and renders
   Terrain3D's checkerboard when launched with `--site`.
+- Drawing: shared meshes and materials are cached for the session (`HumanFigure.scene`/`tinted`,
+  `MeshMerge.instance`/`baked`, door and detail meshes) and released by the world's `_exit_tree`; a
+  vendored model with many parts goes through `MeshMerge` (one surface per material). Every prop class
+  sets a `visibility_range_end`. Beyond 350 m buildings draw as `BuildingChunks` cells (merged on the
+  worker pool, one per 128 m, the building's mesh names its cell as `visibility_parent`); each cell also
+  carries the walls as an occluder, switched off while the player is inside one of its buildings.
+  Every `WorkerThreadPool.add_task` must be waited for (`wait_for_task_completion`), or what the task
+  captured outlives the renderer and the quit crashes (exit 134, "RenderingServer is null").
 - Physics is Jolt. Concave colliders set `backface_collision = true`: Jolt ignores the back of a face
   otherwise, and the LOD2 walls are wound either way (the player walked through them).
 - Data sources, make targets and the terrain pipeline are documented in `docs/data-pipeline.md`; the

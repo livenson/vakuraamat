@@ -190,6 +190,7 @@ scaling_3d/mode=2
 scaling_3d/mode.macos=4
 scaling_3d/scale=0.75
 global_illumination/gi/use_half_resolution=true
+occlusion_culling/use_occlusion_culling=true
 anti_aliasing/quality/screen_space_aa=0
 environment/ssao/quality=2
 environment/ssil/quality=2

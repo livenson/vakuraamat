@@ -678,6 +678,10 @@ const CHIMNEY_SIZE := Vector3(0.6, 1.6, 0.6)
 static var _detail: Dictionary = {}   # kind -> [Mesh, Material]
 
 
+static func release_details() -> void:
+	_detail.clear()
+
+
 func _detail_mesh(kind: String) -> MeshInstance3D:
 	if not _detail.has(kind):
 		var mesh: Mesh
@@ -1039,6 +1043,7 @@ func set_highlight(on: bool) -> void:
 
 
 func set_exterior_visible(on: bool) -> void:
+	BuildingChunks.set_occluding(self, on)
 	if _mesh_node:
 		_mesh_node.visible = on
 	if _outline and not on:

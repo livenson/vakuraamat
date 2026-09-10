@@ -42,7 +42,10 @@ screenshot; 2 because the user named trees as the worst; 3–6 as time allows.
 - [x] 7 performance quick wins (2026-09-10, `--bench`): traffic spawns from memory, flying pick and building
   apply budgeted, shared door meshes, nearer vegetation, Jolt, VRAM-compressed model textures. Toomemägi:
   video memory 2.1 -> 1.4 GB, street draw calls -11%; Tartu survey flight: frames over 100 ms 21 -> 4.
-  Next: per-class visibility ranges and occluders, lamp MultiMesh, MetalFX, merged far-view building chunks
+- [x] 8 structural performance (2026-09-10): vendored models merged, per-class visibility ranges, lamp
+  MultiMeshes, merged far-view building cells, footprint occluders, MetalFX/FSR2 at 0.75, no PCSS sun,
+  half-resolution SDFGI. Toomemägi street draw calls 5600 -> ~1100-2200, median frame 14.5 -> 12.4 ms.
+  Next: ground-level GPU (SSIL/SSAO quality), a graphics settings panel, the 1 s turn hitch
 
 ## Result
 

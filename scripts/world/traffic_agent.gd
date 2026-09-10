@@ -370,6 +370,14 @@ const BIKE_PAINTS := [Color(0.12, 0.12, 0.14), Color(0.62, 0.1, 0.1), Color(0.15
 static var _bike_frames: Dictionary = {}   # paint index -> merged frame template (wheels and crank kept apart to turn)
 
 
+static func release() -> void:
+	for t in _bike_frames.values():
+		if is_instance_valid(t):
+			t.free()
+	_bike_frames.clear()
+	_warmed = false
+
+
 ## The frame, wheels and crank of a procedural bicycle in one paint, merged: about 50 tubes and
 ## spokes drawn as a handful of meshes.
 static func _bike_frame(paint_color: Color) -> Node3D:

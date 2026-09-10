@@ -11,6 +11,16 @@ extends RefCounted
 # Merged copies of vendored models, one per path: built on first use, handed out as duplicates
 # that share the merged meshes (and so batch with each other).
 static var _templates: Dictionary = {}
+
+
+## Drop the merged templates and baked meshes (the world calls this as it leaves the tree: the
+## templates are nodes outside any tree, and nothing may hold GPU resources past the renderer).
+static func release() -> void:
+	for t in _templates.values():
+		if is_instance_valid(t):
+			t.free()
+	_templates.clear()
+	_baked.clear()
 const COPY := Node.DUPLICATE_SIGNALS | Node.DUPLICATE_GROUPS | Node.DUPLICATE_SCRIPTS   # not USE_INSTANTIATION: that re-reads the unmerged scene
 
 

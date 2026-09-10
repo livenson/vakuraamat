@@ -27,6 +27,12 @@ static var _knob_mesh: SphereMesh
 static var _knob_mat: StandardMaterial3D
 
 
+static func release() -> void:
+	_unit_box = null
+	_knob_mesh = null
+	_knob_mat = null
+
+
 func setup(width: float, height: float, mat: Material, thickness := 0.06) -> void:
 	if _unit_box == null:
 		_unit_box = BoxMesh.new()

@@ -36,6 +36,20 @@ static var _scenes: Dictionary = {}
 static var _tinted: Dictionary = {}
 
 
+static var _warming: Array[String] = []   # threaded requests not yet taken by scene()
+
+
+static func release() -> void:
+	# a threaded load nobody collected stays with the loader, holding its materials past the
+	# renderer at quit: collect each one, then let it all go
+	for p in _warming:
+		if not _scenes.has(p) and ResourceLoader.load_threaded_get_status(p) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
+			ResourceLoader.load_threaded_get(p)
+	_warming.clear()
+	_scenes.clear()
+	_tinted.clear()
+
+
 static func scene(path: String) -> PackedScene:
 	if not _scenes.has(path):
 		if ResourceLoader.load_threaded_get_status(path) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
@@ -49,8 +63,9 @@ static func scene(path: String) -> PackedScene:
 ## session is instanced from memory instead of read from disk inside a physics tick.
 static func warm(paths: Array) -> void:
 	for p: String in paths:
-		if not _scenes.has(p) and ResourceLoader.exists(p):
+		if not _scenes.has(p) and not p in _warming and ResourceLoader.exists(p):
 			ResourceLoader.load_threaded_request(p)
+			_warming.append(p)
 
 
 ## `m` with its albedo multiplied by `tint`, one shared copy per (material, tint).

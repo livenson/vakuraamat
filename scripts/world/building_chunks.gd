@@ -12,9 +12,28 @@ extends Node3D
 const CELL := 128.0
 const NEAR := 350.0       # metres from a cell's centre inside which its real buildings draw
 const SETTLE_S := 0.75    # wait this long after a cell's last change before merging it
+# Occlusion: each cell also carries its buildings' walls as an occluder (Godot's CPU occlusion
+# culling then skips what stands behind them: at street level most of the town).
+const OCC_MIN_HEIGHT := 3.0
+const OCC_BOTTOM := 0.5
+const OCC_TOP := 0.7
+
+
+## The occluder of `b`'s cell on or off: stepping inside a building must not hide the street
+## seen through its windows.
+static func set_occluding(b: FootprintBuilding, on: bool) -> void:
+	var far := of(b)
+	if far == null:
+		return
+	var lp := far.to_local(b.global_position)
+	var cell := Vector2i(floori(lp.x / CELL), floori(lp.z / CELL))
+	var oi = far._cells.get(cell, {}).get("occ")
+	if oi and is_instance_valid(oi):
+		oi.visible = on
 
 var _cells: Dictionary = {}          # Vector2i -> {mi, members: {instance id -> building}, at: seconds}
 var _dirty: Array[Vector2i] = []
+var _tasks: Array[int] = []          # merges on the worker pool: each must be waited for, done or not
 
 
 ## The layer's far-view node for building `b`, made on first use; null outside a layer.
@@ -71,6 +90,7 @@ func _rebuild(cell: Vector2i) -> void:
 		return
 	var inv := global_transform.affine_inverse()
 	var parts: Array = []   # [Transform3D, Material, arrays]
+	var walls: Array = []   # [Transform3D, footprint, height]: the occluder's walls
 	var members: Array = []
 	for id: int in e.members.keys():
 		var b = e.members[id]
@@ -84,14 +104,32 @@ func _rebuild(cell: Vector2i) -> void:
 		var xf := inv * mi.global_transform
 		for pair in fb.far_arrays():
 			parts.append([xf, pair[0], pair[1]])
+		if fb.height >= OCC_MIN_HEIGHT and fb.polygon.size() >= 3:
+			walls.append([inv * fb.global_transform, fb.polygon, fb.height])
 		members.append(weakref(fb))
 	e.busy = true
 	var me: WeakRef = weakref(self)
-	WorkerThreadPool.add_task(func():
+	_reap()
+	_tasks.append(WorkerThreadPool.add_task(func():
 		var merged: Array = BuildingChunks._merge(parts)
+		var occ: Array = BuildingChunks._occluder(walls)
 		var node = me.get_ref()
 		if node:
-			node.call_deferred("_put", cell, merged, members), false, "far buildings")
+			node.call_deferred("_put", cell, merged, members, occ), false, "far buildings"))
+
+
+## Release the finished merges (a task the pool was never asked about keeps what it captured).
+func _reap() -> void:
+	for id in _tasks.duplicate():
+		if WorkerThreadPool.is_task_completed(id):
+			WorkerThreadPool.wait_for_task_completion(id)
+			_tasks.erase(id)
+
+
+func _exit_tree() -> void:
+	for id in _tasks:
+		WorkerThreadPool.wait_for_task_completion(id)
+	_tasks.clear()
 
 
 ## Worker thread: one set of arrays per material, the parts moved into the cell's space.
@@ -136,6 +174,30 @@ static func _merge(parts: Array) -> Array:
 	return out
 
 
+## Worker thread: the cell's walls as occluder quads, from just above the ground to OCC_TOP of
+## each building's height, so an occluder never pokes out of the walls it stands in for.
+static func _occluder(walls: Array) -> Array:
+	var verts := PackedVector3Array()
+	var idx := PackedInt32Array()
+	for w in walls:
+		var xf: Transform3D = w[0]
+		var poly: PackedVector2Array = w[1]
+		var top: float = float(w[2]) * OCC_TOP
+		var n := poly.size()
+		for i in n:
+			var a := poly[i]
+			var b := poly[(i + 1) % n]
+			if a.distance_squared_to(b) < 1.0:
+				continue   # a short wall hides nothing worth the rays
+			var base := verts.size()
+			verts.append(xf * Vector3(a.x, OCC_BOTTOM, a.y))
+			verts.append(xf * Vector3(b.x, OCC_BOTTOM, b.y))
+			verts.append(xf * Vector3(b.x, top, b.y))
+			verts.append(xf * Vector3(a.x, top, a.y))
+			idx.append_array([base, base + 1, base + 2, base, base + 2, base + 3])
+	return [verts, idx]
+
+
 static func _filled3(n: int, v: Vector3) -> PackedVector3Array:
 	var a := PackedVector3Array()
 	a.resize(n)
@@ -144,7 +206,7 @@ static func _filled3(n: int, v: Vector3) -> PackedVector3Array:
 
 
 ## Main thread: the merged arrays become the cell's mesh, and its buildings hand over to it.
-func _put(cell: Vector2i, merged: Array, members: Array) -> void:
+func _put(cell: Vector2i, merged: Array, members: Array, occ: Array = []) -> void:
 	var t0 := Time.get_ticks_usec()
 	var e: Dictionary = _cells[cell]
 	e.busy = false
@@ -167,6 +229,16 @@ func _put(cell: Vector2i, merged: Array, members: Array) -> void:
 		if fb and is_instance_valid(fb) and fb.far_mesh_node():
 			var mi: MeshInstance3D = fb.far_mesh_node()
 			mi.visibility_parent = mi.get_path_to(cmi)
+	if occ.size() == 2 and not (occ[0] as PackedVector3Array).is_empty():
+		var oi: OccluderInstance3D = e.get("occ")
+		if oi == null:
+			oi = OccluderInstance3D.new()
+			oi.name = "Occ_%d_%d" % [cell.x, cell.y]
+			add_child(oi)
+			e.occ = oi
+		var ao := ArrayOccluder3D.new()
+		ao.set_arrays(occ[0], occ[1])
+		oi.occluder = ao
 	var ctrl := get_parent() as EraController
 	if ctrl and ctrl.windows_collected:
 		ctrl.register_windows(cmi)   # the new mesh's window surfaces take the lit glass
