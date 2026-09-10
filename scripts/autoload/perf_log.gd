@@ -38,6 +38,7 @@ func _ready() -> void:
 	_open(true)
 	if not enabled:
 		return
+	RenderingServer.viewport_set_measure_render_time(get_viewport().get_viewport_rid(), true)
 
 
 ## Start a fresh file, the current one becoming perf.prev.log; `session` marks a new run's header.
@@ -83,11 +84,15 @@ func _process(_delta: float) -> void:
 	_sec_frames += 1
 	_sec_sum += ms
 	_sec_max = maxf(_sec_max, ms)
+	var nodes := int(Performance.get_monitor(Performance.OBJECT_NODE_COUNT))
+	var mem := Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0
 	if ms >= SPIKE_MS:
-		_file.store_line("%s SPIKE %.0f ms | %s | %s" % [_stamp(), ms, _where(), ", ".join(_prev_marks) if not _prev_marks.is_empty() else "no marks"])
+		_file.store_line("%s SPIKE %.0f ms | %s | %s | %s" % [_stamp(), ms, _where(), ", ".join(_prev_marks) if not _prev_marks.is_empty() else "no marks", _anatomy(nodes, mem)])
 		_file.flush()
 	elif not _prev_marks.is_empty():
 		_file.store_line("%s mark %.0f ms | %s" % [_stamp(), ms, ", ".join(_prev_marks)])
+	_last_nodes = nodes
+	_last_mem = mem
 	var t := now / 1e6
 	if t - _sec_start >= 1.0:
 		var perf := Performance
@@ -103,6 +108,24 @@ func _process(_delta: float) -> void:
 		_sec_max = 0.0
 		if _file.get_position() > ROLL_BYTES:
 			_open(false)
+
+
+var _last_nodes := 0
+var _last_mem := 0.0
+
+
+## What arrived in a long frame, so one without marks still says where to look: the nodes and
+## static MB it added (a load or an instantiation), and the renderer's CPU time of a recent frame
+## (the render thread runs a frame or two behind; hundreds of ms there is pipelines compiling).
+## Nothing grown and a small render time means the frame was spent waiting: the GPU, the driver,
+## a lock, the OS. (Performance's process and physics times are not refreshed every frame, so
+## they are left out rather than misread.)
+func _anatomy(nodes: int, mem: float) -> String:
+	var render := RenderingServer.get_frame_setup_time_cpu()
+	var vp := get_viewport()
+	if vp:
+		render += RenderingServer.viewport_get_measured_render_time_cpu(vp.get_viewport_rid())
+	return "nodes %+d, mem %+.0f MB, render cpu %.0f ms" % [nodes - _last_nodes, mem - _last_mem, render]
 
 
 func _stamp() -> String:
