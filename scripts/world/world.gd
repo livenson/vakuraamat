@@ -54,6 +54,12 @@ func _ready() -> void:
 	var sp: Array = start.get("spawn", [512, 512])
 	_spawn = Vector3(float(sp[0]), 0.0, float(sp[1]))
 	terrain.set_camera(player.camera)
+	var nan := 0
+	for r: Terrain3DRegion in terrain.data.get_regions_active():
+		nan += TerrainBuilder.drop_nan_instances(r)
+	if nan > 0:
+		terrain.instancer.update_mmis(true)
+		print("[world] dropped %d vegetation instances with NaN heights" % nan)
 	_configure_sky()
 	_apply_orthophoto()
 	place_water(Sites.active, self)

@@ -392,6 +392,49 @@ func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Arr
 ## `exclusions` are [x, z, r] circles kept clear. Returns instance counts per rule.
 ## `keep_textures`: the ground texture list to write back (headless initialisation drops it from
 ## the loaded assets, so the tool captures it before the node enters the tree).
+## Drop the instances whose transform is not finite from a region, returning how many went.
+## Scatters before the NaN guard wrote grass at heights sampled past a region's edge (66 of Riia tn
+## 1's 10,648 instances); one NaN bound breaks the renderer's depth sort in every frame it is in view
+## ("bad comparison function; sorting will be broken", no script backtrace). They sit in the border
+## cells only, so only those are read.
+static func drop_nan_instances(region: Terrain3DRegion) -> int:
+	if region == null:
+		return 0
+	var last := region.region_size / 32 - 1   # the instancer's cells are 32 m
+	var inst: Dictionary = region.get_instances()
+	var dropped := 0
+	for mid in inst:
+		var cells: Dictionary = inst[mid]
+		for cell: Vector2i in cells:
+			if cell.x != 0 and cell.y != 0 and cell.x != last and cell.y != last:
+				continue
+			var e: Array = cells[cell]
+			var xfs: Array = e[0]
+			var bad := false
+			for t: Transform3D in xfs:
+				if not t.origin.is_finite():
+					bad = true
+					break
+			if not bad:
+				continue
+			var cols: PackedColorArray = e[1]
+			var keep_x: Array[Transform3D] = []
+			var keep_c := PackedColorArray()
+			for i in xfs.size():
+				var t: Transform3D = xfs[i]
+				if t.origin.is_finite():
+					keep_x.append(t)
+					if i < cols.size():
+						keep_c.append(cols[i])
+				else:
+					dropped += 1
+			e[0] = keep_x
+			e[1] = keep_c
+	if dropped > 0:
+		region.set_instances(inst)
+	return dropped
+
+
 ## Draw distances and shadows from RULES onto a tile's mesh assets, by name. The world calls it on
 ## every tile it loads, so a change to the table reaches packs and cached tiles built before it
 ## (their terrain_assets.tres keeps whatever ranges were current when `make tile` wrote it).

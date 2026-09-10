@@ -98,6 +98,8 @@ func execute(cmd: Dictionary) -> Array:
 		out.append("report " + Reporter.capture(str(cmd.report), world))
 	if cmd.has("stats"):
 		out.append(stats_line())
+	if cmd.has("nan"):
+		out.append(nan_nodes())
 	if cmd.has("quit"):
 		_result("quit")
 		get_tree().quit()
@@ -165,6 +167,28 @@ func reload_path(p: String) -> String:
 		ResourceLoader.load(p, "", ResourceLoader.CACHE_MODE_REPLACE)
 		result = "%s: cache replaced" % p
 	return result
+
+
+## Every 3D node whose transform or bounds are not finite (NaN or inf), by path: a NaN depth breaks
+## the renderer's sorts ("bad comparison function; sorting will be broken", no script backtrace).
+func nan_nodes() -> String:
+	var found: Array[String] = []
+	var stack: Array[Node] = [get_tree().root]
+	var n_seen := 0
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		for c in n.get_children():
+			stack.append(c)
+		if not (n is Node3D) or not (n as Node3D).is_inside_tree():
+			continue
+		n_seen += 1
+		var bad := not (n as Node3D).global_transform.origin.is_finite()
+		if not bad and n is VisualInstance3D:
+			var a := (n as VisualInstance3D).get_aabb()
+			bad = not (a.position.is_finite() and a.size.is_finite())
+		if bad and found.size() < 12:
+			found.append("%s (%s)" % [n.get_path(), n.get_class()])
+	return "nan: %d of %d 3D nodes%s" % [found.size(), n_seen, (": " + ", ".join(found)) if not found.is_empty() else ""]
 
 
 func _result(text: String) -> void:

@@ -10,6 +10,7 @@
     python3 tools/dev.py quit
     python3 tools/dev.py codes                      # toggle the K codes overlay
     python3 tools/dev.py stats                      # frame counters: process/physics ms, draw calls, memory
+    python3 tools/dev.py nan                        # 3D nodes with a NaN/inf transform or bounds (broken sorts)
     python3 tools/dev.py perf [all|prev]            # the session's performance log: the spikes (frames over 100 ms)
                                                     # with what ran in them; "all" every line; "prev" the previous session
     python3 tools/dev.py teleport <x> <z> [yaw_deg]
@@ -190,6 +191,8 @@ def main(argv):
         send({"note": " ".join(args)})
     elif cmd == "stats":
         send({"stats": True})
+    elif cmd == "nan":
+        send({"nan": True})
     elif cmd == "perf":
         perf(args)
     else:

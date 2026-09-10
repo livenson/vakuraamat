@@ -218,6 +218,9 @@ func _load_now(loc: Vector2i) -> void:
 			PerfLog.mark("region file %d ms" % (Time.get_ticks_msec() - t_load))
 			if r:
 				r.set_location(loc)
+				var nan := TerrainBuilder.drop_nan_instances(r)
+				if nan > 0:
+					PerfLog.mark("dropped %d NaN instances" % nan)
 				t_load = Time.get_ticks_msec()
 				terrain.data.add_region(r, true)
 				PerfLog.mark("add_region %d ms" % (Time.get_ticks_msec() - t_load))
