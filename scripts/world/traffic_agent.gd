@@ -27,6 +27,26 @@ var _speed_now := 0.0
 var _terrain: Terrain3D
 
 
+## Every model an agent can be made of, loading in the background (once per session).
+static var _warmed := false
+
+
+static func warm() -> void:
+	if _warmed:
+		return
+	_warmed = true
+	var paths: Array = [BIKE_MODEL]
+	for n in HumanFigure.MEN + HumanFigure.WOMEN:
+		paths.append(HumanFigure.DIR + n + ".glb")
+	for n in SKETCHFAB_CARS:
+		paths.append(SKETCHFAB + n + ".glb")
+	for n in KIT_UTILITY + ["sedan"]:
+		paths.append(CAR_KIT + n + ".glb")
+	for n in ["pug", "beagle", "cat"]:
+		paths.append("res://assets/vendor/polypizza/%s.glb" % n)
+	HumanFigure.warm(paths)
+
+
 func setup(g: RoadGraph, k: String, e: Dictionary, start_s: float, fwd: bool, seed_value: int, year: int) -> void:
 	_year = year
 	graph = g
@@ -156,7 +176,7 @@ func _make_animal(which: String) -> Node3D:
 	var path := "res://assets/vendor/polypizza/%s.glb" % names[rng.randi() % names.size()]
 	if not ResourceLoader.exists(path):
 		return _make_walker()
-	var model: Node3D = (load(path) as PackedScene).instantiate()
+	var model: Node3D = HumanFigure.scene(path).instantiate()
 	var b: AABB = Interiors._bounds(model)
 	var k := (0.42 if which == "dog" else 0.3) / maxf(b.size.y, 0.001)
 	var holder := Node3D.new()
@@ -172,7 +192,7 @@ func _make_animal(which: String) -> Node3D:
 func _make_walker() -> Node3D:
 	if HumanFigure.available():
 		return HumanFigure.make(rng, _year)
-	var fig: Node3D = load(FIGURES[rng.randi() % FIGURES.size()]).instantiate()
+	var fig: Node3D = HumanFigure.scene(FIGURES[rng.randi() % FIGURES.size()]).instantiate()
 	var k := rng.randf_range(0.9, 1.05)
 	fig.scale = Vector3(k, k, k)
 	_clothes(fig, CLOTHES[rng.randi() % CLOTHES.size()])
@@ -325,7 +345,7 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 	if not with_rider and ResourceLoader.exists(BIKE_MODEL):
 		# the parked bike and the mounted view: the Poly Pizza bicycle (Poly by Google, CC BY 3.0), 1.8 m long
 		var holder := Node3D.new()
-		var model: Node3D = (load(BIKE_MODEL) as PackedScene).instantiate()
+		var model: Node3D = HumanFigure.scene(BIKE_MODEL).instantiate()
 		var b: AABB = Interiors._bounds(model)
 		var k := 1.8 / maxf(maxf(b.size.x, b.size.z), 0.001)
 		model.scale = Vector3.ONE * k
@@ -390,7 +410,7 @@ static func build_bike(with_rider: bool, r: RandomNumberGenerator, clothes: Colo
 		rider.rotation.x = 0.3                   # leaning onto the handlebar (pitch about the feet)
 		root.add_child(rider)
 	elif with_rider:
-		var fig: Node3D = load(FIGURES[0]).instantiate()
+		var fig: Node3D = HumanFigure.scene(FIGURES[0]).instantiate()
 		fig.position = Vector3(0, 0.5, -0.3)
 		fig.scale = Vector3(0.95, 0.95, 0.95)
 		root.add_child(fig)
@@ -434,7 +454,7 @@ func _make_car(year: int) -> Node3D:
 	if not ResourceLoader.exists(path):
 		return _make_box_car(year)
 	var root := Node3D.new()
-	var model: Node3D = load(path).instantiate()
+	var model: Node3D = HumanFigure.scene(path).instantiate()
 	model.rotation.y = PI            # the kit's front is +Z; agents face -Z
 	model.scale = Vector3.ONE * CAR_SCALE
 	root.add_child(model)
@@ -449,7 +469,7 @@ func _make_sketchfab_car() -> Node3D:
 	var path := SKETCHFAB + name + ".glb"
 	if not ResourceLoader.exists(path):
 		return null
-	var model: Node3D = (load(path) as PackedScene).instantiate()
+	var model: Node3D = HumanFigure.scene(path).instantiate()
 	var b: AABB = Interiors._bounds(model)
 	var longest := maxf(b.size.x, b.size.z)
 	if longest < 0.01:
@@ -475,10 +495,7 @@ func _tint_car(model: Node3D, year: int) -> void:
 		for si in mi.mesh.get_surface_count():
 			var m: Material = mi.mesh.surface_get_material(si)
 			if m is BaseMaterial3D:
-				var c: BaseMaterial3D = m.duplicate()
-				c.albedo_color = c.albedo_color * tint
-				c.roughness = 0.35
-				mi.set_surface_override_material(si, c)
+				mi.set_surface_override_material(si, HumanFigure.tinted(m, tint, 0.35))
 
 
 func _make_box_car(year: int) -> Node3D:
@@ -515,7 +532,7 @@ func _make_cart() -> Node3D:
 	_box(root, Vector3(0.28, 0.28, 0.6), Vector3(0, 1.85, 3.7), horse)    # head
 	for lp in [Vector3(-0.2, 0.42, 1.8), Vector3(0.2, 0.42, 1.8), Vector3(-0.2, 0.42, 3.0), Vector3(0.2, 0.42, 3.0)]:
 		_box(root, Vector3(0.12, 0.85, 0.12), lp, horse)
-	var fig: Node3D = load(FIGURES[0]).instantiate()
+	var fig: Node3D = HumanFigure.scene(FIGURES[0]).instantiate()
 	fig.position = Vector3(0, 1.1, 0.2)
 	fig.scale = Vector3(0.9, 0.9, 0.9)
 	root.add_child(fig)

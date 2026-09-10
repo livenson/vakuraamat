@@ -29,6 +29,42 @@ var _rest: Dictionary = {}                 # name -> rest rotation (Quaternion)
 var _axes: Dictionary = {}                 # name -> {x, y, z}: the figure's axes expressed in the bone's rest frame
 
 
+# Loaded scenes and tinted materials kept for the session: ambient traffic spawns and frees figures
+# all the time, and a plain load() re-read the glb and its textures from disk each time the last
+# walker holding it went away (25 ms a walker, up to 150 ms, inside one physics tick).
+static var _scenes: Dictionary = {}
+static var _tinted: Dictionary = {}
+
+
+static func scene(path: String) -> PackedScene:
+	if not _scenes.has(path):
+		if ResourceLoader.load_threaded_get_status(path) != ResourceLoader.THREAD_LOAD_INVALID_RESOURCE:
+			_scenes[path] = ResourceLoader.load_threaded_get(path)   # warmed: waits only if still loading
+		else:
+			_scenes[path] = load(path)
+	return _scenes[path]
+
+
+## Start loading `paths` on the loader's threads, so the first walker, dog or car of the
+## session is instanced from memory instead of read from disk inside a physics tick.
+static func warm(paths: Array) -> void:
+	for p: String in paths:
+		if not _scenes.has(p) and ResourceLoader.exists(p):
+			ResourceLoader.load_threaded_request(p)
+
+
+## `m` with its albedo multiplied by `tint`, one shared copy per (material, tint).
+static func tinted(m: BaseMaterial3D, tint: Color, roughness := -1.0) -> BaseMaterial3D:
+	var key := "%d:%s:%s" % [m.get_instance_id(), tint.to_html(), roughness]
+	if not _tinted.has(key):
+		var c: BaseMaterial3D = m.duplicate()
+		c.albedo_color = c.albedo_color * tint
+		if roughness >= 0.0:
+			c.roughness = roughness
+		_tinted[key] = c
+	return _tinted[key]
+
+
 static func available() -> bool:
 	return ResourceLoader.exists(DIR + MEN[0] + ".glb")
 
@@ -44,10 +80,10 @@ static func make(rng: RandomNumberGenerator, year: int = 2026, variant: String =
 
 
 func setup(variant: String, rng: RandomNumberGenerator, year: int) -> void:
-	var scene: PackedScene = load(DIR + variant + ".glb")
-	if scene == null:
+	var packed := scene(DIR + variant + ".glb")
+	if packed == null:
 		return
-	var model: Node3D = scene.instantiate()
+	var model: Node3D = packed.instantiate()
 	model.rotation.y = PI   # the export faces +Z; agents and NPCs face -Z
 	add_child(model)
 	skeleton = model.find_child("*", true, false) as Skeleton3D if model is Skeleton3D else null
@@ -77,9 +113,7 @@ func _tint(model: Node3D, rng: RandomNumberGenerator, year: int) -> void:
 		for si in mi.mesh.get_surface_count():
 			var m: Material = mi.mesh.surface_get_material(si)
 			if m is BaseMaterial3D:
-				var c: BaseMaterial3D = m.duplicate()
-				c.albedo_color = c.albedo_color * tint
-				mi.set_surface_override_material(si, c)
+				mi.set_surface_override_material(si, tinted(m, tint))
 
 
 func set_walking(on: bool, ratio: float = 1.0) -> void:

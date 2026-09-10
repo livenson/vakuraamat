@@ -16,12 +16,14 @@ var agents: Array[TrafficAgent] = []
 var _timer := 0.0
 var _first := true
 var _rng := RandomNumberGenerator.new()
+var _off := Bench.is_off("traffic")
 
 
 func _ready() -> void:
 	var pack := Sites.pack_of(self)
 	graph = RoadGraph.from_pack(pack)
 	_rng.seed = hash(pack) + year
+	TrafficAgent.warm()
 
 
 ## Share of each kind by era year.
@@ -49,14 +51,27 @@ func time_factor() -> float:
 func _physics_process(delta: float) -> void:
 	if GameState.world == null or graph == null or graph.edges.is_empty() or not is_visible_in_tree():
 		return
+	if _off:
+		return
 	var player: Node3D = GameState.world.player
+	var t0 := Time.get_ticks_usec()
 	for a in agents:
 		if is_instance_valid(a):
 			a.advance(delta, agents)
 	agents = agents.filter(func(a): return is_instance_valid(a))
+	if Time.get_ticks_usec() - t0 > 4000:
+		PerfLog.mark("traffic advance %d agents %d ms" % [agents.size(), (Time.get_ticks_usec() - t0) / 1000])
 	_timer -= delta
 	if _timer > 0.0:
 		return
+	t0 = Time.get_ticks_usec()
+	var before := agents.size()
+	_tick(player)
+	if Time.get_ticks_usec() - t0 > 4000:
+		PerfLog.mark("traffic tick %d->%d agents %d ms" % [before, agents.size(), (Time.get_ticks_usec() - t0) / 1000])
+
+
+func _tick(player: Node3D) -> void:
 	_timer = 1.0
 	var lp := to_local(player.global_position)   # the graph is in pack-local metres (streamed tiles sit at an offset)
 	var centre := Vector2(lp.x, lp.z)

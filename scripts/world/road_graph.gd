@@ -3,9 +3,13 @@
 class_name RoadGraph
 extends RefCounted
 
-var edges: Array[Dictionary] = []     # {id, kind, width, pts: PackedVector2Array, cum: PackedFloat32Array, length, a, b, name}
+const CELL := 64.0                    # edges_near's grid: edge midpoints bucketed by 64 m cell
+
+var edges: Array[Dictionary] = []     # {id, kind, width, pts: PackedVector2Array, cum: PackedFloat32Array, length, a, b, name, mid}
 var node_edges: Dictionary = {}       # node id -> Array[int]
 var _nodes: PackedVector2Array = PackedVector2Array()
+var _node_cells: Dictionary = {}      # Vector2i (1 m cell) -> Array[int] node ids: _node without a scan of every node
+var _cells: Dictionary = {}           # Vector2i (CELL) -> Array[int] edge ids by midpoint
 
 
 static func from_pack(pack: String = "") -> RoadGraph:
@@ -34,15 +38,29 @@ func build(roads: Array) -> void:
 		edges.append(e)
 		node_edges[e.a].append(e.id)
 		node_edges[e.b].append(e.id)
+		e.mid = point_at(e, e.length * 0.5)
+		var cell := Vector2i(floori(e.mid.x / CELL), floori(e.mid.y / CELL))
+		if not _cells.has(cell):
+			_cells[cell] = []
+		_cells[cell].append(e.id)
 
 
+## The node within a metre of p, or a new one. Nodes are bucketed by 1 m cell, so only the 3x3
+## cells around p are asked (a city tile's 5000 nodes made the plain scan quadratic).
 func _node(p: Vector2) -> int:
-	for i in _nodes.size():
-		if _nodes[i].distance_squared_to(p) < 1.0:
-			return i
+	var c := Vector2i(floori(p.x), floori(p.y))
+	for dx in range(-1, 2):
+		for dy in range(-1, 2):
+			for i: int in _node_cells.get(c + Vector2i(dx, dy), []):
+				if _nodes[i].distance_squared_to(p) < 1.0:
+					return i
 	_nodes.append(p)
-	node_edges[_nodes.size() - 1] = []
-	return _nodes.size() - 1
+	var id := _nodes.size() - 1
+	node_edges[id] = []
+	if not _node_cells.has(c):
+		_node_cells[c] = []
+	_node_cells[c].append(id)
+	return id
 
 
 ## Position along an edge at distance s from its start.
@@ -69,12 +87,18 @@ func dir_at(e: Dictionary, s: float, forward: bool) -> Vector2:
 ## Edges of the given kinds whose middle lies between rmin and rmax from `center`.
 func edges_near(center: Vector2, rmin: float, rmax: float, kinds: Array) -> Array[int]:
 	var out: Array[int] = []
-	for e in edges:
-		if not (e.kind in kinds):
-			continue
-		var d := point_at(e, e.length * 0.5).distance_to(center)
-		if d >= rmin and d <= rmax:
-			out.append(e.id)
+	var lo := Vector2i(floori((center.x - rmax) / CELL), floori((center.y - rmax) / CELL))
+	var hi := Vector2i(floori((center.x + rmax) / CELL), floori((center.y + rmax) / CELL))
+	for cx in range(lo.x, hi.x + 1):
+		for cy in range(lo.y, hi.y + 1):
+			for id: int in _cells.get(Vector2i(cx, cy), []):
+				var e: Dictionary = edges[id]
+				if not (e.kind in kinds):
+					continue
+				var d: float = (e.mid as Vector2).distance_to(center)
+				if d >= rmin and d <= rmax:
+					out.append(id)
+	out.sort()   # the order the plain scan gave: spawns pick by index, so a seed places the same agents
 	return out
 
 
