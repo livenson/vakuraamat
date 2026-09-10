@@ -47,7 +47,8 @@ var _job: BuildJob
 # The worker threads all report back in the same frame (a tile's 500 jobs finish within a few
 # hundred milliseconds of each other), and each mesh, its collider and its draw calls cost the main
 # thread a millisecond or two: that landed as one 1.3-2 s frame. The finished jobs queue here and a
-# few milliseconds' worth are applied per frame instead.
+# few milliseconds' worth are applied once per frame. The budget is the frame's, not the call's:
+# a job that finishes only queues, or a burst of finishes each spent a fresh budget in one frame.
 const APPLY_BUDGET_USEC := 5000
 static var _apply_queue: Array = []
 static var _apply_hooked := false
@@ -61,16 +62,22 @@ static func _queue_apply(job) -> void:
 			node._apply(job)
 		return
 	_apply_queue.append(job)
-	_drain()
+	if not _apply_hooked:
+		_apply_hooked = true
+		(tree as SceneTree).process_frame.connect(_drain_next, CONNECT_ONE_SHOT)
 
 
 static func _drain() -> void:
 	var t0 := Time.get_ticks_usec()
+	var n := 0
 	while not _apply_queue.is_empty() and Time.get_ticks_usec() - t0 < APPLY_BUDGET_USEC:
 		var job = _apply_queue.pop_front()
 		var node = job.owner.get_ref()
 		if node and is_instance_valid(node):
 			node._apply(job)
+			n += 1
+	if Time.get_ticks_usec() - t0 > 2 * APPLY_BUDGET_USEC:   # one apply alone overran: name it in a spike
+		PerfLog.mark("buildings applied %d in %d ms, %d queued" % [n, (Time.get_ticks_usec() - t0) / 1000, _apply_queue.size()])
 	var tree := Engine.get_main_loop()
 	if not _apply_queue.is_empty() and not _apply_hooked and tree is SceneTree:
 		_apply_hooked = true
@@ -599,11 +606,25 @@ func _model() -> Dictionary:
 
 
 func _enter_tree() -> void:
+	standing[get_instance_id()] = self
 	# the plain mesh is built in _ready; these small props come after it so they sit on the model
-	ready.connect(_details, CONNECT_ONE_SHOT)
+	if not is_node_ready() and not ready.is_connected(_details):
+		ready.connect(_details, CONNECT_ONE_SHOT)
+
+
+func _exit_tree() -> void:
+	standing.erase(get_instance_id())
+
+
+## Every building in the tree right now (origin layer and streamed tiles), instance id -> node:
+## what the flying pick and other whole-town passes read instead of walking 70k nodes.
+static var standing: Dictionary = {}
+static var _details_off := Bench.is_off("details")
 
 
 func _details() -> void:
+	if _details_off:
+		return
 	var top := height
 	var model := _model()
 	if not model.is_empty():

@@ -16,13 +16,14 @@ const REACH_WALK := 4.5    # an arm and a step: doors, props, the wall beside yo
 const REACH_FLY := 600.0   # a survey from the air: the town below, well short of the camera's 4 km
 const CONE_DEG := 2.0      # the floor: a building smaller than this on screen is still pickable
 const STICKY_S := 0.25     # keep the last pick this long when the aim slips off it
-const SURVEY_REFRESH_S := 0.5   # how often the flown-over buildings are re-collected
+const SURVEY_EVERY_S := 0.1     # the cone pick runs ten times a second, not every physics tick
 
 var target: Interactable = null
 var blocked := false
 var _lit: FootprintBuilding = null   # the building outlined for the current target
-var _survey: Array = []             # [FootprintBuilding, centre, radius] of every building standing
-var _survey_age := 0.0
+var _spheres: Dictionary = {}       # instance id -> [centre, radius] of each built building, measured once
+var _survey_wait := 0.0
+var _survey_last: FootprintBuilding = null
 var _slipped := 0.0                 # seconds since the pick last found something
 
 
@@ -83,52 +84,46 @@ func _pick(flying: bool) -> Interactable:
 ## view to its centre is within the angle the building itself subtends - with a small floor so a
 ## shed a quarter mile off is not impossible to hit. Of the candidates the nearest wins, which is
 ## what "the one I am looking at" means when a hall stands behind a house.
+##
+## The candidates are FootprintBuilding.standing (every building in the tree, kept by the buildings
+## themselves), each measured once when its mesh stands, so a tile that has just arrived counts
+## from its first built house. Between picks the last answer holds.
 func _survey_pick() -> Interactable:
-	_refresh_survey()
+	_survey_wait -= get_physics_process_delta_time()
+	if _survey_wait > 0.0:
+		return _building_info(_survey_last) if _survey_last and is_instance_valid(_survey_last) else null
+	_survey_wait = SURVEY_EVERY_S
+	_survey_last = null
 	var cam: Node3D = get_parent()
 	if cam == null:
 		return null
 	var eye := cam.global_position
 	var look := -cam.global_transform.basis.z
 	var floor_rad := deg_to_rad(CONE_DEG)
+	var reach2 := REACH_FLY * REACH_FLY
 	var best: FootprintBuilding = null
 	var best_far := INF
-	for entry in _survey:
-		# the validity check has to come before the typed assignment, not after it: assigning a freed
-		# instance to a typed variable is itself the error, and a tile unloading frees its buildings
-		# while this list still holds them
-		if not is_instance_valid(entry[0]):
-			_survey_age = 0.0   # something went away: rebuild on the next tick rather than limp on
+	for id: int in FootprintBuilding.standing:
+		var b: FootprintBuilding = FootprintBuilding.standing[id]
+		var s: Array = _spheres.get(id, [])
+		if s.is_empty():
+			if not b.is_built:
+				continue   # measured once it stands on its snapped ground
+			s = _measure(b)
+			_spheres[id] = s
+		var to: Vector3 = s[0] - eye
+		var far2 := to.length_squared()
+		if far2 > reach2 or far2 < 0.000001 or far2 >= best_far * best_far:
 			continue
-		var b: FootprintBuilding = entry[0]
-		var to: Vector3 = entry[1] - eye
-		var far := to.length()
-		if far > REACH_FLY or far < 0.001 or far >= best_far:
-			continue
+		var far := sqrt(far2)
 		var off := acos(clampf(look.dot(to / far), -1.0, 1.0))
-		if off <= maxf(float(entry[2]) / far, floor_rad):
+		if off <= maxf(float(s[1]) / far, floor_rad):
 			best = b
 			best_far = far
+	if _spheres.size() > FootprintBuilding.standing.size() * 2 + 256:
+		_spheres = {}   # tiles went away: forget their measures rather than grow without end
+	_survey_last = best
 	return _building_info(best) if best else null
-
-
-## Every real building standing right now - the origin layer and each streamed tile - as the centre
-## of its footprint at half its height, and the radius that centre needs to cover the whole thing.
-## Rebuilt a couple of times a second while flying, which is what it costs to notice a tile that
-## has just arrived.
-func _refresh_survey() -> void:
-	_survey_age -= get_physics_process_delta_time()
-	if _survey_age > 0.0 and not _survey.is_empty():
-		return
-	_survey_age = SURVEY_REFRESH_S
-	_survey = []
-	var world: Node = GameState.world
-	if world == null or not world.has_method("_building_scopes"):
-		return
-	for layer in world._building_scopes():
-		for b in layer.find_children("*", "FootprintBuilding", true, false):
-			var m := _measure(b)
-			_survey.append([b, m[0], m[1]])
 
 
 ## The centre of a building's footprint at half its height, and the distance from there to its
