@@ -24,6 +24,7 @@ var _storage_box: VBoxContainer
 
 func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	_warm_renderer()
 	theme = BookTheme.theme()
 	if "--locations" in OS.get_cmdline_user_args():
 		GameState.menu_open_locations = true
@@ -99,11 +100,11 @@ func _build() -> void:
 	gap.custom_minimum_size = Vector2(0, 28)
 	box.add_child(gap)
 	if not summary.is_empty():
-		_entry("UI_CONTINUE_GAME", (Sites.display_name(summary.site) + ", " if not saved_here else "") + _book_line(summary), func():
-			if summary.site != "" and summary.site != Sites.active and Sites.available.has(summary.site):
-				Sites.select(summary.site)
-			GameState.pending_load = true
-			await _enter_world())
+		_entry("UI_CONTINUE_GAME", (Sites.display_name(summary.site) + ", " if not saved_here else "") + _book_line(summary), _continue_game.bind(summary))
+		if "--continue" in OS.get_cmdline_user_args():
+			# the Continue entry pressed for you (timing a release build's way in), a moment after the
+			# menu's first frames, as a player would
+			get_tree().create_timer(0.5).timeout.connect(_continue_game.bind(summary))
 	_entry("UI_NEW_GAME", Sites.display_name(Sites.active), func(): _start_new_game())
 	_entry("MENU_LOCATIONS", tr("MENU_PACKS_COUNT") % Sites.available.size(), _build_locations_panel)
 	_entry("MENU_LANGUAGE", "English" if TranslationServer.get_locale().begins_with("et") else "Eesti", func():
@@ -665,3 +666,53 @@ func _progress_sheet(name: String, head_key := "MENU_GENERATING", note_key := "M
 		close.grab_focus())
 	overlay.grab_focus()
 	return overlay
+
+
+func _continue_game(summary: Dictionary) -> void:
+	if summary.site != "" and summary.site != Sites.active and Sites.available.has(summary.site):
+		Sites.select(summary.site)
+	GameState.pending_load = true
+	await _enter_world()
+
+
+
+## The renderer builds its own pipelines the first time a 3D camera draws - on a cold first launch
+## on macOS (Metal) 3.3 s in one frame, whatever the camera looks at, and a plain StandardMaterial3D
+## another 0.3 s. Drawn here, behind the menu page in the menu's first frame, that is the boot splash
+## staying up a moment longer; drawn by the world, it froze its loading screen (2026-09-11: the
+## world's first frame 4.8 s cold, 1.3 s with this). Once per run; macOS keeps them afterwards.
+static var _renderer_warm := false
+
+
+func _warm_renderer() -> void:
+	if _renderer_warm or DisplayServer.get_name() == "headless":
+		return
+	_renderer_warm = true
+	# the boot splash again, over the menu, until those frames are drawn: the frozen one is the splash
+	var splash := CanvasLayer.new()
+	splash.layer = 100
+	var bg := ColorRect.new()
+	bg.color = ProjectSettings.get_setting("application/boot_splash/bg_color", Color.BLACK)
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	splash.add_child(bg)
+	var image := TextureRect.new()
+	image.texture = load(str(ProjectSettings.get_setting("application/boot_splash/image", "")))
+	image.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	image.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	image.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	splash.add_child(image)
+	add_child(splash)
+	var root := Node3D.new()
+	var cam := Camera3D.new()
+	root.add_child(cam)
+	var box := MeshInstance3D.new()
+	box.mesh = BoxMesh.new()
+	box.material_override = StandardMaterial3D.new()
+	box.position = Vector3(0.0, 0.0, -3.0)
+	root.add_child(box)
+	add_child(root)
+	cam.current = true
+	for i in 3:
+		await get_tree().process_frame
+	root.queue_free()
+	splash.queue_free()
