@@ -208,11 +208,36 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
        `fetch_cadastre_lv` instead of the Estonian registers, and nothing to refine. The same job
        serves neighbour tiles streamed from a Latvian place.
      - The frozen sidecar carries the new modules and `estonia.json` (the Valga/Valka test).
-     - Places outside Rīga get flat roofs until step 4. None has companies, roads or bus stops
-       before steps 3 and 5.
-3. **Companies and money.** UR + VID + annual reports into `tenants.json`; the health rules
-   accept annual turnover. Done when name plates and the K overlay show Latvian companies and
-   `health_test` passes on the pack.
+     - Places outside Rīga get flat roofs until step 4. None has roads or bus stops before
+       step 5.
+3. **Companies and money.** Done 2026-09-12 (`tools/pipeline/fetch_tenants_lv.py`, also a stage of
+   the service's Latvian job):
+   - **Old Town results.** 2,361 companies on the tile's buildings and plots, and 2,581 more on its
+     streets, in 10 s. VID taxes for 3,219, annual-report turnover for 3,237. Health: 1,936 sound,
+     159 watch on turnover, 110 watch on an overdue report, 122 distressed by status, 34 by a year
+     of zero taxes while employing.
+   - **Matching.** First the company's address code against a building's or a parcel's (1,069).
+     Then its address against the tile's in the same town (1,292): the premises after " - " are
+     dropped and alternatives after ";" tried. Companies in flats carry the flat's own code, so
+     the address match is the larger half.
+   - **Status.** An open insolvency proceeding counts as bankrupt (`N`, distressed). Any row in
+     the liquidation file counts as in liquidation (`L`, distressed). A legal-protection
+     proceeding stays registered but is on watch, its reason the register status.
+     Terminated entities are left out.
+   - **Names.** The long legal forms are shortened as a sign writes them ("AS "Citadele
+     banka"", "VSIA …"); 10 rows with other forms keep their full name. Sole traders (IK, IND)
+     and farms (ZEM) are skipped; `validate_site` now rejects the Latvian sole-trader forms too.
+   - **People.** Officers and members are kept as counts and uuid5 hashes of name, masked code
+     and birth date, or a company's own number, so `Links` can tie co-owned firms and nothing
+     readable is stored.
+   - **Figures.** VID has no turnover: `turnover` is the last annual report's
+     (`turnover_year`), `taxes` the last year VID has in full (`taxes_year`, the three-year
+     file's 2024 until four archived quarters make a later year), and `employees` VID's latest
+     quarter. `Tenants.facts` names the year of each figure, "turnover 61 781 €/yr (2025)".
+     Banks' income statements carry no net turnover, so they show none.
+   - **Left open.** No sector where VID's annual file lacks the company (new firms); no company
+     link (the register's public page URL is unverified); a data.gov.lv rename would need the
+     file names in `fetch_tenants_lv` updated.
 4. **Roofs from the laser points** for buildings without LOD2. Done when Valka's houses have
    pitched roofs (screenshot beside the orthophoto).
 5. **Roads, stops, departures, fields.** OSM roads, the GTFS feeds, LAD fields.

@@ -312,13 +312,16 @@ def run_job(job):
         finally:
             fetch_tile.PROGRESS = None
         if country == "lv":
-            # Latvia (docs/latvia-plan.md): the cadastre gives parcels and buildings in one pass; the
-            # companies, roads, stops, fields and timetables are later steps of the plan
+            # Latvia (docs/latvia-plan.md): the cadastre gives parcels and buildings in one pass, the
+            # register and VID the companies; roads, stops, fields and timetables are later steps
             stage("cadastre (VZD), buildings, Rīga's roofs", 0.5)
             import fetch_cadastre_lv
             ok, _ = with_deadline(f"{sid}: cadastre", 1500, fetch_cadastre_lv.fetch, sid, root=ws)
             if not ok:
                 raise RuntimeError("the Latvian cadastre could not be read (see the service log)")
+            stage("companies (UR) and taxes (VID)", 0.62)
+            import fetch_tenants_lv
+            with_deadline(f"{sid}: tenants", 600, fetch_tenants_lv.fetch, sid, root=ws)
             stops_thread = None
         else:
             stops_thread = estonian_registers(sid, ws, stage)

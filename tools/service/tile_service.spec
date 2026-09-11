@@ -31,7 +31,7 @@ a = Analysis(
     hiddenimports=hiddenimports + ["new_site", "gen_era_scenes", "extract_features", "fetch_buildings", "fetch_trees", "fetch_parcels",
                                    "fetch_roads", "fetch_stops", "fetch_departures", "fetch_tenants", "fetch_fields", "market", "fetch_tile",
                                    "validate_site", "register_extra", "emtak", "geo", "paths", "sources",
-                                   "fetch_tile_lv", "fetch_cadastre_lv", "geocode_lv"],
+                                   "fetch_tile_lv", "fetch_cadastre_lv", "fetch_tenants_lv", "geocode_lv"],
     hookspath=[],
     runtime_hooks=[],
     excludes=["tkinter", "matplotlib", "IPython"],

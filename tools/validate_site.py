@@ -215,7 +215,7 @@ def validate(site, rep, root=ROOT):
                 rep.err(f"{who}: building_id {t['building_id']!r} not in buildings.json")
             if t.get("match") == "exact" and t.get("tunnus") is None and t.get("building_id") is None:
                 rep.err(f"{who}: exact match without a parcel or building")
-            if str(t.get("legal_form") or "").startswith("Füüsilisest isikust"):
+            if str(t.get("legal_form") or "").startswith(("Füüsilisest isikust", "Individuālais komersants", "Individuālais uzņēmums")):
                 rep.err(f"{who}: sole proprietor (a private person) in tenants.json")
             # the register's people files are used as structure only: no names, contacts or ids of persons
             for k in ("eesnimi", "nimi_arinimi", "email", "phone", "isikukood", "board_names", "members"):
