@@ -11,6 +11,8 @@ extends Node3D
 @export var spawn_max := 220.0
 @export var despawn := 320.0
 
+const ARRIVAL_BUDGET_USEC := 6000
+
 var graph: RoadGraph
 var agents: Array[TrafficAgent] = []
 var _timer := 0.0
@@ -84,11 +86,17 @@ func _tick(player: Node3D) -> void:
 	for id in near:
 		metres += graph.edges[id].length
 	var target := mini(max_agents, int(metres / 100.0 * density * time_factor()))
-	# fill the whole target on the first tick (arrival, era switch), then trickle in
+	# fill the whole target on arrival (and era switch), then trickle in. The arrival fill runs a few
+	# milliseconds a physics frame: 40 agents in one tick were 350-650 ms, one frame of the world's
+	# loading screen standing still.
 	var burst := target - agents.size() if _first else 3
-	_first = false
+	var t0 := Time.get_ticks_usec()
 	for _i in range(mini(burst, target - agents.size())):
 		_spawn(centre)
+		if _first and Time.get_ticks_usec() - t0 > ARRIVAL_BUDGET_USEC:
+			_timer = 0.0   # the rest on the next physics frame
+			return
+	_first = false
 
 
 func _spawn(centre: Vector2) -> void:
