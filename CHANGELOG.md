@@ -8,7 +8,7 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
-## Unreleased
+## v0.9.0 — 2026-09-11
 
 **No more frozen window on the way in.**
 
