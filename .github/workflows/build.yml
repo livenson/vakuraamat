@@ -101,10 +101,26 @@ jobs:
             fi
           done
           godot --headless --path . --import || true
+      - name: "Metal toolchain (macOS: the shader baker compiles .metallib with it)"
+        if: matrix.preset == 'macOS'
+        run: |
+          # Xcode 26 ships the Metal compiler as a separate component. Without it the baker stores
+          # Metal source, and every player's first launch compiles it: 25 s of frozen frames on entering
+          # a world (v0.8.0, perf.log 2026-09-11)
+          xcrun -sdk macosx metal -v >/dev/null 2>&1 || xcodebuild -downloadComponent MetalToolchain
+          xcrun -sdk macosx metal -v
       - name: Export ${{ matrix.preset }}
         run: |
           mkdir -p "$(dirname '${{ matrix.path }}')"
-          godot --headless --path . --export-release "${{ matrix.preset }}" "${{ matrix.path }}"
+          if [ "${{ matrix.preset }}" = "macOS" ]; then
+            # the shader baker needs a rendering device, which --headless does not create
+            godot --path . --export-release "${{ matrix.preset }}" "${{ matrix.path }}" 2>&1 | tee export.log
+            if grep -q "Metal shader baking limited to SPIR-V" export.log; then
+              echo "::warning::the macOS build ships unbaked Metal shaders; its first launch compiles them"
+            fi
+          else
+            godot --headless --path . --export-release "${{ matrix.preset }}" "${{ matrix.path }}"
+          fi
           ls -la "$(dirname '${{ matrix.path }}')"
       - name: "Bundle (Windows and Linux: the executable, its pck and the sidecar)"
         if: matrix.preset != 'macOS'
