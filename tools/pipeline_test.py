@@ -65,6 +65,14 @@ def test_health_blank_is_not_zero():
     check(h("R", [q(0, 0, 3)] * 4, False) == "distressed", "a year of published zero taxes with staff is no longer distressed")
     check(h("R", [q(0, 900, 3)] * 4, False) == "sound", "an employer paying only payroll taxes reads as distressed")
     check(h("L", [], False) == "distressed", "a company in liquidation is not distressed")
+    w = register_extra.health_why
+    check(w("R", [q(None, None, 58)] * 4, True) == {"rule": "report"}, "an overdue report does not say so")
+    def t(year, turnover):
+        return {"year": year, "q": 1, "taxes": 100, "labour": 100, "turnover": turnover, "employees": 1}
+    fall = [t(2024, 30000)] * 4 + [t(2025, 5000)] * 4
+    check(h("R", fall, False) == "watch" and w("R", fall, False) == {"rule": "turnover", "from": [2024, 120000], "to": [2025, 20000]},
+          "a turnover drop does not carry its two years")
+    check(w("R", [t(2025, 100)] * 4, False) is None, "a sound company carries a reason")
 
 
 def main():
