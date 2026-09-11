@@ -362,8 +362,8 @@ static func _pipelines_compiled() -> int:
 ## enters the scene in the frame it enters, and that frame waits for them: on a cold first launch
 ## (Metal) tens of milliseconds each, and a town arriving at once froze the window under the loading
 ## label for seconds. So things arrive a few at a time - the layer's members
-## (EraController.fill_pending), the traffic (TrafficSystem's arrival budget) - and the label moves
-## between them. Physics is held to one step a frame meanwhile: after a long frame Godot runs up to
+## (EraController.fill_pending), the roads, lamps and shelters (RoadNetwork, in the "arriving" group
+## until they stand), the buses and the traffic (their arrival budgets) - and the label moves between them. Physics is held to one step a frame meanwhile: after a long frame Godot runs up to
 ## eight to catch up, and every _physics_process budget ran eight times over. The camera sees nothing:
 ## a viewport with 3D disabled would start no compilations at all and leave them all to the first
 ## frame shown.
@@ -380,7 +380,8 @@ func _hold_until_ready(label: Label, cull_mask: int) -> void:
 		if n != last:
 			last = n
 			quiet_since = now
-		if not filling and now - quiet_since >= HOLD_QUIET_MS:
+		var arriving := get_tree().get_nodes_in_group(RoadNetwork.ARRIVING).size()
+		if not filling and arriving == 0 and now - quiet_since >= HOLD_QUIET_MS:
 			break
 		var layer: EraController = _era_nodes.get(GameState.current_era)
 		if filling and layer and layer.fill_total > 0:

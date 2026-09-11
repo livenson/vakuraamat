@@ -26,12 +26,37 @@ func _ready() -> void:
 	var parsed = JSON.parse_string(text) if text != "" else null
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return
-	roads = parsed.get("roads", [])
+	roads = parsed.get("roads", [])   # nearest() and the codes overlay read these from the start
 	var terrain: Terrain3D = GameState.world.terrain if GameState.world else null
 	if terrain == null:
 		return
+	_build(terrain)   # not awaited: the pieces arrive over the next frames
+
+
+const ARRIVING := "arriving"   # nodes still building what they show; the world's loading screen waits for them
+const BUILD_BUDGET_USEC := 8000
+var _slice_start := 0
+
+
+## Past the frame's budget, wait for the next frame. False when the network left the tree meanwhile.
+func _breathe() -> bool:
+	if Time.get_ticks_usec() - _slice_start > BUILD_BUDGET_USEC:
+		await get_tree().process_frame
+		_slice_start = Time.get_ticks_usec()
+	return is_inside_tree()
+
+
+## The ribbons, the street lights, the bus stops and the billboards, a few milliseconds a frame: a
+## city tile's 687 roads with their 600 lamps and 30 shelters were a second in one frame (debug build),
+## the loading screen standing still and a streamed tile's arrival a hitch.
+func _build(terrain: Terrain3D) -> void:
+	add_to_group(ARRIVING)
+	var t0 := Time.get_ticks_usec()
+	_slice_start = t0
 	var tools := {}   # "<kind>" and "<kind>_kerb" -> SurfaceTool; one plain material each
 	for r in roads:
+		if not await _breathe():
+			return
 		var kind := str(r.get("kind", "road"))
 		var style: Dictionary = STYLE.get(kind, STYLE.road)
 		for key in [kind, kind + "_kerb"]:
@@ -60,9 +85,15 @@ func _ready() -> void:
 		mi.material_override = mat
 		mi.name = "Roads_" + key
 		add_child(mi)
-	_street_lights(terrain)
-	_bus_stops(terrain)
+	var lit: bool = await _street_lights(terrain)
+	if not lit:
+		return
+	var stops: bool = await _bus_stops(terrain)
+	if not stops:
+		return
 	_billboards(terrain)
+	remove_from_group(ARRIVING)
+	PerfLog.mark("roads %d built over %d ms" % [roads.size(), (Time.get_ticks_usec() - t0) / 1000])
 
 
 const POSTER_RECT := Rect2(0.793, 0.674, 0.198, 0.317)   # the second advert panel in the town shelter's atlas (UV space)
@@ -422,14 +453,14 @@ const STOP_MODELS := {"rural": "res://assets/vendor/sketchfab/bus_stop_rural.glb
 ## Bus shelters where OpenStreetMap has a stop (tools/pipeline/fetch_stops.py writes stops.json with
 ## each stop moved to the roadside and its heading): the Soviet-era shelter on roads, the small
 ## modern one on streets; the timetable board is readable (E) with the stop's name and lines.
-func _bus_stops(terrain: Terrain3D) -> void:
+func _bus_stops(terrain: Terrain3D) -> bool:
 	var pack := Sites.pack_of(self)
 	var path := Sites.path_in(pack, "stops.json")
 	if not FileAccess.file_exists(path):
-		return
+		return true
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
 	if typeof(parsed) != TYPE_DICTIONARY:
-		return
+		return true
 	var scenes := {}
 	var bounds := {}
 	for key in STOP_MODELS:
@@ -439,8 +470,10 @@ func _bus_stops(terrain: Terrain3D) -> void:
 			bounds[key] = Interiors._bounds(probe)   # the open front faces +Z
 			probe.free()
 	if scenes.is_empty():
-		return
+		return true
 	for st in parsed.get("stops", []):
+		if not await _breathe():
+			return false
 		var kind: String = "town" if str(st.get("road_kind", "")) == "street" else "rural"
 		if not scenes.has(kind):
 			kind = scenes.keys()[0]
@@ -478,6 +511,7 @@ func _bus_stops(terrain: Terrain3D) -> void:
 		add_child(holder)
 		if kind == "town":
 			_timetable(model, str(st.get("id", "")), pack)   # the register's own times over the baked board
+	return true
 
 
 ## Lamp posts along the streets (asphalt with a kerb): one every LAMP_SPACING metres on the right
@@ -485,7 +519,7 @@ func _bus_stops(terrain: Terrain3D) -> void:
 const LAMP_MODEL := "res://assets/vendor/sketchfab/street_lamp.glb"   # pinokio21, CC BY (THIRD_PARTY.md)
 
 
-func _street_lights(terrain: Terrain3D) -> void:
+func _street_lights(terrain: Terrain3D) -> bool:
 	var lamp_scene: PackedScene = load(LAMP_MODEL) if ResourceLoader.exists(LAMP_MODEL) else null
 	var lamp_bounds := AABB()
 	if lamp_scene:
@@ -504,12 +538,15 @@ func _street_lights(terrain: Terrain3D) -> void:
 	head_mat.albedo_color = Color(0.9, 0.85, 0.7)
 	head_mat.emission_enabled = true
 	head_mat.emission = Color(1.0, 0.85, 0.6)
-	head_mat.emission_energy_multiplier = 0.0
+	head_mat.emission_energy_multiplier = 3.0 if _lit else 0.0
+	_head_mat = head_mat
 	var side := 1.0
 	var cells: Dictionary = {}   # Vector2i -> {poles, heads}: transforms, one MultiMesh each per cell
 	for r in roads:
 		if str(r.get("kind", "road")) != "street":
 			continue
+		if not await _breathe():
+			return false
 		var pts := _resample(r.points)
 		var half: float = maxf(float(r.get("width", 3.0)), 1.2) / 2.0
 		var along := LAMP_SPACING * 0.5
@@ -557,11 +594,11 @@ func _street_lights(terrain: Terrain3D) -> void:
 				along += LAMP_SPACING
 				side = -side
 			acc += seg
-	_head_mat = head_mat
 	var pole_draw: Mesh = MeshMerge.baked(LAMP_MODEL) if lamp_scene and lamp_bounds.size.y > 0.01 else pole_mesh
 	for cell: Vector2i in cells:
 		_lamp_multimesh(pole_draw, null if pole_draw != pole_mesh else pole_mat, cells[cell].poles, POLE_RANGE, true)
 		_lamp_multimesh(head_mesh, head_mat, cells[cell].heads, HEAD_RANGE, false)
+	return true
 
 
 # Street lights drawn as MultiMeshes, one per LAMP_CELL square and part, so a city tile's 600
@@ -599,10 +636,12 @@ func _lamp_multimesh(mesh: Mesh, mat: Material, xforms: Array, range_end: float,
 
 
 var _head_mat: StandardMaterial3D = null
+var _lit := false
 
 
 ## Street lights on or off (the era controller calls this with the windows after dark).
 func set_lit(on: bool) -> void:
+	_lit = on
 	for l in _lamps:
 		l.visible = on
 	if _head_mat:
