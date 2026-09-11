@@ -229,15 +229,21 @@ func geocode(q: String) -> Array:
 		if a > 50.0 and a < 70.0:
 			var p := wgs84_to_lest97(a, b)
 			return [{"name": "%.4f N %.4f E" % [a, b], "x": p.x, "y": p.y}]
-	var r := await http(GEOCODER + q.uri_encode())
-	if not r.ok:
-		return []
-	var parsed = JSON.parse_string(r.body)
 	var out := []
+	var r := await http(GEOCODER + q.uri_encode())
+	var parsed = JSON.parse_string(r.body) if r.ok else null
 	if typeof(parsed) == TYPE_DICTIONARY:
 		for a in parsed.get("addresses", []):
 			if a.has("viitepunkt_x") and a.has("viitepunkt_y"):
 				out.append({"name": str(a.get("pikkaadress", a.get("ipikkaadress", q))), "x": float(a.viitepunkt_x), "y": float(a.viitepunkt_y)})
+	# Latvia: the tile service searches the Latvian address register (tools/pipeline/geocode_lv.py);
+	# without the service the search stays Estonian
+	var lv := await http(service_url() + "/geocode_lv?q=" + q.uri_encode())
+	var found = JSON.parse_string(lv.body) if lv.ok else null
+	if typeof(found) == TYPE_ARRAY:
+		for a in found:
+			if typeof(a) == TYPE_DICTIONARY and a.has("x") and a.has("y"):
+				out.append({"name": str(a.get("name", q)), "x": float(a.x), "y": float(a.y)})
 	return out
 
 
@@ -255,6 +261,12 @@ func locate_by_ip() -> Dictionary:
 
 func in_estonia(x: float, y: float) -> bool:
 	return x > 369000.0 and x < 740000.0 and y > 6377000.0 and y < 6635000.0
+
+
+## Whether the service may have data for an L-EST97 point: Estonia's box or Latvia's (the Latvian
+## tiles are built on the same grid, docs/latvia-plan.md). The service decides the border exactly.
+func in_coverage(x: float, y: float) -> bool:
+	return in_estonia(x, y) or (x > 305000.0 and x < 770000.0 and y > 6165000.0 and y < 6450000.0)
 
 
 static func _m(phi: float, e: float) -> float:
@@ -326,7 +338,7 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 	var free := free_bytes()
 	if not await ensure_service():
 		error = tr("MENU_SERVICE_DOWN") % base
-	elif not in_estonia(x, y):
+	elif not in_coverage(x, y):
 		error = tr("MENU_OUTSIDE_ESTONIA")
 	elif free >= 0 and free < MIN_FREE_BYTES:
 		error = tr("MENU_LOW_DISK") % [fmt_bytes(free), fmt_bytes(MIN_FREE_BYTES)]

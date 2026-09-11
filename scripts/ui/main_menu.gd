@@ -301,7 +301,7 @@ func _build_locations_panel() -> void:
 	var srow := HBoxContainer.new()
 	list.add_child(srow)
 	_query = LineEdit.new()
-	_query.placeholder_text = "Kvissentali tee, Tartu"
+	_query.placeholder_text = "Kvissentali tee, Tartu  /  Doma laukums, Rīga"
 	_query.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_query.text_submitted.connect(func(_t): _search())
 	_query.text_changed.connect(_on_query_changed)   # suggestions while typing
@@ -496,7 +496,7 @@ func _use_my_location() -> void:
 	if not d.get("ok", false):
 		_status.text = tr("MENU_NO_RESULTS")
 		return
-	if not Locator.in_estonia(d.x, d.y):
+	if not Locator.in_coverage(d.x, d.y):
 		_status.text = tr("MENU_OUTSIDE_ESTONIA") + "  (%s)" % d.name
 		return
 	_show_results([d])

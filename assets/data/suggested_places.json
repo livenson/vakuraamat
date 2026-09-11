@@ -110,5 +110,59 @@
   "x": 593579,
   "y": 6469861,
   "address": "Viljandi maakond, Viljandi linn, Ranna pst"
+ },
+ {
+  "name": "Rīga, Alberta iela",
+  "country": "lv",
+  "note_en": "Rīga, the Art Nouveau street (Latvia; the city's own roof models)",
+  "note_et": "Riia, juugendstiilis tänav (Läti; linna enda katusemudelid)",
+  "x": 506620,
+  "y": 6312840,
+  "address": "Alberta iela 12, Rīga"
+ },
+ {
+  "name": "Jūrmala, Majori",
+  "country": "lv",
+  "note_en": "Jūrmala, the resort street by the sea (Latvia; flat roofs for now)",
+  "note_et": "Jūrmala, kuurordi tänav mere ääres (Läti; katused esialgu lamedad)",
+  "x": 487891,
+  "y": 6314342,
+  "address": "Jomas iela 50, Jūrmala"
+ },
+ {
+  "name": "Cēsis",
+  "country": "lv",
+  "note_en": "Cēsis, the medieval town and its castle (Latvia; flat roofs for now)",
+  "note_et": "Cēsis, keskaegne linn ja linnus (Läti; katused esialgu lamedad)",
+  "x": 576781,
+  "y": 6352851,
+  "address": "Rīgas iela 7, Cēsis"
+ },
+ {
+  "name": "Kuldīga",
+  "country": "lv",
+  "note_en": "Kuldīga, the old town on the Venta (Latvia; flat roofs for now)",
+  "note_et": "Kuldīga, vanalinn Venta jõe ääres (Läti; katused esialgu lamedad)",
+  "x": 376550,
+  "y": 6315673,
+  "address": "Baznīcas iela 6, Kuldīga"
+ },
+ {
+  "name": "Valka",
+  "country": "lv",
+  "note_en": "Valka, one town with Valga across the border (Latvia)",
+  "note_et": "Valka, üks linn Valgaga üle piiri (Läti)",
+  "x": 619115,
+  "y": 6405171,
+  "address": "Valka, Valkas novads"
+ },
+ {
+  "name": "Līvāni",
+  "country": "lv",
+  "note_en": "Līvāni, a small town on the Daugava (Latvia)",
+  "note_et": "Līvāni, väike linn Daugava ääres (Läti)",
+  "x": 634592,
+  "y": 6247844,
+  "address": "Līvāni, Līvānu novads"
  }
 ]

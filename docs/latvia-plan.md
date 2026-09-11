@@ -199,6 +199,17 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
    - **Left over.** Some faces still lack windows, roofs read paler than Rīga's red tiles in the
      orthophoto, and the ground between buildings is lumpy in places (holes under buildings
      interpolated from the ground points).
+   - **Menu (2026-09-12).** Latvia can be tried from the Locations page:
+     - The map draws Latvia beside Estonia (`assets/data/latvia.json`).
+     - Six Latvian suggestions: Rīga Alberta iela, Jūrmala Majori, Cēsis, Kuldīga, Valka and Līvāni.
+     - The search finds Latvian places and addresses through the service's `/geocode_lv`.
+     - `Locator.in_coverage` replaces the Estonia-only check in the create path and "Use my location".
+     - The tile service builds a Latvian place: ground and orthophoto from LĢIA, then
+       `fetch_cadastre_lv` instead of the Estonian registers, and nothing to refine. The same job
+       serves neighbour tiles streamed from a Latvian place.
+     - The frozen sidecar carries the new modules and `estonia.json` (the Valga/Valka test).
+     - Places outside Rīga get flat roofs until step 4. None has companies, roads or bus stops
+       before steps 3 and 5.
 3. **Companies and money.** UR + VID + annual reports into `tenants.json`; the health rules
    accept annual turnover. Done when name plates and the K overlay show Latvian companies and
    `health_test` passes on the pack.

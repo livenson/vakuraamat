@@ -11,6 +11,8 @@ datas = [
     (os.path.join(ROOT, "sites", "palupera", "site.json"), "sites/palupera"),
     (os.path.join(ROOT, "sites", "palupera", "strings.csv"), "sites/palupera"),
     (os.path.join(ROOT, "assets", "data", "parcel_rules.json"), "assets/data"),
+    # Estonia's outline: sources.Latvia tells Valga from Valka by it (the Latvian laser sheets reach over the border)
+    (os.path.join(ROOT, "assets", "data", "estonia.json"), "assets/data"),
     (os.path.join(ROOT, "assets", "i18n", "strings.csv"), "assets/i18n"),
 ]
 binaries, hiddenimports = [], []
@@ -28,7 +30,8 @@ a = Analysis(
     datas=datas,
     hiddenimports=hiddenimports + ["new_site", "gen_era_scenes", "extract_features", "fetch_buildings", "fetch_trees", "fetch_parcels",
                                    "fetch_roads", "fetch_stops", "fetch_departures", "fetch_tenants", "fetch_fields", "market", "fetch_tile",
-                                   "validate_site", "register_extra", "emtak", "geo", "paths", "sources"],
+                                   "validate_site", "register_extra", "emtak", "geo", "paths", "sources",
+                                   "fetch_tile_lv", "fetch_cadastre_lv", "geocode_lv"],
     hookspath=[],
     runtime_hooks=[],
     excludes=["tkinter", "matplotlib", "IPython"],
