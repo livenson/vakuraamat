@@ -105,7 +105,9 @@ class Estonia(DataSource):
 # service, optional canopy, historical maps, buildings, trees, and a geocoder.
 PLANNED = {
     "fi": "Finland: NLS 2 m DEM and orthophotos (open, API key), NLS topographic DB buildings, National Archives historical maps",
-    "lv": "Latvia: LGIA lidar DEM and orthophoto (open), cadastre buildings",
+    "lv": "Latvia (docs/latvia-plan.md): LGIA laser sheets (LAS, gridded to 1 m by us) and 2016-18 orthophoto, "
+          "VZD cadastre with values and building year/floors/use, Riga LOD2, VAR addresses, UR companies + VID taxes (CC0), "
+          "on the L-EST97 grid",
     "nl": "Netherlands: AHN 0.5 m DEM, PDOK orthophoto, BAG buildings with construction year, 3D BAG (LOD2)",
     "dk": "Denmark: Dataforsyningen DEM 0.4 m, orthophoto, BBR buildings",
     "ch": "Switzerland: swissALTI3D 0.5 m, SWISSIMAGE, swissBUILDINGS3D (LOD2)",

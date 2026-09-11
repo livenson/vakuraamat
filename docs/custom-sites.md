@@ -328,7 +328,8 @@ prints the implemented and planned adapters (Finland, Latvia, the Netherlands, D
 the UK, the US, and a coarse global fallback with what each would use). Adding a country means
 writing one adapter class and registering it; the game side (packs, blocks, services) is unchanged.
 The Estonian-specific parts that would still need a per-country answer are the historical map layers
-per era and the story blocks' cultural texture.
+per era and the story blocks' cultural texture. Latvia is the first planned second country; its
+verified sources, the mapping onto pack files and the steps are in [latvia-plan.md](latvia-plan.md).
 
 ## Endless map: neighbouring tiles
 
