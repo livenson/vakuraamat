@@ -8,6 +8,21 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
+## Unreleased
+
+**No more frozen window on the way in.**
+
+- **Entering a place no longer freezes the game.** On a Mac's first launch of a new version, going
+  into a city froze the whole window for about 40 seconds while macOS compiled the game's graphics.
+  The macOS build now ships them compiled, and the loading screen stays up — and keeps moving — until
+  the town, its roads, buses and traffic are all in place, instead of lifting early and stuttering
+  while they arrived. A first launch shows the splash a few seconds longer; after that the way in is
+  a couple of seconds.
+- **Why a company is on watch.** A yellow or red company now says why: *watch: annual report
+  overdue*, *watch: turnover fell 120 000 € → 20 000 € (2024 → 2025)*, *distressed: in liquidation*.
+  The map's health legend explains both colours.
+- **The macOS build needs macOS 14 (Sonoma) or newer** on Apple Silicon; Intel Macs are unchanged.
+
 ## v0.8.0 — 2026-09-10
 
 **Smoother, and a quicker start.**
