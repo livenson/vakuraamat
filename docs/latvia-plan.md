@@ -1,8 +1,13 @@
 # Latvia: the second country
 
-**Status (2026-09-11):** sources verified by probe for a Rīga square (LKS-92 E 506000–507000,
-N 312000–313000; L-EST97 about E 506700, N 6311800) and a rural square by Līvāni. Time-sensitive
-downloads are archived in `data_raw/lv/` (step 0). No adapter code yet.
+**Status (2026-09-11):**
+- Sources verified by probe for a Rīga square (LKS-92 E 506000–507000, N 312000–313000; L-EST97
+  about E 506700, N 6311800) and a rural square by Līvāni.
+- Time-sensitive downloads are archived in `data_raw/lv/` (step 0).
+- Step 1 is done: the `Latvia` adapter and `tools/pipeline/fetch_tile_lv.py` build a Rīga Old Town
+  tile (centre 506400 6311650) in under a minute from a cold cache. The local pack is
+  `sites/riga_vecpilseta`, not committed until it has a cadastre (`make validate` wants
+  `parcels.json`).
 
 The goal is a Latvian place that plays like an Estonian one: the same pack files, the same book,
 the same rule that every figure is a register field. Nothing in the pack format changes. A
@@ -34,9 +39,9 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
 
 | Layer | Source | Format and access | Licence |
 |---|---|---|---|
-| Laser points | LĢIA, sheet list `s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/LGIA_OpenData_las_saites.txt` (65,917 sheets, 1×1 km) | LAS 1.2, uncompressed, ~170 MB/km²; ground 2, vegetation 3–5, building 6, water 9; **no CRS in the file** (EPSG:3059, LAS-2000,5 heights). Rīga 6.1 pts/m² (2016), rural ~4 pts/m² (2013–2019) | CC BY 4.0 |
+| Laser points | LĢIA, sheet list `s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/LGIA_OpenData_las_saites.txt` (65,917 sheets, 1×1 km) | LAS 1.2, uncompressed, ~170 MB/km²; **no CRS in the file** (EPSG:3059, LAS-2000,5 heights). Rīga 6.1 pts/m² (2016), rural ~4 pts/m² (2013–2019). LĢIA's own classes, read from where the points lie (the agency publishes no list): 2 ground, 3–5 vegetation, 6 buildings, 7 noise, **9 bridge decks, 11 piers and moored boats, 14 water surface** (ASPRS would put water in 9) | CC BY 4.0 |
 | Ground model | LĢIA `citi/dtm/DTM_Latvija_20m.7z` | 20 m grid, whole country, 399 MB. Too coarse: we grid our own from the laser points | CC BY 4.0 |
-| Orthophoto | LĢIA 6th cycle (2016–18), `ortofoto_rgb_v6/LGIA_OpenData_Ortofoto_rgb_v6_saites.txt` | 25 cm GeoTIFF in 2.5 km sheets, tiled: a window is cut over `/vsicurl/` (500 m in 4.6 s). 7th/8th cycles (2019–24) only by application, WMS | CC BY 4.0 |
+| Orthophoto | LĢIA 6th cycle (2016–18), `ortofoto_rgb_v6/LGIA_OpenData_Ortofoto_rgb_v6_saites.txt` | 25 cm GeoTIFF in 2.5 km sheets, tiled: a window is cut over `/vsicurl/` (500 m in 4.6 s). The georeference is only in the `.tfw` beside each sheet. LĢIA's open-data list also offers cycles 1–5 (1994–2015) for download, the plot page's history strip. 7th/8th cycles (2019–24) only by application, WMS | CC BY 4.0 |
 | Cadastre, geometry | VZD `kadastra-informacijas-sistemas-atverti-telpiskie-dati` | SHP zip per municipality (Rīga 21 MB), weekly. `KKParcel`, `KKBuilding` (+`PARCELCODE`), `KKParcelPart`, `KKEngineeringStructurePoly`. Fields are only codes and dates | CC BY 4.0 |
 | Cadastre, attributes | VZD `kadastra-informacijas-sistemas-atvertie-dati` | national zips of one XML per municipality, weekly: `building.zip` 242 MB, `parcel.zip` 53 MB, `address.zip` 39 MB, `valuation.zip` 229 MB. XSDs published. Rīga's entry can be read by range request | CC BY 4.0 |
 | Building fields | `building.zip` | `BuildingCadastreNr`, `VARISCode`, `BuildingName`, `BuildingUseKindId/Name` (e.g. 1251 "Rūpnieciskās ražošanas ēkas"), `BuildingKindId/Name`, `BuildingArea`, `BuildingGroundFloors`, `BuildingUndergroundFloors`, `BuildingExploitYear`, `BuildingDeprecation`, element materials per part (foundation, walls, roof), `ParcelCadastreNrList`. In the Rīga square: 96 % floors, 87 % year, 96 % address code | |
@@ -66,8 +71,8 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
 
 | Pack file | Filled from | Notes |
 |---|---|---|
-| `heightmap.r32`, `canopy.r32` | the laser sheets under the tile, reprojected to EPSG:3301 | A 1024 m tile on the Estonian grid straddles up to four 1 km sheets (~700 MB download, cached). Ground: class 2 gridded at 1 m, holes filled. Canopy: highest return minus ground. A cheap first pass: ground only, 5 m (the same two-pass split the Estonian job has) |
-| `ortho.jpg` | 6th-cycle orthophoto, windows cut over `/vsicurl/` and warped to EPSG:3301 | The plot page's history strip has one picture (2016–18) until the newer cycles are licensed |
+| `heightmap.r32`, `canopy.r32` | the laser sheets under the tile, reprojected to EPSG:3301 | Done (step 1). A 1024 m tile on the Estonian grid straddles four 1 km sheets (470 MB for the Old Town, cached). Ground: classes 2 and 14 averaged per metre, holes under buildings filled; cells with no return at all in areas wider than 17 m are open water, set to the median water-surface height (0.39 m on the Daugava), because interpolating from the banks streaked across the river. Canopy: the highest **vegetation** return (3–5) above the ground, so a roof never reads as a tree, unlike Maa-amet's nDSM, which the building footprints have to mask |
+| `ortho.jpg` | 6th-cycle orthophoto, windows cut over `/vsicurl/` and warped to EPSG:3301 | Done (step 1). The plot page's history strip can draw on cycles 1–5 (1994–2015) |
 | `trees.json` | tree tops found in the vegetation classes (local maxima of the canopy) | Species unknown: conifer or deciduous from return intensity, or left out |
 | `parcels.json` | `KKParcel` geometry + `parcel.zip` + `valuation.zip` + `address.zip` | `tunnus` = parcel code; `purpose` = NĪLM codes with `purpose_pct`; `land_value` from `ValueType` (which type the book shows is an open question); `link` to kadastrs.lv |
 | `market.json` | the sale-price CSVs (prices per m² by purpose, deals near the tile) | Latvia has real deal prices, not only valuations; label them as such |
@@ -100,7 +105,7 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
 | No single-tree data | Canopy maxima (above) |
 | No road classes or widths | OpenStreetMap |
 | No geocoder | The tile service indexes `aw_eka.csv` and answers `/geocode` for Latvia; `Locator` goes through the service instead of calling in-ADS directly |
-| Orthophoto 2016–18, no history | Apply to LĢIA for the WMS of the newer cycles (terms to check) |
+| Orthophoto 2016–18 is the newest open one | Cycles 1–5 give the history; apply to LĢIA for the WMS of cycles 7–8 (terms to check) |
 | Tax history only from now on | Archive every quarter (step 0); ask VID for older quarters, or use the annual file |
 
 ## Engine changes
@@ -151,9 +156,17 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
 
    Still to do: download each new quarter as it comes out (VID replaced the file on 2026-08-14,
    so the next is due around mid-November), and move the store off this laptop.
-1. **Adapter and ground.** `Latvia` in `sources.py`; laser sheets → heightmap and canopy;
-   orthophoto windows; `terrain_meta.json` with Latvian attribution. Done when a Rīga tile loads
-   with ground and orthophoto (screenshot) and `make validate` passes.
+1. **Adapter and ground.** Done 2026-09-11:
+   - `Latvia` in `sources.py`, tested before Estonia. A point is Latvian when LĢIA has a laser
+     sheet under it and it is off Estonian land by `assets/data/estonia.json`: Valga resolves to
+     Estonia, Valka to Latvia, the Gulf of Rīga to nobody.
+   - `fetch_tile.py` hands a non-Estonian tile to its adapter's `build_tile`.
+   - `new_site.py` stamps `"country"` in `site.json` and writes Latvian credits.
+   - Screenshots show the Old Town on its orthophoto, with trees only where the vegetation points
+     are, at 89–110 fps.
+   - `make validate` fails on the pack until step 2 brings `parcels.json`.
+   - Still open: the tile service runs the Estonian stages in its own job code, so a Latvian place
+     cannot be made from the menu yet; that is step 7.
 2. **Cadastre and buildings.** Parcels, buildings with year, floors and use, footprints; the Rīga
    LOD2 join. Done when the Old Town stands with its roofs and the book lists its plots.
 3. **Companies and money.** UR + VID + annual reports into `tenants.json`; the health rules

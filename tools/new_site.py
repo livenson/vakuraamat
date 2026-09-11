@@ -32,6 +32,16 @@ import paths  # noqa: E402
 ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar
 CREDIT_ET = 'Maa maksustamishind 2022: Maakataster, Maa- ja Ruumiamet. Ettevõtted: Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0).'
 CREDIT_EN = 'Land values 2022: the cadastre, Maa- ja Ruumiamet. Companies: e-Business Register open data, Centre of Registers and Information Systems (CC BY 4.0).'
+# a Latvian pack (docs/latvia-plan.md): the ground and pictures so far; the registers follow in later steps
+LV_GROUND_ET = 'Kaardiandmed: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, laserskaneerimine ja ortofoto 2016-2018 (CC BY 4.0).'
+LV_GROUND_EN = 'Map data: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, laser scanning and orthophoto 2016-2018 (CC BY 4.0).'
+
+
+def country_of(center):
+    """The adapter id covering the centre ("ee", "lv"), "ee" when none does (the old default)."""
+    import sources
+    s = sources.for_point(float(center[0]), float(center[1]))
+    return s.id if s else "ee"
 
 # ---------------------------------------------------------------- EPSG:3301 (L-EST97) -> WGS84
 A_GRS80 = 6378137.0
@@ -248,13 +258,19 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
     json.dump(scenes, open(os.path.join(site_dir, "scenes.json"), "w"), indent=1)
     S("LOC_LANDMARK", "Maamärk", "The landmark"); S("LOC_FARMSTEAD", "Talu", "The farmstead")
     S(f"EX_LANDMARK_{y}", f"{name}: siit algab sinu raamat.", f"{name}: your book starts here.")
+    country = country_of(center)
     S("CODEX_REAL_TITLE", "Päris", "Real"); S("CODEX_REAL", f"Maa: {name}, Maa- ja Ruumiameti kõrgusandmed, ortofoto, hooned, katastriüksused ja maa väärtused, meetri täpsusega.", f"The ground: {name}, from the Land Board's elevation data, orthophoto, buildings, cadastral units and land values, to the metre.")
     S("CODEX_INVENTED_TITLE", "Välja mõeldud", "Invented"); S("CODEX_INVENTED", "Majade seinad ja katused on taastatud ehitisregistri mõõtude ja Maa-ameti LOD2 mudeli järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.", "The walls and roofs are reconstructed from the Building Register's measurements and Maa-amet's LOD2 model; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one.")
     S("CODEX_DATA_TITLE", "Andmed", "Data"); S("CODEX_DATA", "Kaardiandmed: Maa- ja Ruumiamet 2026. %s" % CREDIT_ET, "Map data: Maa- ja Ruumiamet 2026. %s" % CREDIT_EN)
+    if country == "lv":
+        strings[:] = [r for r in strings if r[0] not in ("CODEX_REAL", "CODEX_DATA")]
+        S("CODEX_REAL", f"Maa: {name}, Läti Geoinfoameti (LĢIA) laserpunktidest ja ortofotost, meetri täpsusega.",
+          f"The ground: {name}, from the Latvian Geospatial Information Agency's (LĢIA) laser points and orthophoto, to the metre.")
+        S("CODEX_DATA", LV_GROUND_ET, LV_GROUND_EN)
 
     # --- manifest + strings ---------------------------------------------------------------------------
     manifest = {
-        "id": site, "pipeline": PACK_VERSION, "name_key": SITE_KEY, "subtitle_key": f"{SITE_KEY}_SUBTITLE",
+        "id": site, "country": country, "pipeline": PACK_VERSION, "name_key": SITE_KEY, "subtitle_key": f"{SITE_KEY}_SUBTITLE",
         "description": f"{name}: generated site pack.",
         "terrain": {"tile": tile, "center": [float(center[0]), float(center[1])], "size": size, "latitude": lat, "longitude": lon, "utc_offset": 3.0, "date": [2026, 9, 3]},
         "start": {"era": e, "spawn": layout["spawn"], "yaw_deg": yaw},

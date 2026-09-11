@@ -10,6 +10,7 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 |---|---|---|---|
 | Maa-amet geoportal, 1 m DTM sheets (`dem_1m_geotiff`) | ground heights, EH2000 | `tools/pipeline/fetch_tile.py` | `assets/terrain/<tile>/heightmap.r32`, `terrain_meta.json` |
 | the same sheets at 5 m (`dem_5m_geotiff`, `--dem-res 5`) | the ground a new place ships with; the tile service fetches the 5 m model first and replaces it with the 1 m one in its refine pass (`--only-dem`) | `fetch_tile.py`, `tools/tile_service.py` | the same files, `dtm_res_m: 5` in the meta |
+| LĢIA laser points (LAS 1.2, 1 km sheets; Latvia) and the 6th-cycle orthophoto (2016-18, 25 cm) | a Latvian tile's ground (classes 2 and 14 averaged per metre, holes filled, open water at its level), canopy (vegetation classes 3-5 only) and orthophoto, reprojected from LKS-92 onto the L-EST97 grid | `tools/pipeline/fetch_tile_lv.py` (through the `Latvia` adapter; see [latvia-plan.md](latvia-plan.md)) | the same tile files |
 | Maa-amet map sheet grids (`epk10T_SHP.zip`, `epk2T_SHP.zip`) | which 1:10 000 and 1:2000 sheets lie under the tile | `fetch_tile.py` (`GRID_ZIP`, `GRID2T_ZIP`) | cached in `data_raw/epk10T/`, `data_raw/epk2T/` |
 | Maa-amet nDSM (1:2000 sheets); the 1:20 000 CHM (`chm_geotiff`, trees only, coarser) where no nDSM exists | canopy and object heights | `fetch_tile.py` | `assets/terrain/<tile>/canopy.r32` |
 | Maa-amet WMS `fotokaart` (`EESTIFOTO`) | 25 cm orthophoto; and one plot's square at a time, at the size the book shows it, for the plot page's "today" | `fetch_tile.py`, `scripts/ui/plot_history.gd` | `assets/terrain/<tile>/ortho.jpg`, `user://cache/plots/<pack>/` |
@@ -34,7 +35,8 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | Sketchfab (CC BY, via the MCP server, `make mcp`) and Poly Pizza (CC0 / CC BY) models | cars, street lamps, benches, bus shelters, the spruce and juniper, hay bales, tractor, farm plants; playground, boats and stairs | downloaded, split with `tools/blender/split_glb.py`, listed in `assets/vendor/sketchfab/CREDITS.md` | `assets/vendor/sketchfab/`, `assets/vendor/polypizza/`, `assets/models/trees/spruce_src.glb` |
 
 Licences, attribution strings and fetch dates are in `THIRD_PARTY.md`. Endpoints and the per-country
-adapter interface are in `tools/pipeline/sources.py`; only Estonia is implemented.
+adapter interface are in `tools/pipeline/sources.py`; Estonia is implemented, and Latvia's ground (step 1 of
+[latvia-plan.md](latvia-plan.md)).
 
 ## Transformations
 
