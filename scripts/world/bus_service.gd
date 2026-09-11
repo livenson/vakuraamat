@@ -15,6 +15,7 @@ class_name BusService
 extends Node3D
 
 const TICK_S := 0.5
+const ARRIVAL_BUDGET_USEC := 6000   # the first sync after arrival spawned 50 buses in one frame (0.5 s, debug build)
 
 var pack := ""
 var _stops: Array = []
@@ -32,6 +33,7 @@ func _ready() -> void:
 	var n := Departures.routes(pack).size()
 	if n > 0:
 		print("[buses] %s: %d routes on the timetable" % [pack, n])
+		HumanFigure.warm([BusAgent.MODEL])   # read on a loader thread, not by the first bus's frame
 
 
 func _physics_process(delta: float) -> void:
@@ -59,6 +61,9 @@ func _sync() -> void:
 	var now := hour * 60.0
 	var day := Departures.today(pack)
 	var live := {}
+	var t0 := Time.get_ticks_usec()
+	var spawned := 0
+	var more := false
 	for i in routes.size():
 		var r: Dictionary = routes[i]
 		var length := _length_of(r)
@@ -78,6 +83,9 @@ func _sync() -> void:
 			var key := "%d@%s" % [i, t]
 			live[key] = true
 			if not _running.has(key) or not is_instance_valid(_running[key]):
+				if spawned > 0 and Time.get_ticks_usec() - t0 > ARRIVAL_BUDGET_USEC:
+					more = true   # the rest next physics frame; live keeps counting, so nothing running is dropped
+					continue
 				var bus := BusAgent.new()
 				add_child(bus)
 				bus.setup(r, _stops, since / _game_minutes_per_real_second() * BusAgent.SPEED)
@@ -85,7 +93,12 @@ func _sync() -> void:
 					bus.queue_free()
 					continue
 				_running[key] = bus
+				spawned += 1
 				print("[buses] %s %s left at %s, %.0f m along" % [r.get("line", ""), r.get("headsign", ""), t, bus.s])
+	if spawned > 0 and Time.get_ticks_usec() - t0 > 4000:
+		PerfLog.mark("buses %d new in %d ms" % [spawned, (Time.get_ticks_usec() - t0) / 1000])
+	if more:
+		_timer = 0.0
 	for key in _running.keys():
 		if not is_instance_valid(_running[key]):
 			_running.erase(key)

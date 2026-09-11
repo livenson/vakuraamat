@@ -170,7 +170,38 @@ func _enter_world() -> void:
 		if is_instance_valid(sheet):
 			sheet.queue_free()
 			_page.process_mode = Node.PROCESS_MODE_INHERIT
-	get_tree().change_scene_to_file("res://scenes/world/world.tscn")
+	get_tree().change_scene_to_packed(await _load_world())
+
+
+const WORLD := "res://scenes/world/world.tscn"
+
+
+## The world scene read on a loader thread - its meshes' pipelines compile there too - under the
+## world's own loading screen (the same dark page and line), so the click is answered at once and
+## nothing stands still between the menu and the world taking over.
+func _load_world() -> PackedScene:
+	if ResourceLoader.has_cached(WORLD) or ResourceLoader.load_threaded_request(WORLD) != OK:
+		return load(WORLD)
+	var cover := CanvasLayer.new()
+	cover.layer = 100
+	var dark := ColorRect.new()
+	dark.color = Color(0.06, 0.05, 0.04, 1)   # the world's Fade
+	dark.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	cover.add_child(dark)
+	var line := Label.new()
+	line.text = tr("UI_LOADING_WORLD") % Sites.display_name(Sites.active)
+	line.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	line.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	line.grow_vertical = Control.GROW_DIRECTION_BOTH
+	line.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	line.add_theme_font_size_override("font_size", 28)
+	line.add_theme_color_override("font_color", Color(0.85, 0.68, 0.25))
+	dark.add_child(line)
+	add_child(cover)
+	while ResourceLoader.load_threaded_get_status(WORLD) == ResourceLoader.THREAD_LOAD_IN_PROGRESS:
+		await get_tree().process_frame
+	var packed := ResourceLoader.load_threaded_get(WORLD) as PackedScene
+	return packed if packed else load(WORLD)
 
 
 func _start_new_game(site_id: String = "") -> void:
