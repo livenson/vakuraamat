@@ -29,8 +29,8 @@ func _ready() -> void:
 	_install_neighbour()
 	world = load("res://scenes/world/world.tscn").instantiate()
 	add_child(world)
-	await get_tree().process_frame
-	await get_tree().create_timer(0.5).timeout
+	while not world._ready_done:   # the loading screen stays until the layer has filled in; the edge guard starts then
+		await get_tree().process_frame
 	var st: TileStreamer = world.streamer
 	_check(st != null, "world has no streamer")
 	_check(st.pack_for(Vector2i(1, 0)) == _nid, "pack id for (1,0) is %s, expected %s" % [st.pack_for(Vector2i(1, 0)), _nid])

@@ -14,6 +14,8 @@ signal filled   # every staggered member is in the tree
 
 @export var era_id := ""
 
+var fill_done := 0     # members fill_pending has put back so far, of fill_total (the loading screen's progress)
+var fill_total := 0
 var _snapped := false
 var _window_mats: Array[StandardMaterial3D] = []
 var _windows_lit := false
@@ -57,6 +59,8 @@ func fill_pending(pending: Array, near: Vector3, budget := FILL_BUDGET_USEC) -> 
 	pending.sort_custom(func(a, b): return _near_sq(a[1], origin) < _near_sq(b[1], origin))
 	var terrain: Terrain3D = GameState.world.terrain if GameState.world else null
 	var t0 := Time.get_ticks_usec()
+	fill_done = 0
+	fill_total = pending.size()
 	for i in pending.size():
 		if not is_inside_tree():
 			for j in range(i, pending.size()):
@@ -64,6 +68,7 @@ func fill_pending(pending: Array, near: Vector3, budget := FILL_BUDGET_USEC) -> 
 			return
 		var t_m := Time.get_ticks_usec()
 		pending[i][0].add_child(pending[i][1])
+		fill_done = i + 1
 		if _snapped and terrain:
 			_snap_one(pending[i][1], terrain)
 		if Time.get_ticks_usec() - t_m > 25000:

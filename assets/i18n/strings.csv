@@ -136,6 +136,8 @@ NOTICE_BIKE_ON,"Rattal. Shift kiiremini, E maha.","On the bike. Shift to go fast
 NOTICE_BIKE_OFF,Maha tuldud.,Off the bike.
 UI_LOADING_TILE,Naabertükk laeb: %s,Loading the neighbour tile: %s
 UI_LOADING_WORLD,%s laeb...,Loading %s...
+UI_LOADING_TOWN,Linn kerkib... %d%%,Building the town... %d%%
+UI_LOADING_GRAPHICS,Graafika valmib... %d varjutajat,Preparing graphics... %d shaders
 NOTICE_EDGE_PENDING,Sealpoolne maa on alles mõõtmisel – oota hetk,The land beyond is still being surveyed. Wait a moment
 NOTICE_EDGE_NONE,Sealpool kaarti ei ole,There is no map beyond here
 NOTICE_TILE_READY,Naaberala on valmis,The next stretch of land is ready
