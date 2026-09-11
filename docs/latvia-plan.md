@@ -5,9 +5,10 @@
   about E 506700, N 6311800) and a rural square by Līvāni.
 - Time-sensitive downloads are archived in `data_raw/lv/` (step 0).
 - Step 1 is done: the `Latvia` adapter and `tools/pipeline/fetch_tile_lv.py` build a Rīga Old Town
-  tile (centre 506400 6311650) in under a minute from a cold cache. The local pack is
-  `sites/riga_vecpilseta`, not committed until it has a cadastre (`make validate` wants
-  `parcels.json`).
+  tile (centre 506400 6311650) in under a minute from a cold cache.
+- Step 2 is done: `tools/pipeline/fetch_cadastre_lv.py` writes the pack's `parcels.json` (838
+  units, all valued) and `buildings.json` (775 buildings, 713 dated, 615 with Rīga's LOD2 roofs).
+  `sites/riga_vecpilseta` validates, boots in `make test` and is committed on the `latvia` branch.
 
 The goal is a Latvian place that plays like an Estonian one: the same pack files, the same book,
 the same rule that every figure is a register field. Nothing in the pack format changes. A
@@ -167,8 +168,37 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
    - `make validate` fails on the pack until step 2 brings `parcels.json`.
    - Still open: the tile service runs the Estonian stages in its own job code, so a Latvian place
      cannot be made from the menu yet; that is step 7.
-2. **Cadastre and buildings.** Parcels, buildings with year, floors and use, footprints; the Rīga
-   LOD2 join. Done when the Old Town stands with its roofs and the book lists its plots.
+2. **Cadastre and buildings.** Done 2026-09-11:
+   - **What it reads.** The municipality comes from the address register's polygons (a state city
+     from `Pilsetas` with `VKUR_TIPS` 101, else `Novadi`; `ATRIB` is the ATVK code). The outlines
+     come from its `kk_shp.zip`, only the cadastral groups under the tile. The attributes come from
+     the municipality's own XML in six national zips, read by range request (about 90 MB compressed
+     for Rīga, cached per export date) and streamed, keeping only the tile's objects.
+   - **Parcels.** `land_value` is the universal cadastral value (`univ`, 2025-01-01); `fisc` sits
+     beside it as `land_value_fisc`. `purpose` holds the game's classes, mapped by the words of the
+     Latvian purpose names (parking and mixed city-centre use included); `purpose_code` and
+     `purpose_text` keep the register's own. `ownership` is the owner's kind as the register writes
+     it (`juridiska persona`, `pašvaldība`, `valsts`, `fiziska persona`); the playground rule now
+     accepts `pašvaldība`. `land_registry` is the property's land-book folio, so `Links` ties the
+     parcels of one property. 13 parcels carry no purpose in the register and have no class. `link`
+     is null: no public per-parcel URL on kadastrs.lv was found that opens the object.
+   - **Buildings.** Use, kind, floors, year taken into use, the element materials
+     (`Sienas`, `Fasāde`, `Jumta segums` ...), the address, the VAR address code (`ads.var_code`, the
+     key for the companies in step 3) and the parcels a building stands on. Heights come from the
+     building-class laser points (`fetch_tile_lv` keeps them as `data_raw/lv/<tile>_roofs.r32`).
+   - **LOD2.** The Rīga models are triangle meshes without attributes; each goes to the building
+     whose outline holds most of its footprint. Coplanar triangles are merged back into faces and
+     wound so roofs face up and walls face out (the engine takes a face's normal from its vertex
+     order). Pieces under 1 m² are dropped: the models carry every cornice, 222 faces a building
+     against 16 in Maa-amet's. A model whose base lies more than a metre under the ground is
+     anchored a metre under it. The file is written compact: 8 MB against Pirita's 3 MB.
+   - **Engine.** The building sheet names the Latvian cadastre and its designation instead of
+     "EHR", and the book no longer shows a register link for a plot without one.
+   - **Checks.** Old Town screenshots, the plot page and the building sheet; `--bench` 114 fps at
+     street level and 124 fps flying; `make test` green with the pack.
+   - **Left over.** Some faces still lack windows, roofs read paler than Rīga's red tiles in the
+     orthophoto, and the ground between buildings is lumpy in places (holes under buildings
+     interpolated from the ground points).
 3. **Companies and money.** UR + VID + annual reports into `tenants.json`; the health rules
    accept annual turnover. Done when name plates and the K overlay show Latvian companies and
    `health_test` passes on the pack.
@@ -180,6 +210,37 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
 
 Each step bumps `PACK_VERSION` when it adds something the UI reads, and gets a `THIRD_PARTY.md`
 row for every source in the same commit.
+
+## More Latvian sources (surveyed 2026-09-11)
+
+A second pass through data.gov.lv, most of it probed with real field names. Samples (37 MB) are in
+`data_raw/lv/samples/extra/`. "Person filter" means: keep legal persons only (11-digit codes
+starting with 4 or 5).
+
+| # | Dataset | Join | In the game |
+|---|---|---|---|
+| 1 | BIS construction cases (`bis_jlyakg7hgslonjnwyrwc6w` cases, `bis_tln9s3hrpjlnucmjip9r3g` objects, `bis_04lylzfvt9f25h4divvcfq` new builds), daily CSV, CC0: stage (`Aktuala_stadija`: Iecere … Būvdarbi … Ekspluatācija), kind (new, rebuild, demolition, facade renewal), dates | building cadastral designation, VAR code, lat/lon | scaffolding and a fence while works run; "reconstruction, works since 2025-03". Never show the free-text object name (it can hold names) |
+| 2 | Monuments under state protection (`valsts-aizsargajamo-nekustamo-piemineklu-saraksts`, 9,044 rows): value group, typology, dating, in force since, condition | cadastral designations (`;` list; some cells Excel-mangled) | "Monument of national significance, since 1998, condition: good". Titles naming historical people: show only typology and value group |
+| 3 | Rīga historic centre plan (`rigas-vesturiska-centra-un-ta-aizsardzibas-zonas-teritorijas-planojums`): UNESCO site and buffer-zone boundaries, 2,408 culturally valuable buildings, lost historic buildings, permitted use | geometry, monument number | the UNESCO line on the map; "culturally valuable building" on the sheet |
+| 4 | LĢIA orthophoto cycles 1–5 (1994–99 B/W 1 m, 2003–05 1 m, 2007–08 and 2010–11 0.5 m, 2013–15 0.25 m) from the `LGIA_OpenData_Ortofoto_*_saites.txt` lists; a window is cut over `/vsicurl/` with the `.tfw` beside it (`CPL_VSIL_CURL_ALLOWED_EXTENSIONS=.tif,.tfw`) | coordinates | the plot page's history strip. Strip-stored cycles pull whole rows: a 1 km cut of cycle 5 moves ~120 MB, so cut per plot, as the Estonian strip does |
+| 5 | BIS energy certificates (`bis_ygdi8jmgg-bneuijz7wiwq`, 57 columns) and Rīga's heating efficiency of apartment blocks (`rigas-daudzdzivoklu-maju-apkures-energoefektivitates-raditaji`, renovation year and programme) | cadastral designations | an energy class on the sheet, a K-overlay mode. Drop the expert's name |
+| 6 | Food businesses (PVD, `pakalpojumi.pvd.gov.lv/lv/opendata_files/ipvd_object_opendata/download`, daily): outlet name, company number, address, activity, last inspection grade; VID excise licences (222 MB CSV): licence kind, address, **opening hours** | address text → VAR, company number | real outlet names on plates and in interiors; shop windows lit by the real hours |
+| 7 | TAPIS WFS (zoning `funkcionalais_zonejums`, encumbrances `apgrutinatas_teritorijas`, plans in public discussion); bbox **northing first** in EPSG:3059 | geometry | "Zoning: mixed centre JC8 (Rīga plan 2023)"; a notice when a plan is open for comment |
+| 8 | Company distress for the health verdict: UR `suspensions-prohibitions`, `liquidations`, `maksatnespejas-procesi` (insolvency), `securing-measures` (drop the bailiff's name); VID `saimnieciskas-darbibas-apturesana`, `pvn-maksataji` | registration number | "distressed: VID suspended activity 2026-09-10" |
+| 9 | Rīga environment-degrading buildings (`vidi-degradejosas-buves-riga`: status, class A/B/C, council decision) and municipal property (`rigas-ipasumi`, with vacant premises for rent or sale) | cadastral designation | grime and boarded windows; a "for rent, 52 m²" sign; a city-owned layer |
+| 10 | BIS house files: the manager (company number, period) and repair works per year | building cadastral designation | "Managed by SIA … since 2011; heating repair 2025-10" |
+| 11 | Public procurement (IUB daily JSON, `open.iub.gov.lv/data/notice/…`), EU-funds projects (with `KadastraNumurs` for the place) | registration number, cadastral number | "won 3 public contracts, 1.2 M €"; an EU plaque on the plot |
+| 12 | LVĢMC observations (`hidrometeorologiskie-noverojumi`): last-hour weather, the Daugava gauge, warnings with polygons | station coordinates (the observation ids need a mapping to the station list) | live rain and temperature, the river level on a quay gauge |
+| 13 | CSP small-area statistics: population on a 100 m grid, dwellings per cell, wages by neighbourhood | grid code (probably LKS-92 hectometres; check) | pedestrian density; a neighbourhood page |
+
+Also found: VZD's registered-but-not-found buildings, pre-registered new builds and renamed streets;
+Rīga's noise maps, planned resurfacing and poster columns; riga.lv event RSS with places and times;
+pharmacies (ZVA live export with WGS84 coordinates). Not open: a tourist-accommodation register,
+gambling venues, and the official notices of Latvijas Vēstnesis (HTML only).
+
+Build first, by value against effort: construction cases (1), heritage (2, 3), the orthophoto history
+(4), energy (5), outlets and opening hours (6), zoning (7), distress signals (8), degrading and
+municipal buildings (9).
 
 ## Attribution and licences
 

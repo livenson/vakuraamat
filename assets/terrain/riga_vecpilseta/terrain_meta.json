@@ -1,0 +1,65 @@
+{
+  "name": "riga_vecpilseta",
+  "country": "lv",
+  "crs": "EPSG:3301",
+  "sheet": "4311-32-21",
+  "xmin": 505888,
+  "ymin": 6311138,
+  "xmax": 506912,
+  "ymax": 6312162,
+  "size_m": 1024,
+  "size_px": 1024,
+  "resolution_m": 1.0,
+  "dtm_res_m": 1,
+  "heightmap": "heightmap.r32",
+  "heightmap_format": "float32 little-endian, row-major, row 0 = north edge (ymax), metres LAS-2000,5 (EVRF2007 like EH2000)",
+  "z_min": 0.09,
+  "z_max": 16.4,
+  "z_scale": 1.0,
+  "texture": "ortho.jpg",
+  "texture_px": 4096,
+  "canopy": {
+    "file": "canopy.r32",
+    "source": "LĢIA laser points, highest vegetation return (classes 3-5) above the ground (4311-32-21, 4311-32-22, 4311-32-31, 4311-32-32)",
+    "max_height": 64.14,
+    "format": "float32 little-endian, row-major, row 0 = north; metres above ground; 0 = nothing"
+  },
+  "era_maps": {},
+  "world_mapping": "Godot x = easting - xmin; Godot z = ymax - northing (north is -Z); y = height * z_scale; L-EST97 grid, the Latvian sources reprojected from LKS-92 (EPSG:3059)",
+  "source": {
+    "laser": {
+      "sheets": [
+        "4311-32-21",
+        "4311-32-22",
+        "4311-32-31",
+        "4311-32-32"
+      ],
+      "missing": [],
+      "ground_filled": 0.47,
+      "coverage": 0.811,
+      "ground_pts_per_cell": 2.25,
+      "urls": [
+        "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/4311/4311-32-21.las",
+        "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/4311/4311-32-22.las",
+        "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/4311/4311-32-31.las",
+        "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/4311/4311-32-32.las"
+      ]
+    },
+    "ortho": {
+      "ortho_sheets": [
+        "4311-32_1"
+      ],
+      "ortho_urls": [
+        "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v6/4311/4311-32_1.tif"
+      ],
+      "ortho_cycle": "LĢIA 6th cycle, 2016-2018, 25 cm"
+    },
+    "index": [
+      "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/LGIA_OpenData_las_saites.txt",
+      "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v6/LGIA_OpenData_Ortofoto_rgb_v6_saites.txt"
+    ]
+  },
+  "fetched": "2026-09-11",
+  "attribution": "Map data: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA), 2026, CC BY 4.0",
+  "license": "CC BY 4.0 (LĢIA open data licence)"
+}

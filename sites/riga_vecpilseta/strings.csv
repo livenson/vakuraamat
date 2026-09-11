@@ -1,0 +1,13 @@
+keys,et,en
+SITE_RIGA_VECPILSETA,"Rīga, Vecpilsēta","Rīga, Vecpilsēta"
+SITE_RIGA_VECPILSETA_SUBTITLE,"Rīga, Vecpilsēta: päris maa, päris väärtused.","Rīga, Vecpilsēta: real plots, real values."
+ERA_2026_NAME,Aasta 2026,The year 2026
+LOC_LANDMARK,Maamärk,The landmark
+LOC_FARMSTEAD,Talu,The farmstead
+EX_LANDMARK_2026,"Rīga, Vecpilsēta: siit algab sinu raamat.","Rīga, Vecpilsēta: your book starts here."
+CODEX_REAL_TITLE,Päris,Real
+CODEX_INVENTED_TITLE,Välja mõeldud,Invented
+CODEX_INVENTED,"Majade seinad ja katused on taastatud ehitisregistri mõõtude ja Maa-ameti LOD2 mudeli järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.","The walls and roofs are reconstructed from the Building Register's measurements and Maa-amet's LOD2 model; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one."
+CODEX_DATA_TITLE,Andmed,Data
+CODEX_REAL,"Maa: Rīga, Vecpilsēta, Läti Geoinfoameti (LĢIA) laserpunktidest ja ortofotost, meetri täpsusega.","The ground: Rīga, Vecpilsēta, from the Latvian Geospatial Information Agency's (LĢIA) laser points and orthophoto, to the metre."
+CODEX_DATA,"Kaardiandmed: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, laserskaneerimine ja ortofoto 2016-2018 (CC BY 4.0).","Map data: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, laser scanning and orthophoto 2016-2018 (CC BY 4.0)."

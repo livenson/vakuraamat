@@ -992,7 +992,9 @@ func _notice_board(root: Node3D, b: FootprintBuilding, poly: PackedVector2Array,
 ## What the registers say about a building, as a page: the register row, the tenants, the plot.
 static func register_sheet(b: FootprintBuilding) -> String:
 	var lines: Array[String] = []
-	lines.append(TranslationServer.translate("UI_SHEET_REGISTER") % (b.address if b.address != "" else str(b.building_id)))
+	# the register the row comes from: Estonia's Building Register (EHR), or Latvia's cadastre
+	var lv := str(Sites.manifest_for(Sites.pack_of(b)).get("country", "ee")) == "lv"
+	lines.append(TranslationServer.translate("UI_SHEET_REGISTER_LV" if lv else "UI_SHEET_REGISTER") % (b.address if b.address != "" else str(b.building_id)))
 	var bits: Array[String] = []
 	if b.purpose != "":
 		bits.append(b.purpose)
@@ -1006,7 +1008,7 @@ static func register_sheet(b: FootprintBuilding) -> String:
 		bits.append(b.roof_cover)
 	lines.append(" · ".join(bits))
 	if b.ehr != "":
-		lines.append("EHR " + b.ehr)
+		lines.append(TranslationServer.translate("UI_SHEET_CODE_LV") % b.ehr if lv else "EHR " + b.ehr)
 	lines.append("")
 	lines.append(TranslationServer.translate("UI_SHEET_TENANTS"))
 	# every row the plot's page shows, described the same way: a sheet that named fewer of the

@@ -303,7 +303,7 @@ func _fill_plot() -> void:
 	_fill_links(body, str(p.tunnus))
 	var lrow := HBoxContainer.new()
 	body.add_child(lrow)
-	_link_button(lrow, str(p.get("link", "")), tr("UI_BOOK_IN_THE_REGISTER"))
+	_link_button(lrow, str(p.get("link")) if p.get("link") != null else "", tr("UI_BOOK_IN_THE_REGISTER"))   # a Latvian plot has none yet
 	_fill_plot_history(body, p.tunnus)
 	show_parcel.emit(p.tunnus)
 

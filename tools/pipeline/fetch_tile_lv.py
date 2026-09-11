@@ -46,6 +46,7 @@ LEST97 = 3301
 # surface. ASPRS would put water in 9; here 9 is 10 m above the river.
 GROUND = (2, 14)         # ground, water surface
 VEGETATION = (3, 4, 5)   # low, medium, high vegetation
+BUILDING = 6
 WATER = 14
 NOISE = (7, 18)          # low and high noise
 ATTRIBUTION = "Map data: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA), {year}, CC BY 4.0"
@@ -164,8 +165,8 @@ def read_las(path):
 
 
 def grid_points(las_paths, bbox, size):
-    """Per metre over an L-EST97 box: (ground, highest return, highest vegetation return, ground hits,
-    water level or None). Rows run north to south. Empty cells are NaN."""
+    """Per metre over an L-EST97 box: (ground, highest return, highest vegetation return, highest
+    building return, ground hits, water level or None). Rows run north to south. Empty cells are NaN."""
     from pyproj import Transformer
     to_lest = Transformer.from_crs(f"EPSG:{LKS92}", f"EPSG:{LEST97}", always_xy=True)
     xmin, ymin, xmax, ymax = bbox
@@ -174,6 +175,7 @@ def grid_points(las_paths, bbox, size):
     gcnt = np.zeros(n, np.int32)
     top = np.full(n, -np.inf, np.float32)
     veg = np.full(n, -np.inf, np.float32)
+    roof = np.full(n, -np.inf, np.float32)
     water = []
     for p in las_paths:
         x, y, z, cls = read_las(p)
@@ -190,14 +192,22 @@ def grid_points(las_paths, bbox, size):
         np.maximum.at(top, cell, zz)
         v = np.isin(cc, VEGETATION)
         np.maximum.at(veg, cell[v], zz[v])
+        r = cc == BUILDING
+        np.maximum.at(roof, cell[r], zz[r])
         water.append(zz[cc == WATER])
         log(f"{os.path.basename(p)}: {int(inside.sum()):,} points on the tile, {int(g.sum()):,} ground")
     ground = np.where(gcnt > 0, gsum / np.maximum(gcnt, 1), np.nan).astype(np.float32).reshape(size, size)
     top = np.where(np.isfinite(top), top, np.nan).reshape(size, size)
     veg = np.where(np.isfinite(veg), veg, np.nan).reshape(size, size)
+    roof = np.where(np.isfinite(roof), roof, np.nan).reshape(size, size)
     water = np.concatenate(water) if water else np.zeros(0, np.float32)
     level = float(np.median(water)) if water.size >= 100 else None
-    return ground, top, veg, gcnt.reshape(size, size), level
+    return ground, top, veg, roof, gcnt.reshape(size, size), level
+
+
+def roofs_path(raw_dir, tile):
+    """Where the building-class heights above ground are kept for the cadastre step (not a pack file)."""
+    return os.path.join(raw_dir, "lv", f"{tile}_roofs.r32")
 
 
 def _box_count(mask, r):
@@ -229,7 +239,7 @@ def fill_ground(ground):
     return filled.astype(np.float32), float((~mask).mean())
 
 
-def fetch_ground(bbox, size, out_dir, raw_dir, span=(0.05, 0.55)):
+def fetch_ground(bbox, size, out_dir, raw_dir, tile, span=(0.05, 0.55)):
     """heightmap.r32 and canopy.r32 from the laser sheets under the box. Returns the meta fields."""
     sheets = _sheets_over(lks_bbox(bbox), 1000.0, las_sheet)
     index = las_index()
@@ -250,7 +260,7 @@ def fetch_ground(bbox, size, out_dir, raw_dir, span=(0.05, 0.55)):
         _progress(f0, text + (", cached" if os.path.exists(dest) else ""))
         local.append(_download(index[s], dest, label=text, span=(f0, f1)))
     _progress(span[0] + (span[1] - span[0]) * 0.85, "gridding the ground and the canopy")
-    ground, top, veg, hits, level = grid_points(local, bbox, size)
+    ground, top, veg, roof, hits, level = grid_points(local, bbox, size)
     covered = float(np.isfinite(top).mean())
     water = open_water(~np.isfinite(top))
     if water.any():
@@ -264,6 +274,10 @@ def fetch_ground(bbox, size, out_dir, raw_dir, span=(0.05, 0.55)):
     canopy = np.where((canopy > 0.3) & (canopy < 200.0), canopy, 0.0).astype(np.float32)
     geo.write_r32(heights, os.path.join(out_dir, "heightmap.r32"))
     geo.write_r32(canopy, os.path.join(out_dir, "canopy.r32"))
+    # the roofs above the ground, for the buildings the cadastre draws (fetch_cadastre_lv.py): the
+    # highest building return per metre, 0 where the laser saw no building
+    roofs = np.nan_to_num(roof - heights, nan=0.0)
+    geo.write_r32(np.where(roofs > 0.5, roofs, 0.0).astype(np.float32), roofs_path(raw_dir or paths.raw_root(), tile))
     zmin, zmax = float(heights.min()), float(heights.max())
     log(f"ground {zmin:.2f}..{zmax:.2f} m, {holes:.0%} of cells filled, points on {covered:.0%} of the tile; canopy up to {canopy.max():.1f} m")
     if covered < 0.5:
@@ -335,7 +349,7 @@ def build_tile(a, raw_dir, out_dir, bbox):
     xmin, ymin, xmax, ymax = bbox
     size = int(xmax - xmin)
     meta_path = os.path.join(out_dir, "terrain_meta.json")
-    ground = fetch_ground(bbox, size, out_dir, raw_dir)
+    ground = fetch_ground(bbox, size, out_dir, raw_dir, a.name)
     if a.only_dem:
         meta = json.load(open(meta_path)) if os.path.exists(meta_path) else {}
         meta.update({k: ground[k] for k in ("z_min", "z_max", "dtm_res_m", "canopy")})

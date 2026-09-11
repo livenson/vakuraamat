@@ -201,6 +201,8 @@ UI_LAMP,Lamp,Lamp
 UI_NOTICE_BOARD,Teadetetahvel,Notice board
 UI_SHEET_CLOSE,Esc sulgeb,Esc closes
 UI_SHEET_REGISTER,"Ehitisregister: %s","Building register: %s"
+UI_SHEET_REGISTER_LV,"Läti kinnisvarakataster: %s","Latvian real-property cadastre: %s"
+UI_SHEET_CODE_LV,"Ehitise katastritähis %s","Building cadastral designation %s"
 UI_SHEET_TENANTS,Üürnikud,Tenants
 UI_SHEET_OWNER,Katastriüksus %s · omanik %s,Cadastral unit %s · owner %s
 UI_SHEET_NO_TENANTS,Ühtegi ettevõtet ei ole siia registreeritud.,No company is registered at this address.
