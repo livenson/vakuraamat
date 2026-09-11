@@ -1,0 +1,710 @@
+[gd_resource type="Resource" script_class="RuntimeShaders" format=4]
+
+[ext_resource type="Shader" path="res://addons/sky_3d/shaders/SkyMaterial.gdshader" id="1_1ympl"]
+[ext_resource type="Shader" path="res://addons/sky_3d/shaders/AtmFog.gdshader" id="2_pl7qg"]
+[ext_resource type="Shader" path="res://assets/shaders/lake.gdshader" id="3_yy4vj"]
+[ext_resource type="Script" path="res://scripts/world/runtime_shaders.gd" id="4_ehb51"]
+
+[sub_resource type="Shader" id="Shader_3dlvk"]
+code = "
+shader_type spatial;
+render_mode unshaded;
+
+uniform highp sampler2D depth_texture : source_color, hint_depth_texture, filter_nearest, repeat_disable;
+
+void fragment() {
+	float depth = textureLod(depth_texture, SCREEN_UV, 0.).x;
+	#if CURRENT_RENDERER == RENDERER_COMPATIBILITY
+	depth = depth * 2.0 - 1.0;
+	#endif
+	vec3 ndc = vec3(SCREEN_UV * 2.0 - 1.0, depth);
+	vec4 view = INV_PROJECTION_MATRIX * vec4(ndc, 1.0);
+	view.xyz /= view.w;
+	float depth_linear = -view.z;
+
+	// Normalize depth to the range 0 - 1
+	highp float scaledDepth = clamp(depth_linear / 100000.0, 0.0, 1.0);
+
+	// Encode using 127 steps, which map to the 128 - 255 range.
+	// Avoids precision loss for compatability and mobile renderer
+	// 21bit depth value
+	highp float r = (floor(scaledDepth * 127.0) + 128.0) / 255.0;
+	highp float g = (floor(fract(scaledDepth * 127.0) * 127.0) + 128.0) / 255.0;
+	highp float b = (floor(fract(scaledDepth * 127.0 * 127.0) * 127.0) + 128.0) / 255.0;
+		
+	ALBEDO = vec3(r, g, b); // Return encoded value, required for Mobile & Compatibility renderers
+
+}
+
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_y7uat"]
+render_priority = 0
+shader = SubResource("Shader_3dlvk")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_acdkg"]
+shader = ExtResource("1_1ympl")
+shader_parameter/sky_visible = true
+shader_parameter/color_correction = Vector2(0, 1)
+shader_parameter/ground_color = Color(0.3, 0.3, 0.3, 1)
+shader_parameter/horizon_offset = 0.0
+shader_parameter/atm_darkness = 0.5
+shader_parameter/atm_sun_intensity = 18.0
+shader_parameter/atm_day_tint = Color(0.808, 0.91, 1, 1)
+shader_parameter/atm_horizon_light_tint = Color(0.98, 0.635, 0.463, 1)
+shader_parameter/atm_night_tint = Color(0.041, 0.049, 0.061, 0.245)
+shader_parameter/atm_level_params = Vector3(1, 0, 0)
+shader_parameter/atm_thickness = 0.7
+shader_parameter/atm_beta_ray = Vector3(1e-05, 1e-05, 3e-05)
+shader_parameter/atm_beta_mie = Vector3(3.038e-08, 3.038e-08, 3.038e-08)
+shader_parameter/sun_light_color = Color(1, 1, 1, 1)
+shader_parameter/sun_disk_color = Color(0.996, 0.541, 0.14, 1)
+shader_parameter/sun_disk_intensity = 2.0
+shader_parameter/sun_disk_size = 0.015
+shader_parameter/atm_sun_mie_tint = Color(1, 1, 1, 1)
+shader_parameter/atm_sun_mie_intensity = 1.0
+shader_parameter/atm_sun_partial_mie_phase = Vector3(0.36, 1.64, 1.6)
+shader_parameter/moon_color = Color(1, 1, 1, 1)
+shader_parameter/moon_texture_alignment = Vector3(7, 1.4, 4.8)
+shader_parameter/moon_texture_flip_u = false
+shader_parameter/moon_texture_flip_v = false
+shader_parameter/moon_size = 0.07
+shader_parameter/atm_moon_mie_tint = Color(0.137, 0.184, 0.292, 1)
+shader_parameter/atm_moon_mie_intensity = 0.17152
+shader_parameter/atm_moon_partial_mie_phase = Vector3(0.36, 1.64, 1.6)
+shader_parameter/starmap_color = Color(0.71, 0.71, 0.71, 0.855)
+shader_parameter/starmap_flip_u = false
+shader_parameter/starmap_flip_v = false
+shader_parameter/starmap_alignment = Vector3(2.68288, -0.25891, 0.40101)
+shader_parameter/star_rotation_offset = 9.38899
+shader_parameter/star_rotation = 0.0
+shader_parameter/star_tilt = 0.0
+shader_parameter/star_field_color = Color(1, 1, 1, 1)
+shader_parameter/star_scintillation = 0.75
+shader_parameter/star_scintillation_speed = 0.01
+shader_parameter/clouds_night_color = Color(0.09, 0.094, 0.129, 1)
+shader_parameter/cirrus_visible = true
+shader_parameter/cirrus_intensity = 2.0
+shader_parameter/cirrus_coverage = 0.5
+shader_parameter/cirrus_thickness = 10.0
+shader_parameter/cirrus_absorption = 2.0
+shader_parameter/cirrus_sky_tint_fade = 0.5
+shader_parameter/cirrus_size = 1.0
+shader_parameter/cirrus_uv = Vector2(0.16, 0.11)
+shader_parameter/cirrus_position1 = Vector2(0, 0)
+shader_parameter/cirrus_position2 = Vector2(0, 0)
+shader_parameter/cumulus_visible = true
+shader_parameter/cumulus_intensity = 0.6
+shader_parameter/cumulus_coverage = 0.55
+shader_parameter/cumulus_thickness = 0.0243
+shader_parameter/cumulus_absorption = 2.0
+shader_parameter/cumulus_noise_freq = 2.7
+shader_parameter/cumulus_sky_tint_fade = 0.0
+shader_parameter/cumulus_size = 0.5
+shader_parameter/cumulus_position = Vector2(0, 0)
+shader_parameter/cumulus_partial_mie_phase = Vector3(0.95756, 1.04244, 0.412)
+shader_parameter/cumulus_mie_intensity = 1.0
+shader_parameter/show_azimuthal_grid = false
+shader_parameter/azimuthal_grid_color = Color(0.871, 0.722, 0.529, 1)
+shader_parameter/azimuthal_grid_rotation_offset = 0.03
+shader_parameter/show_equatorial_grid = false
+shader_parameter/equatorial_grid_color = Color(0, 0.75, 1, 1)
+shader_parameter/equatorial_grid_rotation_offset = 0.03
+shader_parameter/moon_matrix = Basis(1, 0, 0, 0, 1, 0, 0, 0, 1)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_8jm1x"]
+render_priority = 0
+shader = ExtResource("2_pl7qg")
+shader_parameter/color_correction = Vector2(0, 0)
+shader_parameter/sea_level = 0.0
+shader_parameter/fog_density = 0.0001
+shader_parameter/fog_rayleigh_depth = 0.115
+shader_parameter/fog_mie_depth = 0.0
+shader_parameter/fog_falloff = 3.0
+shader_parameter/fog_start = 0.0
+shader_parameter/fog_end = 1000.0
+shader_parameter/sun_direction = Vector3(0.25, -0.25, 0.25)
+shader_parameter/moon_direction = Vector3(0.45, -0.25, 0.45)
+shader_parameter/atm_darkness = 0.5
+shader_parameter/atm_sun_intensity = 30.0
+shader_parameter/atm_day_tint = Color(0.78, 0.85, 0.98, 1)
+shader_parameter/atm_horizon_light_tint = Color(0.98, 0.73, 0.49, 1)
+shader_parameter/atm_night_tint = Color(0.16, 0.2, 0.25, 1)
+shader_parameter/atm_level_params = Vector3(1, 0, 0)
+shader_parameter/atm_thickness = 0.7
+shader_parameter/atm_beta_ray = Vector3(0, 0, 0)
+shader_parameter/atm_beta_mie = Vector3(0, 0, 0)
+shader_parameter/atm_sun_partial_mie_phase = Vector3(0, 0, 0)
+shader_parameter/atm_sun_mie_tint = Color(1, 1, 1, 1)
+shader_parameter/atm_sun_mie_intensity = 1.0
+shader_parameter/atm_moon_partial_mie_phase = Vector3(0, 0, 0)
+shader_parameter/atm_moon_mie_tint = Color(0.13, 0.18, 0.29, 1)
+shader_parameter/atm_moon_mie_intensity = 0.7
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_07ybk"]
+albedo_color = Color(0.5, 0.32, 0.26, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1skor"]
+cull_mode = 2
+albedo_color = Color(0.848, 0.772, 0.62, 1)
+roughness = 0.9
+normal_enabled = true
+uv1_scale = Vector3(0.6, 0.6, 0.6)
+uv1_triplanar = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sn2gk"]
+resource_name = "Window"
+albedo_color = Color(0.08, 0.1, 0.13, 1)
+metallic = 0.9
+metallic_specular = 1.0
+roughness = 0.05
+emission_enabled = true
+emission = Color(1, 0.72, 0.4, 1)
+emission_energy_multiplier = 0.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_31y44"]
+cull_mode = 2
+albedo_color = Color(0.468, 0.497, 0.54, 1)
+roughness = 0.95
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_grbn6"]
+resource_name = "bus_stop_material"
+cull_mode = 2
+metallic = 1.0
+metallic_texture_channel = 2
+roughness_texture_channel = 1
+normal_enabled = true
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gr5vn"]
+vertex_color_use_as_albedo = true
+roughness = 0.85
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wklpl"]
+resource_name = "Body_2"
+albedo_color = Color(0.875, 0.88, 0.8875, 1)
+metallic = 1.0
+metallic_texture_channel = 2
+roughness = 0.35
+roughness_texture_channel = 1
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tq6il"]
+resource_name = "Glass_2"
+transparency = 4
+cull_mode = 2
+albedo_color = Color(0, 0, 0, 0.85804117)
+roughness = 0.35
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pg7b7"]
+resource_name = "Optics_2"
+albedo_color = Color(0.875, 0.88, 0.8875, 1)
+roughness = 0.35
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p4xqd"]
+resource_name = "colormap"
+cull_mode = 2
+albedo_color = Color(0.9375, 0.9, 0.8, 1)
+roughness = 0.35
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_511oo"]
+resource_name = "Human.male_casualsuit05"
+transparency = 4
+cull_mode = 2
+albedo_color = Color(0.5, 0.7, 0.6, 1)
+roughness = 0.8039
+normal_enabled = true
+metadata/_gltf_primary_texture_coord = 0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_7nl3r"]
+render_priority = 0
+shader = ExtResource("3_yy4vj")
+shader_parameter/wave_speed = 0.35
+shader_parameter/wave_a = Vector4(1, 0.4, 0.02, 7)
+shader_parameter/wave_b = Vector4(-0.3, 0.8, 0.015, 4.2)
+shader_parameter/wave_c = Vector4(-0.9, -0.6, 0.01, 2.3)
+shader_parameter/normal_scale = 0.09
+shader_parameter/normal_drift = Vector2(0.018, 0.012)
+shader_parameter/normal_strength = 0.22
+shader_parameter/foam_level = 0.6
+shader_parameter/refraction = 0.035
+shader_parameter/color_deep = Color(0.03, 0.08, 0.08, 1)
+shader_parameter/color_shallow = Color(0.22, 0.34, 0.27, 1)
+shader_parameter/beers_law = 0.45
+shader_parameter/depth_offset = -0.3
+
+[sub_resource type="Shader" id="Shader_latav"]
+code = "shader_type spatial;
+render_mode blend_mix,depth_draw_opaque,cull_back,diffuse_burley,specular_schlick_ggx,skip_vertex_transform;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+uniform vec3 _camera_pos = vec3(0.f);
+uniform float _mesh_size = 48.f;
+uniform uint _background_mode = 1u; 
+uniform uint _mouse_layer = 0x80000000u; 
+uniform float _vertex_spacing = 1.0;
+uniform float _vertex_density = 1.0; 
+uniform float _region_size = 1024.0;
+uniform float _region_texel_size = 0.0009765625; 
+uniform int _region_map_size = 32;
+uniform int _region_map[1024];
+uniform vec2 _region_locations[1024];
+uniform float _texture_normal_depth_array[32];
+uniform float _texture_ao_strength_array[32];
+uniform float _texture_roughness_mod_array[32];
+uniform float _texture_uv_scale_array[32];
+uniform vec4 _texture_color_array[32];
+uniform highp sampler2DArray _height_maps : repeat_disable;
+uniform highp sampler2DArray _control_maps : repeat_disable;
+uniform highp sampler2DArray _color_maps : source_color, filter_linear_mipmap_anisotropic, repeat_disable;
+uniform highp sampler2DArray _texture_array_albedo : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform highp sampler2DArray _texture_array_normal : hint_normal, filter_linear_mipmap_anisotropic, repeat_enable;
+
+
+uniform sampler2D ortho_texture : source_color, filter_linear_mipmap_anisotropic, repeat_disable;
+uniform vec2 ortho_origin = vec2(0.0, 0.0);
+uniform float ortho_extent = 1024.0;
+uniform float ortho_strength : hint_range(0.0, 1.0) = 1.0;
+uniform vec4 ortho_tint : source_color = vec4(1.0); 
+
+
+
+
+uniform sampler2D info_texture : source_color, filter_linear, repeat_disable;
+uniform vec2 info_origin = vec2(0.0, 0.0);
+uniform float info_extent = 1024.0;
+uniform float info_mix : hint_range(0.0, 1.0) = 0.0;
+uniform float detail_near : hint_range(0.0, 500.0) = 40.0; 
+uniform float detail_far : hint_range(0.0, 2000.0) = 400.0; 
+uniform float detail_contrast : hint_range(0.0, 2.0) = 1.0; 
+uniform float roughness_bias : hint_range(-1.0, 1.0) = 0.35; 
+uniform float specular_amount : hint_range(0.0, 1.0) = 0.08; 
+uniform bool enable_texturing = true;
+uniform float blend_sharpness : hint_range(0, 1) = 0.5;
+uniform bool flat_terrain_normals = false;
+
+uniform float auto_slope : hint_range(0, 10) = 1.0;
+uniform float auto_height_reduction : hint_range(0, 1) = 0.1;
+uniform int auto_base_texture : hint_range(0, 31) = 0;
+uniform int auto_overlay_texture : hint_range(0, 31) = 1;
+
+uniform bool enable_macro_variation = true;
+uniform vec3 macro_variation1 : source_color = vec3(1.);
+uniform vec3 macro_variation2 : source_color = vec3(1.);
+uniform float macro_variation_slope : hint_range(0., 1.) = 0.333;
+uniform highp sampler2D noise_texture : source_color, filter_linear_mipmap_anisotropic, repeat_enable;
+uniform float noise1_scale : hint_range(0.001, 1.) = 0.04; 
+uniform float noise1_angle : hint_range(0, 6.283) = 0.;
+uniform vec2 noise1_offset = vec2(0.5);
+uniform float noise2_scale : hint_range(0.001, 1.) = 0.076; 
+
+
+varying vec3 v_normal;
+varying vec3 v_vertex;
+varying mat3 TBN;
+
+
+
+
+
+
+
+
+
+ivec3 get_index_coord(const vec2 uv, const int search) {
+ vec2 r_uv = round(uv);
+ vec2 o_uv = mod(r_uv,_region_size);
+ ivec2 pos;
+ int bounds, layer_index = -1;
+ for (int i = -1; i < clamp(search,  0 ,  2 ); i++) {
+ if ((layer_index == -1 && _background_mode == 0u ) || i < 0) {
+ r_uv -= i == -1 ? vec2(0.0) : vec2(float(o_uv.x <= o_uv.y), float(o_uv.y <= o_uv.x));
+ pos = ivec2(floor((r_uv) * _region_texel_size)) + (_region_map_size / 2);
+ bounds = int(uint(pos.x | pos.y) < uint(_region_map_size));
+ layer_index = (_region_map[ pos.y * _region_map_size + pos.x ] * bounds - 1);
+ }
+ }
+ return ivec3(ivec2(mod(r_uv,_region_size)), layer_index);
+}
+
+
+
+
+vec3 get_index_uv(const vec2 uv2) {
+ ivec2 pos = ivec2(floor(uv2)) + (_region_map_size / 2);
+ int bounds = int(uint(pos.x | pos.y) < uint(_region_map_size));
+ int layer_index = _region_map[ pos.y * _region_map_size + pos.x ] * bounds - 1;
+ return vec3(uv2 - _region_locations[layer_index], float(layer_index));
+}
+
+void vertex() {
+ 
+ v_vertex = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz;
+
+ 
+ float v_vertex_xz_dist = length(v_vertex.xz - _camera_pos.xz);
+
+ 
+ float scale = MODEL_MATRIX[0][0];
+ float vertex_lerp = smoothstep(0.55, 0.95, (v_vertex_xz_dist / scale - _mesh_size - 4.0) / (_mesh_size - 2.0));
+ vec2 v_fract = fract(VERTEX.xz * 0.5) * 2.0;
+ 
+ vec2 shift = (scale < _vertex_spacing + 1e-6) ? 
+ 
+ mix(v_fract, vec2(v_fract.x, -v_fract.y),
+ round(fract(round(mod(v_vertex.z * _vertex_density, 4.0)) *
+ round(mod(v_vertex.x * _vertex_density, 4.0)) * 0.25))
+ ) :
+ 
+ v_fract * round((fract(v_vertex.xz * 0.25 / scale) - 0.5) * 4.0);
+ vec2 start_pos = v_vertex.xz * _vertex_density;
+ vec2 end_pos = (v_vertex.xz - shift * scale) * _vertex_density;
+ v_vertex.xz -= shift * scale * vertex_lerp;
+
+ 
+ UV = v_vertex.xz * _vertex_density;
+
+ 
+ UV2 = fma(UV, vec2(_region_texel_size), vec2(0.5 * _region_texel_size));
+
+ 
+ ivec3 v_region = get_index_coord(start_pos,  1 );
+ uint control = floatBitsToUint(texelFetch(_control_maps, v_region, 0)).r;
+ bool hole =  bool(control >>2u & 0x1u) ;
+
+ 
+ if ( !(CAMERA_VISIBLE_LAYERS == _mouse_layer) &&
+ (hole || (_background_mode == 0u && v_region.z == -1))) {
+ v_vertex.x = 0. / 0.;
+ } else {
+ 
+ ivec3 uv_a = get_index_coord(start_pos,  1 );
+ ivec3 uv_b = get_index_coord(end_pos,  1 );
+ float h = mix(texelFetch(_height_maps, uv_a, 0).r,texelFetch(_height_maps, uv_b, 0).r,vertex_lerp);
+ v_vertex.y = h;
+
+ 
+ float u = mix(texelFetch(_height_maps, get_index_coord(start_pos + vec2(1,0),  1 ), 0).r,
+ texelFetch(_height_maps, get_index_coord(end_pos + vec2(1,0),  1 ), 0).r, vertex_lerp);
+ float v = mix(texelFetch(_height_maps, get_index_coord(start_pos + vec2(0,1),  1 ), 0).r,
+ texelFetch(_height_maps, get_index_coord(end_pos + vec2(0,1),  1 ), 0).r, vertex_lerp);
+
+ v_normal = normalize(vec3(h - u, _vertex_spacing, h - v));
+ }
+
+ 
+ VERTEX = (VIEW_MATRIX * vec4(v_vertex, 1.0)).xyz;
+
+ 
+ vec3 w_tangent = normalize(cross(v_normal, vec3(0.0, 0.0, 1.0)));
+ vec3 w_binormal = normalize(cross(v_normal, w_tangent));
+ TBN = mat3(w_tangent, w_binormal, v_normal);
+
+ NORMAL = normalize((VIEW_MATRIX * vec4(v_normal, 0.0)).xyz);
+ BINORMAL = normalize((VIEW_MATRIX * vec4(w_binormal, 0.0)).xyz);
+ TANGENT = normalize((VIEW_MATRIX * vec4(w_tangent, 0.0)).xyz);
+}
+
+
+
+
+
+mat2 rotate_plane(float angle) {
+ float c = cos(angle), s = sin(angle);
+ return mat2(vec2(c, s), vec2(-s, c));
+}
+
+void fragment() {
+ 
+ vec2 uv = UV;
+ vec2 uv2 = UV2;
+
+ 
+ vec3 region_uv = get_index_uv(uv2);
+ const vec3 offsets = vec3(0, 1, 2);
+ vec2 index_id = floor(uv);
+ vec2 weight = fract(uv);
+ vec2 invert = 1.0 - weight;
+ vec4 weights = vec4(
+ invert.x * weight.y, 
+ weight.x * weight.y, 
+ weight.x * invert.y, 
+ invert.x * invert.y 
+ );
+
+ ivec3 index[4];
+ 
+ index[0] = get_index_coord(index_id + offsets.xy,  2 );
+ index[1] = get_index_coord(index_id + offsets.yy,  2 );
+ index[2] = get_index_coord(index_id + offsets.yx,  2 );
+ index[3] = get_index_coord(index_id + offsets.xx,  2 );
+
+ vec3 base_ddx = dFdxCoarse(v_vertex);
+ vec3 base_ddy = dFdyCoarse(v_vertex);
+ vec4 base_dd = vec4(base_ddx.xz, base_ddy.xz);
+ 
+ float region_mip = log2(max(length(base_ddx.xz), length(base_ddy.xz)) * _vertex_density);
+
+ 
+ vec4 color_map = region_uv.z > -1.0 ? textureLod(_color_maps, region_uv, region_mip) :  vec4(1.0, 1.0, 1.0, 0.5) ;
+
+ if (flat_terrain_normals) {
+ NORMAL = normalize(cross(dFdyCoarse(VERTEX),dFdxCoarse(VERTEX)));
+ TANGENT = normalize(cross(NORMAL, VIEW_MATRIX[2].xyz));
+ BINORMAL = normalize(cross(NORMAL, TANGENT));
+ }
+
+ 
+ vec4 normal_rough = vec4(0., 1., 0., 0.7);
+ vec4 albedo_height = vec4(1.);
+ float normal_map_depth = 1.;
+ float ao_strength = 0.;
+
+ if (enable_texturing) {
+ 
+ albedo_height = vec4(0.);
+ normal_rough = vec4(0.);
+ normal_map_depth = 0.;
+ ao_strength = 0.;
+ float total_weight = 0.;
+ float sharpness = fma(56., blend_sharpness, 8.);
+
+ 
+ 
+ uvec4 control = floatBitsToUint(vec4(
+ texelFetch(_control_maps, index[0], 0).r,
+ texelFetch(_control_maps, index[1], 0).r,
+ texelFetch(_control_maps, index[2], 0).r,
+ texelFetch(_control_maps, index[3], 0).r));
+
+ {
+ 
+ float auto_blend = clamp(fma(auto_slope * 2.0, (v_normal.y - 1.0), 1.0)
+ - auto_height_reduction * 0.01 * v_vertex.y, 0.0, 1.0);
+ 
+ uvec4 is_auto = (control & uvec4(0x1u)) | uvec4(uint(region_uv.z < 0.0));
+ uint u_auto = 
+ ((uint(auto_base_texture) & 0x1Fu) << 27u) |
+ ((uint(auto_overlay_texture) & 0x1Fu) << 22u) |
+ ((uint(fma(auto_blend, 255.0 , 0.5)) & 0xFFu) << 14u);
+ control = control * (1u - is_auto) + u_auto * is_auto;
+ }
+
+
+ 
+ 
+ ivec4 t_id[2] = {ivec4(control >> uvec4(27u) & uvec4(0x1Fu)),
+ ivec4(control >> uvec4(22u) & uvec4(0x1Fu))};
+ ivec2 texture_ids[4] = ivec2[4](
+ ivec2(t_id[0].x, t_id[1].x),
+ ivec2(t_id[0].y, t_id[1].y),
+ ivec2(t_id[0].z, t_id[1].z),
+ ivec2(t_id[0].w, t_id[1].w));
+
+ 
+ vec4 weights_id_1 = vec4(control >> uvec4(14u) & uvec4(0xFFu)) *  0.003921568627450  * weights;
+ vec4 weights_id_0 = weights - weights_id_1;
+ vec2 t_weights[4] = {vec2(0), vec2(0), vec2(0), vec2(0)};
+ for (int i = 0; i < 4; i++) {
+ vec2 w_0 = vec2(weights_id_0[i]);
+ vec2 w_1 = vec2(weights_id_1[i]);
+ ivec2 id_0 = texture_ids[i].xx;
+ ivec2 id_1 = texture_ids[i].yy;
+ t_weights[0] += fma(w_0, vec2(equal(texture_ids[0], id_0)), w_1 * vec2(equal(texture_ids[0], id_1)));
+ t_weights[1] += fma(w_0, vec2(equal(texture_ids[1], id_0)), w_1 * vec2(equal(texture_ids[1], id_1)));
+ t_weights[2] += fma(w_0, vec2(equal(texture_ids[2], id_0)), w_1 * vec2(equal(texture_ids[2], id_1)));
+ t_weights[3] += fma(w_0, vec2(equal(texture_ids[3], id_0)), w_1 * vec2(equal(texture_ids[3], id_1)));
+ }
+
+
+ 
+ 
+ 
+ 
+ uint id_read = 0u; 
+ 
+ vec4 nrm = vec4(0.0, 1.0, 0.0, 1.0);
+ 
+ uv *= _vertex_spacing;
+ for (int i = 0; i < 4; i++) {
+ for (int t = 0; t < 2; t++) {
+ int id = texture_ids[i][t];
+ uint mask = 1u << uint(id);
+ if ((id_read & mask) == 0u) {
+ 
+ id_read |= mask;
+ float id_w = t_weights[i][t];
+ float id_scale = _texture_uv_scale_array[id] * 0.5;
+ vec2 id_uv = fma(uv, vec2(id_scale), vec2(0.5));
+ vec4 i_dd = base_dd * id_scale;
+ vec4 alb = textureGrad(_texture_array_albedo, vec3(id_uv, float(id)), i_dd.xy, i_dd.zw);
+ float world_normal = clamp(fma(TBN[0], vec3(nrm.x), fma(TBN[1], vec3(nrm.z), v_normal * vec3(nrm.y))).y, 0., 1.);
+ nrm = textureGrad(_texture_array_normal, vec3(id_uv, float(id)), i_dd.xy, i_dd.zw);
+ alb.rgb *= _texture_color_array[id].rgb;
+ nrm.a = clamp(nrm.a + _texture_roughness_mod_array[id], 0., 1.);
+ 
+ nrm.xyz = fma(nrm.xzy, vec3(2.0), vec3(-1.0));
+ 
+ float id_weight = exp2(sharpness * log2(id_w + alb.a * world_normal));
+ albedo_height += alb * id_weight;
+ normal_rough += nrm * id_weight;
+ normal_map_depth += _texture_normal_depth_array[id] * id_weight;
+ ao_strength += _texture_ao_strength_array[id] * id_weight;
+ total_weight += id_weight;
+ }
+ }
+ }
+ 
+ float weight_inv = 1.0 / total_weight;
+ albedo_height *= weight_inv;
+ normal_rough *= weight_inv;
+ normal_map_depth *= weight_inv;
+ ao_strength *= weight_inv;
+ }
+
+ 
+ vec3 macrov = vec3(1.);
+ if (enable_macro_variation) {
+ float noise1 = texture(noise_texture, (uv * noise1_scale * .1 + noise1_offset) * rotate_plane(noise1_angle)).r;
+ float noise2 = texture(noise_texture, uv * noise2_scale * .1).r;
+ macrov = mix(macro_variation1, vec3(1.), noise1);
+ macrov *= mix(macro_variation2, vec3(1.), noise2);
+ macrov = mix(vec3(1.0), macrov, clamp(v_normal.y + macro_variation_slope, 0., 1.));
+ }
+
+ 
+ float roughness = clamp(fma(color_map.a - 0.5, 2.0, normal_rough.a), 0., 1.);
+
+ 
+ 
+ vec2 ortho_uv = (uv * _vertex_spacing - ortho_origin) / ortho_extent;
+ vec3 ortho_rgb = texture(ortho_texture, ortho_uv).rgb * ortho_tint.rgb;
+ float ortho_mix = ortho_strength * float(all(greaterThanEqual(ortho_uv, vec2(0.0))) && all(lessThanEqual(ortho_uv, vec2(1.0))));
+ vec3 base_rgb = albedo_height.rgb * color_map.rgb * macrov;
+ 
+ 
+ float detail_luma = dot(albedo_height.rgb, vec3(0.299, 0.587, 0.114));
+ vec3 near_rgb = ortho_rgb * mix(1.0, clamp(detail_luma * 2.0, 0.35, 1.8), detail_contrast);
+ float dist = length(v_vertex - _camera_pos);
+ float far_t = smoothstep(detail_near, detail_far, dist);
+ vec3 ortho_final = mix(near_rgb, ortho_rgb, far_t);
+ ALBEDO = mix(base_rgb, ortho_final, ortho_mix);
+ 
+ 
+ if (info_mix > 0.0) {
+ vec2 info_uv = (uv * _vertex_spacing - info_origin) / info_extent;
+ vec4 info = texture(info_texture, info_uv);
+ float inside = float(all(greaterThanEqual(info_uv, vec2(0.0))) && all(lessThanEqual(info_uv, vec2(1.0))));
+ ALBEDO = mix(ALBEDO, info.rgb, info.a * info_mix * inside);
+ }
+ ROUGHNESS = clamp(roughness + roughness_bias, 0.0, 1.0);
+ SPECULAR = specular_amount;
+ 
+ NORMAL_MAP = fma(normalize(normal_rough.xzy), vec3(0.5), vec3(0.5));
+ NORMAL_MAP_DEPTH = normal_map_depth;
+
+ 
+ float ao = (1. - (albedo_height.a * log(2.1 - ao_strength))) * (1. - normal_rough.y);
+ AO = clamp(1. - ao * ao_strength, albedo_height.a, 1.0);
+ AO_LIGHT_AFFECT = (1.0 - albedo_height.a) * clamp(normal_rough.y, 0., 1.);
+
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_hkq5m"]
+render_priority = 0
+shader = SubResource("Shader_latav")
+shader_parameter/_camera_pos = Vector3(0, 0, 0)
+shader_parameter/_mesh_size = 48.0
+shader_parameter/_background_mode = 1
+shader_parameter/_mouse_layer = 2147483648
+shader_parameter/_vertex_spacing = 1.0
+shader_parameter/_vertex_density = 1.0
+shader_parameter/_region_size = 1024.0
+shader_parameter/_region_texel_size = 0.0009765625
+shader_parameter/_region_map_size = 32
+shader_parameter/_region_map = PackedInt32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/_region_locations = PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/_texture_normal_depth_array = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/_texture_ao_strength_array = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/_texture_roughness_mod_array = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/_texture_uv_scale_array = PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/_texture_color_array = PackedVector4Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+shader_parameter/ortho_origin = Vector2(0, 0)
+shader_parameter/ortho_extent = 1024.0
+shader_parameter/ortho_strength = 1.0
+shader_parameter/ortho_tint = Color(1, 1, 1, 1)
+shader_parameter/info_origin = Vector2(0, 0)
+shader_parameter/info_extent = 1024.0
+shader_parameter/info_mix = 0.0
+shader_parameter/detail_near = 40.0
+shader_parameter/detail_far = 400.0
+shader_parameter/detail_contrast = 1.0
+shader_parameter/roughness_bias = 0.35
+shader_parameter/specular_amount = 0.08
+shader_parameter/enable_texturing = true
+shader_parameter/blend_sharpness = 0.5
+shader_parameter/flat_terrain_normals = false
+shader_parameter/auto_slope = 1.0
+shader_parameter/auto_height_reduction = 0.1
+shader_parameter/auto_base_texture = 0
+shader_parameter/auto_overlay_texture = 1
+shader_parameter/enable_macro_variation = true
+shader_parameter/macro_variation1 = Color(1, 1, 1, 1)
+shader_parameter/macro_variation2 = Color(1, 1, 1, 1)
+shader_parameter/macro_variation_slope = 0.333
+shader_parameter/noise1_scale = 0.04
+shader_parameter/noise1_angle = 0.0
+shader_parameter/noise1_offset = Vector2(0.5, 0.5)
+shader_parameter/noise2_scale = 0.076
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1ympl"]
+resource_name = "Human.male_elegantsuit01"
+transparency = 4
+cull_mode = 2
+albedo_color = Color(0.6, 0.65, 0.7, 1)
+roughness = 0.9
+metadata/_gltf_primary_texture_coord = 0
+
+[resource]
+script = ExtResource("4_ehb51")
+materials = Array[Material]([SubResource("ShaderMaterial_y7uat"), SubResource("ShaderMaterial_acdkg"), SubResource("ShaderMaterial_8jm1x"), SubResource("StandardMaterial3D_07ybk"), SubResource("StandardMaterial3D_1skor"), SubResource("StandardMaterial3D_sn2gk"), SubResource("StandardMaterial3D_31y44"), SubResource("StandardMaterial3D_grbn6"), SubResource("StandardMaterial3D_gr5vn"), SubResource("StandardMaterial3D_wklpl"), SubResource("StandardMaterial3D_tq6il"), SubResource("StandardMaterial3D_pg7b7"), SubResource("StandardMaterial3D_p4xqd"), SubResource("StandardMaterial3D_511oo"), SubResource("ShaderMaterial_7nl3r"), SubResource("ShaderMaterial_hkq5m"), SubResource("StandardMaterial3D_1ympl")])
+sources = PackedStringArray("kvissentali: MeshInstance3D MouseQuad", "kvissentali: sky", "kvissentali: MeshInstance3D _FogMeshI", "kvissentali: MeshInstance3D Detail_chimney", "kvissentali: MeshInstance3D @MeshInstance3D@1119", "kvissentali: MeshInstance3D @MeshInstance3D@1119", "kvissentali: MeshInstance3D @MeshInstance3D@1132", "kvissentali: MeshInstance3D bus_stop_bus_stop_material_0", "kvissentali: MeshInstance3D @MeshInstance3D@603", "kvissentali: MeshInstance3D Merged", "kvissentali: MeshInstance3D Merged", "kvissentali: MeshInstance3D Merged", "kvissentali: MeshInstance3D body", "kvissentali: MeshInstance3D Human_male_casualsuit05_export", "kvissentali: MeshInstance3D Surface", "kvissentali: Terrain3D", "palupera: MeshInstance3D Human_male_elegantsuit01_export")

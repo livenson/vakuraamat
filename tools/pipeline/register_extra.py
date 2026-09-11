@@ -266,8 +266,19 @@ def _num(s):
 
 def health_of(status, quarters, report_overdue):
     """sound | watch | distressed from the register status, the tax quarters and the report deadline."""
+    return _health(status, quarters, report_overdue)[0]
+
+
+def health_why(status, quarters, report_overdue):
+    """Which rule made health_of's verdict, with the figures it read: {"rule": "status" | "zero_taxes" |
+    "report" | "turnover", "from": [year, turnover], "to": [year, turnover]}, or None when sound. The
+    game says it next to the verdict; the pack keeps only the last eight quarters, too few to rebuild it."""
+    return _health(status, quarters, report_overdue)[1]
+
+
+def _health(status, quarters, report_overdue):
     if status in ("N", "L"):
-        return "distressed"
+        return "distressed", {"rule": "status"}
     # a year of taxes published as zero while people are employed. A blank is not a zero: the Tax
     # Board leaves both tax columns empty where it publishes no amount (127k of 440k rows, among them
     # every municipal kindergarten and school, whose taxes the city pays), and the file writes real
@@ -276,9 +287,9 @@ def health_of(status, quarters, report_overdue):
     published = [q for q in recent if q["taxes"] is not None or q["labour"] is not None]
     if (len(published) == 4 and all((q["taxes"] or 0) + (q["labour"] or 0) == 0 for q in published)
             and any((q["employees"] or 0) > 0 for q in recent)):
-        return "distressed"
+        return "distressed", {"rule": "zero_taxes"}
     if report_overdue:
-        return "watch"
+        return "watch", {"rule": "report"}
     years = {}
     for q in quarters:
         if q["turnover"] is not None:
@@ -287,8 +298,8 @@ def health_of(status, quarters, report_overdue):
     if len(full) >= 2:
         a, b = sum(years[full[-2]]), sum(years[full[-1]])
         if a > 0 and b < a * 0.6:
-            return "watch"
-    return "sound"
+            return "watch", {"rule": "turnover", "from": [full[-2], a], "to": [full[-1], b]}
+    return "sound", None
 
 
 def enrich(tenants, root, max_age_days=7, refresh=False, today=None):
@@ -362,6 +373,7 @@ def enrich(tenants, root, max_age_days=7, refresh=False, today=None):
             "deleted": g.get("deleted"),
             "report_overdue": report_overdue,
             "health": health_of(t.get("status"), quarters, report_overdue),
+            "health_why": health_why(t.get("status"), quarters, report_overdue),
         })
         if g or p or s or quarters:
             enriched += 1

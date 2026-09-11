@@ -66,8 +66,57 @@ static func facts(t: Dictionary) -> String:
 	if t.get("capital") != null and float(t.capital) >= 2500.0:
 		bits.append(TranslationServer.translate("UI_CAPITAL") % BookTheme.money(int(t.capital)))
 	if t.get("health") and str(t.health) != "sound":
-		bits.append(TranslationServer.translate("HEALTH_" + str(t.health).to_upper()))
+		var verdict := TranslationServer.translate("HEALTH_" + str(t.health).to_upper())
+		var why := health_reason(t)
+		bits.append(verdict + (": " + why if why != "" else ""))
 	return " · ".join(bits)
+
+
+## Why a company is on watch or in distress. Packs built since 2026-09-11 carry the pipeline's own
+## reason with its figures (health_why, tools/pipeline/register_extra.py); older ones are read by the
+## same rules from the row's fields, where the eight quarters a pack keeps may be too few to name the
+## two years compared - then the rule itself is the answer, being the only one left. A yellow plot
+## with a bare "watch" left the player to guess whether it was the taxes, the report or the register.
+static func health_reason(t: Dictionary) -> String:
+	var say := func(key: String) -> String: return TranslationServer.translate(key)
+	var health := str(t.get("health", ""))
+	var why = t.get("health_why")
+	var rule := str(why.get("rule", "")) if typeof(why) == TYPE_DICTIONARY else ""
+	if rule == "":
+		if health == "distressed":
+			rule = "status" if str(t.get("status", "")) in ["N", "L"] else "zero_taxes"
+		elif health == "watch":
+			rule = "report" if t.get("report_overdue") == true else "turnover"
+	match rule:
+		"status":
+			return say.call("HEALTH_WHY_STATUS") % str(t.get("status_text", t.get("status", "")))
+		"zero_taxes":
+			return say.call("HEALTH_WHY_ZERO_TAXES")
+		"report":
+			return say.call("HEALTH_WHY_REPORT")
+		"turnover":
+			var years := _turnover_years(why, t)
+			if years.is_empty():
+				return say.call("HEALTH_WHY_TURNOVER_RULE")
+			return say.call("HEALTH_WHY_TURNOVER") % [BookTheme.money(int(years[1])), BookTheme.money(int(years[3])), int(years[0]), int(years[2])]
+	return ""
+
+
+## [year, turnover, year, turnover] of the two years a turnover watch compared: from the pipeline's
+## reason, or the last two years whose four quarters the row still has; [] when it has not.
+static func _turnover_years(why, t: Dictionary) -> Array:
+	if typeof(why) == TYPE_DICTIONARY and why.get("from") is Array and why.get("to") is Array:
+		return [why.from[0], why.from[1], why.to[0], why.to[1]]
+	var years := {}
+	for q in t.get("quarters", []):
+		if q is Array and q.size() >= 3 and q[2] != null:
+			years[int(q[0])] = years.get(int(q[0]), []) + [float(q[2])]
+	var full: Array = years.keys().filter(func(y): return years[y].size() == 4)
+	full.sort()
+	if full.size() < 2:
+		return []
+	var sum := func(qs: Array) -> float: return qs.reduce(func(s, v): return s + v, 0.0)
+	return [full[-2], sum.call(years[full[-2]]), full[-1], sum.call(years[full[-1]])]
 
 
 ## Names of the active companies (status R), the rule the door label and the name plates share.

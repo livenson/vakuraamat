@@ -11,7 +11,7 @@ Writes sites/<site>/tenants.json: {"attribution", "source", "sources", "fetched"
    emtak {code, text, nace, section}|null, sector (farm|industry|construction|trade|transport|hospitality|media|finance|
    property|services|public|culture)|null, capital, web, employees, turnover (last four quarters, EUR), taxes,
    employees_hist [[year, n]], quarters [[year, q, turnover, employees]], board_size, shareholders, owner_managed,
-   owners [hashed ids], deleted, report_overdue, health: sound|watch|distressed}]}  (register_extra.py: the general
+   owners [hashed ids], deleted, report_overdue, health: sound|watch|distressed, health_why: the rule and its figures}]}  (register_extra.py: the general
    data, the persons and shareholders files as structure only, the Tax Board's quarterly figures).
 Rows are filtered by the settlement codes (EHAK) of the tile's parcels, then matched: the company's ADS address id
 against the Building Register ids of the tile's buildings, then a normalised "street + number" key against the

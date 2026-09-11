@@ -97,6 +97,14 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   `sites/*`); `assets/terrain/*/data` stays uncommitted. After `make site` on a new pack, `make tile`
   fetches the buildings: re-run `tools/new_site.py --id <id> --force` and `make scenes`, or the layer
   keeps the massing boxes (`make validate` warns).
+- Shaders ship baked (`shader_baker/enabled` on the macOS preset; needs Xcode's Metal toolchain,
+  `xcodebuild -downloadComponent MetalToolchain`, and an export without `--headless`, which re-saves
+  `project.godot`: revert it). The baker only sees materials saved in resources, so the ones built in
+  code live in `assets/materials/runtime_shaders.tres`: run `make shaders` (a window, ~1 min a place)
+  after adding or changing a material made in a script, or its shader compiles on the player's first
+  frame (a cold first launch froze the loading screen for seconds). Godot 4.7.2's Metal baker needs
+  `min_macos_version_arm64` 14 or later (godotengine/godot#123266: lower targets crash on entry).
+  Timing a release build's way in: `<app>/Contents/MacOS/Vakuraamat -- --continue` presses Continue.
 - New location: `make site SITE=<id> NAME="..." CENTER="<easting> <northing>"` then `make tile SITE=<id>`
   (fetches DTM/nDSM/orthophoto, builds terrain, derives buildings and water,
   generates scenes, validates). `make validate` is pure python and fast; run it after editing a pack.

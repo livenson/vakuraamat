@@ -136,6 +136,8 @@ NOTICE_BIKE_ON,"Rattal. Shift kiiremini, E maha.","On the bike. Shift to go fast
 NOTICE_BIKE_OFF,Maha tuldud.,Off the bike.
 UI_LOADING_TILE,Naabertükk laeb: %s,Loading the neighbour tile: %s
 UI_LOADING_WORLD,%s laeb...,Loading %s...
+UI_LOADING_TOWN,Linn kerkib... %d%%,Building the town... %d%%
+UI_LOADING_GRAPHICS,Graafika valmib... %d varjutajat,Preparing graphics... %d shaders
 NOTICE_EDGE_PENDING,Sealpoolne maa on alles mõõtmisel – oota hetk,The land beyond is still being surveyed. Wait a moment
 NOTICE_EDGE_NONE,Sealpool kaarti ei ole,There is no map beyond here
 NOTICE_TILE_READY,Naaberala on valmis,The next stretch of land is ready
@@ -233,7 +235,7 @@ UI_MAP_MODE_SIZE,töötajad,employees
 UI_MAP_MODE_HEALTH,ettevõtte seis,company health
 UI_MAP_MODE_AGE,asutamisaasta,founded
 UI_MAP_MODE_OWNERS,ühised omanikud,shared owners
-UI_MAP_HEALTH_NOTE,"Krundil tegutseva ettevõtte seis: äriregistri staatus, maksuameti kvartalid ja aruande tähtaeg. Mitte hoone seisukord.","The health of the company on the plot: register status, Tax Board quarters and the reporting deadline. Not the state of the building."
+UI_MAP_HEALTH_NOTE,"Krundil tegutseva ettevõtte seis, mitte hoone seisukord. Kollane: majandusaasta aruanne hilineb või käive langes aastaga üle 40 %. Punane: likvideerimisel või pankrotis, või aasta jooksul null makse, kuigi töötajaid on.","The health of the company on the plot, not the state of the building. Yellow: the annual report is overdue, or turnover fell by more than 40 % on the year before. Red: in liquidation or bankrupt, or a year of zero taxes while employing staff."
 UI_MAP_AGE_NOTE,"Krundil tegutseva ettevõtte asutamisaasta, mitte hoone vanus.","The year the company on the plot was founded, not the age of the building."
 UI_MAP_SIZE_LEGEND,ring: töötajate arv,circle: employees
 UI_MAP_OWNERS_LEGEND,joon: sama omanik või juhatuse liige,line: same owner or board member
@@ -252,6 +254,11 @@ SECTOR_CULTURE,"kultuur, sport, muud teenused","arts, sport, other services"
 HEALTH_SOUND,korras,sound
 HEALTH_WATCH,jälgimisel,watch
 HEALTH_DISTRESSED,raskustes,distressed
+HEALTH_WHY_REPORT,majandusaasta aruanne hilineb,annual report overdue
+HEALTH_WHY_TURNOVER,käive langes %s → %s (%d → %d),turnover fell %s → %s (%d → %d)
+HEALTH_WHY_TURNOVER_RULE,käive langes aastaga üle 40 %,turnover fell by more than 40 % on the year before
+HEALTH_WHY_STATUS,registri staatus: %s,register status: %s
+HEALTH_WHY_ZERO_TAXES,"aasta jooksul null makse, kuigi töötajaid on",a year of zero taxes while employing staff
 UI_EMPLOYEES,%d töötajat,%d employees
 UI_TURNOVER,käive %s/a,turnover %s/yr
 UI_TAXES,maksud %s/a,taxes %s/yr

@@ -25,6 +25,7 @@ var _ready_done := false            # screenshots and the clock wait for the ter
 var _era_nodes: Dictionary = {}     # era_id -> EraController
 var filling := false                # the active layer's buildings and parcels are still arriving
 var _spawn := Vector3(512, 0, 512)  # from the site manifest "start.spawn" (tile metres)
+var _physics_steps := 0            # Engine.max_physics_steps_per_frame held at 1 behind the loading screen; 0 when not held
 
 
 func _ready() -> void:
@@ -41,6 +42,12 @@ func _ready() -> void:
 	loading.add_theme_font_size_override("font_size", 28)
 	loading.add_theme_color_override("font_color", Color(0.85, 0.68, 0.25))
 	fade.add_child(loading)
+	# Behind the loading screen the camera sees nothing, and a long frame is followed by one physics
+	# step rather than up to eight (see _hold_until_ready)
+	var cull_mask: int = player.camera.cull_mask
+	player.camera.cull_mask = 0
+	_physics_steps = Engine.max_physics_steps_per_frame
+	Engine.max_physics_steps_per_frame = 1
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--screenshot="):
 			player.input_enabled = false   # deterministic captures: no mouse motion while the ground builds
@@ -92,6 +99,8 @@ func _ready() -> void:
 		if not GameState.current_era:
 			await GameState.switch_era(str(report.get("era", "")))
 		print("[world] replaying report %s" % report.get("id", ""))
+	await _hold_until_ready(loading, cull_mask)
+	_restore_physics_steps()
 	loading.queue_free()
 	var tw := create_tween()
 	tw.tween_property(fade, "color:a", 0.0, FADE_TIME)
@@ -239,6 +248,7 @@ func restart_here() -> void:
 func _exit_tree() -> void:
 	if GameState.world == self:
 		GameState.world = null
+	_restore_physics_steps()   # left while the loading screen was still up
 	# the session caches of shared meshes, materials and merged templates go with the world, while
 	# the renderer is still up (held past it, they crashed the quit)
 	MeshMerge.release()
@@ -324,6 +334,66 @@ func _era_scene(path: String) -> PackedScene:
 		return null
 	PerfLog.mark("era scene %s parsed in %d ms" % [path.get_file(), Time.get_ticks_msec() - t0])
 	return ResourceLoader.load_threaded_get(path)
+
+
+const HOLD_QUIET_MS := 600      # no pipeline compiled for this long: the shaders have caught up
+const HOLD_MAX_MS := 120000     # never keep the player out longer than this, compiled or not
+# the compilations a frame can wait for; specializations are optimised variants built in the
+# background while the ubershader draws, and never hold a frame
+const PIPELINE_MONITORS := [Performance.PIPELINE_COMPILATIONS_CANVAS, Performance.PIPELINE_COMPILATIONS_MESH,
+	Performance.PIPELINE_COMPILATIONS_SURFACE, Performance.PIPELINE_COMPILATIONS_DRAW]
+
+
+func _restore_physics_steps() -> void:
+	if _physics_steps > 0:
+		Engine.max_physics_steps_per_frame = _physics_steps
+		_physics_steps = 0
+
+
+static func _pipelines_compiled() -> int:
+	var n := 0
+	for m in PIPELINE_MONITORS:
+		n += int(Performance.get_monitor(m))
+	return n
+
+
+## Keep the loading screen up until the layer's buildings and parcels stand and the pipeline
+## compilations they started have stopped coming. The renderer compiles the pipelines of whatever
+## enters the scene in the frame it enters, and that frame waits for them: on a cold first launch
+## (Metal) tens of milliseconds each, and a town arriving at once froze the window under the loading
+## label for seconds. So things arrive a few at a time - the layer's members
+## (EraController.fill_pending), the roads, lamps and shelters (RoadNetwork, in the "arriving" group
+## until they stand), the buses and the traffic (their arrival budgets) - and the label moves between them. Physics is held to one step a frame meanwhile: after a long frame Godot runs up to
+## eight to catch up, and every _physics_process budget ran eight times over. The camera sees nothing:
+## a viewport with 3D disabled would start no compilations at all and leave them all to the first
+## frame shown.
+func _hold_until_ready(label: Label, cull_mask: int) -> void:
+	var t0 := Time.get_ticks_msec()
+	var start := _pipelines_compiled()
+	var last := start
+	var quiet_since := t0
+	var title := tr("UI_LOADING_WORLD") % Sites.display_name(Sites.active)
+	while Time.get_ticks_msec() - t0 < HOLD_MAX_MS:
+		await get_tree().process_frame
+		var now := Time.get_ticks_msec()
+		var n := _pipelines_compiled()
+		if n != last:
+			last = n
+			quiet_since = now
+		var arriving := get_tree().get_nodes_in_group(RoadNetwork.ARRIVING).size()
+		if not filling and arriving == 0 and now - quiet_since >= HOLD_QUIET_MS:
+			break
+		var layer: EraController = _era_nodes.get(GameState.current_era)
+		if filling and layer and layer.fill_total > 0:
+			label.text = title + "\n" + tr("UI_LOADING_TOWN") % (100 * layer.fill_done / layer.fill_total)
+		else:
+			label.text = title + "\n" + tr("UI_LOADING_GRAPHICS") % (n - start)
+	# the frame that draws the world for the first time pays for whatever is still missing: that one
+	# still happens behind the curtain
+	player.camera.cull_mask = cull_mask
+	await get_tree().process_frame
+	await get_tree().process_frame
+	PerfLog.mark("loading screen held %d ms, %d pipelines compiled" % [Time.get_ticks_msec() - t0, _pipelines_compiled() - start])
 
 
 ## The layer's buildings and parcels, nearest the player first, a few milliseconds a frame. Doors
