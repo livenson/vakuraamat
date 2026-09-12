@@ -858,7 +858,7 @@ func _draw_debug_map(c: Control) -> void:
 			or _map_layout.origin != origin or pp.distance_to(_map_layout.at) > side * 0.06:
 		_lay_out_map(origin, side, loc, pack, pp)
 	if _map_mode != "off":
-		_draw_company_layer(c, origin, side, pack, font)
+		_draw_company_layer(c, origin, side, pack)
 	_draw_focus_layer(c, origin, side, pack)
 	for d in _map_layout.dots:
 		c.draw_circle(d.pos, 4, d.col)
@@ -872,6 +872,8 @@ func _draw_debug_map(c: Control) -> void:
 		else:
 			c.draw_string(font, l.pos + Vector2(1, 1), l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.size, Color(0, 0, 0, 0.8))
 			c.draw_string(font, l.pos, l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.size, l.col)
+	if _map_mode != "off":
+		_draw_company_legend(c, origin, side, font)
 	# what is under the mouse, on a slip of paper, on top of everything
 	_draw_hover_card(c, origin, side, pack, font)
 	# the player and heading
@@ -1031,16 +1033,18 @@ func _hover_card_lines(title: String, tunnus: String, pack: String) -> Array:
 
 ## The company layer: parcels filled by their dominant tenant (sector, health, founding age), dots
 ## sized by employees, or lines between parcels whose companies share an owner; with a legend.
-func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String, font: Font) -> void:
+func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String) -> void:
 	var k := side / 1024.0
 	var layer := _map_layer(pack)
 	var parcels: Array = layer.get("parcels", [])
 	for pr in parcels:
-		var col: Color = MapPalette.colour(_map_mode, pr.tenant)
-		if _map_mode in ["size", "owners"] and pr.tenant.is_empty():
+		# the company this layer shows: the worst verdict in the health layer, the largest active one else
+		var tenant: Dictionary = MapPalette.pick(_map_mode, pr.get("rows", [])) if pr.has("rows") else pr.tenant
+		var col: Color = MapPalette.colour(_map_mode, tenant)
+		if _map_mode in ["size", "owners"] and tenant.is_empty():
 			continue
 		if _map_mode == "size":
-			var n := float(pr.tenant.get("employees", 0) if pr.tenant.get("employees") != null else 0)
+			var n := float(tenant.get("employees", 0) if tenant.get("employees") != null else 0)
 			if n <= 0.0:
 				continue
 			var r := clampf(3.0 + sqrt(n) * 2.2, 3.0, 40.0) * k * (1024.0 / 700.0)
@@ -1053,7 +1057,7 @@ func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String,
 		for q in pr.poly:
 			pts.append(origin + Vector2(float(q[0]), float(q[1])) * k)
 		if pts.size() >= 3:
-			col.a = 0.38 if not pr.tenant.is_empty() else col.a
+			col.a = 0.38 if not tenant.is_empty() else col.a
 			c.draw_colored_polygon(pts, col)
 			c.draw_polyline(pts + PackedVector2Array([pts[0]]), Color(col.r, col.g, col.b, 0.8), 1.0)
 	if _map_mode == "owners":
@@ -1074,6 +1078,11 @@ func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String,
 		for pr in parcels:
 			if not pr.get("owners", []).is_empty():
 				c.draw_circle(origin + Vector2(pr.at) * k, 3.0, Color(1.0, 0.85, 0.3))
+
+
+## The company layer's legend: one line per class and the layer's note. Drawn after the dots and the
+## street labels, so a legend that has to sit inside the map is not written over.
+func _draw_company_legend(c: Control, origin: Vector2, side: float, font: Font) -> void:
 	# legend: one line per class, in the page beside the map. The map is square and the panel is not,
 	# so there is a margin either side of it; putting the legend there stops it covering the plots it
 	# is explaining. Only if that margin is too narrow does it sit inside, bottom right, as it used to.
@@ -1085,7 +1094,7 @@ func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String,
 	var note := tr(MapPalette.note(_map_mode)) if MapPalette.note(_map_mode) != "" else ""
 	var note_h := 0.0
 	if note != "":
-		w = maxf(w, 190.0)
+		w = maxf(w, 240.0 if note.length() > 160 else 190.0)   # the health note runs to four sentences
 		note_h = 6.0 + font.get_multiline_string_size(note, HORIZONTAL_ALIGNMENT_LEFT, w - 12.0, 10).y
 	var h := 20.0 + items.size() * 15.0 + note_h
 	var margin := c.size.x - (origin.x + side)
@@ -1233,7 +1242,7 @@ func _map_layer(pack: String) -> Dictionary:
 			for h in t.get("owners", []):
 				owners[str(h)] = true
 		parcels.append({"tunnus": str(u.get("tunnus", "")), "poly": poly, "at": Vector2(float(u.get("x", 0.0)), float(u.get("z", 0.0))),
-			"tenant": dom, "owners": owners.keys()})
+			"tenant": dom, "rows": rows, "owners": owners.keys()})
 	_map_layers[pack] = {"streets": streets, "numbers": numbers, "parcels": parcels}
 	return _map_layers[pack]
 

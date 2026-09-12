@@ -131,7 +131,8 @@ func _texture(pack: String) -> Texture2D:
 	return tex
 
 
-## The company a unit takes its colour from, the same choice the map's layer makes.
+## The company a unit takes its colour from in the current mode, the same choice the map's layer
+## makes (MapPalette.pick: the worst verdict in the health layer, the largest active company else).
 func _dominant_by_tunnus(pack: String) -> Dictionary:
 	var rows := {}
 	var path := Sites.path_in(pack, "tenants.json")
@@ -143,7 +144,7 @@ func _dominant_by_tunnus(pack: String) -> Dictionary:
 					rows.get_or_add(str(t.tunnus), []).append(t)
 	var out := {}
 	for tunnus in rows:
-		out[tunnus] = MapPalette.dominant(rows[tunnus])
+		out[tunnus] = MapPalette.pick(mode, rows[tunnus])
 	return out
 
 

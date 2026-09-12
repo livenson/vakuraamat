@@ -37,15 +37,22 @@ static func colour(mode: String, t: Dictionary) -> Color:
 	return NO_TENANT
 
 
-## What the mode is measuring, for the foot of its legend: a translation key, or "" for the modes
-## whose classes say it themselves. "Health" is the one that reads as something else entirely -
-## the condition of the building, or a hospital - so it says whose health and where it comes from.
+## What the mode is measuring, for the foot of its legend: a translation key. Every layer says which
+## of a plot's companies decides it (the largest active one; health falls back to the others when
+## none is active). "Health" is also the one that reads as something else entirely - the condition of
+## the building, or a hospital - so it says whose health and where it comes from.
 static func note(mode: String) -> String:
 	match mode:
+		"sector":
+			return "UI_MAP_SECTOR_NOTE"   # which of a plot's companies decides its colour
+		"size":
+			return "UI_MAP_SIZE_NOTE"
 		"health":
 			return "UI_MAP_HEALTH_NOTE"
 		"age":
 			return "UI_MAP_AGE_NOTE"
+		"owners":
+			return "UI_MAP_OWNERS_NOTE"
 	return ""
 
 
@@ -70,6 +77,30 @@ static func legend(mode: String) -> Array:
 		"owners":
 			out.append(["UI_MAP_OWNERS_LEGEND", Color(1.0, 0.85, 0.3)])
 	return out
+
+
+## The company a parcel is coloured by in `mode`: its largest active company. In the health layer a
+## parcel whose companies are all inactive (bankrupt, in liquidation) shows the worst of their verdicts
+## instead of nothing - `dominant` skips them, so the legend promised red for them and a plot never
+## turned red for its register status. Only then: an Old Town office address holds dozens of firms,
+## nearly always one in liquidation, and "the worst verdict wins" painted a third of the town red
+## (106 of 344 plots, against 11 with this rule).
+static func pick(mode: String, rows: Array) -> Dictionary:
+	var best := dominant(rows)
+	if mode != "health" or not best.is_empty():
+		return best
+	var rank := {"distressed": 2, "watch": 1, "sound": 0}
+	var best_key := -1.0
+	for t in rows:
+		var h := str(t.get("health", ""))
+		if not rank.has(h):
+			continue
+		var size := float(t.get("employees", 0) if t.get("employees") != null else 0)
+		var key := float(rank[h]) * 1e12 + size * 1e6 + float(t.get("turnover", 0) if t.get("turnover") != null else 0) / 1e6
+		if key > best_key:
+			best_key = key
+			best = t
+	return best
 
 
 ## The company that stands for a parcel: the biggest by employees, then by turnover, among the rows

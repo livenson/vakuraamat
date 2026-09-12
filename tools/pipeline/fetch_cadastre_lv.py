@@ -486,7 +486,16 @@ def lod2_record(faces, t, xmin, ymax, bx, bz, ground=None):
 
 
 # ------------------------------------------------------------------------------------------ records
-def purpose_class(name):
+# NĪLM codes whose group decides the class before any word does: 12xx is engineering infrastructure
+# (power lines, pipelines, water intake and sewage works), whose names mention water and matched
+# "ūdens" (Domes bulvāris 7A in Valka read as a lake, playtest report 2026-09-12T10-57-49)
+PURPOSE_CODE_CLASSES = {"12": "TOOTMISMAA"}
+
+
+def purpose_class(name, code=None):
+    group = str(code or "")[:2]
+    if group in PURPOSE_CODE_CLASSES:
+        return PURPOSE_CODE_CLASSES[group]
     low = (name or "").lower()
     for word, cls in PURPOSE_CLASSES:
         if word in low:
@@ -603,8 +612,8 @@ def fetch(site, root=ROOT, use_lod2=True):
         codes = [first(d, "LandPurposeKind", "LandPurposeKindId") for d in rows]
         names = [first(d, "LandPurposeKind", "LandPurposeKindName") for d in rows]
         classes = []
-        for n in names:
-            c = purpose_class(n)
+        for n, pc in zip(names, codes):
+            c = purpose_class(n, pc)
             if c is None:
                 unmatched[n] = unmatched.get(n, 0) + 1
             elif c not in classes:

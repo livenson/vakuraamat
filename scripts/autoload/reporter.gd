@@ -109,7 +109,7 @@ func links_for(pos: Vector3, target: Node, layer: Node) -> Dictionary:
 	var out := {}
 	var u := Parcels.at(pos)
 	if not u.is_empty():
-		out["cadastre"] = str(u.get("link", ""))
+		out["cadastre"] = str(u.get("link")) if u.get("link") != null else ""   # a Latvian plot has none: not "<null>"
 		if u.get("land_registry"):
 			out["land_registry_number"] = str(u.land_registry)
 	var fb: Node = null

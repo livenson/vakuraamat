@@ -36,6 +36,13 @@ func _ready() -> void:
 		[2024, 1, 10000, 2], [2024, 2, 5000, null], [2024, 3, 5000, null], [2024, 4, 0, null]]}
 	var why := Tenants.health_reason(falling)
 	_check(why.contains("2023") and why.contains("2024") and why.begins_with("turnover fell"), "turnover drop reads '%s'" % why)
+	# the health layer colours a plot whose companies are all inactive by their worst verdict (it
+	# showed grey: MapPalette.dominant skips them), while a live company still speaks for its plot
+	var bankrupt := {"name": "A", "status": "N", "health": "distressed", "employees": 0}
+	var live := {"name": "B", "status": "R", "health": "sound", "employees": 3}
+	_check(MapPalette.pick("health", [bankrupt]).get("name") == "A", "a plot with only a bankrupt company is not red")
+	_check(MapPalette.pick("health", [bankrupt, live]).get("name") == "B", "a bankrupt shell outranks the live company on its plot")
+	_check(MapPalette.pick("sector", [bankrupt]).is_empty(), "the sector layer colours a plot by a bankrupt company")
 	if not _failed:
 		print("[health] PASSED: %d flagged companies each say why, in every interface language" % flagged)
 		get_tree().quit(0)
