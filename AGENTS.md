@@ -180,7 +180,7 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
 - Prop checks without a world: `tools/godot/figure_preview.tscn` (the eight figures), `bike_preview.tscn`
   (bicycles with riders, side-on, a red block marking the riding direction).
 - Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`
-  (or `--fullscreen`; `--locations` for the second page, `--creating` / `--failed` for the world-creation
+  (or `--fullscreen`; `--locations` for the second page, `--query=<place>` with its results, `--storage` for the storage page, `--creating` / `--failed` for the world-creation
   sheet). Menu strings come from compiled translations: run `godot --headless --import` after editing
   `strings.csv` or the screenshot shows raw keys.
 - Strings: `assets/i18n/strings.csv` (keys, et, en, lv). Add keys with all three languages, never hard-code text; a pack's `strings.csv` may leave `lv` out (the fallback locale is English). The language key and menus cycle through `Lang.LOCALES` (scripts/ui/lang.gd); screenshots take `--locale=lv`.

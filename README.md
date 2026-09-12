@@ -3,12 +3,20 @@
 [![Latest release](https://img.shields.io/github/v/release/livenson/vakuraamat?label=download&sort=semver)](https://github.com/livenson/vakuraamat/releases/latest)
 [![Builds](https://img.shields.io/badge/builds-macOS%20%C2%B7%20Windows%20%C2%B7%20Linux-blue)](https://github.com/livenson/vakuraamat/releases/latest)
 
-A digital twin of a square kilometre of Estonia, to walk through and ask questions of. The cadastral
-plots are the real ones, with their official 2022 taxation values; the buildings are the ones in the
-Building Register, with the roofs Maa-amet measured; the companies are the ones registered at each
-address; every tree stands where the laser scan found it. Every building has a door and rooms
-inside. Built from Maa-amet (Estonian Land and Spatial Development Board), Building Register and
-Business Register open data with Godot 4.7, GDScript and Terrain3D.
+A digital twin of any square kilometre of Estonia or Latvia, to walk through and ask questions of.
+The cadastral plots are the real ones, with their official land values; the buildings are the ones
+in the national registers, with the roofs the 3D city models and laser scans measured; the companies
+are the ones registered at each address, with what the tax offices publish about them; the ground
+and the forest are where the laser scan found them. Every building has a door and rooms inside.
+
+Built with Godot 4.7, GDScript and Terrain3D from each country's own open data:
+- **Estonia:** Maa-amet (the Land and Spatial Development Board), the Building Register and the
+  e-Business Register.
+- **Latvia:** LĢIA, the State Land Service (VZD), Rīga's city models, the Enterprise Register and the
+  State Revenue Service.
+
+A country is one adapter and one descriptor, so a third can be added
+([docs/adding-a-country.md](docs/adding-a-country.md)).
 
 **[⬇ Download the latest release](https://github.com/livenson/vakuraamat/releases/latest)** — a
 ready-to-play build for macOS, Windows or Linux. No Godot, no Python, nothing else to install.
@@ -19,7 +27,7 @@ ready-to-play build for macOS, Windows or Linux. No Godot, no Python, nothing el
 | ![A Kvissentali street](docs/screenshots/street.jpg) A Kvissentali street: the Building Register's houses on the cadastre's plots | ![Inside a company's building](docs/screenshots/shop.jpg) Inside a company's building: rooms, stairs and windows onto the real street |
 | ![Debug map](docs/screenshots/map.jpg) The map (M): plots, companies, street names and house numbers on the orthophoto | ![The plot over the years](docs/screenshots/home.jpg) A plot over the years: every orthophoto flown over it since 1993 |
 
-## Install and play
+## Install and run
 
 1. Open the **[latest release](https://github.com/livenson/vakuraamat/releases/latest)** and download
    the zip for your platform (about 420–450 MB — the packs carry their terrain, models and textures):
@@ -39,40 +47,53 @@ ready-to-play build for macOS, Windows or Linux. No Godot, no Python, nothing el
    ```
 
    On **Linux**, mark it executable if the unzip did not: `chmod +x Vakuraamat.x86_64`.
-4. Pick a place on the front page. Two worlds ship with the build — **Kvissentali** (a Tartu suburb)
-   and **Palupera** (rural) — and *Locations* turns any Estonian address into a new square kilometre
-   in a couple of minutes over the network, because the build carries the whole data pipeline as a
-   sidecar executable. Worlds you make and the data they download live under the game's user
-   directory, not in the app.
+4. Pick a place on the front page. Five worlds ship with the build:
+   - **Kvissentali**, a Tartu suburb;
+   - **Palupera**, rural;
+   - **Pirita**, Tallinn by the sea;
+   - **Rīga Old Town**;
+   - **Valka**, on the Estonian border.
+
+   *Locations* turns any Estonian or Latvian address into a new square kilometre in a couple of
+   minutes over the network: search, press **Go**, and **Cancel** if it takes too long. This works
+   because the build carries the whole data pipeline as a sidecar executable. Worlds you make and
+   the data they download live under the game's user directory, not in the app.
 
 Nothing else is needed to play: no Godot, no Python, no account, no data download beyond the zip.
 What changed in each build is in [CHANGELOG.md](CHANGELOG.md).
 
 ### Controls
 
-WASD move, E interact, Tab the book, B this plot, J journal, M map, I layer, K codes, F fly,
-T teleport, H home, F8 report, Esc menu.
+WASD move, E interact, Tab the book, / find, B this plot, J journal, L language (Estonian, English,
+Latvian), M map, I layer, Shift+I one sector, K codes, F fly, T teleport, H home, F8 report, Esc menu.
 
 ## What you do
 
 - **The book (Tab):** the cadastre as a sortable, searchable list - address, purpose, area, the 2022
   taxation value, the form of ownership - and a plot's own page: its land registry number, when it
   was entered in the cadastre, the companies registered there, a link into the register itself, and
-  the plot's square from each national orthophoto campaign since 1993 (1993-2000, 2005, 2010, 2015,
-  2020) and from today's. **B** opens the plot under your
+  the plot's square from each national orthophoto campaign and from today's:
+  - Estonia: 1993-2000, 2005, 2010, 2015 and 2020;
+  - Latvia: 2003-05, 2007-08, 2010-11 and 2013-15. **B** opens the plot under your
   feet; *Place* is the pack itself, what it holds and where every figure came from.
 - **Fly (F):** from the air the crosshair names the building under it, up to six hundred metres out.
 - **The buses are the real ones:** the shelter's board carries the timetable the public transport
   register publishes for that stop, and a bus turns up to run it. Kvissentali is the end of lines 8
-  and 10; Palupera gets one a day to Elva, Otepää, Puka and Valga.
+  and 10; Palupera gets one a day to Elva, Otepää, Puka and Valga. In Latvia the timetables are
+  ATD's and Rīgas satiksme's.
 - **Walk in:** every real building has a door; inside is generated from its footprint and register
   data (storeys, rooms, stairs, window rhythm), and the windows look out at the real street.
-- **Know your tenants:** every company carries what the Business Register and the Tax Board publish:
-  activity, staff, turnover, taxes, board and owner structure, a health flag. The map (M) colours the
-  plots by sector, employees, health, founding year or shared owners; the book has a Companies page;
+- **Know your tenants:** every company carries what the business register and the tax office publish
+  (Estonia's e-Business Register and Tax Board; Latvia's Enterprise Register and State Revenue
+  Service): activity, staff, turnover, taxes, board and owner structure, and a health flag.
+  - **The map (M)** colours the plots by sector, by the mix of industries on each plot, by one chosen
+    sector, or by employees, health, founding year or shared owners.
+  - **The ground (I)** shows the same layers around you; Shift+I steps through the sectors.
+  - **In the book and on the street:** the book has a Companies page;
   shops hang their signs and neon by the door, and billboards advertise the biggest employers.
-- **Anywhere in Estonia:** *Locations* in the menu turns an address into a playable square kilometre
-  in a couple of minutes, and the neighbouring tiles stream in as you walk.
+- **Anywhere in Estonia or Latvia:** search *Locations* in the menu for an address and press Go. A new
+  place is playable in a couple of minutes, and you can cancel at any time. The neighbouring tiles
+  stream in as you walk, across the border too.
 
 ## Run from source
 
@@ -115,6 +136,14 @@ flowchart LR
     HIST[Historical orthophoto WMS: 1993-2020 campaigns]
     ADM[County outlines, ETAK standing water]
   end
+  subgraph latvia [Latvia's open data]
+    LAS[LĢIA laser points and orthophoto cycles]
+    VZD[VZD cadastre and buildings, Rīga LOD2 models]
+    URVID[Enterprise Register and State Revenue Service]
+    OSMLV[OpenStreetMap roads]
+    GTFSLV[ATD and Rīgas satiksme timetables]
+    VAR[VZD address register]
+  end
   EHR[Building Register: year, storeys, materials, addresses]
   ARI[e-Business Register: companies by address, activity, capital, structure]
   EMTA[Tax Board quarterly: taxes, turnover, employees]
@@ -137,7 +166,13 @@ flowchart LR
   PJ & BJ --> FTE
   TILE --> EF[extract_features.py] --> WJ[(water and massing)]
   PH --> PHF[fetch_polyhaven.py] --> TEX[(ground and facade textures)]
-  ADS --> TS[tile_service.py: any point in Estonia] --> FT
+  LAS --> FTL[fetch_tile_lv.py: one laser sheet per new world] --> TILE
+  VZD & LAS --> FCL[fetch_cadastre_lv.py, roof_fit.py] --> PJ & BJ
+  URVID --> FTLV[fetch_tenants_lv.py] --> TEJ
+  OSMLV --> FRL[fetch_roads_lv.py] --> RJ
+  GTFSLV --> FD
+  VAR --> GLV[geocode_lv.py] --> TS
+  ADS --> TS[tile_service.py and the country adapters in sources.py: any covered point] --> FT & FTL
   ADM --> FO[fetch_outline.py] --> EST[(assets/data/estonia.json: the menu's locator map)]
 
   TILE & TJ & RJ & BJ --> IMP[import_terrain.gd: control map, scatter, measured trees] --> REG[(Terrain3D region)]
@@ -147,7 +182,7 @@ flowchart LR
   PJ & TEJ & MJ --> BOOK[The book: the cadastre, the companies, the place] --> GAME
   DJ --> BUS[Shelter timetables and the buses that keep them] --> GAME
   HIST & ORTHO --> PH2[plot_history.gd: a plot's square per campaign, fetched live] --> BOOK
-  ADS & IPAPI --> LOC[locator.gd: New location, Use my location] --> TS
+  ADS & IPAPI --> LOC[locator.gd: the Locations search, Use my location] --> TS
 ```
 
 The full table of sources, tools, outputs and readers, the make targets and the pipeline internals
@@ -156,11 +191,18 @@ are in [docs/data-pipeline.md](docs/data-pipeline.md). Licences and attribution 
 
 ## Custom locations
 
-Every place is a site pack under `sites/<id>/`: Kvissentali (Tartu) is the first, Palupera the rural
-second, Pirita (Tallinn, by the sea) the third. A build ships all three with their ground baked, and the
-first visit to Kvissentali or Pirita downloads the tiles around them in one go from the GitHub release
-(`tools/starter_places.py`). `make site` and `make tile` make one from an EPSG:3301 centre; the tile service does the
-same for any point from inside the game. See [docs/custom-sites.md](docs/custom-sites.md).
+Every place is a site pack under `sites/<id>/`. The repository carries five:
+- **Estonia:** Kvissentali (Tartu), Palupera (rural) and Pirita (Tallinn, by the sea).
+- **Latvia:** Rīga Old Town and Valka (on the border).
+
+The first visit to Kvissentali or Pirita downloads the tiles around them in one go from the GitHub
+release (`tools/starter_places.py`). `make site` and `make tile` make a pack from an EPSG:3301
+centre; the tile service does the same for any point from inside the game. All countries are built
+on one grid, L-EST97, with Latvian data reprojected onto it.
+
+What differs per country is an adapter in `tools/pipeline/sources.py` and a descriptor in
+`assets/data/countries/<id>.json`. See [docs/custom-sites.md](docs/custom-sites.md) and
+[docs/adding-a-country.md](docs/adding-a-country.md).
 
 ## Development
 
@@ -170,6 +212,10 @@ same for any point from inside the game. See [docs/custom-sites.md](docs/custom-
 - [AGENTS.md](AGENTS.md): conventions, commands and pitfalls for people and coding agents.
 - [docs/data-pipeline.md](docs/data-pipeline.md): sources, requirements, make targets, terrain
   pipeline, world mapping, quirks and the repository layout.
+- [docs/adding-a-country.md](docs/adding-a-country.md): what a third country takes: an adapter in
+  `tools/pipeline/sources.py` and a descriptor in `assets/data/countries/<id>.json`, with the checks.
+- [docs/latvia-plan.md](docs/latvia-plan.md): the Latvian sources, how each became pack files, and
+  the step log.
 - [docs/tv-streaming.md](docs/tv-streaming.md): playing on an Android TV over the home network.
 - [docs/historical-imagery.md](docs/historical-imagery.md): the orthophotos back to 1993 and the
   Fotoladu photograph archive, and five ways they could sit in the game; the plot page's pictures
@@ -188,7 +234,17 @@ free for commercial use with attribution ("Map data: Maa- ja Ruumiamet (Estonian
 Development Board), 2026", also in every `terrain_meta.json`); buildings' attributes from the
 Building Register (EHR); companies from the e-Business Register open data (CC BY 4.0) and the Tax
 Board's quarterly figures; bus stops from OpenStreetMap (ODbL: `stops.json` stays under it); lines
-and times from the public transport register's open data; farmed fields from PRIA. The optional "Use
+and times from the public transport register's open data; farmed fields from PRIA.
+
+The Latvian data comes from:
+- LĢIA: laser points and orthophotos ("Map data: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA)");
+- VZD: the cadastre, buildings and address register;
+- Rīga city: the LOD2 models;
+- the Enterprise Register and the State Revenue Service: companies;
+- ATD and Rīgas satiksme: timetables;
+- OpenStreetMap: roads.
+
+Each Latvian source's licence is in `THIRD_PARTY.md`. The optional "Use
 my location" asks ip-api.com for a city-level point (free for non-commercial use). Every pack file
 carries its own `attribution`, and the book's *Place* page prints them. Everything vendored is listed
 in `THIRD_PARTY.md`.

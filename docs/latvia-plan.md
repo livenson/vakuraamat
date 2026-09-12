@@ -105,8 +105,8 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
 | No LOD2 outside Rīga | Step 4. Without it `footprint_building.gd` extrudes each footprint to its height with a flat roof: right for Soviet apartment blocks, wrong for houses, farms and wooden towns. Fit a gable or hip roof to the building-class points (ridge line and height), or, cheaper, pick the roof by `kind` and floors |
 | No single-tree data | Canopy maxima (above) |
 | No road classes or widths | OpenStreetMap |
-| No geocoder | The tile service indexes `aw_eka.csv` and answers `/geocode` for Latvia; `Locator` goes through the service instead of calling in-ADS directly |
-| Orthophoto 2016–18 is the newest open one | Cycles 1–5 give the history; apply to LĢIA for the WMS of cycles 7–8 (terms to check) |
+| No geocoder | Done: the tile service indexes the address register (`geocode_lv.py`) and answers `/geocode?country=lv`; `lv.json`'s geocoder points the game there |
+| Orthophoto 2016–18 is the newest open one | Done for the history: cycles 2–5 are cut per tile in the refine pass (cycle 1 is not in the bucket). Apply to LĢIA for the WMS of cycles 7–8 (terms to check) |
 | Tax history only from now on | Archive every quarter (step 0); ask VID for older quarters, or use the annual file |
 
 ## Engine changes
@@ -309,6 +309,24 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
      digits), not by the pack, since a border tile carries both.
    - **Left open.** Tram and train routes; the timetables on a border tile come from the pack's
      own country only; starter-place bundles for the Latvian places.
+8. **After the steps.** Done 2026-09-12:
+   - **Countries as data.** `sources.py` adapters own everything per-country in the pipeline and the
+     tile service. `assets/data/countries/<id>.json` descriptors do the same for the game.
+     [adding-a-country.md](adding-a-country.md) is the checklist.
+   - **Plot history.** LĢIA's cycles 2–5 are cut per tile in the refine pass, so a Latvian plot
+     page shows 2003–05 to 2013–15. That refine pass now reaches the game through the meta's
+     `refined` flag.
+   - **One laser sheet per new world.**
+     - The world is centred on the sheet that holds the searched place (`place_center`); grazed
+       sheets are skipped (`SKIP_M`); tiles meet without a step (`BLEND_M`); see the `heightmap.r32`
+       row above.
+     - Cēsis went from 4 sheets and 1242 MB to 1 sheet and 299 MB, and the job took 130 s.
+   - **Rīga LOD2.** A round drum's facets are all under 1 m², so `merge_faces` dropped them with the
+     mouldings. It now drops a small piece only when a large face stands beside it.
+     - St James's lantern stage is back; 25 buildings in all regained missing tops.
+   - **Locations page.**
+     - Search comes first, with one-click Go and a Cancel on the progress sheet.
+     - The Latvian places sit on the same map as the Estonian ones.
 
 Each step bumps `PACK_VERSION` when it adds something the UI reads, and gets a `THIRD_PARTY.md`
 row for every source in the same commit.
