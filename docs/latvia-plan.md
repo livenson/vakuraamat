@@ -238,8 +238,24 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
    - **Left open.** No sector where VID's annual file lacks the company (new firms); no company
      link (the register's public page URL is unverified); a data.gov.lv rename would need the
      file names in `fetch_tenants_lv` updated.
-4. **Roofs from the laser points** for buildings without LOD2. Done when Valka's houses have
-   pitched roofs (screenshot beside the orthophoto).
+4. **Roofs from the laser points** for buildings without LOD2. Done 2026-09-12
+   (`tools/pipeline/roof_fit.py`, called by `fetch_cadastre_lv` for every building no Rīga model
+   covers):
+   - **Input.** `fetch_tile_lv` keeps the building-class returns as the highest height above the
+     ground per metre (`data_raw/lv/<tile>_roofs.r32`).
+   - **Fit.** Four candidates on the footprint's minimum rotated rectangle: flat, a gable along
+     the long side, a gable across it, and a hip. Each takes its eave from a low percentile near
+     the eaves and its ridge from a high one over the whole footprint. The smallest error against
+     the cells wins, and a pitched roof has to beat the flat one by 15 %.
+   - **When it stays flat.** Footprints under 82 % of their rectangle (L shapes) and roofs with
+     less than 0.8 m between eave and ridge keep the flat roof at the measured height.
+   - **Faces.** Written as LOD2 faces the engine already draws, wound so the engine's normal
+     points up on roofs and out on walls; gable ends are pentagons. Buildings record
+     `roof_source: "lod2" | "laser"`.
+   - **Checks.** A synthetic house of each kind is recovered as that kind, heights within 0.4 m.
+     Valka (the new `sites/valka` pack): 975 buildings, 137 gable along, 72 gable across, 31 hip,
+     550 flat. The Old Town: 77 buildings without a model, 12 of them pitched. Screenshots from
+     above show the town's houses with gables and hips instead of boxes.
 5. **Roads, stops, departures, fields.** Roads, stops and departures done 2026-09-12:
    - **Roads.** `fetch_roads_lv.py` takes the tile's `highway` ways from OpenStreetMap and splits
      each at every node another way shares: the road graph joins edges only at their ends, and an

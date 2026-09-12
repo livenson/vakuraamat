@@ -666,6 +666,8 @@ def fetch(site, root=ROOT, use_lod2=True):
     def ground_under(poly):
         return float(min(heights[min(max(int(z), 0), size - 1), min(max(int(x), 0), size - 1)] for x, z in poly))
 
+    import roof_fit
+    roof_kinds = {}
     buildings = []
     with_year = with_lod2 = 0
     for code, (g, pcode) in sorted(b_geo.items()):
@@ -699,17 +701,31 @@ def fetch(site, root=ROOT, use_lod2=True):
         if seen:
             roof_color = [round(0.75 * seen[i] + 0.25 * roof_color[i], 3) for i in range(3)]
         model = None
+        roof_source = None
         if code in owner_of:
             tris = [tri for i in owner_of[code] for tri in models[i][1]]
             model = lod2_record(merge_faces(tris), t, xmin, ymax, bx, bz, ground_under(poly))
             if model:
                 with_lod2 += 1
+                roof_source = "lod2"
                 h = max(h, round(model["z_max"] - model["z_min"], 1))
+        if model is None and roofs is not None:
+            # no model: a roof fitted to the building-class laser heights (roof_fit.py), pitched where
+            # the points show a ridge, else the flat roof at the measured height the engine draws anyway
+            roof = roof_fit.fit(poly, roofs)
+            if roof is not None:
+                roof_kinds[roof["kind"]] = roof_kinds.get(roof["kind"], 0) + 1
+                if roof["kind"] != "flat":
+                    g = ground_under(poly)
+                    model = {"z_min": round(g, 2), "z_max": round(g + roof["ridge"], 2), "faces": roof_fit.faces(roof, bx, bz),
+                             "roof": roof["kind"]}
+                    roof_source = "laser"
+                h = round(float(roof["ridge"]), 1)
         addr = addresses(code)
         on = [c for c in every(basic, "ParcelCadastreNrList", "ObjectCadastreNrData") if isinstance(c, str)] or ([pcode] if pcode else [code[:11]])
         var_code = first(basic, "VARISCode")
         buildings.append({
-            "id": int(code), "ehr": code, "lod2": model, "polygon": poly, "x": bx, "z": bz,
+            "id": int(code), "ehr": code, "lod2": model, "roof_source": roof_source, "polygon": poly, "x": bx, "z": bz,
             "w": round(max(xs) - min(xs), 1), "d": round(max(zs) - min(zs), 1), "h": round(float(h), 1),
             "floors": floors, "year": yr, "name": first(basic, "BuildingName"), "purpose": first(basic, "BuildingUseKind", "BuildingUseKindName"),
             "purpose_code": use_id, "status": first(basic, "BuildingDeprecation"), "type": first(r, "BuildingTypeData", "BuildingKind", "BuildingKindName"),
@@ -743,7 +759,7 @@ def fetch(site, root=ROOT, use_lod2=True):
     log(f"wrote sites/{site}/parcels.json: {len(parcels)} units {dict(sorted(kinds.items(), key=lambda kv: -kv[1]))}; "
         f"{len(valued)}/{len(parcels)} valued, total {summary['total_land_value']:,} EUR")
     log(f"wrote sites/{site}/buildings.json: {len(buildings)} buildings, {with_year} dated, {with_lod2} with LOD2 roofs "
-        f"({len(models)} models under the tile)")
+        f"({len(models)} models under the tile); roofs fitted to the laser points: {roof_kinds}")
     return parcels, buildings
 
 

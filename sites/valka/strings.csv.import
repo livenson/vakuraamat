@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://b24rixa26nvre"
+
+[deps]
+
+files=["res://sites/valka/strings.et.translation", "res://sites/valka/strings.en.translation"]
+
+source_file="res://sites/valka/strings.csv"
+dest_files=["res://sites/valka/strings.et.translation", "res://sites/valka/strings.en.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

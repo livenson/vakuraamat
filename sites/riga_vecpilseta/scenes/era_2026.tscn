@@ -343,7 +343,7 @@ metadata/footprint = Vector2(13.3, 24.5)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000102022003"]
 script = ExtResource("2")
 polygon = PackedVector2Array(1.35, 12.27, -6.68, -10.35, -1.42, -12.23, 6.62, 10.38)
-height = 2.5
+height = 2.2
 wall_color = Color(0.720, 0.710, 0.680, 1)
 roof_color = Color(0.347, 0.331, 0.366, 1)
 source = "buildings.json"
@@ -586,7 +586,7 @@ metadata/footprint = Vector2(11.5, 11.2)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000090016002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-5.75, -0.36, -1.39, -5.61, 5.77, 0.34, 1.41, 5.59)
-height = 4.2
+height = 4.1
 wall_color = Color(0.720, 0.710, 0.680, 1)
 roof_color = Color(0.211, 0.279, 0.297, 1)
 source = "buildings.json"
@@ -1183,7 +1183,7 @@ metadata/footprint = Vector2(14.2, 12.8)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000090046006"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-5.95, 0.39, -5.88, 0.32, -7.06, -0.72, -5.05, -2.97, -3.88, -1.94, -2.61, -3.37, 0.10, -6.46, 7.15, -0.38, 1.08, 6.37, -5.66, 0.64)
-height = 3.9
+height = 3.5
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.555, 0.578, 0.593, 1)
 source = "buildings.json"
@@ -1272,7 +1272,7 @@ metadata/footprint = Vector2(15.1, 19.0)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000102010001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-7.59, -6.30, 2.33, -9.52, 7.49, 6.38, -2.15, 9.51, -3.87, 4.23, -4.15, 4.32, -4.33, 3.75, -4.05, 3.65, -7.12, -5.82, -7.41, -5.73)
-height = 5.7
+height = 5.5
 wall_color = Color(0.620, 0.630, 0.640, 1)
 roof_color = Color(0.455, 0.496, 0.522, 1)
 source = "buildings.json"
@@ -1450,7 +1450,7 @@ metadata/footprint = Vector2(23.3, 20.3)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000090020002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(0.54, -10.05, 1.60, -10.13, 4.25, -7.91, 4.85, -8.61, 5.87, -8.70, 7.39, -7.49, 7.54, -6.39, 6.95, -5.69, 11.63, -1.78, 3.80, 7.30, 1.70, 5.52, -1.53, 9.34, -3.06, 7.91, -5.06, 10.15, -11.70, 4.50)
-height = 17.8
+height = 18.0
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.567, 0.607, 0.625, 1)
 source = "buildings.json"
@@ -2049,7 +2049,7 @@ metadata/footprint = Vector2(8.7, 4.7)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000090065003"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-4.39, 1.42, -3.96, -2.29, 4.33, -1.45, 3.93, 2.37)
-height = 8.6
+height = 3.0
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.382, 0.364, 0.385, 1)
 source = "buildings.json"
@@ -2093,7 +2093,7 @@ metadata/footprint = Vector2(39.0, 26.8)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080006002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(11.20, -13.41, 11.57, -12.72, 11.51, -12.69, 12.59, -10.65, 12.64, -10.68, 13.00, -10.00, 12.95, -9.97, 14.39, -7.23, 14.44, -7.26, 14.79, -6.60, 14.75, -6.59, 15.50, -5.17, 15.53, -5.19, 15.86, -4.57, 15.82, -4.55, 17.23, -1.87, 17.26, -1.89, 17.60, -1.25, 17.54, -1.22, 18.63, 0.86, 18.69, 0.83, 19.00, 1.40, 19.04, 1.38, 19.46, 2.19, 19.39, 2.22, 19.46, 2.36, 18.79, 2.71, 18.31, 1.80, 10.32, 5.45, 10.55, 6.02, 10.43, 6.07, 10.46, 6.14, 9.82, 6.41, 9.79, 6.34, 9.67, 6.39, 9.46, 5.89, 9.24, 5.99, 6.00, -0.28, -5.18, 5.53, -5.05, 5.79, -18.21, 13.40, -18.31, 13.15, -18.78, 13.32, -19.50, 11.57, -6.63, 4.14, -6.08, 3.81, -6.90, 2.24, -7.77, 2.70, -7.17, 3.85, -8.51, 4.54, -9.11, 3.39, -10.62, 4.17, -13.11, -0.62, -9.41, -2.54, -9.46, -2.63, -3.61, -5.66, -3.68, -5.79, -0.73, -7.29, -0.64, -7.12, 1.51, -8.23, 1.42, -8.40)
-height = 10.5
+height = 9.4
 wall_color = Color(0.620, 0.620, 0.580, 1)
 roof_color = Color(0.577, 0.442, 0.393, 1)
 source = "buildings.json"
@@ -2225,7 +2225,7 @@ metadata/footprint = Vector2(72.6, 10.8)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080104001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-12.58, -4.71, -5.68, -3.99, -5.90, -2.00, 27.41, 3.13, 36.28, 4.27, 36.14, 5.37, -5.97, -1.30, -6.30, 1.77, -7.46, 1.62, -7.33, 0.42, -11.79, -0.08, -11.92, 1.07, -13.20, 0.92, -13.01, -0.88, -36.33, -4.60, -36.23, -5.47, -12.92, -1.68)
-height = 20.2
+height = 18.8
 wall_color = Color(0.620, 0.620, 0.580, 1)
 roof_color = Color(0.652, 0.526, 0.477, 1)
 source = "buildings.json"
@@ -2383,7 +2383,7 @@ metadata/footprint = Vector2(7.3, 8.4)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080090002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-3.64, -4.08, 3.16, -4.14, 3.67, 3.71, 3.66, 4.17, -3.67, 4.23)
-height = 12.5
+height = 12.8
 wall_color = Color(0.850, 0.800, 0.680, 1)
 roof_color = Color(0.712, 0.519, 0.464, 1)
 source = "buildings.json"
@@ -2518,7 +2518,7 @@ metadata/footprint = Vector2(15.0, 15.0)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080115001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-0.50, 7.44, -0.92, 7.40, -1.40, 7.32, -2.03, 7.17, -2.71, 6.94, -3.36, 6.66, -3.96, 6.31, -4.73, 5.76, -5.17, 5.37, -5.74, 4.77, -6.24, 4.09, -6.58, 3.52, -6.88, 2.87, -7.14, 2.16, -7.35, 1.37, -7.43, 0.79, -7.49, 0.06, -7.45, -0.72, -7.35, -1.48, -7.18, -2.14, -6.91, -2.91, -6.51, -3.70, -5.96, -4.56, -5.59, -5.05, -4.85, -5.77, -4.27, -6.21, -3.94, -6.44, -3.22, -6.83, -2.63, -7.09, -2.14, -7.25, -1.51, -7.41, -0.92, -7.51, -0.42, -7.56, 0.13, -7.57, 0.84, -7.53, 1.49, -7.42, 2.08, -7.28, 2.86, -7.01, 3.44, -6.74, 4.05, -6.40, 4.59, -6.01, 5.16, -5.53, 5.68, -5.00, 6.10, -4.47, 6.53, -3.82, 6.88, -3.13, 7.10, -2.61, 7.25, -2.13, 7.40, -1.50, 7.50, -0.87, 7.54, -0.16, 7.53, 0.44, 7.47, 1.01, 7.36, 1.58, 7.22, 2.13, 6.96, 2.84, 6.70, 3.42, 6.33, 4.03, 5.97, 4.55, 5.55, 5.05, 5.04, 5.54, 4.67, 5.83, 4.22, 6.13, 3.92, 6.31, 3.54, 6.56, 3.26, 6.73, 2.84, 6.93, 2.22, 7.14, 1.81, 7.26, 1.34, 7.35, 0.87, 7.42, 0.65, 7.45, 0.41, 7.47, 0.13, 7.47, -0.05, 7.47, -0.22, 7.45)
-height = 32.6
+height = 29.3
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.520, 0.567, 0.551, 1)
 source = "buildings.json"
@@ -2584,7 +2584,7 @@ metadata/footprint = Vector2(8.3, 3.3)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080058003"]
 script = ExtResource("2")
 polygon = PackedVector2Array(4.11, 1.61, -3.94, 1.69, -4.11, 1.67, -4.15, -1.47, 3.86, -1.64)
-height = 3.0
+height = 2.1
 wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.275, 0.343, 0.333, 1)
 source = "buildings.json"
@@ -3098,7 +3098,7 @@ metadata/footprint = Vector2(19.9, 22.4)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000090040002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-9.97, -7.65, -6.02, -11.22, 9.90, 9.25, 7.59, 11.18)
-height = 21.3
+height = 23.5
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.493, 0.534, 0.544, 1)
 source = "buildings.json"
@@ -3430,7 +3430,7 @@ metadata/footprint = Vector2(23.2, 23.2)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080071002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(11.58, -1.64, 7.23, -1.41, 7.51, 4.75, -2.54, 5.41, -2.39, 10.12, -9.94, 10.47, -9.84, 11.61, -10.25, 11.62, -10.59, 11.55, -11.03, 11.34, -11.35, 10.96, -11.58, 10.60, -10.51, -10.48, 11.13, -11.54)
-height = 14.2
+height = 13.6
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.637, 0.499, 0.496, 1)
 source = "buildings.json"
@@ -4077,7 +4077,7 @@ metadata/footprint = Vector2(46.9, 25.6)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080071001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(21.95, 12.84, 0.10, 11.12, -1.05, 10.99, -18.09, 7.11, -23.40, 6.04, -22.88, -3.60, -7.65, -2.16, -7.64, -2.16, -1.66, -1.60, 9.30, -0.57, 9.30, -1.87, 10.67, -3.24, 11.54, -3.24, 11.93, -10.95, 12.28, -10.95, 12.29, -11.27, 13.83, -12.73, 14.39, -12.79, 14.54, -10.88, 17.11, -11.06, 17.09, -11.36, 22.18, -11.68, 22.50, -6.78, 23.48, -6.80)
-height = 14.1
+height = 13.6
 wall_color = Color(0.620, 0.620, 0.580, 1)
 roof_color = Color(0.754, 0.770, 0.774, 1)
 source = "buildings.json"
@@ -4188,7 +4188,7 @@ metadata/footprint = Vector2(14.6, 15.2)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080071004"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-7.22, 6.24, -7.11, 6.25, -6.39, -6.65, -6.46, -6.65, -6.43, -7.56, -5.50, -7.53, -5.50, -7.46, 6.37, -7.08, 6.38, -7.17, 7.35, -7.13, 7.29, -6.13, 7.23, -6.13, 6.89, 0.10, 6.98, 0.11, 6.92, 1.07, 7.23, 1.09, 7.11, 3.03, 6.80, 3.02, 6.75, 3.92, 6.68, 3.92, 6.53, 6.67, 6.54, 6.67, 6.48, 7.65, -2.92, 7.34, -2.93, 7.41, -3.98, 7.38, -3.97, 7.31, -5.44, 7.26, -5.45, 7.33, -6.50, 7.30, -6.49, 7.23, -7.26, 7.21)
-height = 10.7
+height = 10.9
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.481, 0.514, 0.519, 1)
 source = "buildings.json"
@@ -4411,7 +4411,7 @@ metadata/footprint = Vector2(6.6, 8.8)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080083002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-3.32, -4.01, -1.62, -4.18, 0.94, -4.44, 2.53, -3.20, 3.30, 1.70, 2.50, 3.54, -0.05, 4.38)
-height = 11.9
+height = 7.5
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.315, 0.292, 0.332, 1)
 source = "buildings.json"
@@ -4523,7 +4523,7 @@ metadata/footprint = Vector2(11.5, 8.2)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000090032003"]
 script = ExtResource("2")
 polygon = PackedVector2Array(1.91, -4.14, 5.79, 0.57, 1.50, 4.11, -1.94, -0.06, -3.85, 1.60, -5.71, -0.54, -1.42, -4.12, -0.08, -2.49)
-height = 19.5
+height = 19.3
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.440, 0.458, 0.462, 1)
 source = "buildings.json"
@@ -4612,7 +4612,7 @@ metadata/footprint = Vector2(10.1, 7.5)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000060111003"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-5.04, -1.43, 0.84, -3.78, 4.33, -3.43, 5.04, -1.23, 4.08, 0.70, -3.77, 3.70)
-height = 19.9
+height = 20.4
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.332, 0.366, 0.397, 1)
 source = "buildings.json"
@@ -4679,7 +4679,7 @@ metadata/footprint = Vector2(9.1, 13.4)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080079002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-4.58, -6.07, -0.74, -6.73, 1.15, 4.11, 4.25, 3.57, 4.56, 5.34, -0.86, 6.71, -2.34, -3.73, -4.14, -3.50)
-height = 19.9
+height = 19.8
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.332, 0.364, 0.393, 1)
 source = "buildings.json"
@@ -5412,7 +5412,7 @@ metadata/footprint = Vector2(16.9, 7.6)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000060102002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(8.47, -0.78, 8.21, 2.24, 6.86, 3.65, 5.57, 2.33, 0.15, 2.12, -0.24, 2.41, -2.19, 2.33, -2.80, 3.22, -2.82, 3.69, -7.15, 3.20, -7.70, 3.80, -8.45, 3.77, -8.40, 2.47, -8.21, 2.41, -7.96, 2.30, -7.73, 2.15, -7.52, 2.01, -7.33, 1.86, -7.08, 1.62, -6.91, 1.40, -6.71, 1.14, -6.53, 0.79, -6.35, 0.40, -6.29, 0.14, -6.22, -0.16, -6.19, -0.46, -6.17, -0.81, -6.20, -1.16, -6.28, -1.51, -6.36, -1.79, -6.47, -2.04, -6.56, -2.27, -6.68, -2.46, -6.79, -2.63, -6.92, -2.79, -6.15, -3.75, -0.48, -2.71, -0.54, -2.46, 3.63, -1.51, 3.69, -1.75)
-height = 21.4
+height = 21.1
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.408, 0.437, 0.449, 1)
 source = "buildings.json"
@@ -5501,7 +5501,7 @@ metadata/footprint = Vector2(15.9, 23.2)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080004006"]
 script = ExtResource("2")
 polygon = PackedVector2Array(7.95, 9.93, 5.21, 11.64, -7.93, -9.94, -5.37, -11.54, 6.63, 7.83)
-height = 2.9
+height = 2.8
 wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.390, 0.403, 0.412, 1)
 source = "buildings.json"
@@ -5794,7 +5794,7 @@ metadata/footprint = Vector2(15.4, 36.7)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080032001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(5.42, -18.36, 7.76, -4.73, 0.38, 18.38, -7.68, 15.60, -2.96, -1.59, 1.32, -1.11, 2.28, -4.85, -0.07, -11.38, -0.86, -11.44, -0.92, -12.28, -1.46, -12.58, -1.52, -13.07, -1.10, -13.61, -0.19, -13.85, -0.56, -17.57)
-height = 20.9
+height = 18.1
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.540, 0.561, 0.573, 1)
 source = "buildings.json"
@@ -5971,7 +5971,7 @@ metadata/footprint = Vector2(8.9, 7.1)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000080012004"]
 script = ExtResource("2")
 polygon = PackedVector2Array(2.90, -3.51, 4.48, -0.96, -2.83, 3.58, -4.41, 1.03)
-height = 6.3
+height = 6.2
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.414, 0.473, 0.497, 1)
 source = "buildings.json"
@@ -5993,7 +5993,7 @@ metadata/footprint = Vector2(8.6, 7.5)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000060026001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(0.53, -3.72, 4.18, -0.25, 4.28, 0.27, -2.05, 3.78, -3.00, 3.32, -3.40, 0.46, -4.08, 0.26, -4.37, -0.55, -4.20, -1.57)
-height = 25.4
+height = 24.6
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.400, 0.402, 0.431, 1)
 source = "buildings.json"
@@ -6302,7 +6302,7 @@ metadata/footprint = Vector2(10.4, 9.7)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070005002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-2.40, -4.83, 5.25, -1.47, 0.15, 4.83, -5.17, -1.28)
-height = 13.9
+height = 13.8
 wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.246, 0.293, 0.336, 1)
 source = "buildings.json"
@@ -7301,7 +7301,7 @@ metadata/footprint = Vector2(8.8, 11.4)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000060050001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(4.26, 3.36, -1.03, 5.67, -4.43, -3.56, 0.67, -5.69, 0.70, -5.62, 0.86, -5.68, 4.35, 3.13, 4.19, 3.20)
-height = 14.9
+height = 12.1
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.753, 0.522, 0.458, 1)
 source = "buildings.json"
@@ -7747,7 +7747,7 @@ metadata/footprint = Vector2(13.3, 7.6)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070086001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-0.55, 2.21, -6.16, 2.74, -6.62, -0.29, -4.28, -0.51, -4.06, -3.67, -3.08, -3.62, -2.48, -2.64, -1.01, -2.47, -0.30, -3.78, 4.77, -1.33, 3.79, 0.25, 6.68, 1.45, 5.59, 3.85, 2.80, 3.13)
-height = 3.9
+height = 3.8
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.497, 0.536, 0.558, 1)
 source = "buildings.json"
@@ -7882,7 +7882,7 @@ metadata/footprint = Vector2(11.5, 9.2)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000062001002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-5.70, -1.25, -3.04, -3.93, -1.78, -2.40, 1.01, -4.62, 5.77, 0.11, 4.68, 1.25, 3.41, 2.45, 2.15, 3.66, 0.87, 4.56)
-height = 13.5
+height = 12.7
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.496, 0.484, 0.493, 1)
 source = "buildings.json"
@@ -8151,7 +8151,7 @@ metadata/footprint = Vector2(15.5, 15.1)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070016001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(7.71, -1.10, 5.98, 0.34, 6.17, 0.58, -3.05, 7.51, -7.78, 0.97, -1.13, -4.36, 2.87, -7.58)
-height = 13.9
+height = 13.1
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.564, 0.593, 0.609, 1)
 source = "buildings.json"
@@ -8174,7 +8174,7 @@ metadata/footprint = Vector2(5.5, 4.4)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070084007"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-2.70, 2.16, -2.75, -1.77, -1.04, -1.90, -1.03, -0.11, 0.36, -0.21, 0.35, -2.07, 2.68, -2.22, 2.70, 1.76)
-height = 14.6
+height = 13.5
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.502, 0.464, 0.444, 1)
 source = "buildings.json"
@@ -8262,7 +8262,7 @@ metadata/footprint = Vector2(13.4, 11.9)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000020015004"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-1.36, 5.95, -6.73, 2.38, -4.12, -0.62, -2.50, 0.78, -0.91, -1.07, 0.39, 0.06, 0.57, 0.11, 0.73, 0.07, 0.84, 0.03, 5.66, -6.00, 6.66, -5.19)
-height = 12.7
+height = 12.0
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.425, 0.459, 0.493, 1)
 source = "buildings.json"
@@ -8284,7 +8284,7 @@ metadata/footprint = Vector2(20.7, 23.3)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070023003"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-5.47, -11.68, -4.99, -11.20, -6.27, -10.03, -5.08, -8.82, -3.79, -10.05, -1.53, -7.82, -2.59, -6.77, -1.65, -5.81, -0.48, -6.80, 4.20, -2.21, 6.25, -0.21, 5.29, 0.77, 7.84, 3.20, 8.77, 2.25, 10.36, 3.80, 1.22, 11.67, -2.86, 4.83, -5.29, 0.76, -4.08, 0.11, -4.89, -1.37, -6.11, -0.61, -10.36, -7.73, -8.51, -9.22, -7.53, -8.01, -6.58, -8.81, -7.58, -9.97)
-height = 19.0
+height = 19.2
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.358, 0.399, 0.436, 1)
 source = "buildings.json"
@@ -8443,7 +8443,7 @@ metadata/footprint = Vector2(10.4, 7.9)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000060045010"]
 script = ExtResource("2")
 polygon = PackedVector2Array(1.33, -3.93, 5.21, -1.67, 4.50, -1.29, 1.46, 1.14, 1.38, 1.02, 1.15, 0.81, 0.91, 0.64, 0.70, 0.54, 0.49, 0.47, 0.23, 0.42, 0.01, 0.39, -0.19, 0.41, -0.43, 0.46, -0.68, 0.53, -0.88, 0.64, -1.07, 0.78, -1.36, 1.06, -1.51, 1.26, -1.53, 1.31, -1.60, 1.46, -1.63, 1.52, -1.70, 1.76, -1.73, 2.00, -1.75, 2.14, -1.74, 2.30, -1.71, 2.53, -1.66, 2.71, -1.57, 2.93, -2.59, 3.94, -5.22, 1.24, -3.01, -0.77)
-height = 16.7
+height = 16.3
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.649, 0.662, 0.652, 1)
 source = "buildings.json"
@@ -8534,7 +8534,7 @@ metadata/footprint = Vector2(7.0, 6.7)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070089002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(3.47, -1.18, 0.54, 3.35, -3.54, 1.45, -1.28, -3.36)
-height = 20.8
+height = 4.1
 wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.464, 0.437, 0.429, 1)
 source = "buildings.json"
@@ -8622,7 +8622,7 @@ metadata/footprint = Vector2(38.6, 35.7)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070023002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(4.06, -3.40, 2.47, -4.95, 1.54, -4.00, -1.01, -6.43, -0.05, -7.41, -2.10, -9.41, 5.86, -17.92, 8.58, -15.22, 8.47, -15.09, 16.40, -7.31, 16.53, -7.44, 19.35, -4.67, 19.08, -4.44, 19.30, -4.18, 11.40, 2.42, 11.32, 2.34, 10.46, 3.05, 8.20, 0.72, 6.76, 1.93, 8.78, 4.36, 8.87, 4.45, 8.64, 4.62, 8.68, 4.66, 8.63, 4.70, 8.73, 4.84, 7.08, 6.26, 6.87, 5.98, 4.30, 8.16, 1.57, 10.48, -0.51, 8.16, -2.30, 9.27, -0.80, 11.73, -10.54, 17.82, -10.70, 17.55, -10.87, 17.65, -12.85, 14.29, -12.64, 14.16, -17.03, 6.77, -17.25, 6.90, -19.28, 3.50, -9.16, -2.37, -5.08, 4.47)
-height = 21.4
+height = 20.9
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.618, 0.631, 0.636, 1)
 source = "buildings.json"
@@ -8667,7 +8667,7 @@ metadata/footprint = Vector2(8.6, 12.1)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070092002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(1.68, -6.03, 4.33, -3.92, 0.91, 6.04, -4.29, 3.79, -3.85, 2.49, -3.36, 1.69, -3.46, 1.65, -0.53, -2.88)
-height = 21.1
+height = 21.2
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.474, 0.438, 0.449, 1)
 source = "buildings.json"
@@ -9139,7 +9139,7 @@ metadata/footprint = Vector2(28.1, 27.3)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070048002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-13.61, 11.53, -13.55, 11.29, -14.04, 11.17, -13.40, 8.64, -13.59, 8.59, -13.10, 6.67, -12.91, 6.72, -12.27, 4.18, -11.95, 4.27, -9.32, -6.07, -9.60, -6.51, -7.20, -8.02, -6.94, -7.61, 5.27, -4.51, 7.34, -12.51, 7.49, -12.48, 7.79, -13.64, 13.89, -12.93, 13.14, -9.93, 14.07, -9.60, 12.13, -2.07, 11.14, 0.00, 10.81, 1.83, 10.33, 1.71, 8.24, 6.11, 9.05, 6.38, 8.73, 7.33, 7.95, 7.07, 7.59, 7.71, 5.86, 13.45, 0.19, 11.56, 2.20, 5.43, 2.34, 5.47, 3.58, 1.18, 0.78, 0.39, -1.48, 9.32, -1.75, 9.44, -2.20, 9.33, -4.09, 10.16, -4.98, 13.68, -5.61, 13.52, -5.52, 13.20)
-height = 13.9
+height = 12.3
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.520, 0.461, 0.452, 1)
 source = "buildings.json"
@@ -9251,7 +9251,7 @@ metadata/footprint = Vector2(7.5, 8.3)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000020024002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(3.67, 0.68, 1.85, 2.35, -0.18, 4.17, -3.80, -0.61, 0.84, -4.12, 1.60, -3.10, 3.73, -0.68)
-height = 23.8
+height = 22.7
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.538, 0.584, 0.596, 1)
 source = "buildings.json"
@@ -9742,7 +9742,7 @@ metadata/footprint = Vector2(10.9, 12.2)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000020069002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-5.51, 3.21, 1.74, -6.10, 5.43, -3.22, -1.82, 6.08)
-height = 9.4
+height = 8.9
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.599, 0.625, 0.643, 1)
 source = "buildings.json"
@@ -9944,7 +9944,7 @@ metadata/footprint = Vector2(23.6, 18.8)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070047001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(3.10, -7.35, 3.61, -9.39, 11.76, -7.77, 8.60, 9.44, -11.80, 5.28, -8.52, -7.99, 0.58, -6.30, 0.03, -3.86, 5.46, -2.51, 6.36, -6.57)
-height = 12.9
+height = 12.5
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.779, 0.693, 0.675, 1)
 source = "buildings.json"
@@ -10280,7 +10280,7 @@ metadata/footprint = Vector2(8.5, 6.9)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000020077002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-4.19, -0.23, -0.23, -3.48, 4.26, -0.12, 1.08, 3.43, -1.84, 0.75)
-height = 10.6
+height = 10.4
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.558, 0.584, 0.591, 1)
 source = "buildings.json"
@@ -10390,7 +10390,7 @@ metadata/footprint = Vector2(9.8, 16.1)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070046003"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-3.70, -2.87, -2.67, -2.70, -2.02, -6.22, -3.03, -6.38, -2.84, -7.41, -1.95, -7.99, 1.81, -6.95, -0.60, -0.43, 0.58, 2.73, 4.94, 2.84, 3.87, 7.51, 0.96, 7.15, 0.82, 8.04, -0.56, 7.82, -0.60, 8.09, -2.57, 7.79, -2.53, 7.54, -3.03, 7.47, -2.58, 4.00, -4.90, 3.62)
-height = 4.4
+height = 15.2
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.418, 0.367, 0.357, 1)
 source = "buildings.json"
@@ -10615,7 +10615,7 @@ metadata/footprint = Vector2(21.1, 32.1)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000050069002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(0.81, -16.09, 3.57, -8.25, -5.84, -5.01, -0.56, 10.26, 8.86, 7.01, 10.58, 12.00, -0.89, 16.00, -5.71, 1.84, -10.53, -12.33, -6.89, -13.49, -3.25, -14.66)
-height = 19.8
+height = 21.0
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.458, 0.470, 0.474, 1)
 source = "buildings.json"
@@ -10705,7 +10705,7 @@ metadata/footprint = Vector2(19.4, 16.0)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070045002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(3.41, 6.63, 3.13, 8.02, -0.93, 7.19, -0.66, 5.85, -2.73, 5.47, -2.80, 5.81, -4.60, 5.45, -4.53, 5.10, -5.69, 4.86, -5.77, 5.21, -7.74, 4.81, -7.66, 4.44, -9.64, 4.03, -7.36, -8.01, 9.72, -4.54, 7.01, 7.32)
-height = 21.4
+height = 20.7
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.423, 0.475, 0.519, 1)
 source = "buildings.json"
@@ -10928,7 +10928,7 @@ metadata/footprint = Vector2(13.0, 13.9)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070037002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-0.14, -6.97, 2.23, -3.75, 1.41, -3.18, 1.30, -2.49, 2.91, -0.30, 3.62, -0.19, 4.44, -0.76, 6.52, 2.06, -0.46, 6.92, -6.52, -1.30, -1.19, -5.02, -1.78, -5.83)
-height = 16.7
+height = 17.9
 wall_color = Color(0.460, 0.380, 0.290, 1)
 roof_color = Color(0.428, 0.476, 0.501, 1)
 source = "buildings.json"
@@ -11682,7 +11682,7 @@ metadata/footprint = Vector2(7.3, 8.5)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070158002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-0.07, -4.22, 3.64, -2.24, 0.24, 4.24, -3.68, 2.00)
-height = 10.9
+height = 5.4
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.514, 0.446, 0.461, 1)
 source = "buildings.json"
@@ -11727,7 +11727,7 @@ metadata/footprint = Vector2(6.5, 8.0)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000070125002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(0.13, -4.02, 0.82, -3.66, 3.27, -2.23, -0.14, 3.99, -3.24, 2.39)
-height = 11.0
+height = 4.3
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.535, 0.463, 0.484, 1)
 source = "buildings.json"
@@ -12128,7 +12128,7 @@ metadata/footprint = Vector2(15.4, 15.9)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000020109001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(7.63, 2.28, 3.37, 7.94, -3.74, 1.11, -4.14, 1.55, -7.58, -1.55, -7.73, -1.74, -3.11, -7.94, 0.26, -4.69)
-height = 17.2
+height = 13.8
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.588, 0.422, 0.393, 1)
 source = "buildings.json"
@@ -12173,7 +12173,7 @@ metadata/footprint = Vector2(22.9, 22.4)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000020110001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-11.43, 3.64, -7.17, -2.02, 2.36, -11.20, 7.05, -6.54, 10.82, -2.94, 11.45, -1.88, 10.92, -1.38, 6.80, 2.90, 8.35, 4.40, 8.66, 6.03, 7.35, 7.40, 5.76, 7.13, 4.05, 5.49, 0.85, 8.25, -2.57, 11.23)
-height = 19.3
+height = 17.7
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.679, 0.696, 0.708, 1)
 source = "buildings.json"
@@ -12330,7 +12330,7 @@ metadata/footprint = Vector2(21.8, 42.1)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000020111001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(3.01, 21.04, -10.95, 7.16, -10.65, 6.50, -9.97, 5.84, -8.77, 5.82, -8.13, 6.16, -7.83, 6.35, -2.02, 1.07, -4.66, -1.57, 0.12, -6.77, -0.36, -7.45, -1.12, -7.34, -3.57, -10.24, -3.57, -11.33, -5.57, -13.52, -4.70, -14.43, -9.41, -18.80, -7.64, -21.03, -2.66, -17.14, 2.20, -12.39, 8.23, -6.51, -0.44, 2.01, 10.90, 13.63)
-height = 16.6
+height = 15.7
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.732, 0.655, 0.643, 1)
 source = "buildings.json"
@@ -12397,7 +12397,7 @@ metadata/footprint = Vector2(26.0, 27.5)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000020114001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-12.96, -5.76, -4.87, -13.56, -4.85, -13.73, -3.51, -12.17, 0.29, -7.85, 4.70, -2.84, 5.99, -1.37, 13.04, 8.37, 10.06, 10.31, 8.05, 7.54, 6.55, 8.53, 8.18, 11.61, 5.31, 13.74, -2.89, 4.30, -1.56, 3.19, -0.40, 2.53, 0.46, 2.31, 3.07, 0.48, 1.74, -0.87, 0.50, 0.32, -3.50, -3.68, -3.71, -6.11, -5.25, -6.28, -5.41, -4.97, -8.86, -1.66)
-height = 18.8
+height = 17.4
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.655, 0.687, 0.700, 1)
 source = "buildings.json"
@@ -12552,7 +12552,7 @@ metadata/footprint = Vector2(74.0, 53.7)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000010147001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-37.03, 0.25, -3.71, -26.88, 10.79, -9.06, 11.47, -9.17, 12.97, -10.27, 16.55, -5.88, 14.16, -3.93, 26.42, 11.12, 30.30, 17.02, 35.29, 14.46, 36.99, 18.04, 19.42, 26.54, 18.86, 24.97, 16.29, 26.05, 11.28, 13.72, -2.56, 19.45, -2.35, 19.94, -15.37, 26.85)
-height = 3.2
+height = 17.7
 wall_color = Color(0.740, 0.730, 0.700, 1)
 roof_color = Color(0.520, 0.520, 0.506, 1)
 source = "buildings.json"
@@ -12618,7 +12618,7 @@ metadata/footprint = Vector2(34.3, 30.3)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000020151001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(5.91, -15.18, 17.15, -2.79, -9.74, 15.11, -17.17, 2.02)
-height = 24.5
+height = 25.0
 wall_color = Color(0.720, 0.710, 0.680, 1)
 roof_color = Color(0.505, 0.525, 0.539, 1)
 source = "buildings.json"
@@ -12777,7 +12777,7 @@ metadata/footprint = Vector2(18.3, 15.8)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000010081001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-9.15, -1.63, 4.99, -7.88, 9.11, 2.09, 8.73, 2.26, -2.59, 7.24, -4.45, 7.94, -9.00, -1.29)
-height = 17.2
+height = 20.7
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.511, 0.465, 0.479, 1)
 source = "buildings.json"
@@ -12910,7 +12910,7 @@ metadata/footprint = Vector2(13.6, 11.2)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000030150002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-4.98, 5.65, -6.79, -0.03, -4.68, -1.01, 4.43, -5.24, 5.33, -5.59, 6.17, -3.31, 5.32, -2.99, 6.80, 0.94)
-height = 16.5
+height = 16.6
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.414, 0.385, 0.412, 1)
 source = "buildings.json"
@@ -12977,7 +12977,7 @@ metadata/footprint = Vector2(16.6, 13.1)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000010083003"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-8.32, -0.52, 3.73, -6.55, 6.85, -1.32, 6.95, -1.37, 8.03, 0.44, 7.93, 0.49, 8.33, 1.17, 4.33, 2.73, 4.23, 2.46, -6.12, 6.55)
-height = 9.4
+height = 3.6
 wall_color = Color(0.720, 0.710, 0.680, 1)
 roof_color = Color(0.338, 0.379, 0.430, 1)
 source = "buildings.json"
@@ -13762,7 +13762,7 @@ metadata/footprint = Vector2(6.5, 12.8)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000030153002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-3.30, -5.50, -0.85, -6.36, 3.24, 5.39, -0.20, 6.41)
-height = 3.1
+height = 2.7
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.255, 0.293, 0.334, 1)
 source = "buildings.json"
@@ -13784,7 +13784,7 @@ metadata/footprint = Vector2(6.9, 6.1)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000030118002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-1.58, -3.03, 3.44, -1.97, 1.97, 3.11, -3.41, 1.79)
-height = 23.2
+height = 22.2
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.509, 0.535, 0.544, 1)
 source = "buildings.json"
@@ -13941,7 +13941,7 @@ metadata/footprint = Vector2(10.3, 6.1)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000010140003"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-5.19, 0.80, 3.83, -3.04, 5.15, -0.87, -3.92, 3.09)
-height = 19.0
+height = 17.5
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.428, 0.378, 0.374, 1)
 source = "buildings.json"
@@ -14521,7 +14521,7 @@ metadata/footprint = Vector2(14.3, 13.9)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000012005002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-7.19, 3.23, 0.34, 0.31, -2.73, -4.65, 2.75, -6.99, 6.02, -0.53, 7.15, 0.79, 5.14, 2.15, 2.29, 3.44, -0.10, 4.40, -1.00, 3.84, -3.26, 5.68, -5.44, 6.91, -5.56, 6.64, -5.97, 5.80)
-height = 11.0
+height = 9.7
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.594, 0.461, 0.422, 1)
 source = "buildings.json"
@@ -14611,7 +14611,7 @@ metadata/footprint = Vector2(18.3, 18.1)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000030173001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-9.16, 0.84, -1.77, -9.05, 0.29, -8.08, 9.16, -1.95, 8.39, -1.00, 8.57, -0.87, 7.68, 0.33, 7.52, 0.21, 0.77, 9.06, -5.07, 5.45, -4.45, 4.49)
-height = 21.6
+height = 22.8
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.517, 0.538, 0.552, 1)
 source = "buildings.json"
@@ -14856,7 +14856,7 @@ metadata/footprint = Vector2(7.0, 9.1)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000010131003"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-0.09, -4.58, 3.55, 2.83, 0.14, 4.50, -3.49, -2.91)
-height = 2.9
+height = 2.7
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.323, 0.352, 0.391, 1)
 source = "buildings.json"
@@ -15148,7 +15148,7 @@ metadata/footprint = Vector2(23.5, 14.7)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000030135004"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-4.57, -7.32, 11.73, -1.26, 8.87, 6.44, 3.06, 4.28, 2.61, 5.31, -0.20, 4.09, -1.25, 6.51, -6.53, 3.97, -8.59, 7.39, -11.81, 5.59, -11.51, 5.07, -11.79, 4.91, -8.62, -3.62, -6.27, -2.75)
-height = 11.7
+height = 14.6
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.314, 0.341, 0.374, 1)
 source = "buildings.json"
@@ -15505,7 +15505,7 @@ metadata/footprint = Vector2(20.0, 24.4)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000030109002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-6.98, -6.38, -2.05, -12.21, 2.75, -8.52, 1.65, -7.31, 9.96, -2.22, 6.90, 1.14, -3.30, 12.15, -10.05, 5.14, -4.96, 0.15, -3.74, -2.72, -5.13, -4.36)
-height = 14.1
+height = 13.4
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.553, 0.464, 0.449, 1)
 source = "buildings.json"
@@ -15931,7 +15931,7 @@ metadata/footprint = Vector2(5.0, 4.8)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000030019001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-2.55, -0.64, -1.83, -0.97, 1.17, -2.36, 2.48, 0.98, -1.22, 2.39)
-height = 14.1
+height = 11.8
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.709, 0.510, 0.458, 1)
 source = "buildings.json"
@@ -15975,7 +15975,7 @@ metadata/footprint = Vector2(20.5, 19.7)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000030073001"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-6.61, -0.67, -2.24, -4.39, 3.86, -9.82, 10.28, -0.08, -4.27, 9.84, -6.86, 6.67, -10.26, 2.14)
-height = 3.2
+height = 21.5
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.320, 0.341, 0.368, 1)
 source = "buildings.json"
@@ -16085,7 +16085,7 @@ metadata/footprint = Vector2(19.5, 21.5)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000030096002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-3.53, -10.73, 3.43, -4.21, 2.43, -2.75, 2.52, -2.66, 6.07, 0.55, 9.70, 6.76, 9.62, 6.79, -1.24, 10.81, -9.75, -1.11)
-height = 7.1
+height = 6.2
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.508, 0.491, 0.477, 1)
 source = "buildings.json"
@@ -16151,7 +16151,7 @@ metadata/footprint = Vector2(6.0, 5.6)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000030023002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-2.98, -1.78, -0.50, -2.81, 0.24, -0.76, 2.04, -1.41, 2.99, 1.19, -1.32, 2.76)
-height = 18.0
+height = 17.6
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.370, 0.389, 0.396, 1)
 source = "buildings.json"
@@ -16308,7 +16308,7 @@ metadata/footprint = Vector2(17.5, 18.4)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000030103002"]
 script = ExtResource("2")
 polygon = PackedVector2Array(0.60, -9.24, 7.15, 1.41, 8.73, 5.33, 4.05, 7.02, -1.91, 9.17, -3.48, 5.23, -8.76, -4.43)
-height = 18.5
+height = 18.7
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.516, 0.430, 0.421, 1)
 source = "buildings.json"
@@ -16934,7 +16934,7 @@ metadata/footprint = Vector2(7.2, 8.3)
 [node name="Footprint" type="Node3D" parent="Buildings/B1000030048003"]
 script = ExtResource("2")
 polygon = PackedVector2Array(-2.12, -4.20, 3.62, -0.12, 0.87, 4.11, -3.51, 1.19, -3.57, -2.21)
-height = 22.9
+height = 23.2
 wall_color = Color(0.660, 0.420, 0.320, 1)
 roof_color = Color(0.255, 0.290, 0.318, 1)
 source = "buildings.json"

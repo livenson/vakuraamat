@@ -1,0 +1,43 @@
+{
+  "id": "valka",
+  "country": "lv",
+  "pipeline": 3,
+  "name_key": "SITE_VALKA",
+  "subtitle_key": "SITE_VALKA_SUBTITLE",
+  "description": "Valka: generated site pack.",
+  "terrain": {
+    "tile": "valka",
+    "center": [
+      619115.0,
+      6405171.0
+    ],
+    "size": 1024,
+    "latitude": 57.77247,
+    "longitude": 26.00187,
+    "utc_offset": 3.0,
+    "date": [
+      2026,
+      9,
+      3
+    ]
+  },
+  "start": {
+    "era": "era_2026",
+    "spawn": [
+      512.0,
+      532.0
+    ],
+    "yaw_deg": 0.0
+  },
+  "water": "water_2026.json",
+  "buildings": "buildings_2026.json",
+  "locations": {
+    "LOC_LANDMARK": "landmark",
+    "LOC_FARMSTEAD": "farm"
+  },
+  "codex": [
+    "CODEX_REAL",
+    "CODEX_INVENTED",
+    "CODEX_DATA"
+  ]
+}
