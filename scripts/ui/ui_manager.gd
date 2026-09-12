@@ -670,7 +670,7 @@ func _refresh_codes() -> void:
 	var u := Parcels.at(pos)
 	lines.append(tr("UI_CODES_PARCEL") + ": " + (Parcels.describe(u) if not u.is_empty() else "-"))
 	if not u.is_empty():
-		lines.append("   " + str(u.get("link", "")))
+		lines.append("   " + Countries.parcel_link(u))
 		if u.get("land_value") != null:
 			lines.append("   %s: %s   %s: %s" % [tr("UI_CODES_OWNER"), str(u.get("ownership", "")),
 				tr("UI_BOOK_COL_VALUE"), BookTheme.money(int(u.land_value))])
@@ -851,8 +851,23 @@ func _fill_debug_map() -> void:
 
 
 func _map_frame(c: Control) -> Array:
-	var side := minf(c.size.x, c.size.y)
-	return [(c.size - Vector2(side, side)) * 0.5, side]
+	# with a company layer on, the square leaves room on the right for its legend, which then stands
+	# beside the map instead of over the plots it explains
+	var room := _legend_width(ThemeDB.fallback_font) + 16.0 if _map_mode != "off" else 0.0
+	var side := minf(c.size.x - room, c.size.y)
+	return [Vector2((c.size.x - room - side) * 0.5, (c.size.y - side) * 0.5), side]
+
+
+## How wide the company layer's legend is drawn: its title, its longest entry, its note.
+func _legend_width(font: Font) -> float:
+	var w := font.get_string_size(_mode_title(), HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x + 14.0
+	w = maxf(w, 150.0)
+	for it in MapPalette.legend(_map_mode):
+		w = maxf(w, font.get_string_size(tr(str(it[0])), HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x + 30.0)
+	var note := MapPalette.note(_map_mode)
+	if note != "":
+		w = maxf(w, 240.0 if tr(note).length() > 160 else 190.0)   # the health note runs to four sentences
+	return w
 
 
 ## Draws on the canvas that emitted `draw` (bound at connect time): when the panel is rebuilt, the
@@ -866,6 +881,9 @@ func _draw_debug_map(c: Control) -> void:
 	var f := _map_frame(c)
 	var origin: Vector2 = f[0]
 	var side: float = f[1]
+	if is_instance_valid(_debug_bg):   # the photograph under the square moves aside with it for the legend
+		_debug_bg.position = origin
+		_debug_bg.size = Vector2(side, side)
 	var font := ThemeDB.fallback_font
 	# the map shows the 1024 m tile the player stands in: the site's tile or a streamed neighbour
 	var loc := Vector2i.ZERO
@@ -1162,13 +1180,10 @@ func _draw_company_legend(c: Control, origin: Vector2, side: float, font: Font) 
 	# is explaining. Only if that margin is too narrow does it sit inside, bottom right, as it used to.
 	var items: Array = MapPalette.legend(_map_mode)
 	var title := _mode_title()
-	var w := 150.0
-	for it in items:
-		w = maxf(w, font.get_string_size(tr(str(it[0])), HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x + 30.0)
+	var w := _legend_width(font)
 	var note := tr(MapPalette.note(_map_mode)) if MapPalette.note(_map_mode) != "" else ""
 	var note_h := 0.0
 	if note != "":
-		w = maxf(w, 240.0 if note.length() > 160 else 190.0)   # the health note runs to four sentences
 		note_h = 6.0 + font.get_multiline_string_size(note, HORIZONTAL_ALIGNMENT_LEFT, w - 12.0, 10).y
 	var h := 20.0 + items.size() * 15.0 + note_h
 	var margin := c.size.x - (origin.x + side)

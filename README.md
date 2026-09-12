@@ -27,6 +27,13 @@ ready-to-play build for macOS, Windows or Linux. No Godot, no Python, nothing el
 | ![A Kvissentali street](docs/screenshots/street.jpg) A Kvissentali street: the Building Register's houses on the cadastre's plots | ![Inside a company's building](docs/screenshots/shop.jpg) Inside a company's building: rooms, stairs and windows onto the real street |
 | ![Debug map](docs/screenshots/map.jpg) The map (M): plots, companies, street names and house numbers on the orthophoto | ![The plot over the years](docs/screenshots/home.jpg) A plot over the years: every orthophoto flown over it since 1993 |
 
+**Latvia:**
+
+| | |
+|---|---|
+| ![Rīga Old Town from above](docs/screenshots/riga_from_above.jpg) Rīga Old Town from above, the ground coloured by the industries of each plot's companies (I) | ![Over Rīga's rooftops](docs/screenshots/riga_rooftops.jpg) Over Rīga's rooftops: every building from the city's own 3D models |
+| ![The map in Rīga](docs/screenshots/riga_map.jpg) The map (M) in Rīga: every plot striped by the sectors of the companies registered on it | ![A Rīga plot over the years](docs/screenshots/riga_history.jpg) A Rīga plot over the years, in Latvian: LĢIA's orthophotos since 2003 |
+
 ## Install and run
 
 1. Open the **[latest release](https://github.com/livenson/vakuraamat/releases/latest)** and download
