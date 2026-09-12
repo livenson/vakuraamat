@@ -8,6 +8,17 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
+## v0.10.1 — 2026-09-12
+
+**Fixes from the Rīga playtest.**
+
+- **Latvian photographs are cleaner.** The cruise ships moored along the Daugava in Rīga are no
+  longer painted flat on the river, and a plot's older photographs are shown at their own
+  resolution, so Rīga's 2013–15 year is twice as sharp.
+- **A plot with no address shows its code** in the book instead of "<null>" (the Latvian cadastre
+  leaves some addresses empty).
+- **A pug trots around the parked bicycle** when you start, stopping once a lap to look at it.
+
 ## v0.10.0 — 2026-09-12
 
 **Latvia.**
