@@ -8,7 +8,7 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
-## Unreleased
+## v0.10.0 — 2026-09-12
 
 **Latvia.**
 
@@ -33,6 +33,8 @@ The earliest entries were written from the tags' own messages after the fact.
     steps through the sectors.
 - **Bankrupt and liquidating companies turn their plot red** in the health layer, and every layer's
   legend explains what its colours mean.
+- **A Latvian plot links to its property's page** on Lursoft from the book ("See it in the
+  register"). The map's legend now stands beside the map instead of over the plots.
 - **St James's Cathedral in Rīga has its whole spire again**, and 24 other Rīga buildings got back
   tops (towers, turrets) that were missing.
 
