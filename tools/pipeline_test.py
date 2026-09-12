@@ -133,10 +133,38 @@ def test_lod2_small_pieces():
     return "LOD2 trim dropped, a lantern kept"
 
 
+def test_tile_seams():
+    """A Latvian tile built beside one that stands bends its first BLEND_M metres to meet it: no step
+    at the seam, the ground beyond untouched; the neighbour found by its bbox in a service workspace."""
+    try:
+        import numpy as np
+        import fetch_tile_lv
+    except ImportError as e:
+        return f"seam checks skipped ({e.name} missing)"
+    import json, tempfile
+    size, k = 256, fetch_tile_lv.BLEND_M
+    mine = np.full((size, size), 10.0, np.float32)
+    west = np.full((size, size), 12.0, np.float32)                        # 2 m higher
+    out = fetch_tile_lv.blend_edges(mine, [("w", west)])
+    check(np.allclose(out[:, 0], 12.0) and np.allclose(out[:, k:], 10.0), "the west seam is not met, or the interior moved")
+    check(np.all(np.diff(out[:, :k], axis=1) <= 1e-6), "the ramp is not monotone")
+    with tempfile.TemporaryDirectory() as ws:
+        for sid, xmin in (("a", 0), ("t256_0", 256)):
+            d = os.path.join(ws, sid, "assets", "terrain", sid)
+            os.makedirs(d)
+            json.dump({"xmin": xmin, "xmax": xmin + size, "ymin": 0, "ymax": size, "size_px": size, "heightmap": "heightmap.r32"},
+                      open(os.path.join(d, "terrain_meta.json"), "w"))
+            (west if sid == "a" else mine).tofile(os.path.join(d, "heightmap.r32"))
+        near = fetch_tile_lv.adjacent_tiles((256, 0, 512, size), size, os.path.join(ws, "t256_0", "assets", "terrain", "t256_0"))
+        check([s for s, _ in near] == ["w"], f"the west neighbour in the service workspace was not found: {[s for s, _ in near]}")
+    return "tile seams met"
+
+
 def main():
     test_holder_id()
     test_health_blank_is_not_zero()
-    sheets = test_lv_sheets() + "; " + test_lod2_small_pieces()
+    seams = test_tile_seams()
+    sheets = test_lv_sheets() + "; " + test_lod2_small_pieces() + "; " + seams
     if failures:
         print("[pipeline] FAILED:")
         for f in failures:

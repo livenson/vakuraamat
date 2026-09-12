@@ -308,6 +308,67 @@ def fill_ground(ground):
     return filled.astype(np.float32), float((~mask).mean())
 
 
+# ------------------------------------------------------------------------------------------ seams
+# A skipped strip is filled flat from the ground beside it, while the real ground there - on the
+# neighbour tile's sheet - keeps sloping: the Cēsis test world met its east neighbour with a step of
+# 0.33 m typically and up to 4 m on the Gauja's valley side. Extending the interior's slope into the
+# strip did not help (0.23 m, same p95, worse worst case): the strip's shape is local. So a tile built
+# beside one that already stands bends its first metres to meet that tile's edge instead.
+BLEND_M = 40   # how far a new tile's ground bends to meet a neighbour already built
+
+
+def adjacent_tiles(bbox, size, out_dir):
+    """The tiles already built edge to edge with this one: [(side "w"/"e"/"n"/"s", heights)]. Looked for
+    beside `out_dir` (a repository's assets/terrain/*) and, when it is a tile service job's
+    (<workspace>/<id>/assets/terrain/<id>), among the service's other packs."""
+    import glob
+    here = os.path.abspath(out_dir)
+    terrain = os.path.dirname(here)
+    metas = glob.glob(os.path.join(terrain, "*", "terrain_meta.json"))
+    job = os.path.dirname(os.path.dirname(terrain))
+    if os.path.basename(job) == os.path.basename(here):
+        metas += glob.glob(os.path.join(os.path.dirname(job), "*", "assets", "terrain", "*", "terrain_meta.json"))
+    xmin, ymin, xmax, ymax = bbox
+    out = []
+    for path in sorted({os.path.abspath(p) for p in metas}):
+        d = os.path.dirname(path)
+        if d == here:
+            continue
+        try:
+            m = json.load(open(path))
+            if int(m.get("size_px", 0)) != size:
+                continue
+            side = None
+            if abs(m["ymin"] - ymin) < 1 and abs(m["ymax"] - ymax) < 1:
+                side = "w" if abs(m["xmax"] - xmin) < 1 else "e" if abs(m["xmin"] - xmax) < 1 else None
+            elif abs(m["xmin"] - xmin) < 1 and abs(m["xmax"] - xmax) < 1:
+                side = "n" if abs(m["ymin"] - ymax) < 1 else "s" if abs(m["ymax"] - ymin) < 1 else None
+            if side:
+                out.append((side, np.fromfile(os.path.join(d, m.get("heightmap", "heightmap.r32")), "<f4").reshape(size, size)))
+        except (OSError, ValueError, KeyError):
+            continue   # a half-written or foreign tile: nothing to meet
+    return out
+
+
+def blend_edges(heights, neighbours, k=BLEND_M):
+    """The ground bent over its first `k` metres on each side that has a neighbour, so that its edge
+    row meets the neighbour's (rows north to south, as the heightmaps are). A smoothstep from the
+    full difference at the edge to none at `k`: the step becomes a gentle ramp."""
+    h = heights.astype(np.float32).copy()
+    t = 1.0 - np.arange(k, dtype=np.float32) / k
+    w = t * t * (3.0 - 2.0 * t)   # 1 at the edge, 0 at k
+    for side, other in neighbours:
+        if side == "w":
+            h[:, :k] += (other[:, -1] - h[:, 0])[:, None] * w[None, :]
+        elif side == "e":
+            h[:, -k:] += (other[:, 0] - h[:, -1])[:, None] * w[::-1][None, :]
+        elif side == "n":
+            h[:k, :] += w[:, None] * (other[-1, :] - h[0, :])[None, :]
+        elif side == "s":
+            h[-k:, :] += w[::-1][:, None] * (other[0, :] - h[-1, :])[None, :]
+    return h
+
+
 def fetch_ground(bbox, size, out_dir, raw_dir, tile, span=(0.05, 0.55)):
     """heightmap.r32 and canopy.r32 from the laser sheets under the box. Returns the meta fields."""
     index = las_index()
@@ -343,6 +404,11 @@ def fetch_ground(bbox, size, out_dir, raw_dir, tile, span=(0.05, 0.55)):
         ground[water] = level
         log(f"open water on {water.mean():.0%} of the tile at {level:.2f} m")
     heights, holes = fill_ground(ground)
+    near = adjacent_tiles(bbox, size, out_dir)
+    blended = [side for side, _ in near]
+    if near:
+        heights = blend_edges(heights, near)
+        log(f"ground bent over {BLEND_M} m to meet the tiles already built on the {', '.join(blended)}")
     canopy = np.nan_to_num(veg - heights, nan=0.0)
     canopy = np.where((canopy > 0.3) & (canopy < 200.0), canopy, 0.0).astype(np.float32)
     geo.write_r32(heights, os.path.join(out_dir, "heightmap.r32"))
@@ -361,7 +427,7 @@ def fetch_ground(bbox, size, out_dir, raw_dir, tile, span=(0.05, 0.55)):
         "canopy": {"file": "canopy.r32", "source": f"LĢIA laser points, highest vegetation return (classes 3-5) above the ground ({', '.join(sheets)})",
                    "max_height": round(float(canopy.max()), 2),
                    "format": "float32 little-endian, row-major, row 0 = north; metres above ground; 0 = nothing"},
-        "laser": {"sheets": sheets, "missing": missing, "skipped": skipped, "skipped_share": round(float(skip.mean()), 3),
+        "laser": {"sheets": sheets, "missing": missing, "skipped": skipped, "skipped_share": round(float(skip.mean()), 3), "blended": blended,
                   "ground_filled": round(holes, 3), "coverage": round(covered, 3),
                   "ground_pts_per_cell": round(density, 2), "urls": [index[s] for s in sheets]},
     }
