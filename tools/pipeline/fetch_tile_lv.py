@@ -111,7 +111,9 @@ def has_laser_sheet(x3301, y3301):
 
 
 def lks_bbox(bbox, margin=5.0):
-    """An L-EST97 box as the LKS-92 box around it (the grids turn against each other by up to 2.5 degrees)."""
+    """An L-EST97 box as the LKS-92 box around it. The grids turn against each other by at most 0.1
+    degree across Latvia (+0.06 at Liepāja, -0.09 at Zilupe; scale 0.9988-0.9997), so with no margin
+    the box is within 2 m of the tile's own square."""
     xmin, ymin, xmax, ymax = bbox
     edge = [(xmin + (xmax - xmin) * t, y) for t in np.linspace(0, 1, 9) for y in (ymin, ymax)]
     edge += [(x, ymin + (ymax - ymin) * t) for t in np.linspace(0, 1, 9) for x in (xmin, xmax)]
@@ -125,6 +127,73 @@ def _sheets_over(box, step, namer):
     xs = list(np.arange(xmin, xmax, step)) + [xmax]
     ys = list(np.arange(ymin, ymax, step)) + [ymax]
     return sorted({namer(x, y) for x in xs for y in ys})
+
+
+# ------------------------------------------------------------------------------------------ which sheets
+# A laser sheet is a 1 km square and 170-300 MB. A 1024 m tile anywhere touches at least four, but
+# most of them only by a strip: a world centred on one sheet (place_center) overhangs it by 12 m a
+# side, and a sheet whose share of the tile is that thin is not worth its download - the strip is
+# filled from the ground beside it. A new world then downloads one sheet instead of four; its first
+# ring of streamed neighbours (36 m onto the next sheet) one or two. Downloading them side by side
+# was measured and does not help: 5.4 MB/s on one connection, 5.5 MB/s in total on four.
+SKIP_M = 40.0   # a sheet whose share of the tile is narrower than this is not downloaded
+
+
+def select_sheets(bbox, index, skip_m=SKIP_M):
+    """The laser sheets an L-EST97 tile needs: (keep, skip, missing), sheet names. The tile's square on
+    the LKS-92 grid is cut by the 1 km sheet grid; a published sheet whose share is narrower than
+    `skip_m` on either axis is skipped, unless no wide one is left to fill it from (a tile on the
+    coast), when the narrow ones are kept. Unpublished sheets are `missing`: the sea, the border."""
+    x0, y0, x1, y1 = lks_bbox(bbox, margin=0.0)
+    keep, skip, missing = [], [], []
+    for i in range(int(x0 // 1000), int(x1 // 1000) + 1):
+        for j in range(int(y0 // 1000), int(y1 // 1000) + 1):
+            w = min(x1, (i + 1) * 1000.0) - max(x0, i * 1000.0)
+            h = min(y1, (j + 1) * 1000.0) - max(y0, j * 1000.0)
+            if w <= 0 or h <= 0:
+                continue
+            name = las_sheet(i * 1000 + 500, j * 1000 + 500)
+            if name not in index:
+                missing.append(name)
+            elif min(w, h) < skip_m:
+                skip.append(name)
+            else:
+                keep.append(name)
+    if not keep and skip:
+        keep, skip = skip, []
+    return sorted(keep), sorted(skip), sorted(missing)
+
+
+def skipped_mask(bbox, size, skip):
+    """The tile's 1 m cells (rows north to south) that lie on a skipped sheet."""
+    out = np.zeros((size, size), bool)
+    if not skip:
+        return out
+    from pyproj import Transformer
+    xmin, ymin, xmax, ymax = bbox
+    to_lks = Transformer.from_crs(f"EPSG:{LEST97}", f"EPSG:{LKS92}", always_xy=True)
+    gx, gy = np.meshgrid(xmin + np.arange(size) + 0.5, ymax - np.arange(size) - 0.5)
+    lx, ly = to_lks.transform(gx.ravel(), gy.ravel())
+    key = (np.asarray(lx) // 1000).astype(np.int64) * 100000 + (np.asarray(ly) // 1000).astype(np.int64)
+    flat = out.ravel()
+    for k in np.unique(key):
+        i, j = divmod(int(k), 100000)
+        if las_sheet(i * 1000 + 500, j * 1000 + 500) in skip:
+            flat |= key == k
+    return flat.reshape(size, size)
+
+
+def place_center(x3301, y3301, index=None):
+    """Where to centre a new world asked for at an L-EST97 point so that it needs one laser sheet: the
+    centre of the LKS-92 sheet holding the point, back on the L-EST97 grid in whole metres. The point
+    stays inside the world (a sheet is 1000 m, the world 1024 m). Idempotent - a centre maps to
+    itself - and the point unchanged when its sheet is not published."""
+    index = las_index() if index is None else index
+    (x, y), = geo.transform_points([(x3301, y3301)], LEST97, LKS92)
+    if las_sheet(x, y) not in index:
+        return x3301, y3301
+    (ex, ey), = geo.transform_points([((x // 1000) * 1000 + 500, (y // 1000) * 1000 + 500)], LKS92, LEST97)
+    return float(round(ex)), float(round(ey))
 
 
 # ------------------------------------------------------------------------------------------ downloads
@@ -241,14 +310,14 @@ def fill_ground(ground):
 
 def fetch_ground(bbox, size, out_dir, raw_dir, tile, span=(0.05, 0.55)):
     """heightmap.r32 and canopy.r32 from the laser sheets under the box. Returns the meta fields."""
-    sheets = _sheets_over(lks_bbox(bbox), 1000.0, las_sheet)
     index = las_index()
-    missing = [s for s in sheets if s not in index]
-    sheets = [s for s in sheets if s in index]
+    sheets, skipped, missing = select_sheets(bbox, index)
     if not sheets:
         sys.exit("no LĢIA laser sheet covers this tile")
     if missing:
         log(f"no laser sheet for {', '.join(missing)} (outside Latvia or not published)")
+    if skipped:
+        log(f"not downloading {', '.join(skipped)}: under {SKIP_M:.0f} m of the tile each, filled from the ground beside it")
     las_dir = paths.raw("lv", "las") if raw_dir is None else os.path.join(raw_dir, "lv", "las")
     os.makedirs(las_dir, exist_ok=True)
     local = []
@@ -262,7 +331,11 @@ def fetch_ground(bbox, size, out_dir, raw_dir, tile, span=(0.05, 0.55)):
     _progress(span[0] + (span[1] - span[0]) * 0.85, "gridding the ground and the canopy")
     ground, top, veg, roof, hits, level = grid_points(local, bbox, size)
     covered = float(np.isfinite(top).mean())
-    water = open_water(~np.isfinite(top))
+    # a skipped sheet's strip has no returns either, but it is not water: it stays empty and
+    # fill_ground bridges it from the ground beside it (canopy and roofs are 0 there, so a building
+    # on it takes the cadastre's storeys for its height)
+    skip = skipped_mask(bbox, size, skipped)
+    water = open_water(~np.isfinite(top) & ~skip)
     if water.any():
         # the river and the lakes sit at the level of their few water returns, not at a slope
         # interpolated from the banks (which streaks across hundreds of metres)
@@ -288,7 +361,8 @@ def fetch_ground(bbox, size, out_dir, raw_dir, tile, span=(0.05, 0.55)):
         "canopy": {"file": "canopy.r32", "source": f"LĢIA laser points, highest vegetation return (classes 3-5) above the ground ({', '.join(sheets)})",
                    "max_height": round(float(canopy.max()), 2),
                    "format": "float32 little-endian, row-major, row 0 = north; metres above ground; 0 = nothing"},
-        "laser": {"sheets": sheets, "missing": missing, "ground_filled": round(holes, 3), "coverage": round(covered, 3),
+        "laser": {"sheets": sheets, "missing": missing, "skipped": skipped, "skipped_share": round(float(skip.mean()), 3),
+                  "ground_filled": round(holes, 3), "coverage": round(covered, 3),
                   "ground_pts_per_cell": round(density, 2), "urls": [index[s] for s in sheets]},
     }
 

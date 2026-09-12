@@ -75,15 +75,58 @@ def test_health_blank_is_not_zero():
     check(w("R", [t(2025, 100)] * 4, False) is None, "a sound company carries a reason")
 
 
+class _Everything:
+    """A laser-sheet index holding every sheet (the real one is a 5 MB download)."""
+    def __contains__(self, name):
+        return True
+
+
+def _tile(cx, cy):
+    return cx - 512, cy - 512, cx + 512, cy + 512
+
+
+def test_lv_sheets():
+    """A new Latvian world is centred on its laser sheet and downloads that one sheet: the four it
+    only grazes are filled, not fetched (fetch_tile_lv.place_center, select_sheets). Needs the
+    pipeline's wheels (numpy, pyproj); without them the check says it was skipped."""
+    try:
+        import fetch_tile_lv
+        import pyproj  # noqa: F401 - fetch_tile_lv's transforms
+    except ImportError as e:
+        return f"laser-sheet checks skipped ({e.name} missing)"
+    import random
+    every = _Everything()
+    rng = random.Random(7)
+    for _ in range(150):
+        c = fetch_tile_lv.place_center(rng.uniform(320000, 740000), rng.uniform(6190000, 6420000), every)
+        check(fetch_tile_lv.place_center(*c, every) == c, f"place_center moves its own centre {c}")
+        keep = fetch_tile_lv.select_sheets(_tile(*c), every)[0]
+        check(len(keep) == 1, f"a world centred at {c} keeps {keep}")
+        # 12 m of overhang plus 20 stays under SKIP_M; 100 m does not
+        check(len(fetch_tile_lv.select_sheets(_tile(c[0] + 20, c[1] - 20), every)[0]) == 1, f"20 m off {c} needs more than one sheet")
+        check(len(fetch_tile_lv.select_sheets(_tile(c[0] + 100, c[1]), every)[0]) > 1, f"100 m off {c} still keeps one sheet")
+        check(len(fetch_tile_lv.select_sheets(_tile(c[0] + 1024, c[1]), every)[0]) <= 2, f"the neighbour east of {c} needs more than two")
+    # a tile whose wide sheet is not published (the coast) keeps the narrow ones rather than nothing
+    c = fetch_tile_lv.place_center(560000, 6300000, every)
+    keep, skip, _ = fetch_tile_lv.select_sheets(_tile(*c), every)
+    keep2, skip2, missing2 = fetch_tile_lv.select_sheets(_tile(*c), set(skip))
+    check(sorted(keep2) == sorted(skip) and not skip2 and missing2 == keep, f"coast fallback: kept {keep2}, skipped {skip2}")
+    # the skipped strips are the tile's edges, 12 m a side, and never its middle
+    mask = fetch_tile_lv.skipped_mask(_tile(*c), 1024, skip)
+    check(0.03 < mask.mean() < 0.07 and not mask[512, 512] and mask[0, 512] and mask[512, 0], f"skipped strips cover {mask.mean():.1%}")
+    return "a Latvian world downloads one laser sheet"
+
+
 def main():
     test_holder_id()
     test_health_blank_is_not_zero()
+    sheets = test_lv_sheets()
     if failures:
         print("[pipeline] FAILED:")
         for f in failures:
             print("   ", f)
         return 1
-    print("[pipeline] PASSED: holder ids stay opaque, stable and linkable; a blank tax column is not a zero")
+    print(f"[pipeline] PASSED: holder ids stay opaque, stable and linkable; a blank tax column is not a zero; {sheets}")
     return 0
 
 

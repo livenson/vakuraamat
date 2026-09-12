@@ -221,8 +221,10 @@ def apply_anchors(site, anchors, root=ROOT):
 
 
 def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
-             force=False, root=ROOT, texture_mode="import", anchors=None, seed=None, block_ids=None):
-    """A present-day site pack. `eras`, `seed` and `block_ids` are accepted for older callers and ignored."""
+             force=False, root=ROOT, texture_mode="import", anchors=None, seed=None, block_ids=None, focus=None):
+    """A present-day site pack. `eras`, `seed` and `block_ids` are accepted for older callers and ignored.
+    `focus` is the place the world was asked for when its centre was moved (terrain.focus: where the
+    player starts); a rescaffold without one keeps the manifest's."""
     if not re.fullmatch(r"[a-z][a-z0-9_]*", site):
         sys.exit("--id must be lowercase letters, digits, underscores")
     site_dir = os.path.join(root, "sites", site)
@@ -233,6 +235,8 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
             shutil.rmtree(os.path.join(site_dir, sub), ignore_errors=True)
     tile = tile or site
     tile_dir = os.path.join(root, "assets/terrain", tile)
+    if focus is None and os.path.exists(os.path.join(site_dir, "site.json")):
+        focus = json.load(open(os.path.join(site_dir, "site.json"))).get("terrain", {}).get("focus")
     e, y = "era_2026", 2026
     lat, lon = lest97_to_wgs84(*center)
     half = size / 2
@@ -283,7 +287,8 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
     manifest = {
         "id": site, "country": country, "pipeline": PACK_VERSION, "name_key": SITE_KEY, "subtitle_key": f"{SITE_KEY}_SUBTITLE",
         "description": f"{name}: generated site pack.",
-        "terrain": {"tile": tile, "center": [float(center[0]), float(center[1])], "size": size, "latitude": lat, "longitude": lon, "utc_offset": 3.0, "date": [2026, 9, 3]},
+        "terrain": {"tile": tile, "center": [float(center[0]), float(center[1])], "size": size, "latitude": lat, "longitude": lon, "utc_offset": 3.0, "date": [2026, 9, 3],
+                    **({"focus": [float(focus[0]), float(focus[1])]} if focus else {})},
         "start": {"era": e, "spawn": layout["spawn"], "yaw_deg": yaw},
         "water": "water_2026.json", "buildings": "buildings_2026.json",
         "locations": {"LOC_LANDMARK": "landmark", "LOC_FARMSTEAD": "farm"},

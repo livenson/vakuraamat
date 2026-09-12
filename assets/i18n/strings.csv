@@ -239,7 +239,7 @@ MENU_RESULT_NEW_PLAIN,uus maailm,new world,jauna pasaule
 MENU_PLAYED_TODAY,täna,today,šodien
 MENU_PLAYED_YESTERDAY,eile,yesterday,vakar
 MENU_PLAYED_DAYS,%d päeva tagasi,%d days ago,pirms %d dienām
-MENU_PLAYED_NEVER,mängimata,not played yet,vēl nav spēlēta
+MENU_PLAYED_NEVER,külastamata,not visited yet,vēl nav apmeklēta
 MENU_CANCEL,Katkesta,Cancel,Atcelt
 MENU_CANCELLING,Katkestan...,Cancelling...,Atceļ...
 MENU_CANCELLED,Maailma loomine katkestati.,Creating the world was cancelled.,Pasaules radīšana atcelta.

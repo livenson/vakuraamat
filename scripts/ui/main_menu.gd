@@ -7,7 +7,6 @@ extends Control
 
 const SUGGESTED := "res://assets/data/suggested_places.json"
 const PLAYED := "user://played.cfg"   # when each world was last entered: the Locations page's order
-const NEAR_M := 400.0                 # a world whose centre is this near a place holds it, well inside its square
 const MARGIN := 72.0
 
 var box: VBoxContainer          # the left column (menu) or the page body (locations)
@@ -272,10 +271,14 @@ func _build_locations_panel() -> void:
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	left.add_child(scroll)
+	var inset := MarginContainer.new()   # the buttons clear the scrollbar
+	inset.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	inset.add_theme_constant_override("margin_right", 18)
+	scroll.add_child(inset)
 	var list := VBoxContainer.new()
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", 4)
-	scroll.add_child(list)
+	inset.add_child(list)
 	var saved := SaveManager.saved_site()
 	var played := _played()
 	var worlds := _worlds(played)
@@ -283,7 +286,7 @@ func _build_locations_panel() -> void:
 		var row := _row(list, Sites.display_name(id), _world_detail(id, int(played.get(id, 0))))
 		if saved == id:
 			_row_button(row, "UI_CONTINUE_GAME", _continue_in.bind(id))
-		_row_button(row, "MENU_PLAY", _start_new_game.bind(id))
+		_row_button(row, "MENU_GO", _start_new_game.bind(id))
 
 	# --- the map: your worlds, the ideas, what the service has ready; a click on a mark goes there
 	var right := VBoxContainer.new()
@@ -297,7 +300,8 @@ func _build_locations_panel() -> void:
 	right.add_child(_map)
 	_map_actions = []
 	for id in worlds:
-		var c: Array = Sites.manifest_for(id).get("terrain", {}).get("center", [])
+		var terrain: Dictionary = Sites.manifest_for(id).get("terrain", {})
+		var c: Array = terrain.get("focus", terrain.get("center", []))   # the place it was asked for
 		if c.size() == 2:
 			_add_mark(Sites.display_name(id), float(c[0]), float(c[1]), "current" if id == Sites.active else "installed", _start_new_game.bind(id))
 	var legend := BookTheme.label(tr("MENU_MAP_GO"), "DetailLabel", right)
@@ -349,10 +353,14 @@ func _build_storage_panel() -> void:
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	box.add_child(scroll)
+	var inset := MarginContainer.new()   # the buttons clear the scrollbar
+	inset.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	inset.add_theme_constant_override("margin_right", 18)
+	scroll.add_child(inset)
 	_storage_box = VBoxContainer.new()
 	_storage_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_storage_box.add_theme_constant_override("separation", 6)
-	scroll.add_child(_storage_box)
+	inset.add_child(_storage_box)
 	_status = BookTheme.label("", "DetailLabel", box)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var back := Button.new()
@@ -411,21 +419,26 @@ func _continue_in(id: String) -> void:
 	await _enter_world()
 
 
-## An installed world whose square holds the point, or "".
+## An installed world whose square holds the point, or "". The square, not a distance from the
+## centre: a world is centred where its data is cheapest (a Latvian one on its laser sheet), up to
+## half a tile from the place it was asked for.
 func _world_at(x: float, y: float) -> String:
 	for id in Sites.available:
 		if _is_tile_pack(id):
 			continue
-		var c: Array = Sites.manifest_for(id).get("terrain", {}).get("center", [])
-		if c.size() == 2 and absf(float(c[0]) - x) < NEAR_M and absf(float(c[1]) - y) < NEAR_M:
+		var t: Dictionary = Sites.manifest_for(id).get("terrain", {})
+		var c: Array = t.get("center", [])
+		var half := float(t.get("size", 1024)) * 0.5
+		if c.size() == 2 and absf(float(c[0]) - x) < half and absf(float(c[1]) - y) < half:
 			return id
 	return ""
 
 
-## A world the tile service has built, and you have not installed, around the point; {} if none.
+## A world the tile service has built, and you have not installed, whose square holds the point.
 func _service_pack_at(x: float, y: float) -> Dictionary:
 	for p in _service_packs:
-		if absf(float(p.x) - x) < NEAR_M and absf(float(p.y) - y) < NEAR_M:
+		var half := float(p.get("size", 1024)) * 0.5
+		if absf(float(p.x) - x) < half and absf(float(p.y) - y) < half:
 			return p
 	return {}
 
@@ -501,7 +514,7 @@ func _row_button(row: HBoxContainer, key: String, cb: Callable) -> void:
 	BookTheme.hand(b)
 	b.text = tr(key)
 	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	if key in ["MENU_PLAY", "UI_CONTINUE_GAME", "MENU_INSTALL_PLAY", "MENU_GO"]:
+	if key in ["UI_CONTINUE_GAME", "MENU_GO"]:
 		b.theme_type_variation = "PrimaryButton"
 	b.pressed.connect(cb)
 	row.add_child(b)
@@ -570,7 +583,7 @@ func _show_results(results: Array) -> void:
 			else:
 				what.text = tr("MENU_ESTIMATING")
 				cells.get_or_add(key, {"x": x, "y": y, "labels": []}).labels.append(what)
-		_row_button(row, "MENU_PLAY" if have != "" else "MENU_GO", _go.bind(str(r.name), x, y))
+		_row_button(row, "MENU_GO", _go.bind(str(r.name), x, y))
 	for key in cells:
 		_estimate_cell(key, cells[key], serial)   # not awaited: the cells are asked side by side
 

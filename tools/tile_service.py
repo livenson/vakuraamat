@@ -9,7 +9,8 @@ The game (scripts/autoload/locator.gd) talks to it:
     GET  /health                     -> {"ok": true}
     GET  /geocode?q=<text>[&country=<id>] -> [{"name", "x", "y"}]      (every country's address search, or one's)
     GET  /geocode_lv?q=<text>        -> the same as /geocode?country=lv (the name older games ask for)
-    GET  /estimate?x=&y=&size=       -> what a pack for the point would download (HEAD requests to the
+    GET  /estimate?x=&y=&size=       -> what a pack for the point would download, centred where /tile
+                                        would centre it ("center"; a Latvian world on its laser sheet) (HEAD requests to the
                                         geoportal for each DTM and nDSM sheet, cached ones marked), the
                                         service's measured rate and the mean job time: {"items", "bytes",
                                         "cached_bytes", "rate_bps", "seconds_download", "seconds_process", "free_bytes"}
@@ -17,7 +18,8 @@ The game (scripts/autoload/locator.gd) talks to it:
     POST /tile  {"id","name","x","y","size","eras","seed","blocks"} -> 202 {"id"}   starts a job (or reuses a cached zip)
     GET  /status?id=<id>             -> {"stage","progress","done","error"}   (error "cancelled" after /cancel)
     POST /cancel?id=<id>             -> 202: the job stops at its next stage or download chunk
-    GET  /packs                      -> [{"id","name","x","y","size","eras","seed","blocks"}]  packs ready in the cache
+    GET  /packs                      -> [{"id","name","x","y","size","eras","seed","blocks","focus"}]  packs ready in the cache
+                                        (x, y the centre; focus the place it was asked for, where it starts)
     GET  /download?id=<id>           -> zip with site/<pack files> and tile/<engine files>
 A job runs the same tools as `make site` + `make tile`, in a workspace outside the repo, with the
 download cache shared (data_raw/, or --raw-dir). Needs python3 with numpy, Pillow, rasterio, pyogrio, shapely and pyproj;
@@ -151,7 +153,9 @@ def estimate(x, y, size):
     raw_dir = paths.raw_root()
     half = size / 2
     items = []
-    refine = sources.for_point(x, y).estimate((x - half, y - half, x + half, y + half), raw_dir, items, head_size)
+    src = sources.for_point(x, y)
+    x, y = src.place(x, y)   # where the world would be centred (a Latvian one on its laser sheet), as /tile does
+    refine = src.estimate((x - half, y - half, x + half, y + half), raw_dir, items, head_size)
     st = load_stats()
     rate = float(st.get("rate_bps") or 0.0) or 4e6
     jobs = st.get("jobs") or []
@@ -160,7 +164,7 @@ def estimate(x, y, size):
             "download_bytes": to_get, "rate_bps": rate, "seconds_download": round(to_get / rate),
             "seconds_process": round(sum(jobs) / len(jobs)) if jobs else 120,
             "refine_bytes": refine, "seconds_refine": round(refine / rate),   # the 1 m ground, fetched after the pack is playable
-            "free_bytes": shutil.disk_usage(WORKSPACE).free}
+            "free_bytes": shutil.disk_usage(WORKSPACE).free, "center": [x, y]}
 
 
 def cache_info():
@@ -237,7 +241,7 @@ def run_job(job):
         source = sources.for_point(job["x"], job["y"])   # the country's adapter: its agency, registers, refine pass
         stage("scaffold", 0.05)
         new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid,
-                          force=True, root=ws, texture_mode="path", seed=job.get("seed"), block_ids=job.get("blocks"))
+                          force=True, root=ws, texture_mode="path", seed=job.get("seed"), block_ids=job.get("blocks"), focus=job.get("focus"))
         stage(f"{source.label} data", 0.1)
 
         def on_progress(frac, text):   # the fetcher's steps become the job's stage
@@ -272,7 +276,7 @@ def run_job(job):
         stage("layout", 0.7)
         new_site.apply_anchors(sid, anchors, root=ws)
         new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid, force=True,
-                          root=ws, texture_mode="path", anchors=anchors, seed=job.get("seed"), block_ids=job.get("blocks"))
+                          root=ws, texture_mode="path", anchors=anchors, seed=job.get("seed"), block_ids=job.get("blocks"), focus=job.get("focus"))
         new_site.relink_era_maps(sid, root=ws, texture_mode="path")
         stage("scenes", 0.75)
         if not gen_era_scenes.generate(sid, root=ws):
@@ -391,7 +395,8 @@ class Handler(BaseHTTPRequestHandler):
                         m = json.load(open(mpath))
                         packs.append({"id": sid, "name": m.get("description", sid).split(":")[0], "x": m["terrain"]["center"][0], "y": m["terrain"]["center"][1],
                                       "size": m["terrain"]["size"], "eras": ",".join(str(e).rsplit("_", 1)[-1] for e in sorted(os.listdir(os.path.join(WORKSPACE, sid, "sites", sid, "data", "eras"))) if e.endswith(".tres")).replace(".tres", ""),
-                                      "seed": m.get("story", {}).get("seed"), "blocks": m.get("story", {}).get("blocks")})
+                                      "seed": m.get("story", {}).get("seed"), "blocks": m.get("story", {}).get("blocks"),
+                                      "focus": m["terrain"].get("focus")})
             return self._json(200, packs)
         if u.path == "/status":
             sid = qs.get("id", [""])[0]
@@ -447,16 +452,23 @@ class Handler(BaseHTTPRequestHandler):
         size = int(req.get("size") or 1024)
         eras = "2026"   # the present-day layer; older eras belong to the historical game (tag v0.9-historical)
         if country_of(x, y) is None:
-            return self._json(400, {"error": "outside Estonia and Latvia"})
+            return self._json(400, {"error": "outside every country the service covers (tools/pipeline/sources.py --list)"})
+        rebuild = bool(req.get("force")) or bool(req.get("refresh"))
+        focus = None
+        # A new world is centred where its data is cheapest (a Latvian one on its laser sheet: one
+        # download instead of four) and remembers the place it was asked for, where the player starts.
+        # A rebuild keeps its centre, and a streamed neighbour (t<E>_<N>) is laid out from its origin's.
+        if not rebuild and not re.fullmatch(r"t\d+_\d+", sid):
+            focus = [x, y]
+            x, y = sources.for_point(x, y).place(x, y)
         with LOCK:
             job = JOBS.get(sid)
             if job and not job.get("done"):
                 return self._json(202, {"id": sid, "stage": job["stage"]})
-            rebuild = bool(req.get("force")) or bool(req.get("refresh"))
             if os.path.exists(os.path.join(WORKSPACE, sid + ".zip")) and not rebuild:
                 JOBS[sid] = {"id": sid, "stage": "ready", "progress": 1.0, "done": True}
                 return self._json(202, {"id": sid, "stage": "ready"})
-            job = {"id": sid, "name": name, "x": x, "y": y, "size": size, "eras": eras,
+            job = {"id": sid, "name": name, "x": x, "y": y, "focus": focus, "size": size, "eras": eras,
                    "force": bool(req.get("force")), "refresh": bool(req.get("refresh")),
                    "seed": int(req["seed"]) if req.get("seed") is not None else None, "blocks": req.get("blocks") or None,
                    "stage": "queued", "progress": 0.0, "done": False}

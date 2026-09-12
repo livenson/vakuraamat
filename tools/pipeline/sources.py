@@ -40,6 +40,11 @@ class DataSource:
     def covers(self, x, y):
         return self.bbox is not None and self.bbox[0] <= x <= self.bbox[2] and self.bbox[1] <= y <= self.bbox[3]
 
+    def place(self, x, y):
+        """Where to centre a new world asked for at (x, y): the point itself, unless the country's data
+        comes in sheets that a small move saves downloading. The point must stay inside the world."""
+        return x, y
+
     _land = None
 
     def land(self):
@@ -280,6 +285,13 @@ class Latvia(DataSource):
         except ImportError:   # a plain python3 without the pipeline's wheels (shapely, pyproj): cannot tell, so not Latvia
             return False
 
+    def place(self, x, y):
+        """The centre of the laser sheet holding the point (fetch_tile_lv.place_center): one sheet of
+        170-300 MB instead of four. Unmoved when that centre would not be Latvia's (Valga's side)."""
+        import fetch_tile_lv
+        nx, ny = fetch_tile_lv.place_center(x, y)
+        return (nx, ny) if for_point(nx, ny) is self else (x, y)
+
     def build_tile(self, a, raw_dir, out_dir, bbox):
         import fetch_tile_lv
         return fetch_tile_lv.build_tile(a, raw_dir, out_dir, bbox)
@@ -293,11 +305,11 @@ class Latvia(DataSource):
         from them. The orthophoto windows and the cadastre are estimated together."""
         import fetch_tile_lv
         index = fetch_tile_lv.las_index()
-        for sh in fetch_tile_lv._sheets_over(fetch_tile_lv.lks_bbox(box), 1000.0, fetch_tile_lv.las_sheet):
-            if sh in index:
-                local = os.path.join(raw_dir, "lv", "las", sh + ".las")
-                cached = os.path.exists(local)
-                items.append({"name": "laser points %s" % sh, "bytes": os.path.getsize(local) if cached else head(index[sh]), "cached": cached})
+        keep, _, _ = fetch_tile_lv.select_sheets(box, index)   # what fetch_ground downloads: not the sheets it only grazes
+        for sh in keep:
+            local = os.path.join(raw_dir, "lv", "las", sh + ".las")
+            cached = os.path.exists(local)
+            items.append({"name": "laser points %s" % sh, "bytes": os.path.getsize(local) if cached else head(index[sh]), "cached": cached})
         items.append({"name": "orthophoto, cadastre", "bytes": 60 * 1024 ** 2, "cached": False})
         return 0
 

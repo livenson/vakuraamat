@@ -21,6 +21,7 @@ excludes Estonian land.
 |---|---|---|---|
 | `id`, `name`, `label` | the id packs carry (`site.json` `country`), a long name, and the agency the service's progress shows | `ee`, Maa-amet | `lv`, LĢIA |
 | `bbox`, `covers(x, y)` | where the country is. `covers` can be stricter than the box | the box | a laser sheet under the point and not on another country's land |
+| `place(x, y)` | where a new world asked for at a point is centred. The point must stay inside the world; the tile service keeps it as `terrain.focus`, where the player starts | the point | the centre of the laser sheet holding the point, so the world downloads one sheet instead of four (`fetch_tile_lv.place_center`) |
 | `outline` | `assets/data/<file>` with the land as rings (`tools/pipeline/fetch_outline.py`). It gives `land()` / `on_land()` for the cross-border merge and the menu map | `estonia.json` | `latvia.json` |
 | `own_tile`, `build_tile()` | the ground: heightmap, canopy, `ortho.jpg`, and `terrain_meta.json` with `"country"`. Without `own_tile`, `fetch_tile.py`'s own (Estonian) steps run | no | `fetch_tile_lv.build_tile` |
 | `estimate()` | the download list the menu shows before a job, and the bytes the refine pass fetches later | DTM and nDSM sheets, orthophoto | laser sheets |
