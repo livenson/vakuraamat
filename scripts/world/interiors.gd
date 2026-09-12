@@ -992,11 +992,10 @@ func _notice_board(root: Node3D, b: FootprintBuilding, poly: PackedVector2Array,
 ## What the registers say about a building, as a page: the register row, the tenants, the plot.
 static func register_sheet(b: FootprintBuilding) -> String:
 	var lines: Array[String] = []
-	# the register the row comes from: Estonia's Building Register (EHR, 9-digit codes) or Latvia's
-	# cadastre (14-digit building designations). Told by the code, not the pack: a tile on the border
-	# carries buildings from both
-	var lv := b.ehr.length() == 14 if b.ehr != "" else str(Sites.manifest_for(Sites.pack_of(b)).get("country", "ee")) == "lv"
-	lines.append(TranslationServer.translate("UI_SHEET_REGISTER_LV" if lv else "UI_SHEET_REGISTER") % (b.address if b.address != "" else str(b.building_id)))
+	# the register the row comes from, whose country is told by the code's shape (the descriptors'
+	# building_code patterns) before the pack's: a tile on the border carries buildings of both
+	var bc: Dictionary = Countries.for_building_code(b.ehr, Countries.of_pack(Sites.pack_of(b))).get("building_code", {})
+	lines.append(TranslationServer.translate(str(bc.get("register_key", "UI_SHEET_REGISTER"))) % (b.address if b.address != "" else str(b.building_id)))
 	var bits: Array[String] = []
 	if b.purpose != "":
 		bits.append(b.purpose)
@@ -1010,7 +1009,7 @@ static func register_sheet(b: FootprintBuilding) -> String:
 		bits.append(b.roof_cover)
 	lines.append(" · ".join(bits))
 	if b.ehr != "":
-		lines.append(TranslationServer.translate("UI_SHEET_CODE_LV") % b.ehr if lv else "EHR " + b.ehr)
+		lines.append(TranslationServer.translate(str(bc.get("code_key", "UI_SHEET_CODE_EE"))) % b.ehr)
 	lines.append("")
 	lines.append(TranslationServer.translate("UI_SHEET_TENANTS"))
 	# every row the plot's page shows, described the same way: a sheet that named fewer of the

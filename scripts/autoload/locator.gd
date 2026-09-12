@@ -1,4 +1,5 @@
-# Autoload "Locator": finds places (Maa-amet in-ADS geocoder, coarse IP geolocation) and asks the
+# Autoload "Locator": finds places (each country's address search, assets/data/countries/<id>.json;
+# coarse IP geolocation) and asks the
 # tile service (tools/tile_service.py) for a playable pack for a point, which it installs under
 # user://sites/<id> and user://tiles/<id>. The world then builds the Terrain3D data on first visit.
 extends Node
@@ -8,7 +9,6 @@ signal progress(text: String, fraction: float)
 const SETTINGS := "user://settings.cfg"
 const MIN_FREE_BYTES := 1024 * 1024 * 1024   # a pack installs ~150 MB plus its built region data; keep a margin
 const DEFAULT_SERVICE := "http://127.0.0.1:8765"
-const GEOCODER := "https://inaadress.maaamet.ee/inaadress/gazetteer?results=8&features=EHAK,TANAV,KATASTRIYKSUS,EHITISHOONE&address="
 const IP_API := "http://ip-api.com/json/?fields=status,country,countryCode,city,lat,lon"
 
 # EPSG:3301 (L-EST97): Lambert conformal conic 2SP on GRS80
@@ -230,20 +230,37 @@ func geocode(q: String) -> Array:
 			var p := wgs84_to_lest97(a, b)
 			return [{"name": "%.4f N %.4f E" % [a, b], "x": p.x, "y": p.y}]
 	var out := []
-	var r := await http(GEOCODER + q.uri_encode())
-	var parsed = JSON.parse_string(r.body) if r.ok else null
-	if typeof(parsed) == TYPE_DICTIONARY:
-		for a in parsed.get("addresses", []):
-			if a.has("viitepunkt_x") and a.has("viitepunkt_y"):
-				out.append({"name": str(a.get("pikkaadress", a.get("ipikkaadress", q))), "x": float(a.viitepunkt_x), "y": float(a.viitepunkt_y)})
-	# Latvia: the tile service searches the Latvian address register (tools/pipeline/geocode_lv.py);
-	# without the service the search stays Estonian
-	var lv := await http(service_url() + "/geocode_lv?q=" + q.uri_encode())
-	var found = JSON.parse_string(lv.body) if lv.ok else null
-	if typeof(found) == TYPE_ARRAY:
-		for a in found:
-			if typeof(a) == TYPE_DICTIONARY and a.has("x") and a.has("y"):
-				out.append({"name": str(a.get("name", q)), "x": float(a.x), "y": float(a.y)})
+	for c in Countries.all().values():
+		out.append_array(await _geocode_with(c.get("geocoder", {}), q))
+	return out
+
+
+## One country's address search. A public gazetteer asked directly: its `url` with {q}, and where in
+## the answer the list (`results`), the name (the first non-empty of `name`) and the grid coordinates
+## (`x`, `y`) are. Or the tile service's search for it (`service`, a path with {q}), for a register
+## that has no public search (Latvia's, tools/pipeline/geocode_lv.py); without the service it is quiet.
+func _geocode_with(g: Dictionary, q: String) -> Array:
+	var out := []
+	if g.has("url"):
+		var r := await http(Countries.fill(str(g.url), {"q": q.uri_encode()}))
+		var parsed = JSON.parse_string(r.body) if r.ok else null
+		if typeof(parsed) == TYPE_DICTIONARY:
+			for a in parsed.get(str(g.get("results", "results")), []):
+				if typeof(a) != TYPE_DICTIONARY or not a.has(str(g.x)) or not a.has(str(g.y)):
+					continue
+				var name := q
+				for k in g.get("name", []):
+					if str(a.get(k, "")) != "":
+						name = str(a[k])
+						break
+				out.append({"name": name, "x": float(a[str(g.x)]), "y": float(a[str(g.y)])})
+	elif g.has("service"):
+		var r := await http(service_url() + Countries.fill(str(g.service), {"q": q.uri_encode()}))
+		var found = JSON.parse_string(r.body) if r.ok else null
+		if typeof(found) == TYPE_ARRAY:
+			for a in found:
+				if typeof(a) == TYPE_DICTIONARY and a.has("x") and a.has("y"):
+					out.append({"name": str(a.get("name", q)), "x": float(a.x), "y": float(a.y)})
 	return out
 
 
@@ -259,14 +276,10 @@ func locate_by_ip() -> Dictionary:
 	return {"ok": true, "x": p.x, "y": p.y, "name": "%s, %s" % [d.get("city", ""), d.get("country", "")], "country": str(d.get("countryCode", ""))}
 
 
-func in_estonia(x: float, y: float) -> bool:
-	return x > 369000.0 and x < 740000.0 and y > 6377000.0 and y < 6635000.0
-
-
-## Whether the service may have data for an L-EST97 point: Estonia's box or Latvia's (the Latvian
-## tiles are built on the same grid, docs/latvia-plan.md). The service decides the border exactly.
+## Whether the service may have data for an L-EST97 point: inside some country's box (every country
+## is built on the same grid). The service decides the border exactly.
 func in_coverage(x: float, y: float) -> bool:
-	return in_estonia(x, y) or (x > 305000.0 and x < 770000.0 and y > 6165000.0 and y < 6450000.0)
+	return Countries.covers(x, y)
 
 
 static func _m(phi: float, e: float) -> float:
@@ -388,9 +401,10 @@ static func ground_is_coarse(id: String) -> bool:
 	var m = JSON.parse_string(FileAccess.get_file_as_string(meta_path))
 	if typeof(m) != TYPE_DICTIONARY:
 		return false
-	# A Latvian ground is 1 m from the start, so this never said yes for one and its refine pass (the
-	# older photographs, the timetables) never arrived. That pass marks the meta instead.
-	if str(m.get("country", "ee")) == "lv":
+	# How the country's refine pass shows (its descriptor's "refine"). "ground": it replaces a 5 m
+	# ground with the 1 m one, so a coarse ground is the cue. "flag": the ground is fine from the start
+	# (Latvia's laser points) and the pass - older photographs, timetables - marks the meta when it is in
+	if str(Countries.of_meta(m).get("refine", "ground")) == "flag":
 		return not bool(m.get("refined", false))
 	return float(m.get("dtm_res_m", 1.0)) > 1.0
 

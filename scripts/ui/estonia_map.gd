@@ -8,7 +8,6 @@
 class_name EstoniaMap
 extends Control
 
-const OUTLINES := ["res://assets/data/estonia.json", "res://assets/data/latvia.json"]
 const PICK_RADIUS := 12.0   # how near the pointer has to come to a mark, in pixels
 
 signal hovered(index: int)   # -1 when the pointer leaves every mark
@@ -41,7 +40,7 @@ static func _load() -> Dictionary:
 		var land := []
 		var lakes := []
 		var b := [INF, INF, -INF, -INF]
-		for path in OUTLINES:
+		for path in Countries.outlines():   # every described country's (assets/data/countries)
 			var text := FileAccess.get_file_as_string(path)
 			var d = JSON.parse_string(text) if text != "" else null
 			if typeof(d) != TYPE_DICTIONARY or d.get("bounds", []).size() != 4:

@@ -380,6 +380,7 @@ def main(argv=None):
     today = dt.date.today().isoformat()
     meta = {
         "name": a.name,
+        "country": source.id,   # the game's descriptor (assets/data/countries/<id>.json); readers default to "ee"
         "crs": "EPSG:3301",
         "sheet": sheets[0],
         "xmin": xmin, "ymin": ymin, "xmax": xmax, "ymax": ymax,

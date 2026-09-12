@@ -639,8 +639,8 @@ func _toggle_codes() -> void:
 		_refresh_codes()
 		var links: Dictionary = Reporter.links_for(player.global_position, interactor.target, world.get_node("EraLayers").get_node_or_null(GameState.current_era))
 		var urls := []
-		for k in ["cadastre", "ehr", "xgis_map"]:
-			if links.has(k):
+		for k in links:   # every register and map link the place has, whichever country's
+			if str(links[k]).begins_with("http"):
 				urls.append(str(links[k]))
 		if not urls.is_empty():
 			DisplayServer.clipboard_set("\n".join(urls))
@@ -674,7 +674,7 @@ func _refresh_codes() -> void:
 				lines.append("      " + Tenants.headline(t) + ("   " + Tenants.facts(t) if Tenants.facts(t) != "" else ""))
 	var links := Reporter.links_for(pos, interactor.target, layer)
 	if links.has("etak_id"):
-		lines.append(tr("UI_CODES_BUILDING") + ": ETAK %d   %s" % [int(links.etak_id), str(links.get("ehr", ""))])
+		lines.append(tr("UI_CODES_BUILDING") + ": #%d   %s" % [int(links.etak_id), str(links.get("ehr", links.get("building_code", "")))])
 	var road := Reporter._nearest_road(layer, pos)
 	if not road.is_empty():
 		lines.append(tr("UI_CODES_ROAD") + ": %s %s %s m %s (%.0f m)" % [str(road.get("name", "") if road.get("name") else ""), str(road.get("type", "")), str(road.get("width", "")), str(road.get("surface", "") if road.get("surface") else ""), float(road.get("distance", 0))])

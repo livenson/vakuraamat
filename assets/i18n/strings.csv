@@ -247,6 +247,7 @@ UI_MAP_OWNERS_LEGEND,joon: sama omanik või juhatuse liige,line: same owner or b
 UI_MAP_MODE_MIX,tegevusalade segu,industry mix,nozaru sajaukums
 UI_MAP_MODE_FOCUS,üks tegevusala,one sector,viena nozare
 UI_MAP_FOCUS_PICK,Tegevusala: %s,Sector: %s,Nozare: %s
+UI_SHEET_CODE_EE,EHR %s,EHR %s,EHR %s
 UI_MAP_SECTOR_UNKNOWN,tegevusala teadmata,sector not given,nozare nav norādīta
 UI_MAP_FOCUS_ALL,kogu krunt,the whole plot,viss zemes gabals
 UI_MAP_FOCUS_HALF,umbes pool,about half,apmēram puse
