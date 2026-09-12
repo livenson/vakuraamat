@@ -75,7 +75,8 @@
       "cycle": 2,
       "sheets": [
         "4311-32"
-      ]
+      ],
+      "pixel_m": 1.0
     },
     {
       "label": "2010-11",
@@ -83,7 +84,8 @@
       "cycle": 4,
       "sheets": [
         "4311-32_1"
-      ]
+      ],
+      "pixel_m": 0.5
     },
     {
       "label": "2013-15",
@@ -91,8 +93,18 @@
       "cycle": 5,
       "sheets": [
         "4311-32_1"
-      ]
+      ],
+      "pixel_m": 0.25
     }
   ],
-  "refined": true
+  "refined": true,
+  "water": {
+    "parcels": [
+      "01000492026"
+    ],
+    "share": 0.239,
+    "lowered_m2": 157,
+    "bridges": true,
+    "source": "the cadastre's water-land parcels (tools/pipeline/water_parcels.py)"
+  }
 }

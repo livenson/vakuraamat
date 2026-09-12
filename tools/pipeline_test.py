@@ -160,11 +160,65 @@ def test_tile_seams():
     return "tile seams met"
 
 
+def test_water_parcels():
+    """A river parcel is cleared of the ship moored against its quay: the photograph takes the water's
+    tone and the ship's bump in the ground is lowered to the water, while the bridge over it, the quay
+    and a stream in its valley are left as they are (report 2026-09-12T14-26-11)."""
+    try:
+        import numpy as np
+        import water_parcels
+        import rasterio, shapely  # noqa: F401 - the parcels' rasterisation
+        from PIL import Image
+    except ImportError as e:
+        return f"water checks skipped ({e.name} missing)"
+    import json, tempfile
+    size, k = 128, 4
+    water, quay, hull, deck = (35, 50, 69), (150, 150, 145), (240, 240, 240), (120, 120, 120)
+    heights = np.full((size, size), 5.0, np.float32)
+    heights[:, :80] = 0.4                                   # the river, x 0..80, at 0.4 m
+    heights[30:60, 68:80] = 3.0                             # a ship's deck, classed as ground, flush with the quay
+    heights[:, 100:120] = np.linspace(2.0, 9.0, size, dtype=np.float32)[:, None]   # a stream down a valley
+    photo = np.zeros((size * k, size * k, 3), np.uint8)
+    photo[:] = quay
+    photo[:, :80 * k] = water
+    photo[30 * k:60 * k, 68 * k:80 * k] = hull
+    photo[90 * k:96 * k, :80 * k] = deck                    # a bridge across the river
+    with tempfile.TemporaryDirectory() as root:
+        site, tdir = os.path.join(root, "sites", "w"), os.path.join(root, "assets", "terrain", "w")
+        os.makedirs(site)
+        os.makedirs(tdir)
+        json.dump({"terrain": {"tile": "w"}}, open(os.path.join(site, "site.json"), "w"))
+        river = {"tunnus": "river", "purpose": ["VEEKOGUDE_MAA"], "polygon": [[0, 0], [80, 0], [80, size], [0, size]]}
+        stream = {"tunnus": "stream", "purpose": ["VEEKOGUDE_MAA"], "polygon": [[100, 0], [120, 0], [120, size], [100, size]]}
+        road = {"tunnus": "quay", "purpose": ["TRANSPORDIMAA", "VEEKOGUDE_MAA"], "polygon": [[80, 0], [100, 0], [100, size], [80, size]]}
+        json.dump({"parcels": [river, stream, road]}, open(os.path.join(site, "parcels.json"), "w"))
+        json.dump({"size_px": size, "heightmap": "heightmap.r32", "texture": "ortho.jpg", "canopy": None},
+                  open(os.path.join(tdir, "terrain_meta.json"), "w"))
+        heights.tofile(os.path.join(tdir, "heightmap.r32"))
+        Image.fromarray(photo).save(os.path.join(tdir, "ortho.jpg"), quality=95)
+        bridge = np.zeros((size, size), np.float32)
+        bridge[90:96, :80] = 1.0
+        os.makedirs(os.path.join(root, "raw", "bridges"))
+        bridge.tofile(water_parcels.bridges_path(os.path.join(root, "raw"), "w"))
+        note = water_parcels.paint("w", root=root, raw_dir=os.path.join(root, "raw"))
+        h = np.fromfile(os.path.join(tdir, "heightmap.r32"), "<f4").reshape(size, size)
+        out = np.asarray(Image.open(os.path.join(tdir, "ortho.jpg")).convert("RGB")).astype(float)
+        px = lambda x, z: out[int(z * k) + k // 2, int(x * k) + k // 2]   # noqa: E731
+        near = lambda c, ref: float(np.abs(c - np.array(ref)).max()) < 25   # noqa: E731
+        check(note is not None and note["parcels"] == ["river"], f"water parcels taken: {note and note['parcels']}")
+        check(np.allclose(h[30:60, 68:80], 0.4), f"the ship's bump is still {h[30:60, 68:80].max():.1f} m")
+        check(np.allclose(h[:, 81:100], 5.0) and np.allclose(h[:, 100:120], heights[:, 100:120]), "the quay or the stream's valley moved")
+        check(near(px(74, 45), water), f"the ship is still in the photograph: {px(74, 45)}")
+        check(near(px(40, 93), deck), f"the bridge was painted over: {px(40, 93)}")
+        check(near(px(90, 45), quay) and near(px(110, 45), quay), "the quay or the stream's photograph changed")
+    return "a moored ship cleared from its river, the bridge kept"
+
+
 def main():
     test_holder_id()
     test_health_blank_is_not_zero()
     seams = test_tile_seams()
-    sheets = test_lv_sheets() + "; " + test_lod2_small_pieces() + "; " + seams
+    sheets = test_lv_sheets() + "; " + test_lod2_small_pieces() + "; " + seams + "; " + test_water_parcels()
     if failures:
         print("[pipeline] FAILED:")
         for f in failures:

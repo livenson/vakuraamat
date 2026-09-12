@@ -316,11 +316,13 @@ class Latvia(DataSource):
     def registers(self, sid, ws, stage, run):
         """The cadastre gives parcels and buildings in one pass, the register and VID the companies,
         OpenStreetMap the roads and stops. Fields wait for LAD's crop codes."""
-        import fetch_cadastre_lv, fetch_roads_lv, fetch_stops, fetch_tenants_lv
+        import fetch_cadastre_lv, fetch_roads_lv, fetch_stops, fetch_tenants_lv, water_parcels
         stage("cadastre (VZD), buildings, Rīga's roofs", 0.5)
         ok, _ = run(f"{sid}: cadastre", 1500, fetch_cadastre_lv.fetch, sid, root=ws)
         if not ok:
             raise RuntimeError("the Latvian cadastre could not be read (see the service log)")
+        # the rivers the cadastre draws, cleared of the boats the photograph and the laser caught
+        run(f"{sid}: water", 120, water_parcels.paint, sid, root=ws)
         stage("companies (UR) and taxes (VID)", 0.62)
         run(f"{sid}: tenants", 600, fetch_tenants_lv.fetch, sid, root=ws)
         stage("roads (OpenStreetMap)", 0.64)
