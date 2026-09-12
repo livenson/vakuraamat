@@ -406,13 +406,19 @@ def read_citygml(path, area):
     return out
 
 
-def merge_faces(tris, min_area=1.0, d_gap=0.3):
+def merge_faces(tris, min_area=1.0, d_gap=0.3, min_piece=0.1):
     """Coplanar triangles joined back into the faces they came from (a wall, a roof slope), so windows
     and gables see whole faces. Planes are grouped by normal (0.1 steps) and then by offset, split where
     two offsets lie more than `d_gap` apart, so a rounding boundary does not cut a wall in two. Faces are
     wound so the engine's Newell normal points up on a roof and out of the building on a wall; the
-    base is dropped, and so are pieces under `min_area` m² (cornice mouldings: Rīga's models carry
-    every one, 222 faces a building against 16 in Maa-amet's). Returns [[[e, n, h]...]]."""
+    base is dropped, and so are pieces under `min_area` m² that a kept face stands beside at their
+    height (cornice mouldings: Rīga's models carry every one, 222 faces a building against 16 in
+    Maa-amet's). A small piece with nothing beside it stays: it is the building, not its trim - the
+    facets of a round drum or lantern, tessellated into hundreds of triangles under a square metre
+    each, which dropped the stage under St James's spire and left it floating 7 m above the tower
+    (playtest report 2026-09-12T12-59-02). Slivers under `min_piece` go regardless: on the Old Town
+    tile keeping them all added 72% faces for 12% of the recovered surface; from 0.1 m² it is 27%
+    faces for 88% of it, and the lantern stays 99% whole. Returns [[[e, n, h]...]]."""
     import warnings
     from shapely.geometry import Polygon
     from shapely.geometry.polygon import orient
@@ -435,7 +441,7 @@ def merge_faces(tris, min_area=1.0, d_gap=0.3):
         elif (p.mean(axis=0) - centre)[:2] @ n[:2] < 0:
             n = -n                                                # a wall faces out
         bins.setdefault((round(n[0] * 10), round(n[1] * 10), round(n[2] * 10)), []).append((float(n @ p[0]), n, p))
-    faces = []
+    faces, small = [], []
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         for lst in bins.values():
@@ -461,12 +467,36 @@ def merge_faces(tris, min_area=1.0, d_gap=0.3):
                     continue
                 merged = unary_union([q.buffer(0.02, join_style=2) for q in polys]).buffer(-0.02, join_style=2)
                 for q in getattr(merged, "geoms", [merged]):
-                    if q.is_empty or q.geom_type != "Polygon" or q.area < min_area:
+                    if q.is_empty or q.geom_type != "Polygon":
                         continue
                     ring = list(orient(q.simplify(0.05), 1.0).exterior.coords)[:-1]
-                    if len(ring) >= 3:
-                        faces.append([list(o + a * u + b * w) for a, b in ring])
-    return faces
+                    if len(ring) >= 3 and q.area >= min_piece:
+                        (faces if q.area >= min_area else small).append([list(o + a * u + b * w) for a, b in ring])
+    return faces + _unsupported(small, faces)
+
+
+def _unsupported(small, faces, reach=1.0, big=4.0):
+    """The small pieces that no kept face of `big` m² or more stands beside at their height: within
+    `reach` metres of its outline's box in plan and inside its height span. A moulding runs along a
+    wall that is kept anyway; a drum's facets have no wall beside them, only the tower's top below
+    and the spire above."""
+    if not small:
+        return []
+    boxes = []
+    for f in faces:
+        p = np.asarray(f, float)
+        # the face's area by the shoelace in its own plane (Newell): only the big ones hold trim
+        n = np.sum(np.cross(p, np.roll(p, -1, axis=0)), axis=0)
+        if 0.5 * np.linalg.norm(n) >= big:
+            boxes.append([p[:, 0].min() - reach, p[:, 0].max() + reach, p[:, 1].min() - reach, p[:, 1].max() + reach,
+                          p[:, 2].min() - 0.05, p[:, 2].max() + 0.05])
+    if not boxes:
+        return small
+    b = np.asarray(boxes)
+    c = np.asarray([np.mean(np.asarray(f, float), axis=0) for f in small])
+    beside = ((c[:, None, 0] >= b[None, :, 0]) & (c[:, None, 0] <= b[None, :, 1]) & (c[:, None, 1] >= b[None, :, 2])
+              & (c[:, None, 1] <= b[None, :, 3]) & (c[:, None, 2] >= b[None, :, 4]) & (c[:, None, 2] <= b[None, :, 5])).any(axis=1)
+    return [f for f, keep in zip(small, ~beside) if keep]
 
 
 def lod2_record(faces, t, xmin, ymax, bx, bz, ground=None):

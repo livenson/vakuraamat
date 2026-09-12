@@ -117,10 +117,26 @@ def test_lv_sheets():
     return "a Latvian world downloads one laser sheet"
 
 
+def test_lod2_small_pieces():
+    """Rīga's LOD2 pieces under a square metre: a moulding beside a kept wall goes, a piece with
+    nothing beside it stays (the facets of St James's lantern, report 2026-09-12T12-59-02)."""
+    try:
+        import fetch_cadastre_lv
+        import shapely  # noqa: F401 - merge_faces' geometry
+    except ImportError as e:
+        return f"LOD2 checks skipped ({e.name} missing)"
+    wall = [[0.0, 0.0, 0.0], [10.0, 0.0, 0.0], [10.0, 0.0, 10.0], [0.0, 0.0, 10.0]]   # [e, n, h], 100 m²
+    moulding = [[2.0, 0.3, 9.5], [3.0, 0.3, 9.5], [3.0, 0.3, 9.9]]                     # along the wall, at its height
+    lantern = [[5.0, 5.0, 12.0], [5.5, 5.0, 12.0], [5.5, 5.0, 13.0]]                   # above it, nothing beside
+    kept = fetch_cadastre_lv._unsupported([moulding, lantern], [wall])
+    check(kept == [lantern], f"small LOD2 pieces kept: {kept}")
+    return "LOD2 trim dropped, a lantern kept"
+
+
 def main():
     test_holder_id()
     test_health_blank_is_not_zero()
-    sheets = test_lv_sheets()
+    sheets = test_lv_sheets() + "; " + test_lod2_small_pieces()
     if failures:
         print("[pipeline] FAILED:")
         for f in failures:
