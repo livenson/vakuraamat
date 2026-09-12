@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Local tile service: turns a point in Estonia or Latvia into a playable site pack plus its terrain tile.
+"""Local tile service: turns a point in a covered country into a playable site pack plus its terrain tile.
+What differs per country - the agency, the download estimate, the register stages, the refine pass, the
+address search - is the country's adapter in tools/pipeline/sources.py; nothing here names one.
 
     python3 tools/tile_service.py [--port 8765] [--workspace data_raw/service] [--raw-dir data_raw]
 
 The game (scripts/autoload/locator.gd) talks to it:
     GET  /health                     -> {"ok": true}
-    GET  /geocode?q=<text>           -> [{"name", "x", "y"}]           (Maa-amet in-ADS gazetteer, then Latvia's)
-    GET  /geocode_lv?q=<text>        -> [{"name", "x", "y"}]           (Latvia's address register, tools/pipeline/geocode_lv.py)
+    GET  /geocode?q=<text>[&country=<id>] -> [{"name", "x", "y"}]      (every country's address search, or one's)
+    GET  /geocode_lv?q=<text>        -> the same as /geocode?country=lv (the name older games ask for)
     GET  /estimate?x=&y=&size=       -> what a pack for the point would download (HEAD requests to the
                                         geoportal for each DTM and nDSM sheet, cached ones marked), the
                                         service's measured rate and the mean job time: {"items", "bytes",
@@ -43,11 +45,9 @@ if getattr(sys, "frozen", False):
         print("[tile_service] warning: certifi is missing; https calls will fail to verify", flush=True)
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the repository, or the bundle directory of the frozen sidecar (tools/service/build.sh)
-import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads, fetch_stops, fetch_tenants, fetch_fields, market  # noqa: E402
-import fetch_tile, fetch_departures, validate_site, sources  # noqa: E402
+import new_site, gen_era_scenes, extract_features  # noqa: E402
+import fetch_tile, validate_site, sources  # noqa: E402
 MIN_FREE_BYTES = 2 * 1024 ** 3   # a job needs raw sheets, the workspace and the zip: refuse under 2 GB
-ORTHO_BYTES = 6 * 1024 ** 2      # the WMS orthophoto JPEG (4096 px) and the small historical maps
-GEOCODER = "https://inaadress.maaamet.ee/inaadress/gazetteer?results=8&features=EHAK,TANAV,KATASTRIYKSUS,EHITISHOONE&address="
 JOBS = {}
 LOCK = threading.Lock()
 WORKSPACE = os.path.join(paths.raw_root(), "service")   # data_raw/service in the repo; the game's user directory for the sidecar
@@ -72,19 +72,6 @@ def country_of(x, y):
     """The adapter covering an L-EST97 point ("ee", "lv"), or None."""
     s = sources.for_point(x, y)
     return s.id if s else None
-
-
-def geocode(q):
-    """Maa-amet in-ADS: returns [{name, x, y}] with L-EST97 reference points."""
-    with urllib.request.urlopen(GEOCODER + urllib.parse.quote(q), timeout=20) as r:
-        data = json.load(r)
-    out = []
-    for a in data.get("addresses", []):
-        try:
-            out.append({"name": a.get("pikkaadress") or a.get("ipikkaadress") or q, "x": float(a["viitepunkt_x"]), "y": float(a["viitepunkt_y"])})
-        except (KeyError, ValueError):
-            continue
-    return out
 
 
 def load_stats():
@@ -144,49 +131,13 @@ def head_size(url):
 
 
 def estimate(x, y, size):
-    """What a pack for (x, y) downloads: the DTM sheets of the tile's corners, the 1:2000 nDSM sheets,
-    the orthophoto; each with its size (HEAD) and whether data_raw already holds it. In Latvia: the
-    laser sheets under the tile (the ground, the canopy and the building heights all come from them)."""
+    """What a pack for (x, y) downloads, each item with its size (HEAD) and whether data_raw already
+    holds it - the country's adapter lists them (sources.py: Estonia's DTM and nDSM sheets and
+    orthophoto, Latvia's laser sheets) - and how long that, the job and the refine pass should take."""
     raw_dir = paths.raw_root()
     half = size / 2
-    xmin, ymin, xmax, ymax = x - half, y - half, x + half, y + half
     items = []
-    if country_of(x, y) == "lv":
-        import fetch_tile_lv
-        index = fetch_tile_lv.las_index()
-        for sh in fetch_tile_lv._sheets_over(fetch_tile_lv.lks_bbox((xmin, ymin, xmax, ymax)), 1000.0, fetch_tile_lv.las_sheet):
-            if sh in index:
-                local = os.path.join(raw_dir, "lv", "las", sh + ".las")
-                cached = os.path.exists(local)
-                items.append({"name": "laser points %s" % sh, "bytes": os.path.getsize(local) if cached else head_size(index[sh]), "cached": cached})
-        items.append({"name": "orthophoto, cadastre", "bytes": 60 * 1024 ** 2, "cached": False})
-        st = load_stats()
-        rate = float(st.get("rate_bps") or 0.0) or 4e6
-        jobs = st.get("jobs") or []
-        to_get = sum(i["bytes"] for i in items if not i["cached"])
-        return {"items": items, "bytes": sum(i["bytes"] for i in items), "cached_bytes": sum(i["bytes"] for i in items if i["cached"]),
-                "download_bytes": to_get, "rate_bps": rate, "seconds_download": round(to_get / rate),
-                "seconds_process": round(sum(jobs) / len(jobs)) if jobs else 120, "refine_bytes": 0, "seconds_refine": 0,
-                "free_bytes": shutil.disk_usage(WORKSPACE).free}
-
-    def add(name, url, fname):
-        cached = os.path.exists(os.path.join(raw_dir, fname))
-        n = os.path.getsize(os.path.join(raw_dir, fname)) if cached else head_size(url)
-        items.append({"name": name, "bytes": n, "cached": cached})
-
-    sheets = sorted({fetch_tile.sheet_for_point(px, py, raw_dir) for px, py in [(xmin + 1, ymin + 1), (xmax - 1, ymin + 1), (xmin + 1, ymax - 1), (xmax - 1, ymax - 1)]})
-    refine = 0
-    for sh in sheets:
-        url = fetch_tile.dtm_download_url(sh, "dem_5m_geotiff")   # the ground the first pack ships
-        add("DTM %s (5 m)" % sh, url, urllib.parse.parse_qs(urllib.parse.urlparse(url).query)["f"][0])
-        fine = fetch_tile.dtm_download_url(sh)                     # fetched afterwards, not part of the wait
-        fname = urllib.parse.parse_qs(urllib.parse.urlparse(fine).query)["f"][0]
-        refine += 0 if os.path.exists(os.path.join(raw_dir, fname)) else head_size(fine)
-    for sheet in fetch_tile.sheets_2000_for_bbox(xmin, ymin, xmax, ymax, raw_dir):
-        links = sorted(fetch_tile.geoportal_links(sheet, "ndsm_rel_1m_geotiff"), key=fetch_tile.link_year)
-        if links:
-            add("nDSM %s" % sheet, links[-1], urllib.parse.parse_qs(urllib.parse.urlparse(links[-1]).query)["f"][0])
-    items.append({"name": "orthophoto, maps", "bytes": ORTHO_BYTES, "cached": False})
+    refine = sources.for_point(x, y).estimate((x - half, y - half, x + half, y + half), raw_dir, items, head_size)
     st = load_stats()
     rate = float(st.get("rate_bps") or 0.0) or 4e6
     jobs = st.get("jobs") or []
@@ -235,32 +186,6 @@ def write_zip(sid, ws):
     return zpath
 
 
-def estonian_registers(sid, ws, stage):
-    """The Estonian register stages of a job; returns the bus-stop thread still running beside them."""
-    stage("building register", 0.5)
-    with_deadline(f"{sid}: building register", 240, fetch_buildings.fetch, sid, root=ws,
-                  progress=lambda f, t: stage(t, 0.5 + 0.1 * f))
-    stage("cadastre", 0.61)
-    with_deadline(f"{sid}: cadastre", 120, fetch_parcels.fetch, sid, root=ws)
-    stage("roads", 0.63)
-    with_deadline(f"{sid}: roads", 120, fetch_roads.fetch, sid, root=ws)
-    # Overpass queues requests for tens of seconds: the stops fetch runs beside the register stages
-    def stops_job():
-        try:
-            fetch_stops.fetch(sid, root=ws)
-        except Exception as e:  # noqa: BLE001 - optional layer
-            log(f"{sid}: fetch_stops unavailable ({e})")
-    stops_thread = threading.Thread(target=stops_job, daemon=True)
-    stops_thread.start()
-    stage("fields (PRIA)", 0.635)
-    with_deadline(f"{sid}: fields", 120, fetch_fields.fetch, sid, root=ws)
-    stage("tenants (business register)", 0.64)
-    with_deadline(f"{sid}: tenants", 180, fetch_tenants.fetch, sid, root=ws)
-    stage("market snapshot", 0.66)
-    with_deadline(f"{sid}: market", 60, market.derive, sid, root=ws)
-    return stops_thread
-
-
 def run_job(job):
     sid = job["id"]
     ws = os.path.join(WORKSPACE, sid)
@@ -289,15 +214,14 @@ def run_job(job):
         os.makedirs(os.path.join(ws, "sites"), exist_ok=True)
         os.makedirs(os.path.join(ws, "assets", "terrain"), exist_ok=True)
         open(os.path.join(ws, ".gdignore"), "a").close()
-        country = country_of(job["x"], job["y"])
+        source = sources.for_point(job["x"], job["y"])   # the country's adapter: its agency, registers, refine pass
         stage("scaffold", 0.05)
         new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid,
                           force=True, root=ws, texture_mode="path", seed=job.get("seed"), block_ids=job.get("blocks"))
-        source = "LĢIA" if country == "lv" else "Maa-amet"
-        stage(f"{source} data", 0.1)
+        stage(f"{source.label} data", 0.1)
 
         def on_progress(frac, text):   # the fetcher's steps become the job's stage
-            stage(f"{source}: " + text, 0.1 + 0.35 * float(frac))
+            stage(f"{source.label}: " + text, 0.1 + 0.35 * float(frac))
             note_rate(text)
         fetch_tile.PROGRESS = on_progress
         try:
@@ -311,25 +235,9 @@ def run_job(job):
                 fetch_tile.main(["--project", ws, "--site", sid, "--raw-dir", paths.raw_root(), "--dem-res", "5"])
         finally:
             fetch_tile.PROGRESS = None
-        if country == "lv":
-            # Latvia (docs/latvia-plan.md): the cadastre gives parcels and buildings in one pass, the
-            # register and VID the companies, OpenStreetMap the roads and stops; the timetables come
-            # in the refine pass as in Estonia. Fields wait for LAD's crop codes
-            stage("cadastre (VZD), buildings, Rīga's roofs", 0.5)
-            import fetch_cadastre_lv
-            ok, _ = with_deadline(f"{sid}: cadastre", 1500, fetch_cadastre_lv.fetch, sid, root=ws)
-            if not ok:
-                raise RuntimeError("the Latvian cadastre could not be read (see the service log)")
-            stage("companies (UR) and taxes (VID)", 0.62)
-            import fetch_tenants_lv
-            with_deadline(f"{sid}: tenants", 600, fetch_tenants_lv.fetch, sid, root=ws)
-            stage("roads (OpenStreetMap)", 0.64)
-            import fetch_roads_lv
-            with_deadline(f"{sid}: roads", 180, fetch_roads_lv.fetch, sid, root=ws)
-            stops_thread = threading.Thread(target=lambda: with_deadline(f"{sid}: stops", 120, fetch_stops.fetch, sid, root=ws), daemon=True)
-            stops_thread.start()
-        else:
-            stops_thread = estonian_registers(sid, ws, stage)
+        # the country's registers: cadastre, buildings, companies, roads, stops (sources.py); the
+        # timetables come in the refine pass
+        stops_thread = source.registers(sid, ws, stage, with_deadline)
         # a tile on the Estonian-Latvian border: the other country's registers for its side
         stage("the other side of the border", 0.66)
         import cross_border
@@ -386,42 +294,15 @@ def refine_job(job, ws):
             job["refine_stage"] = name
         log(f"{sid}: refining - {name} [{time.time() - started:.0f} s]")
     try:
-        if country_of(job["x"], job["y"]) == "lv":
-            # the ground is 1 m from the start (the laser sheets) and measured trees are a later step:
-            # left are the older photographs (strip-stored, tens of MB a cycle) and the timetables
-            import fetch_tile_lv
-            tile_dir = os.path.join(ws, "assets", "terrain", sid)
-            rstage("older orthophotos (LĢIA, 2003-2015)")
-            with_deadline(f"{sid}: older orthophotos", 600, fetch_tile_lv.add_history, tile_dir)
-            rstage("bus departures (ATD, Rīgas satiksme)")
-            with_deadline(f"{sid}: departures", 300, fetch_departures.fetch, sid, root=ws)
-            # the game's cue to take this pack again (Locator.ground_is_coarse): a Latvian ground is
-            # never coarse, so without it the refined pack never reached the player
-            meta_path = os.path.join(tile_dir, "terrain_meta.json")
-            meta = json.load(open(meta_path))
-            meta["refined"] = True
-            with open(meta_path, "w") as f:
-                json.dump(meta, f, indent=2, ensure_ascii=False)
-            rstage("packing")
-            write_zip(sid, ws)
-            open(os.path.join(WORKSPACE, sid + ".refined"), "w").close()
-            with LOCK:
-                job.update(refined=True, refine_stage="ready", ground_res_m=1)
-            return
-        rstage("1 m ground model")
-        ok, _ = with_deadline(f"{sid}: 1 m ground model", 900, fetch_tile.main,
-                              ["--project", ws, "--site", sid, "--raw-dir", paths.raw_root(), "--dem-res", "1", "--only-dem"])
-        rstage("measured trees")
-        with_deadline(f"{sid}: measured trees", 600, fetch_trees.fetch, sid, root=ws)
-        rstage("bus departures (public transport register)")
-        # the national GTFS is one 52 MB zip for the whole country, cached a week like the register dumps
-        with_deadline(f"{sid}: departures", 300, fetch_departures.fetch, sid, root=ws)
+        # the country's own pass (sources.py): Estonia's 1 m ground, measured trees and timetables,
+        # Latvia's older photographs and timetables; (ok, the ground's resolution in metres)
+        ok, res = sources.for_point(job["x"], job["y"]).refine(sid, ws, rstage, with_deadline)
         rstage("packing")
         write_zip(sid, ws)
         if ok:
             open(os.path.join(WORKSPACE, sid + ".refined"), "w").close()   # JOBS is memory only; this survives a restart
         with LOCK:
-            job.update(refined=True, refine_stage="ready", ground_res_m=1 if ok else 5)
+            job.update(refined=True, refine_stage="ready", ground_res_m=res)
         log(f"{sid}: refined ({time.time() - started:.0f} s)")
     except Exception as e:  # noqa: BLE001 - the pack already stands; a failed refinement is not fatal
         traceback.print_exc()
@@ -443,28 +324,22 @@ class Handler(BaseHTTPRequestHandler):
         qs = urllib.parse.parse_qs(u.query)
         if u.path == "/health":
             return self._json(200, {"ok": True, "version": 1})
-        if u.path == "/geocode":
+        if u.path in ("/geocode", "/geocode_lv"):
+            # every country's address search (sources.py), or one's with ?country=<id>; /geocode_lv is
+            # Latvia's under the name games from before the descriptors ask for
             q = qs.get("q", [""])[0].strip()
             if not q:
-                return self._json(400, {"error": "q missing"})
+                return self._json(400, {"error": "q missing"}) if u.path == "/geocode" else self._json(200, [])
+            only = "lv" if u.path == "/geocode_lv" else qs.get("country", [""])[0]
             out = []
-            try:
-                out = geocode(q)
-            except Exception as e:  # noqa: BLE001
-                log(f"geocode: in-ADS unavailable ({e})")
-            try:
-                import geocode_lv
-                out += geocode_lv.search(q)
-            except Exception as e:  # noqa: BLE001
-                log(f"geocode: Latvian register unavailable ({e})")
+            for s in sources.SOURCES:
+                if only and s.id != only:
+                    continue
+                try:
+                    out += s.geocode(q)
+                except Exception as e:  # noqa: BLE001 - one country's search down is not the others'
+                    log(f"geocode: {s.name} unavailable ({e})")
             return self._json(200, out)
-        if u.path == "/geocode_lv":
-            q = qs.get("q", [""])[0].strip()
-            try:
-                import geocode_lv
-                return self._json(200, geocode_lv.search(q) if q else [])
-            except Exception as e:  # noqa: BLE001
-                return self._json(502, {"error": str(e)})
         if u.path == "/estimate":
             try:
                 x, y = float(qs.get("x", [""])[0]), float(qs.get("y", [""])[0])
@@ -472,7 +347,7 @@ class Handler(BaseHTTPRequestHandler):
             except ValueError:
                 return self._json(400, {"error": "need x and y (EPSG:3301)"})
             if country_of(x, y) is None:
-                return self._json(400, {"error": "outside Estonia and Latvia"})
+                return self._json(400, {"error": "outside every country the service covers (tools/pipeline/sources.py --list)"})
             try:
                 return self._json(200, estimate(x, y, size))
             except Exception as e:  # noqa: BLE001

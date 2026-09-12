@@ -34,15 +34,10 @@ _OUTLINES = {}
 
 
 def outline(country):
-    """The country's land (shapely, L-EST97) from the menu map's outline file, or None."""
+    """The country's land (shapely, L-EST97) from its adapter's outline file, or None."""
     if country not in _OUTLINES:
-        path = os.path.join(paths.ROOT, "assets", "data", "estonia.json" if country == "ee" else "latvia.json")
-        if not os.path.exists(path):
-            _OUTLINES[country] = None
-        else:
-            from shapely.geometry import Polygon
-            from shapely.ops import unary_union
-            _OUTLINES[country] = unary_union([Polygon(r).buffer(0) for r in json.load(open(path))["land"] if len(r) >= 3])
+        import sources
+        _OUTLINES[country] = sources.by_id(country).land()
     return _OUTLINES[country]
 
 
@@ -87,12 +82,15 @@ def complete(site, root=paths.ROOT):
     tile = m["terrain"]["tile"]
     tdir = os.path.join(root, "assets", "terrain", tile)
     meta = json.load(open(os.path.join(tdir, "terrain_meta.json")))
-    mine = m.get("country", "ee")
-    other = "lv" if mine == "ee" else "ee"
-    part = share(meta, other)
-    if part < MIN_SHARE:
+    import sources
+    mine = m.get("country") or "ee"
+    # the neighbour holding most of the tile (one on a tile over three countries: the largest)
+    near = sorted(((share(meta, s.id), s) for s in sources.SOURCES if s.id != mine and s.outline), key=lambda p: -p[0])
+    if not near or near[0][0] < MIN_SHARE:
         return {}
-    log(f"{site}: {part:.0%} of the tile lies in {'Latvia' if other == 'lv' else 'Estonia'}; fetching its registers")
+    part, src = near[0]
+    other = src.id
+    log(f"{site}: {part:.0%} of the tile lies in {src.name}; fetching its registers")
     land = outline(other)
     # the other country's fetchers write whole files, so they run in a scratch copy of the pack with
     # the tile's ground linked in
@@ -105,15 +103,7 @@ def complete(site, root=paths.ROOT):
         json.dump(m2, open(os.path.join(tmp, "sites", site, "site.json"), "w"))
         added = {}
         try:
-            if other == "lv":
-                import fetch_cadastre_lv, fetch_tenants_lv
-                fetch_cadastre_lv.fetch(site, tmp)
-                fetch_tenants_lv.fetch(site, tmp)
-            else:
-                import fetch_buildings, fetch_parcels, fetch_tenants
-                fetch_parcels.fetch(site, tmp)
-                fetch_buildings.fetch(site, tmp)
-                fetch_tenants.fetch(site, tmp)
+            src.border(site, tmp)
         except (Exception, SystemExit) as e:  # noqa: BLE001 - the pack stands on its own side without them
             log(f"{site}: the other side's registers failed ({e}); the pack keeps its own")
             return {}
@@ -154,20 +144,20 @@ def complete(site, root=paths.ROOT):
             doc["attribution"] = _merge_attr(doc.get("attribution"), json.load(open(os.path.join(tsite, "tenants.json"))).get("attribution"))
             json.dump(doc, open(tpath, "w"), ensure_ascii=False, indent=0)
             added["tenants"] = len(theirs)
-        # --- an Estonian pack's roads end at the border: OpenStreetMap's on the Latvian side
-        if other == "lv":
-            try:
-                import fetch_roads_lv
-                fetch_roads_lv.fetch(site, tmp)
+        # --- a pack whose own roads end at the border (Estonia's ETAK): the neighbour's, where its
+        # adapter has a source that crosses (Latvia's OpenStreetMap)
+        try:
+            road_credit = src.border_roads(site, tmp)
+            if road_credit:
                 rpath = os.path.join(site_dir, "roads.json")
                 doc = json.load(open(rpath)) if os.path.exists(rpath) else {"attribution": "", "roads": []}
                 theirs = _on_side(_load(os.path.join(tsite, "roads.json"), "roads"), meta, land, key=_mid)
                 doc["roads"] = doc.get("roads", []) + theirs
-                doc["attribution"] = _merge_attr(doc.get("attribution"), fetch_roads_lv.ATTRIBUTION)
+                doc["attribution"] = _merge_attr(doc.get("attribution"), road_credit)
                 json.dump(doc, open(rpath, "w"), ensure_ascii=False)
                 added["roads"] = len(theirs)
-            except Exception as e:  # noqa: BLE001
-                log(f"{site}: Latvian roads unavailable ({e})")
+        except Exception as e:  # noqa: BLE001
+            log(f"{site}: the other side's roads unavailable ({e})")
         log(f"{site}: merged from the other side {added}")
         return added
     finally:

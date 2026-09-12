@@ -4,7 +4,7 @@
   "outline": "res://assets/data/latvia.json",
   "coverage": [305000, 6165000, 770000, 6450000],
   "geocoder": {
-    "service": "/geocode_lv?q={q}"
+    "service": "/geocode?country=lv&q={q}"
   },
   "refine": "flag",
   "photos": {

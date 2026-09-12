@@ -3,17 +3,16 @@
 # the manifest and strings of the template pack (sites/palupera), the parcel rules and the core
 # strings it reads.
 #   pyinstaller --clean --noconfirm tools/service/tile_service.spec        (tools/service/build.sh)
-import os
+import glob, os
 from PyInstaller.utils.hooks import collect_all
 
 ROOT = os.path.abspath(os.path.join(SPECPATH, "..", ".."))
 datas = [
     (os.path.join(ROOT, "sites", "palupera", "site.json"), "sites/palupera"),
     (os.path.join(ROOT, "sites", "palupera", "strings.csv"), "sites/palupera"),
-    (os.path.join(ROOT, "assets", "data", "parcel_rules.json"), "assets/data"),
-    # Estonia's outline: sources.Latvia tells Valga from Valka by it (the Latvian laser sheets reach over the border)
-    (os.path.join(ROOT, "assets", "data", "estonia.json"), "assets/data"),
-    (os.path.join(ROOT, "assets", "data", "latvia.json"), "assets/data"),   # cross_border.py: the Latvian side of a border tile
+    # the parcel rules and every country's outline: sources.py tells a country's land by its outline
+    # (Latvia's laser sheets reach over the Estonian border), cross_border.py the sides of a border tile
+    *[(p, "assets/data") for p in sorted(glob.glob(os.path.join(ROOT, "assets", "data", "*.json")))],
     (os.path.join(ROOT, "assets", "i18n", "strings.csv"), "assets/i18n"),
 ]
 binaries, hiddenimports = [], []
@@ -29,10 +28,10 @@ a = Analysis(
     pathex=[os.path.join(ROOT, "tools"), os.path.join(ROOT, "tools", "pipeline")],
     binaries=binaries,
     datas=datas,
-    hiddenimports=hiddenimports + ["new_site", "gen_era_scenes", "extract_features", "fetch_buildings", "fetch_trees", "fetch_parcels",
-                                   "fetch_roads", "fetch_stops", "fetch_departures", "fetch_tenants", "fetch_fields", "market", "fetch_tile",
-                                   "validate_site", "register_extra", "emtak", "geo", "paths", "sources",
-                                   "fetch_tile_lv", "fetch_cadastre_lv", "fetch_tenants_lv", "fetch_roads_lv", "roof_fit", "cross_border", "geocode_lv"],
+    # the tools the service imports by name, and every pipeline module: a country's adapter
+    # (sources.py) imports its fetchers lazily, where PyInstaller cannot see them
+    hiddenimports=hiddenimports + ["new_site", "gen_era_scenes", "extract_features", "validate_site"]
+                  + sorted(f[:-3] for f in os.listdir(os.path.join(ROOT, "tools", "pipeline")) if f.endswith(".py")),
     hookspath=[],
     runtime_hooks=[],
     excludes=["tkinter", "matplotlib", "IPython"],

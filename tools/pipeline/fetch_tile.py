@@ -292,8 +292,8 @@ def main(argv=None):
     xmin, ymin = int(round(a.center[0] - half)), int(round(a.center[1] - half))
     xmax, ymax = xmin + a.size, ymin + a.size
     log(f"AOI EPSG:3301 x {xmin}..{xmax}  y {ymin}..{ymax}  ({a.size} m), {source.name}")
-    if source.id != "ee":
-        # another country's ground comes from its own module; the files and the meta are the same
+    if source.own_tile:
+        # a country whose ground comes from its own module (sources.py); the files and the meta are the same
         return source.build_tile(a, raw_dir, out_dir, (xmin, ymin, xmax, ymax))
 
     meta_path = os.path.join(out_dir, "terrain_meta.json")

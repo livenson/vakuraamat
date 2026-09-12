@@ -40,7 +40,9 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   the key is *absent*: `int(null)` then fails with "Nonexistent 'int' constructor" and takes the rest
   of the loop with it. Read those fields through a helper that treats null as empty (`PlaceSearch._text`
   and `_num` are the pattern).
-- Country data adapters: `tools/pipeline/sources.py` (Estonia implemented; add a class per country).
+- Countries: an adapter in `tools/pipeline/sources.py` (pipeline, tile service) and a descriptor in
+  `assets/data/countries/<id>.json` (game, via `Countries`); no other code names a country. Estonia and
+  Latvia are implemented; `docs/adding-a-country.md` is the checklist.
 - A pack for a new place is built in two passes. The job ships what the place needs to be walked in
   (the 5 m ground model, 4 MB a sheet against 75 MB for the 1 m one; the register, cadastre, roads,
   tenants), then `refine_job` fetches the 1 m ground, the measured trees and the departures in the

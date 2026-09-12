@@ -35,15 +35,16 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | Tax Board "tasutud maksud" quarterly open data (EMTA) | taxes paid, turnover and employees per company per quarter, the activity sector | `register_extra.py` (`data_raw/emta/`) | `tenants.json`: `employees`, `turnover`, `taxes`, `quarters`, `health` |
 | Latvian Enterprise Register (UR) and State Revenue Service (VID) open data, CC0 | a Latvian pack's companies: matched by address code or address to the tile's buildings and plots, status from liquidation and insolvency, board and owners as counts and hashed ids, annual-report turnover (`turnover_year`), VID taxes (`taxes_year`) and employees, the NACE sector, the health verdict | `tools/pipeline/fetch_tenants_lv.py` | `sites/<id>/tenants.json` |
 | Maa-amet in-ADS gazetteer | address and place search; the municipality under a point (reverse EHAK lookup) | `tools/tile_service.py` (`/geocode`), `scripts/autoload/locator.gd` (directly), `fetch_buildings.py` (which municipality's LOD2 and tree files to fetch) | menu results |
-| VZD address register: place centroids and every address with its point (Latvia) | the menu's Latvian search: places at once, addresses from an SQLite index built on first use | `tools/pipeline/geocode_lv.py` (the service's `/geocode_lv`, which `Locator.geocode` asks after in-ADS) | `data_raw/lv/var/addresses.sqlite` |
+| VZD address register: place centroids and every address with its point (Latvia) | the menu's Latvian search: places at once, addresses from an SQLite index built on first use | `tools/pipeline/geocode_lv.py` (`sources.Latvia.geocode`: the service's `/geocode?country=lv`, which `Locator.geocode` asks as `lv.json`'s geocoder) | `data_raw/lv/var/addresses.sqlite` |
 | VZD address register: the municipality polygons (Latvia) | Latvia's outline beside Estonia's on the menu's map | `tools/pipeline/fetch_outline.py --country lv` (run by hand, the file is committed) | `assets/data/latvia.json` |
 | ip-api.com IP geolocation (optional, "Use my location" in the menu) | a coarse city-level point; free for non-commercial use, no key | `scripts/autoload/locator.gd` | the menu's suggested place |
 | Poly Haven (CC0) | ground and facade PBR textures | `tools/pipeline/fetch_polyhaven.py` | `assets/terrain/textures/`, `assets/textures/buildings/` |
 | Sketchfab (CC BY, via the MCP server, `make mcp`) and Poly Pizza (CC0 / CC BY) models | cars, street lamps, benches, bus shelters, the spruce and juniper, hay bales, tractor, farm plants; playground, boats and stairs | downloaded, split with `tools/blender/split_glb.py`, listed in `assets/vendor/sketchfab/CREDITS.md` | `assets/vendor/sketchfab/`, `assets/vendor/polypizza/`, `assets/models/trees/spruce_src.glb` |
 
 Licences, attribution strings and fetch dates are in `THIRD_PARTY.md`. Endpoints and the per-country
-adapter interface are in `tools/pipeline/sources.py`; Estonia is implemented, and Latvia's ground (step 1 of
-[latvia-plan.md](latvia-plan.md)).
+adapter interface are in `tools/pipeline/sources.py`, the game's side in `assets/data/countries/<id>.json`;
+Estonia and Latvia ([latvia-plan.md](latvia-plan.md)) are implemented, and
+[adding-a-country.md](adding-a-country.md) is the checklist for the next.
 
 ## Transformations
 

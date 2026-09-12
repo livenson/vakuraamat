@@ -319,17 +319,20 @@ grass. Tiles without coverage are unchanged.
 
 ## Other countries
 
-Everything the pipeline fetches for a place sits behind one interface, `tools/pipeline/sources.py`:
-a metric CRS and coverage box, `dem`, `ortho`, optional `canopy`, `historical`, `buildings`, `trees`,
-`geocode`, `reverse`. Estonia is the one implemented adapter (Maa-amet DTM, nDSM, orthophoto and
-historical WMS, in-ADS gazetteer, ETAK + Building Register + Geo3D buildings, Geo3D trees).
-`fetch_tile.py` refuses points no adapter covers, and `python3 tools/pipeline/sources.py --list`
-prints the implemented and planned adapters (Finland, Latvia, the Netherlands, Denmark, Switzerland,
-the UK, the US, and a coarse global fallback with what each would use). Adding a country means
-writing one adapter class and registering it; the game side (packs, blocks, services) is unchanged.
-The Estonian-specific parts that would still need a per-country answer are the historical map layers
-per era and the story blocks' cultural texture. Latvia is the first planned second country; its
-verified sources, the mapping onto pack files and the steps are in [latvia-plan.md](latvia-plan.md).
+A country is an adapter in `tools/pipeline/sources.py` and a descriptor in
+`assets/data/countries/<id>.json`, and nothing else names one.
+- **The adapter** handles the pipeline and the tile service: coverage, the ground, the download
+  estimate, the register stages, the refine pass, the cross-border rows, timetables, codex texts and
+  address search.
+- **The descriptor** is what the game reads: outline, coverage box, address search, where a plot's
+  older photographs come from, report links, the building-code pattern, and how a refined pack shows.
+
+Estonia and Latvia ([latvia-plan.md](latvia-plan.md)) are implemented. `fetch_tile.py` refuses points
+no adapter covers. `python3 tools/pipeline/sources.py --list` prints the implemented and planned
+adapters, with what each planned one would use: Finland, the Netherlands, Denmark, Switzerland, the
+UK, the US, and a coarse global fallback. [adding-a-country.md](adding-a-country.md) is the checklist.
+It also lists what is still one-country: outline fetching, land-register links, diacritic folding,
+and right-hand traffic.
 
 ## Endless map: neighbouring tiles
 

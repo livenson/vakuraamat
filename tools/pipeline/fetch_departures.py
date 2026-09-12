@@ -121,10 +121,16 @@ def day_of(service_id, calendar):
 
 
 def fetch(site, root=ROOT, refresh=False, max_age_days=7):
+    """A pack's timetables, from its country's feeds (sources.py: the adapter's departures)."""
+    import sources
+    m = json.load(open(os.path.join(root, "sites", site, "site.json")))
+    return sources.by_id(m.get("country")).departures(site, root, refresh, max_age_days)
+
+
+def fetch_ee(site, root=ROOT, refresh=False, max_age_days=7):
+    """Estonia's national GTFS (the public transport register)."""
     site_dir = os.path.join(root, "sites", site)
     m = json.load(open(os.path.join(site_dir, "site.json")))
-    if m.get("country") == "lv":
-        return fetch_lv(site, root, refresh, max_age_days)
     tdir = os.path.join(root, "assets/terrain", m["terrain"]["tile"])
     meta = json.load(open(os.path.join(tdir, "terrain_meta.json")))
     xmin, ymin, xmax, ymax = meta["xmin"], meta["ymin"], meta["xmax"], meta["ymax"]

@@ -30,11 +30,6 @@ PACK_VERSION = 3
 sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar
-CREDIT_ET = 'Maa maksustamishind 2022: Maakataster, Maa- ja Ruumiamet. Ettevõtted: Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0).'
-CREDIT_EN = 'Land values 2022: the cadastre, Maa- ja Ruumiamet. Companies: e-Business Register open data, Centre of Registers and Information Systems (CC BY 4.0).'
-# a Latvian pack (docs/latvia-plan.md): the ground and pictures so far; the registers follow in later steps
-LV_GROUND_ET = 'Kaardiandmed: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, laserskaneerimine ja ortofoto 2016-2018 (CC BY 4.0).'
-LV_GROUND_EN = 'Map data: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, laser scanning and orthophoto 2016-2018 (CC BY 4.0).'
 
 
 def lv_text(row, name, country):
@@ -43,17 +38,13 @@ def lv_text(row, name, country):
     key, en = row[0], row[2]
     if key == "keys":
         return "lv"
-    real = (f"Zeme: {name}, no Latvijas Ģeotelpiskās informācijas aģentūras (LĢIA) lāzerpunktiem un ortofoto, ar metra precizitāti."
-            if country == "lv" else
-            f"Zeme: {name}, no Igaunijas Zemes un telpiskās plānošanas departamenta augstuma datiem, ortofoto, ēkām, kadastra vienībām un zemes vērtībām, ar metra precizitāti.")
-    data = ("Kartes dati: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, lāzerskenēšana un ortofoto 2016–2018 (CC BY 4.0)."
-            if country == "lv" else
-            "Kartes dati: Maa- ja Ruumiamet 2026. Zemes nodokļa vērtības: kadastrs; uzņēmumi: Igaunijas uzņēmumu reģistra atvērtie dati (CC BY 4.0).")
+    import sources
+    codex = sources.by_id(country).codex(name)   # what the pack is made of, in its country's words
+    if key in codex:
+        return codex[key]["lv"]
     table = {"ERA_2026_NAME": "2026. gads", "LOC_LANDMARK": "Orientieris", "LOC_FARMSTEAD": "Sēta",
              "EX_LANDMARK_2026": f"{name}: šeit sākas tava grāmata.", "CODEX_REAL_TITLE": "Īsts", "CODEX_INVENTED_TITLE": "Izdomāts",
-             "CODEX_DATA_TITLE": "Dati", "CODEX_REAL": real, "CODEX_DATA": data,
-             "CODEX_INVENTED": "Sienas un jumti atjaunoti pēc reģistru mēriem un jumtu modeļiem vai lāzerpunktiem; interjeri, koki, satiksme un "
-                               "garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku."}
+             "CODEX_DATA_TITLE": "Dati"}
     if key.endswith("_SUBTITLE"):
         return f"{name}: īsta zeme, īstas vērtības."
     if key.startswith("SITE_"):
@@ -283,14 +274,10 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
     S("LOC_LANDMARK", "Maamärk", "The landmark"); S("LOC_FARMSTEAD", "Talu", "The farmstead")
     S(f"EX_LANDMARK_{y}", f"{name}: siit algab sinu raamat.", f"{name}: your book starts here.")
     country = country_of(center)
-    S("CODEX_REAL_TITLE", "Päris", "Real"); S("CODEX_REAL", f"Maa: {name}, Maa- ja Ruumiameti kõrgusandmed, ortofoto, hooned, katastriüksused ja maa väärtused, meetri täpsusega.", f"The ground: {name}, from the Land Board's elevation data, orthophoto, buildings, cadastral units and land values, to the metre.")
-    S("CODEX_INVENTED_TITLE", "Välja mõeldud", "Invented"); S("CODEX_INVENTED", "Majade seinad ja katused on taastatud ehitisregistri mõõtude ja Maa-ameti LOD2 mudeli järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.", "The walls and roofs are reconstructed from the Building Register's measurements and Maa-amet's LOD2 model; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one.")
-    S("CODEX_DATA_TITLE", "Andmed", "Data"); S("CODEX_DATA", "Kaardiandmed: Maa- ja Ruumiamet 2026. %s" % CREDIT_ET, "Map data: Maa- ja Ruumiamet 2026. %s" % CREDIT_EN)
-    if country == "lv":
-        strings[:] = [r for r in strings if r[0] not in ("CODEX_REAL", "CODEX_DATA")]
-        S("CODEX_REAL", f"Maa: {name}, Läti Geoinfoameti (LĢIA) laserpunktidest ja ortofotost, meetri täpsusega.",
-          f"The ground: {name}, from the Latvian Geospatial Information Agency's (LĢIA) laser points and orthophoto, to the metre.")
-        S("CODEX_DATA", LV_GROUND_ET, LV_GROUND_EN)
+    S("CODEX_REAL_TITLE", "Päris", "Real"); S("CODEX_INVENTED_TITLE", "Välja mõeldud", "Invented"); S("CODEX_DATA_TITLE", "Andmed", "Data")
+    import sources
+    for key, text in sources.by_id(country).codex(name).items():   # what the pack is made of, in its country's words
+        S(key, text["et"], text["en"])
 
     # --- manifest + strings ---------------------------------------------------------------------------
     manifest = {
