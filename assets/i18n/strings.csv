@@ -244,6 +244,16 @@ UI_MAP_SIZE_NOTE,"Ringi suurus: krundi suurima tegutseva ettevõtte töötajate 
 UI_MAP_OWNERS_NOTE,"Joon ühendab krunte, mille ettevõtetel on äriregistri järgi ühine omanik või juhatuse liige. Inimesi ei nimetata; register annab ainult ühise tunnuse.",A line joins plots whose companies share an owner or a board member in the business register. No person is named; the register gives only a shared identifier.,"Līnija savieno zemes gabalus, kuru uzņēmumiem uzņēmumu reģistrā ir kopīgs īpašnieks vai valdes loceklis. Neviens cilvēks netiek nosaukts; reģistrs dod tikai kopīgu identifikatoru."
 UI_MAP_SIZE_LEGEND,ring: töötajate arv,circle: employees,aplis: darbinieku skaits
 UI_MAP_OWNERS_LEGEND,joon: sama omanik või juhatuse liige,line: same owner or board member,līnija: tas pats īpašnieks vai valdes loceklis
+UI_MAP_MODE_MIX,tegevusalade segu,industry mix,nozaru sajaukums
+UI_MAP_MODE_FOCUS,üks tegevusala,one sector,viena nozare
+UI_MAP_FOCUS_PICK,Tegevusala: %s,Sector: %s,Nozare: %s
+UI_MAP_SECTOR_UNKNOWN,tegevusala teadmata,sector not given,nozare nav norādīta
+UI_MAP_FOCUS_ALL,kogu krunt,the whole plot,viss zemes gabals
+UI_MAP_FOCUS_HALF,umbes pool,about half,apmēram puse
+UI_MAP_FOCUS_SOME,väike osa,a small part,neliela daļa
+UI_MAP_FOCUS_NONE,selle ala ettevõtteid pole,none of this sector,šīs nozares uzņēmumu nav
+UI_MAP_MIX_NOTE,"Iga krunt on triibuline oma tegutsevate ettevõtete tegevusalade värvides. Triibu laius on selle tegevusala osa krundi töötajatest või, kui ükski ettevõte töötajaid ei näita, ettevõtetest. Üks värv: üks tegevusala. Hallid triibud: ettevõtted, millele register tegevusala ei anna.","Each plot is striped in the colours of its active companies' sectors. A stripe's width is that sector's share of the plot's employees, or of its companies where none of them reports staff. One colour: one sector. Grey stripes: companies the register gives no activity code.","Katrs zemes gabals ir svītrots tā darbojošos uzņēmumu nozaru krāsās. Svītras platums ir šīs nozares daļa no gabala darbiniekiem vai, ja neviens uzņēmums darbiniekus neuzrāda, no uzņēmumiem. Viena krāsa: viena nozare. Pelēkas svītras: uzņēmumi, kuriem reģistrā nav norādīta darbības joma."
+UI_MAP_FOCUS_NOTE,"Kui suur osa krundist kuulub valitud tegevusalale: selle osa krundi tegutsevate ettevõtete töötajatest või, kui ükski töötajaid ei näita, ettevõtetest. Tegevusala vahetab nupp kaardi kohal; maapind näitab sama.","How much of each plot is in the chosen sector: its share of the employees of the plot's active companies, or of the companies themselves where none reports staff. The button above the map changes the sector; the ground shows the same one.","Cik liela daļa no katra zemes gabala pieder izvēlētajai nozarei: tās daļa no gabala darbojošos uzņēmumu darbiniekiem vai, ja neviens darbiniekus neuzrāda, no pašiem uzņēmumiem. Nozari maina poga virs kartes; zeme rāda to pašu."
 SECTOR_FARM,põllumajandus ja metsandus,farming and forestry,lauksaimniecība un mežsaimniecība
 SECTOR_INDUSTRY,tööstus ja energia,industry and energy,rūpniecība un enerģētika
 SECTOR_CONSTRUCTION,ehitus,construction,būvniecība

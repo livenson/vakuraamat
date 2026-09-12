@@ -14,6 +14,13 @@ func _check(cond: bool, msg: String) -> void:
 		get_tree().quit(1)
 
 
+static func _area(p: PackedVector2Array) -> float:
+	var s := 0.0
+	for i in p.size():
+		s += p[i].cross(p[(i + 1) % p.size()])
+	return absf(s) * 0.5
+
+
 func _ready() -> void:
 	var flagged := 0
 	for site in ["kvissentali", "palupera", "pirita"]:
@@ -43,6 +50,20 @@ func _ready() -> void:
 	_check(MapPalette.pick("health", [bankrupt]).get("name") == "A", "a plot with only a bankrupt company is not red")
 	_check(MapPalette.pick("health", [bankrupt, live]).get("name") == "B", "a bankrupt shell outranks the live company on its plot")
 	_check(MapPalette.pick("sector", [bankrupt]).is_empty(), "the sector layer colours a plot by a bankrupt company")
+	# the industry-mix and one-sector layers: a plot of three traders and one IT employee is three
+	# quarters trade, and its trade stripes cover three quarters of it
+	var shop := {"name": "S", "status": "R", "sector": "trade", "employees": 3}
+	var it := {"name": "I", "status": "R", "sector": "media", "employees": 1}
+	var parts := MapPalette.shares([shop, it, bankrupt])
+	_check(is_equal_approx(float(parts.get("trade", 0.0)), 0.75) and is_equal_approx(float(parts.get("media", 0.0)), 0.25), "shares are %s" % parts)
+	var square := PackedVector2Array([Vector2(0, 0), Vector2(100, 0), Vector2(100, 100), Vector2(0, 100)])
+	var area := {}
+	for piece in MapPalette.stripes(square, parts, MapPalette.STRIPE_M):
+		area[piece[1]] = float(area.get(piece[1], 0.0)) + _area(piece[0])
+	var trade: float = float(area.get(MapPalette.SECTOR_COLORS.trade, 0.0)) / 10000.0
+	_check(absf(trade - 0.75) < 0.04, "the trade stripes cover %.2f of the plot, not 0.75" % trade)
+	var staffless := MapPalette.shares([{"status": "R", "sector": "trade", "employees": null}, {"status": "R", "sector": null}])
+	_check(is_equal_approx(float(staffless.get("", 0.0)), 0.5), "without staff figures each company does not count one: %s" % staffless)
 	if not _failed:
 		print("[health] PASSED: %d flagged companies each say why, in every interface language" % flagged)
 		get_tree().quit(0)

@@ -388,9 +388,20 @@ def refine_job(job, ws):
     try:
         if country_of(job["x"], job["y"]) == "lv":
             # the ground is 1 m from the start (the laser sheets) and measured trees are a later step:
-            # only the timetables (ATD, Rīgas satiksme) are left to fetch
+            # left are the older photographs (strip-stored, tens of MB a cycle) and the timetables
+            import fetch_tile_lv
+            tile_dir = os.path.join(ws, "assets", "terrain", sid)
+            rstage("older orthophotos (LĢIA, 2003-2015)")
+            with_deadline(f"{sid}: older orthophotos", 600, fetch_tile_lv.add_history, tile_dir)
             rstage("bus departures (ATD, Rīgas satiksme)")
             with_deadline(f"{sid}: departures", 300, fetch_departures.fetch, sid, root=ws)
+            # the game's cue to take this pack again (Locator.ground_is_coarse): a Latvian ground is
+            # never coarse, so without it the refined pack never reached the player
+            meta_path = os.path.join(tile_dir, "terrain_meta.json")
+            meta = json.load(open(meta_path))
+            meta["refined"] = True
+            with open(meta_path, "w") as f:
+                json.dump(meta, f, indent=2, ensure_ascii=False)
             rstage("packing")
             write_zip(sid, ws)
             open(os.path.join(WORKSPACE, sid + ".refined"), "w").close()

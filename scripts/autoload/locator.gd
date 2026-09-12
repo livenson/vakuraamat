@@ -386,7 +386,13 @@ static func ground_is_coarse(id: String) -> bool:
 	if not FileAccess.file_exists(meta_path):
 		return false
 	var m = JSON.parse_string(FileAccess.get_file_as_string(meta_path))
-	return typeof(m) == TYPE_DICTIONARY and float(m.get("dtm_res_m", 1.0)) > 1.0
+	if typeof(m) != TYPE_DICTIONARY:
+		return false
+	# A Latvian ground is 1 m from the start, so this never said yes for one and its refine pass (the
+	# older photographs, the timetables) never arrived. That pass marks the meta instead.
+	if str(m.get("country", "ee")) == "lv":
+		return not bool(m.get("refined", false))
+	return float(m.get("dtm_res_m", 1.0)) > 1.0
 
 
 ## Take the refined pack (1 m ground, measured trees) when the service has it ready. The

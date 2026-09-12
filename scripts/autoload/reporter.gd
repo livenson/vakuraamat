@@ -125,6 +125,9 @@ func links_for(pos: Vector3, target: Node, layer: Node) -> Dictionary:
 			if d < best and c.is_visible_in_tree():
 				best = d
 				fb = c
+	var geo: TerrainGeoref = GameState.world.georef if GameState.world and GameState.world.georef else null
+	# Maa-amet's map, EHR and the ETAK search know nothing past the border
+	var lv := geo != null and str(geo.meta.get("country", "ee")) == "lv"
 	if fb:
 		var text := FileAccess.get_file_as_string(Sites.path("buildings.json"))
 		var parsed = JSON.parse_string(text) if text != "" else null
@@ -132,14 +135,17 @@ func links_for(pos: Vector3, target: Node, layer: Node) -> Dictionary:
 			for b in parsed.get("buildings", []):
 				if int(b.id) == fb.building_id:
 					out["etak_id"] = int(b.id)
+					if lv:
+						out["building_code"] = str(b.get("ehr", ""))   # the Latvian cadastral designation
+						break
 					if b.get("ehr"):
 						out["ehr"] = "https://livekluster.ehr.ee/ui/ehr/v1/building/%s" % str(b.ehr)
 					out["etak_search"] = "https://geoportaal.maaamet.ee/est/ruumiandmed/eesti-topograafia-andmekogu/etaki-kirje-otsing-p872.html"
 					break
-	var geo: TerrainGeoref = GameState.world.georef if GameState.world and GameState.world.georef else null
 	if geo and geo.is_valid():
 		var e: Vector2 = geo.world_to_lest97(pos)
-		out["xgis_map"] = "https://xgis.maaamet.ee/xgis2/page/app/maainfo?punkt=%d,%d&moot=500" % [int(e.x), int(e.y)]
+		if not lv:
+			out["xgis_map"] = "https://xgis.maaamet.ee/xgis2/page/app/maainfo?punkt=%d,%d&moot=500" % [int(e.x), int(e.y)]
 		out["lest97"] = "%d %d" % [int(e.x), int(e.y)]
 	return out
 

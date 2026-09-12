@@ -58,7 +58,7 @@ func setup(world: Node3D, tunnus: String, heading: bool = true) -> void:
 		all.append({"label": tr("UI_BOOK_TODAY"), "texture": now, "local": true})
 	# one waiting slot per campaign, named, so the strip has its shape and its years straight away:
 	# the older pictures come from a national service and take a second or two the first time
-	for e in PlotHistory.EPOCHS:
+	for e in PlotHistory.epochs(pack):
 		var wait := PlotThumb.new()
 		row.add_child(wait)
 		wait.setup_pending(str(e.label), tr("UI_BOOK_LOADING"))

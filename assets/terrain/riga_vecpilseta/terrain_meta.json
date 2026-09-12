@@ -57,9 +57,42 @@
     "index": [
       "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/LGIA_OpenData_las_saites.txt",
       "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v6/LGIA_OpenData_Ortofoto_rgb_v6_saites.txt"
+    ],
+    "history": [
+      "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v2/",
+      "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v3/",
+      "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v4/",
+      "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v5/"
     ]
   },
   "fetched": "2026-09-11",
   "attribution": "Map data: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA), 2026, CC BY 4.0",
-  "license": "CC BY 4.0 (LĢIA open data licence)"
+  "license": "CC BY 4.0 (LĢIA open data licence)",
+  "history": [
+    {
+      "label": "2003-05",
+      "texture": "ortho_2003-05.jpg",
+      "cycle": 2,
+      "sheets": [
+        "4311-32"
+      ]
+    },
+    {
+      "label": "2010-11",
+      "texture": "ortho_2010-11.jpg",
+      "cycle": 4,
+      "sheets": [
+        "4311-32_1"
+      ]
+    },
+    {
+      "label": "2013-15",
+      "texture": "ortho_2013-15.jpg",
+      "cycle": 5,
+      "sheets": [
+        "4311-32_1"
+      ]
+    }
+  ],
+  "refined": true
 }

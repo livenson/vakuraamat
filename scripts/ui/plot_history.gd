@@ -73,13 +73,24 @@ static func outline_in(poly: PackedVector2Array, square: Rect2, georef: TerrainG
 	return out
 
 
+## The campaigns a pack's plots are shown in, oldest first. A Latvian tile carries its own: Maa-amet's
+## WMS stops at the border, so the pipeline cuts LĢIA's older cycles over the tile
+## (terrain_meta.json "history", {label, texture}). Elsewhere they are Maa-amet's, asked of the WMS.
+static func epochs(pack: String) -> Array:
+	var m: Dictionary = TerrainGeoref.load_dir(Sites.tile_dir_of(pack if pack != "" else Sites.active)).meta
+	if m.has("history") or str(m.get("country", "ee")) == "lv":
+		return m.get("history", [])
+	return EPOCHS
+
+
 ## The newest picture, cropped out of the tile's own orthophoto - no request, and it is by
 ## definition the one that matches the world the player is standing in. Null if the tile has none.
 ## `px` is what the crop is scaled to; the older years are re-requested from the service at the
 ## large view's size, so this one is asked for the same size or it alone stays a blurry thumbnail.
 ## The orthophoto is 25 cm to the pixel, so a plot's square usually has the detail to answer.
-static func current(square: Rect2, georef: TerrainGeoref, tile_dir: String, px: int = PX) -> Texture2D:
-	var path := tile_dir + "/ortho.jpg"
+## `file` names another photograph of the same tile: a Latvian tile's older cycles lie beside it.
+static func current(square: Rect2, georef: TerrainGeoref, tile_dir: String, px: int = PX, file: String = "ortho.jpg") -> Texture2D:
+	var path := tile_dir + "/" + file
 	if not FileAccess.file_exists(path) or not georef.is_valid():
 		return null
 	var img := Image.new()
@@ -106,7 +117,13 @@ static func fetch(pack: String, tunnus: String, square: Rect2) -> Array:
 	var out: Array = []
 	var dir := "user://cache/plots/%s" % pack
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir))
-	for e in EPOCHS:
+	for e in epochs(pack):
+		if e.has("texture"):   # the tile's own photograph of that year: a crop, nothing to fetch
+			var tile := Sites.tile_dir_of(pack)
+			var own := current(square, TerrainGeoref.load_dir(tile), tile, PX, str(e.texture))
+			if own != null:
+				out.append({"label": str(e.label), "texture": own})
+			continue
 		var base := "%s/%s_%s" % [dir, tunnus.replace(":", "_"), e.label]
 		# The book refills while pictures are in flight, so a second pass must wait for the first
 		# rather than skip the epoch: skipping would show fewer pictures than are already on disk.
@@ -159,6 +176,8 @@ static func fetch_current_large(pack: String, tunnus: String, square: Rect2, px:
 	var tex := _load(base + ".jpg")
 	if tex != null:
 		return tex
+	if not epochs(pack).is_empty() and epochs(pack)[0].has("texture"):
+		return current_large(pack, square, px)   # a Latvian tile: Maa-amet's photograph has nothing there
 	if tunnus != "" and not _busy.has(base):
 		_busy[base] = true
 		var img := await _fetch_image([CURRENT_LAYER], square, base, px, WMS_CURRENT)
@@ -180,10 +199,13 @@ static func fetch_large(pack: String, tunnus: String, label: String, square: Rec
 	if tex != null:
 		return tex
 	var epoch: Dictionary = {}
-	for e in EPOCHS:
+	for e in epochs(pack):
 		if str(e.label) == label:
 			epoch = e
 			break
+	if epoch.has("texture"):
+		var tile := Sites.tile_dir_of(pack if pack != "" else Sites.active)
+		return current(square, TerrainGeoref.load_dir(tile), tile, px, str(epoch.texture))
 	if epoch.is_empty() or _busy.has(base):
 		return null
 	_busy[base] = true

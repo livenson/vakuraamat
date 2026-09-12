@@ -303,21 +303,16 @@ def _tfw_transform(url):
     return Affine(a, b, c - a / 2 - b / 2, d, e, f - d / 2 - e / 2)
 
 
-def fetch_ortho(bbox, out_jpg, px=4096):
-    """The 6th-cycle orthophoto over the box, warped onto the L-EST97 grid, as a px x px JPEG.
-    Only the windows under the tile are read (HTTP range requests on the tiled GeoTIFFs)."""
+def _cut(bbox, index, sheets, px, what):
+    """The sheets' windows under the box, warped onto the L-EST97 grid: a (3, px, px) array, 0 where
+    no sheet reaches. Only the windows are read, as HTTP range requests on the GeoTIFFs."""
     import rasterio
-    from PIL import Image
     from rasterio.crs import CRS
     from rasterio.transform import from_origin
     from rasterio.warp import Resampling, reproject
     from rasterio.windows import Window, from_bounds
     xmin, ymin, xmax, ymax = bbox
     box = lks_bbox(bbox, margin=10.0)
-    index = ortho_index()
-    sheets = [s for s in _sheets_over(box, ORTHO_SHEET_M, ortho_sheet) if s in index]
-    if not sheets:
-        sys.exit("no LĢIA orthophoto sheet covers this tile")
     dst = np.zeros((3, px, px), np.uint8)
     dst_t = from_origin(xmin, ymax, (xmax - xmin) / px, (ymax - ymin) / px)
     src_crs, dst_crs = CRS.from_epsg(LKS92), CRS.from_epsg(LEST97)
@@ -335,11 +330,90 @@ def fetch_ortho(bbox, out_jpg, px=4096):
                           src_nodata=None, dst_nodata=0, resampling=Resampling.bilinear)
             got = part.any(axis=0)
             dst[:, got] = part[:, got]
-            log(f"orthophoto {s}: window {w.width}x{w.height} px")
+            log(f"{what} {s}: window {w.width}x{w.height} px")
+    return dst
+
+
+def _save_jpg(dst, out_jpg, quality=90):
+    from PIL import Image
     if os.path.exists(out_jpg):
         os.remove(out_jpg)
-    Image.fromarray(np.moveaxis(dst, 0, -1)).save(out_jpg, quality=90)
+    Image.fromarray(np.moveaxis(dst, 0, -1)).save(out_jpg, quality=quality)
+
+
+def fetch_ortho(bbox, out_jpg, px=4096):
+    """The 6th-cycle orthophoto over the box, warped onto the L-EST97 grid, as a px x px JPEG."""
+    index = ortho_index()
+    sheets = [s for s in _sheets_over(lks_bbox(bbox, margin=10.0), ORTHO_SHEET_M, ortho_sheet) if s in index]
+    if not sheets:
+        sys.exit("no LĢIA orthophoto sheet covers this tile")
+    _save_jpg(_cut(bbox, index, sheets, px, "orthophoto"), out_jpg)
     return {"ortho_sheets": sheets, "ortho_urls": [index[s][".tif"] for s in sheets], "ortho_cycle": "LĢIA 6th cycle, 2016-2018, 25 cm"}
+
+
+# ------------------------------------------------------------------------------------------ the older cycles
+# LĢIA's earlier nationwide 1:10 000 flights in the open-data bucket, for the plot page's "over the
+# years" strip (Estonia's comes from Maa-amet's historical WMS, which stops at the border). The 1st
+# cycle (1994-99) is not in the bucket (403). The 2nd is in whole 5 km sheets (4311-32), the later
+# ones in 2.5 km quarters (4311-32_1) like the 6th; the years are LĢIA's, and the files' own dates
+# (2006, 2009, 2011, 2014) are when each was finished.
+HISTORY = [("2003-05", 2), ("2007-08", 3), ("2010-11", 4), ("2013-15", 5)]
+HISTORY_PX = 2048        # half a metre to the pixel over a kilometre: what the 2nd-4th cycles have
+
+
+def cycle_index(v):
+    """{sheet: {".tif", ".tfw"}} of one cycle, both files from the same folder (the 3rd cycle has
+    some sheets twice, in a complete folder and a 'nepilns' - incomplete - one)."""
+    url = BUCKET + f"ortofoto_rgb_v{v}/LGIA_OpenData_Ortofoto_rgb_v{v}_saites.txt"
+    path = os.path.join(paths.raw("lv"), f"ortho_v{v}_links.txt")
+    if not os.path.exists(path):
+        _download(url, path)
+    by_stem = {}
+    for line in open(path, encoding="utf-8", errors="ignore"):
+        line = line.strip()
+        if line.startswith("http"):
+            base, ext = os.path.splitext(line)
+            by_stem.setdefault(base, {})[ext.lower()] = line
+    out = {}
+    for base, files in sorted(by_stem.items(), key=lambda kv: "nepilns" in kv[0]):   # complete folders first
+        stem = base.rsplit("/", 1)[1]
+        if ".tif" in files and ".tfw" in files and stem not in out:
+            out[stem] = files
+    return out
+
+
+def add_history(tile_dir, px=HISTORY_PX):
+    """Cut each older cycle over a Latvian tile into ortho_<years>.jpg beside its ortho.jpg and list
+    them in terrain_meta.json as "history". The cycles are strip-stored TIFFs without overviews, so a
+    cut pulls whole rows (tens of MB a cycle): the tile service does it in the refine pass, after the
+    place is playable, the four cycles side by side. A cycle that did not fly over the tile is left out."""
+    from concurrent.futures import ThreadPoolExecutor
+    meta_path = os.path.join(tile_dir, "terrain_meta.json")
+    meta = json.load(open(meta_path))
+    bbox = (meta["xmin"], meta["ymin"], meta["xmax"], meta["ymax"])
+    wanted = _sheets_over(lks_bbox(bbox, margin=10.0), ORTHO_SHEET_M, ortho_sheet)
+
+    def one(entry):
+        label, v = entry
+        index = cycle_index(v)
+        sheets = sorted({n for s in wanted for n in (s, s.split("_")[0]) if n in index})
+        if not sheets:
+            return None
+        dst = _cut(bbox, index, sheets, px, f"cycle {v} ({label})")
+        if dst.any(axis=0).mean() < 0.05:
+            return None
+        name = f"ortho_{label}.jpg"
+        _save_jpg(dst, os.path.join(tile_dir, name), quality=85)
+        return {"label": label, "texture": name, "cycle": v, "sheets": sheets}
+
+    with ThreadPoolExecutor(max_workers=len(HISTORY)) as pool:
+        got = [h for h in pool.map(one, HISTORY) if h]
+    meta["history"] = got
+    meta.setdefault("source", {})["history"] = [BUCKET + f"ortofoto_rgb_v{v}/" for _, v in HISTORY]
+    with open(meta_path, "w") as f:
+        json.dump(meta, f, indent=2, ensure_ascii=False)
+    log(f"history: {', '.join(h['label'] for h in got) or 'no older cycle covers the tile'}")
+    return got
 
 
 # ------------------------------------------------------------------------------------------ the tile

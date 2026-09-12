@@ -14,7 +14,7 @@
 class_name InfoViews
 extends Node3D
 
-const FILLS := ["sector", "health", "age"]   # the map's modes that are a colour per unit
+const FILLS := ["sector", "mix", "focus", "health", "age"]   # the map's modes that are a colour per unit
 const RES := 1024                            # one pixel a metre on a 1 km tile
 const FADE := 0.35
 const STRENGTH := 0.55       # how far the layer covers the ground: enough to read, not enough to hide it
@@ -88,13 +88,13 @@ func _refresh() -> void:
 ## kept. Polygons go through a SubViewport rather than pixel by pixel - the graphics card fills a few
 ## hundred of them in a frame, where GDScript would take a second per layer.
 func _texture(pack: String) -> Texture2D:
-	var key := "%s|%s" % [pack, mode]
+	var key := "%s|%s" % [pack, mode + (":" + MapPalette.focus_sector if mode == "focus" else "")]
 	if _baked.has(key):
 		return _baked[key]
 	var units := Parcels.units(pack)
 	if units.is_empty():
 		return null
-	var tenants := _dominant_by_tunnus(pack)
+	var rows := _rows_by_tunnus(pack)
 	var vp := SubViewport.new()
 	vp.size = Vector2i(RES, RES)
 	vp.transparent_bg = true
@@ -110,17 +110,15 @@ func _texture(pack: String) -> Texture2D:
 		var poly := PackedVector2Array()
 		for q in ring:
 			poly.append(Vector2(float(q[0]), float(q[1])) * k)
-		var dom: Dictionary = tenants.get(str(u.get("tunnus", "")), {})
-		if dom.is_empty():
-			continue   # no company on it: the layer has nothing to say, so the real ground stands
 		# opaque in the picture, because a viewport's transparent pixels come back premultiplied and
 		# a half-alpha fill would arrive darkened as well as faint. How far the colour covers the
 		# ground is STRENGTH, applied once in the shader.
-		var c: Color = MapPalette.colour(mode, dom)
-		var p := Polygon2D.new()
-		p.polygon = poly
-		p.color = Color(c.r, c.g, c.b, 1.0)
-		vp.add_child(p)
+		for piece in _fills(rows.get(str(u.get("tunnus", "")), []), poly, k):
+			var c: Color = piece[1]
+			var p := Polygon2D.new()
+			p.polygon = piece[0]
+			p.color = Color(c.r, c.g, c.b, 1.0)
+			vp.add_child(p)
 	await RenderingServer.frame_post_draw
 	var img := vp.get_texture().get_image()
 	vp.queue_free()
@@ -131,9 +129,23 @@ func _texture(pack: String) -> Texture2D:
 	return tex
 
 
-## The company a unit takes its colour from in the current mode, the same choice the map's layer
-## makes (MapPalette.pick: the worst verdict in the health layer, the largest active company else).
-func _dominant_by_tunnus(pack: String) -> Dictionary:
+## What one unit is painted with in the current mode, the same as the map paints it: [[polygon,
+## colour], ...]. The mixed layer stripes it by its sectors' shares, the one-sector layer shades it by
+## that sector's share, the others colour it by the company MapPalette.pick chooses. Nothing when the
+## layer has nothing to say about the unit, so the real ground stands.
+func _fills(rows: Array, poly: PackedVector2Array, k: float) -> Array:
+	match mode:
+		"mix":
+			return MapPalette.stripes(poly, MapPalette.shares(rows), MapPalette.STRIPE_M * k)
+		"focus":
+			var share: float = MapPalette.shares(rows).get(MapPalette.focus_sector, 0.0)
+			return [[poly, MapPalette.focus_colour(share)]] if share > 0.0 else []
+	var dom := MapPalette.pick(mode, rows)
+	return [] if dom.is_empty() else [[poly, MapPalette.colour(mode, dom)]]
+
+
+## Every unit's companies (tenants.json, exact matches), by cadastral number.
+func _rows_by_tunnus(pack: String) -> Dictionary:
 	var rows := {}
 	var path := Sites.path_in(pack, "tenants.json")
 	if FileAccess.file_exists(path):
@@ -142,10 +154,7 @@ func _dominant_by_tunnus(pack: String) -> Dictionary:
 			for t in parsed.get("tenants", []):
 				if t.get("match") == "exact" and t.get("tunnus") != null:
 					rows.get_or_add(str(t.tunnus), []).append(t)
-	var out := {}
-	for tunnus in rows:
-		out[tunnus] = MapPalette.pick(mode, rows[tunnus])
-	return out
+	return rows
 
 
 func _fade(to: float) -> void:
