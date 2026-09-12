@@ -181,7 +181,7 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   (or `--fullscreen`; `--locations` for the second page, `--creating` / `--failed` for the world-creation
   sheet). Menu strings come from compiled translations: run `godot --headless --import` after editing
   `strings.csv` or the screenshot shows raw keys.
-- Strings: `assets/i18n/strings.csv` (keys, et, en). Add keys, never hard-code text.
+- Strings: `assets/i18n/strings.csv` (keys, et, en, lv). Add keys with all three languages, never hard-code text; a pack's `strings.csv` may leave `lv` out (the fallback locale is English). The language key and menus cycle through `Lang.LOCALES` (scripts/ui/lang.gd); screenshots take `--locale=lv`.
 - UI look: `BookTheme` (scripts/ui/book_theme.gd) is the one theme; new panels set `theme =
   BookTheme.theme()` and use its type variations (HeadLabel, DetailLabel, PrimaryButton, TextButton,
   RowButton) instead of font or colour overrides; euro figures through `BookTheme.money()`, no " · " joins.

@@ -143,6 +143,8 @@ func _ready() -> void:
 				_snap(player, 1.0)
 			if parts.size() > 4:
 				player.set_pose(player.global_position, player.rotation.y, deg_to_rad(float(parts[4])))
+		elif a.begins_with("--locale="):   # screenshots in another language: --locale=lv
+			TranslationServer.set_locale(a.trim_prefix("--locale="))
 		elif a == "--fly":
 			player.flying = true   # checks of the survey view (the crosshair's reach, the outline)
 		elif a == "--bench":

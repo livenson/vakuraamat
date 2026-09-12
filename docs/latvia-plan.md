@@ -6,7 +6,7 @@
 - Time-sensitive downloads are archived in `data_raw/lv/` (step 0).
 - Step 1 is done: the `Latvia` adapter and `tools/pipeline/fetch_tile_lv.py` build a Rīga Old Town
   tile (centre 506400 6311650) in under a minute from a cold cache.
-- Steps 3–5 and 7 are done too (companies, roads and buses, roofs outside Rīga, the border). Step 2 is done: `tools/pipeline/fetch_cadastre_lv.py` writes the pack's `parcels.json` (838
+- Steps 3–7 are done too (companies, roads and buses, roofs outside Rīga, Latvian as a language, the border). Step 2 is done: `tools/pipeline/fetch_cadastre_lv.py` writes the pack's `parcels.json` (838
   units, all valued) and `buildings.json` (775 buildings, 713 dated, 615 with Rīga's LOD2 roofs).
   `sites/riga_vecpilseta` validates, boots in `make test` and is committed on the `latvia` branch.
 
@@ -275,7 +275,20 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
      141, 720 …) and the code list is not among its open datasets. Drawing unknown crops would
      be inventing, so Latvian packs have no fields until the classifier is found. Also left
      open: tram and train routes, and tram stops (`railway=tram_stop`).
-6. **Language.** `lv` column, the locale cycle, the neutral use and sector labels, the menu map.
+6. **Language.** Done 2026-09-12:
+   - **Strings.** `assets/i18n/strings.csv` has an `lv` column for all 305 keys; the script that
+     wrote it refused a missing key or a changed `%s`/`%d`. New packs get Latvian scaffold strings
+     (`new_site.lv_text`); the Estonian packs' stories have no Latvian yet and fall back to
+     English (the fallback locale was Estonian, now English).
+   - **The switch.** A three-way cycle, Estonian → English → Latvian, in `scripts/ui/lang.gd`, used
+     by the main menu's entry (it names the next language), the pause menu and the L key.
+   - **Suggestions.** The suggested places carry `note_lv`.
+   - **Tests.** `health_test` checks the health reasons in all three languages. The screenshot
+     tools take `--locale=lv`.
+   - **Checks.** The main menu, the Locations page and Valka's Companies page read in Latvian.
+   - **Left open.** A native speaker's review; Latvian for the Estonian packs' place stories;
+     register text stays in the register's own language (Estonian building uses in Estonia,
+     Latvian in Latvia), with the game's own labels translated around it.
 7. **Streaming across the border.** Done 2026-09-12 (`tools/pipeline/cross_border.py`, run by
    every tile-service job after its own registers):
    - **Why.** A tile is built by the country its centre lies in, and each country's registers

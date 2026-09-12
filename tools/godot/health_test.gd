@@ -1,4 +1,4 @@
-# Every company the pipeline puts on watch or in distress says why, in both languages: the verdict
+# Every company the pipeline puts on watch or in distress says why, in every interface language: the verdict
 # alone (a yellow plot, "watch" on the register sheet) left the player guessing. Checked on every
 # shipped pack's tenants.json, with the two cases a playtest asked about pinned.
 #   godot --headless --path . res://tools/godot/health_test.tscn
@@ -24,7 +24,7 @@ func _ready() -> void:
 			if not str(t.get("health", "")) in ["watch", "distressed"]:
 				continue
 			flagged += 1
-			for loc in ["en", "et"]:
+			for loc in ["en", "et", "lv"]:
 				TranslationServer.set_locale(loc)
 				var why := Tenants.health_reason(t)
 				_check(why != "" and not why.begins_with("HEALTH_"), "%s (%s): no reason in %s" % [t.name, site, loc])
@@ -37,5 +37,5 @@ func _ready() -> void:
 	var why := Tenants.health_reason(falling)
 	_check(why.contains("2023") and why.contains("2024") and why.begins_with("turnover fell"), "turnover drop reads '%s'" % why)
 	if not _failed:
-		print("[health] PASSED: %d flagged companies each say why, in both languages" % flagged)
+		print("[health] PASSED: %d flagged companies each say why, in every interface language" % flagged)
 		get_tree().quit(0)

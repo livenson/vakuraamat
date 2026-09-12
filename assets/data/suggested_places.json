@@ -5,7 +5,8 @@
   "note_et": "Alatskivi loss Peipsi ääres",
   "x": 681863,
   "y": 6500230,
-  "address": "Tartu maakond, Peipsiääre vald, Alatskivi alevik, Lossi tn 6"
+  "address": "Tartu maakond, Peipsiääre vald, Alatskivi alevik, Lossi tn 6",
+  "note_lv": "Alatskivi pils pie Peipusa ezera"
  },
  {
   "name": "Elva",
@@ -13,7 +14,8 @@
   "note_et": "Elva, raudteelinn mändide all",
   "x": 642048,
   "y": 6456199,
-  "address": "Tartu maakond, Elva vald"
+  "address": "Tartu maakond, Elva vald",
+  "note_lv": "Elva, dzelzceļa pilsētiņa priedēs"
  },
  {
   "name": "Haapsalu linnus",
@@ -21,7 +23,8 @@
   "note_et": "Haapsalu piiskopilinnus",
   "x": 480467,
   "y": 6531438,
-  "address": "Lääne maakond, Haapsalu linn, Kabrametsa küla, Linnuste"
+  "address": "Lääne maakond, Haapsalu linn, Kabrametsa küla, Linnuste",
+  "note_lv": "Hāpsalu, bīskapa pils"
  },
  {
   "name": "Karula",
@@ -29,7 +32,8 @@
   "note_et": "Karula kuppelmaastik (Lüllemäe)",
   "x": 641268,
   "y": 6403488,
-  "address": "Valga maakond, Valga vald, Lüllemäe küla"
+  "address": "Valga maakond, Valga vald, Lüllemäe küla",
+  "note_lv": "Karula, paugurainā zeme (Lüllemäe)"
  },
  {
   "name": "Kolga mõis",
@@ -37,7 +41,8 @@
   "note_et": "Kolga mõis, Harjumaa",
   "x": 591280,
   "y": 6596017,
-  "address": "Harju maakond, Kuusalu vald, Kolga alevik, Kolga mõis"
+  "address": "Harju maakond, Kuusalu vald, Kolga alevik, Kolga mõis",
+  "note_lv": "Kolga muiža, Harjumā"
  },
  {
   "name": "Kuressaare linnus",
@@ -45,7 +50,8 @@
   "note_et": "Kuressaare linnus, Saaremaa",
   "x": 410578,
   "y": 6457165,
-  "address": "Saare maakond, Saaremaa vald, Kuressaare linn, Linnuse tee"
+  "address": "Saare maakond, Saaremaa vald, Kuressaare linn, Linnuse tee",
+  "note_lv": "Kuresāres pils, Sāmsalā"
  },
  {
   "name": "Mooste mõis",
@@ -53,7 +59,8 @@
   "note_et": "Mooste mõis, Põlvamaa",
   "x": 687928,
   "y": 6451254,
-  "address": "Põlva maakond, Põlva vald, Mooste alevik, Mõisahoovi tee"
+  "address": "Põlva maakond, Põlva vald, Mooste alevik, Mõisahoovi tee",
+  "note_lv": "Mooste muiža, Pelvas apriņķī"
  },
  {
   "name": "Otepää",
@@ -61,7 +68,8 @@
   "note_et": "Otepää, kõrgustik",
   "x": 647311,
   "y": 6437896,
-  "address": "Valga maakond, Otepää vald"
+  "address": "Valga maakond, Otepää vald",
+  "note_lv": "Otepē, augstiene"
  },
  {
   "name": "Palmse mõis",
@@ -69,7 +77,8 @@
   "note_et": "Palmse mõis, Lahemaa",
   "x": 610747,
   "y": 6598853,
-  "address": "Lääne-Viru maakond, Haljala vald, Palmse küla, Palmse mõisakompleks"
+  "address": "Lääne-Viru maakond, Haljala vald, Palmse küla, Palmse mõisakompleks",
+  "note_lv": "Palmse muiža, Lahemā"
  },
  {
   "name": "Rõuge",
@@ -77,7 +86,8 @@
   "note_et": "Rõuge, sügavad orud",
   "x": 674253,
   "y": 6402333,
-  "address": "Võru maakond, Rõuge vald"
+  "address": "Võru maakond, Rõuge vald",
+  "note_lv": "Rõuge, dziļās ielejas"
  },
  {
   "name": "Sagadi mõis",
@@ -85,7 +95,8 @@
   "note_et": "Sagadi mõis, Lahemaa",
   "x": 617728,
   "y": 6601021,
-  "address": "Lääne-Viru maakond, Haljala vald, Sagadi küla, 17193 Sagadi mõisa tee"
+  "address": "Lääne-Viru maakond, Haljala vald, Sagadi küla, 17193 Sagadi mõisa tee",
+  "note_lv": "Sagadi muiža, Lahemā"
  },
  {
   "name": "Toomemägi",
@@ -93,7 +104,8 @@
   "note_et": "Tartu, Toomemägi",
   "x": 658789,
   "y": 6474299,
-  "address": "Tartu maakond, Tartu linn, Tartu linn, Lossi tn 25"
+  "address": "Tartu maakond, Tartu linn, Tartu linn, Lossi tn 25",
+  "note_lv": "Tartu, Doma kalns"
  },
  {
   "name": "Vihula mõis",
@@ -101,7 +113,8 @@
   "note_et": "Vihula mõis, Lahemaa",
   "x": 623452,
   "y": 6603039,
-  "address": "Lääne-Viru maakond, Haljala vald, Vihula küla, Vihula mõis"
+  "address": "Lääne-Viru maakond, Haljala vald, Vihula küla, Vihula mõis",
+  "note_lv": "Vihula muiža, Lahemā"
  },
  {
   "name": "Viljandi lossimäed",
@@ -109,7 +122,8 @@
   "note_et": "Viljandi lossimäed",
   "x": 593579,
   "y": 6469861,
-  "address": "Viljandi maakond, Viljandi linn, Ranna pst"
+  "address": "Viljandi maakond, Viljandi linn, Ranna pst",
+  "note_lv": "Viljandi, pilskalni"
  },
  {
   "name": "Rīga, Alberta iela",
@@ -118,34 +132,38 @@
   "note_et": "Riia, juugendstiilis tänav (Läti; linna enda katusemudelid)",
   "x": 506620,
   "y": 6312840,
-  "address": "Alberta iela 12, Rīga"
+  "address": "Alberta iela 12, Rīga",
+  "note_lv": "Rīga, jūgendstila iela (Latvija; pilsētas jumtu modeļi)"
  },
  {
   "name": "Jūrmala, Majori",
   "country": "lv",
-  "note_en": "Jūrmala, the resort street by the sea (Latvia; flat roofs for now)",
-  "note_et": "Jūrmala, kuurordi tänav mere ääres (Läti; katused esialgu lamedad)",
+  "note_en": "Jūrmala, the resort street by the sea (Latvia)",
+  "note_et": "Jūrmala, kuurordi tänav mere ääres (Läti)",
   "x": 487891,
   "y": 6314342,
-  "address": "Jomas iela 50, Jūrmala"
+  "address": "Jomas iela 50, Jūrmala",
+  "note_lv": "Jūrmala, kūrorta iela pie jūras (Latvija)"
  },
  {
   "name": "Cēsis",
   "country": "lv",
-  "note_en": "Cēsis, the medieval town and its castle (Latvia; flat roofs for now)",
-  "note_et": "Cēsis, keskaegne linn ja linnus (Läti; katused esialgu lamedad)",
+  "note_en": "Cēsis, the medieval town and its castle (Latvia)",
+  "note_et": "Cēsis, keskaegne linn ja linnus (Läti)",
   "x": 576781,
   "y": 6352851,
-  "address": "Rīgas iela 7, Cēsis"
+  "address": "Rīgas iela 7, Cēsis",
+  "note_lv": "Cēsis, viduslaiku pilsēta un pils (Latvija)"
  },
  {
   "name": "Kuldīga",
   "country": "lv",
-  "note_en": "Kuldīga, the old town on the Venta (Latvia; flat roofs for now)",
-  "note_et": "Kuldīga, vanalinn Venta jõe ääres (Läti; katused esialgu lamedad)",
+  "note_en": "Kuldīga, the old town on the Venta (Latvia)",
+  "note_et": "Kuldīga, vanalinn Venta jõe ääres (Läti)",
   "x": 376550,
   "y": 6315673,
-  "address": "Baznīcas iela 6, Kuldīga"
+  "address": "Baznīcas iela 6, Kuldīga",
+  "note_lv": "Kuldīga, vecpilsēta pie Ventas (Latvija)"
  },
  {
   "name": "Valka",
@@ -154,7 +172,8 @@
   "note_et": "Valka, üks linn Valgaga üle piiri (Läti)",
   "x": 619115,
   "y": 6405171,
-  "address": "Valka, Valkas novads"
+  "address": "Valka, Valkas novads",
+  "note_lv": "Valka, viena pilsēta ar Valgu pāri robežai (Latvija)"
  },
  {
   "name": "Līvāni",
@@ -163,6 +182,7 @@
   "note_et": "Līvāni, väike linn Daugava ääres (Läti)",
   "x": 634592,
   "y": 6247844,
-  "address": "Līvāni, Līvānu novads"
+  "address": "Līvāni, Līvānu novads",
+  "note_lv": "Līvāni, neliela pilsēta pie Daugavas (Latvija)"
  }
 ]

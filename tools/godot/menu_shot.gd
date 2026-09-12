@@ -6,6 +6,7 @@ var wait := 30
 func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--out="): path = a.trim_prefix("--out=")
+		if a.begins_with("--locale="): TranslationServer.set_locale(a.trim_prefix("--locale="))   # --locale=lv
 		if a.begins_with("--wait="): wait = int(a.trim_prefix("--wait="))   # frames before the shot (1: the renderer warm-up's splash)
 	var menu: Control = load("res://scenes/ui/main_menu.tscn").instantiate()
 	add_child(menu)

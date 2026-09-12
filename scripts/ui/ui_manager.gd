@@ -545,9 +545,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		set_map_mode(str(fills[(at + 1) % fills.size()] if at >= 0 else fills[1]))
 		show_notice(tr("UI_MAP_MODE") + ": " + tr("UI_MAP_MODE_" + _map_mode.to_upper()))
 	elif event.is_action_pressed("language"):
-		var next := "en" if TranslationServer.get_locale().begins_with("et") else "et"
-		TranslationServer.set_locale(next)
-		show_notice("English" if next == "en" else "Eesti keel")
+		show_notice(Lang.cycle())
 		_refresh_era_label()
 		if _open_panel:
 			var p := _open_panel
@@ -755,8 +753,7 @@ func _fill_pause() -> void:
 	WindowMode.changed.connect(relabel, CONNECT_REFERENCE_COUNTED)
 	fs.tree_exiting.connect(func(): WindowMode.changed.disconnect(relabel))
 	_pause_button(body, tr("MENU_LANGUAGE"), func():
-		var next := "en" if TranslationServer.get_locale().begins_with("et") else "et"
-		TranslationServer.set_locale(next)
+		Lang.cycle()
 		_refresh_era_label()
 		_fill_pause())
 	_pause_button(body, tr("MENU_LOCATIONS"), func():

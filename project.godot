@@ -49,8 +49,8 @@ enabled=PackedStringArray("res://addons/sky_3d/plugin.cfg", "res://addons/terrai
 
 [internationalization]
 
-locale/fallback="et"
-locale/translations=PackedStringArray("res://assets/i18n/strings.et.translation", "res://assets/i18n/strings.en.translation")
+locale/fallback="en"
+locale/translations=PackedStringArray("res://assets/i18n/strings.et.translation", "res://assets/i18n/strings.en.translation", "res://assets/i18n/strings.lv.translation")
 
 [input]
 

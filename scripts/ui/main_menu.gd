@@ -107,8 +107,8 @@ func _build() -> void:
 			get_tree().create_timer(0.5).timeout.connect(_continue_game.bind(summary))
 	_entry("UI_NEW_GAME", Sites.display_name(Sites.active), func(): _start_new_game())
 	_entry("MENU_LOCATIONS", tr("MENU_PACKS_COUNT") % Sites.available.size(), _build_locations_panel)
-	_entry("MENU_LANGUAGE", "English" if TranslationServer.get_locale().begins_with("et") else "Eesti", func():
-		TranslationServer.set_locale("en" if TranslationServer.get_locale().begins_with("et") else "et")
+	_entry("MENU_LANGUAGE", str(Lang.NAMES[Lang.next()]), func():
+		Lang.cycle()
 		_build())
 	var fs := _entry("MENU_FULLSCREEN", "", func(): WindowMode.set_fullscreen(not WindowMode.is_fullscreen()))
 	var relabel := func(on: bool):
@@ -285,11 +285,11 @@ func _build_locations_panel() -> void:
 	BookTheme.label(tr("MENU_MAP_LEGEND"), "DetailLabel", list)
 	var text := FileAccess.get_file_as_string(SUGGESTED)
 	var places = JSON.parse_string(text) if text != "" else []
-	var et := TranslationServer.get_locale().begins_with("et")
+	var note_key := "note_" + Lang.current()   # note_et, note_en, note_lv
 	for p in (places if typeof(places) == TYPE_ARRAY else []):
 		var mark := map.places.size()
 		map.places.append({"name": str(p.name), "x": p.x, "y": p.y, "kind": "suggested"})
-		var row := _row(list, str(p.name), "%s   L-EST97 %d %d" % [str(p.get("note_et" if et else "note_en", "")), int(p.x), int(p.y)])
+		var row := _row(list, str(p.name), "%s   L-EST97 %d %d" % [str(p.get(note_key, p.get("note_en", ""))), int(p.x), int(p.y)])
 		row.mouse_entered.connect(func(): map.highlight(mark))   # the row lights its mark on the map
 		row.mouse_exited.connect(func(): map.highlight(-1))
 		_row_button(row, "MENU_CREATE", func(): _create(str(p.name), float(p.x), float(p.y)))

@@ -37,6 +37,30 @@ LV_GROUND_ET = 'Kaardiandmed: Latvijas Ģeotelpiskās informācijas aģentūra (
 LV_GROUND_EN = 'Map data: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, laser scanning and orthophoto 2016-2018 (CC BY 4.0).'
 
 
+def lv_text(row, name, country):
+    """The Latvian column of a scaffold string ("lv" for the header); what has no Latvian of its own
+    here takes the English, and the game falls back to English for anything a pack leaves out."""
+    key, en = row[0], row[2]
+    if key == "keys":
+        return "lv"
+    real = (f"Zeme: {name}, no Latvijas Ģeotelpiskās informācijas aģentūras (LĢIA) lāzerpunktiem un ortofoto, ar metra precizitāti."
+            if country == "lv" else
+            f"Zeme: {name}, no Igaunijas Zemes un telpiskās plānošanas departamenta augstuma datiem, ortofoto, ēkām, kadastra vienībām un zemes vērtībām, ar metra precizitāti.")
+    data = ("Kartes dati: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, lāzerskenēšana un ortofoto 2016–2018 (CC BY 4.0)."
+            if country == "lv" else
+            "Kartes dati: Maa- ja Ruumiamet 2026. Zemes nodokļa vērtības: kadastrs; uzņēmumi: Igaunijas uzņēmumu reģistra atvērtie dati (CC BY 4.0).")
+    table = {"ERA_2026_NAME": "2026. gads", "LOC_LANDMARK": "Orientieris", "LOC_FARMSTEAD": "Sēta",
+             "EX_LANDMARK_2026": f"{name}: šeit sākas tava grāmata.", "CODEX_REAL_TITLE": "Īsts", "CODEX_INVENTED_TITLE": "Izdomāts",
+             "CODEX_DATA_TITLE": "Dati", "CODEX_REAL": real, "CODEX_DATA": data,
+             "CODEX_INVENTED": "Sienas un jumti atjaunoti pēc reģistru mēriem un jumtu modeļiem vai lāzerpunktiem; interjeri, koki, satiksme un "
+                               "garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku."}
+    if key.endswith("_SUBTITLE"):
+        return f"{name}: īsta zeme, īstas vērtības."
+    if key.startswith("SITE_"):
+        return name
+    return table.get(key, en)
+
+
 def country_of(center):
     """The adapter id covering the centre ("ee", "lv"), "ee" when none does (the old default)."""
     import sources
@@ -286,7 +310,7 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
     with open(os.path.join(site_dir, "strings.csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f, lineterminator="\n")
         for r in rows:
-            w.writerow(r)
+            w.writerow(r + [lv_text(r, name, country)])
     for fn in ("buildings_2026.json", "water_2026.json"):
         p = os.path.join(site_dir, fn)
         if not os.path.exists(p):

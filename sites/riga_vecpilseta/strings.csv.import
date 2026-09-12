@@ -6,10 +6,10 @@ uid="uid://bctvlp6ebf15u"
 
 [deps]
 
-files=["res://sites/riga_vecpilseta/strings.et.translation", "res://sites/riga_vecpilseta/strings.en.translation"]
+files=["res://sites/riga_vecpilseta/strings.et.translation", "res://sites/riga_vecpilseta/strings.en.translation", "res://sites/riga_vecpilseta/strings.lv.translation"]
 
 source_file="res://sites/riga_vecpilseta/strings.csv"
-dest_files=["res://sites/riga_vecpilseta/strings.et.translation", "res://sites/riga_vecpilseta/strings.en.translation"]
+dest_files=["res://sites/riga_vecpilseta/strings.et.translation", "res://sites/riga_vecpilseta/strings.en.translation", "res://sites/riga_vecpilseta/strings.lv.translation"]
 
 [params]
 
