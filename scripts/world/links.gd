@@ -19,6 +19,12 @@ static var _blds: Dictionary = {}     # buildings.json path -> {tunnus: Array of
 static var _registry: Dictionary = {}  # parcels.json path -> {kinnistu number: Array of tunnus}
 
 
+## A pack's text field as shown: "" for a missing one. The Latvian cadastre writes `null` where a
+## unit has no address, and str(null) is "<null>" - which the book printed as a plot's name.
+static func text_of(v: Variant) -> String:
+	return "" if v == null else str(v)
+
+
 ## Everything one unit is linked to. Every key is always present; an unknown unit answers empty.
 ##   {tunnus, pack, at: Vector3, address, companies: Array, parcels: Array, buildings: Array}
 ## A `parcels` row is {tunnus, pack, address, at: Vector3, kinds: Array, shared: int}: `kinds` names
@@ -34,7 +40,7 @@ static func of(tunnus: String) -> Dictionary:
 		return out
 	var pack := str(u.get("pack", Sites.active))
 	out.pack = pack
-	out.address = str(u.get("address", ""))
+	out.address = text_of(u.get("address"))
 	out.at = Vector3(float(u.get("x", 0.0)), 0.0, float(u.get("z", 0.0)))
 	out.companies = Tenants.of(pack, tunnus)
 	out.parcels = _siblings(pack, tunnus)
@@ -82,7 +88,7 @@ static func _siblings(pack: String, tunnus: String) -> Array:
 		if v.is_empty():
 			continue   # its tile is not standing: nothing to point at
 		out.append({"tunnus": str(other), "pack": str(v.get("pack", pack)),
-			"address": str(v.get("address", "")),
+			"address": text_of(v.get("address")),
 			"at": Vector3(float(v.get("x", 0.0)), 0.0, float(v.get("z", 0.0))),
 			"kinds": why[other].keys(),
 			"shared": int(shared.get(other, 0))})
@@ -157,7 +163,7 @@ static func _buildings_on(pack: String, tunnus: String, offset: Vector3) -> Arra
 		for q in b.get("polygon", []):
 			poly.append([float(q[0]) + offset.x, float(q[1]) + offset.z])
 		out.append({"id": str(b.get("id", "")), "ehr": str(b.get("ehr", "")),
-			"address": str(b.get("address", "")), "polygon": poly,
+			"address": text_of(b.get("address")), "polygon": poly,
 			"at": Vector3(float(b.get("x", 0.0)) + offset.x, 0.0, float(b.get("z", 0.0)) + offset.z)})
 	return out
 
