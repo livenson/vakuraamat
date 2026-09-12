@@ -75,15 +75,102 @@ def test_health_blank_is_not_zero():
     check(w("R", [t(2025, 100)] * 4, False) is None, "a sound company carries a reason")
 
 
+class _Everything:
+    """A laser-sheet index holding every sheet (the real one is a 5 MB download)."""
+    def __contains__(self, name):
+        return True
+
+
+def _tile(cx, cy):
+    return cx - 512, cy - 512, cx + 512, cy + 512
+
+
+def test_lv_sheets():
+    """A new Latvian world is centred on its laser sheet and downloads that one sheet: the four it
+    only grazes are filled, not fetched (fetch_tile_lv.place_center, select_sheets). Needs the
+    pipeline's wheels (numpy, pyproj); without them the check says it was skipped."""
+    try:
+        import fetch_tile_lv
+        import pyproj  # noqa: F401 - fetch_tile_lv's transforms
+    except ImportError as e:
+        return f"laser-sheet checks skipped ({e.name} missing)"
+    import random
+    every = _Everything()
+    rng = random.Random(7)
+    for _ in range(150):
+        c = fetch_tile_lv.place_center(rng.uniform(320000, 740000), rng.uniform(6190000, 6420000), every)
+        check(fetch_tile_lv.place_center(*c, every) == c, f"place_center moves its own centre {c}")
+        keep = fetch_tile_lv.select_sheets(_tile(*c), every)[0]
+        check(len(keep) == 1, f"a world centred at {c} keeps {keep}")
+        # 12 m of overhang plus 20 stays under SKIP_M; 100 m does not
+        check(len(fetch_tile_lv.select_sheets(_tile(c[0] + 20, c[1] - 20), every)[0]) == 1, f"20 m off {c} needs more than one sheet")
+        check(len(fetch_tile_lv.select_sheets(_tile(c[0] + 100, c[1]), every)[0]) > 1, f"100 m off {c} still keeps one sheet")
+        check(len(fetch_tile_lv.select_sheets(_tile(c[0] + 1024, c[1]), every)[0]) <= 2, f"the neighbour east of {c} needs more than two")
+    # a tile whose wide sheet is not published (the coast) keeps the narrow ones rather than nothing
+    c = fetch_tile_lv.place_center(560000, 6300000, every)
+    keep, skip, _ = fetch_tile_lv.select_sheets(_tile(*c), every)
+    keep2, skip2, missing2 = fetch_tile_lv.select_sheets(_tile(*c), set(skip))
+    check(sorted(keep2) == sorted(skip) and not skip2 and missing2 == keep, f"coast fallback: kept {keep2}, skipped {skip2}")
+    # the skipped strips are the tile's edges, 12 m a side, and never its middle
+    mask = fetch_tile_lv.skipped_mask(_tile(*c), 1024, skip)
+    check(0.03 < mask.mean() < 0.07 and not mask[512, 512] and mask[0, 512] and mask[512, 0], f"skipped strips cover {mask.mean():.1%}")
+    return "a Latvian world downloads one laser sheet"
+
+
+def test_lod2_small_pieces():
+    """Rīga's LOD2 pieces under a square metre: a moulding beside a kept wall goes, a piece with
+    nothing beside it stays (the facets of St James's lantern, report 2026-09-12T12-59-02)."""
+    try:
+        import fetch_cadastre_lv
+        import shapely  # noqa: F401 - merge_faces' geometry
+    except ImportError as e:
+        return f"LOD2 checks skipped ({e.name} missing)"
+    wall = [[0.0, 0.0, 0.0], [10.0, 0.0, 0.0], [10.0, 0.0, 10.0], [0.0, 0.0, 10.0]]   # [e, n, h], 100 m²
+    moulding = [[2.0, 0.3, 9.5], [3.0, 0.3, 9.5], [3.0, 0.3, 9.9]]                     # along the wall, at its height
+    lantern = [[5.0, 5.0, 12.0], [5.5, 5.0, 12.0], [5.5, 5.0, 13.0]]                   # above it, nothing beside
+    kept = fetch_cadastre_lv._unsupported([moulding, lantern], [wall])
+    check(kept == [lantern], f"small LOD2 pieces kept: {kept}")
+    return "LOD2 trim dropped, a lantern kept"
+
+
+def test_tile_seams():
+    """A Latvian tile built beside one that stands bends its first BLEND_M metres to meet it: no step
+    at the seam, the ground beyond untouched; the neighbour found by its bbox in a service workspace."""
+    try:
+        import numpy as np
+        import fetch_tile_lv
+    except ImportError as e:
+        return f"seam checks skipped ({e.name} missing)"
+    import json, tempfile
+    size, k = 256, fetch_tile_lv.BLEND_M
+    mine = np.full((size, size), 10.0, np.float32)
+    west = np.full((size, size), 12.0, np.float32)                        # 2 m higher
+    out = fetch_tile_lv.blend_edges(mine, [("w", west)])
+    check(np.allclose(out[:, 0], 12.0) and np.allclose(out[:, k:], 10.0), "the west seam is not met, or the interior moved")
+    check(np.all(np.diff(out[:, :k], axis=1) <= 1e-6), "the ramp is not monotone")
+    with tempfile.TemporaryDirectory() as ws:
+        for sid, xmin in (("a", 0), ("t256_0", 256)):
+            d = os.path.join(ws, sid, "assets", "terrain", sid)
+            os.makedirs(d)
+            json.dump({"xmin": xmin, "xmax": xmin + size, "ymin": 0, "ymax": size, "size_px": size, "heightmap": "heightmap.r32"},
+                      open(os.path.join(d, "terrain_meta.json"), "w"))
+            (west if sid == "a" else mine).tofile(os.path.join(d, "heightmap.r32"))
+        near = fetch_tile_lv.adjacent_tiles((256, 0, 512, size), size, os.path.join(ws, "t256_0", "assets", "terrain", "t256_0"))
+        check([s for s, _ in near] == ["w"], f"the west neighbour in the service workspace was not found: {[s for s, _ in near]}")
+    return "tile seams met"
+
+
 def main():
     test_holder_id()
     test_health_blank_is_not_zero()
+    seams = test_tile_seams()
+    sheets = test_lv_sheets() + "; " + test_lod2_small_pieces() + "; " + seams
     if failures:
         print("[pipeline] FAILED:")
         for f in failures:
             print("   ", f)
         return 1
-    print("[pipeline] PASSED: holder ids stay opaque, stable and linkable; a blank tax column is not a zero")
+    print(f"[pipeline] PASSED: holder ids stay opaque, stable and linkable; a blank tax column is not a zero; {sheets}")
     return 0
 
 

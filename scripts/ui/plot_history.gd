@@ -1,22 +1,16 @@
-# The land itself, over thirty years: one small aerial photograph of a plot per campaign, from the
-# orthophotos Maa-amet has flown since 1993 (the `ajalooline` WMS the terrain pipeline already
-# talks to). A plot that was forest in 1998 and a car park now says something its land value does
-# not, so the book shows the plot's own square in each of them.
+# The land itself, over thirty years: one small aerial photograph of a plot per campaign. A plot that
+# was forest in 1998 and a car park now says something its land value does not, so the book shows
+# the plot's own square in each of them.
 #
-# Every picture is one WMS request - the campaigns from `ajalooline`, today's from `fotokaart` -
-# kept in user://cache/plots so a plot is fetched once and never again. A campaign
-# that did not fly over this square answers with a blank white square, which is what `_has_ground`
-# is for; that is remembered too, so an uncovered plot is not asked about twice.
+# Where the campaigns come from is the country's (assets/data/countries/<id>.json, "photos"). Either
+# a WMS - Estonia's `ajalooline`, with a layer list per campaign, and its `fotokaart` for today, asked
+# for one plot's square and so answering from whatever finer flight covers it - where every picture is
+# one request kept in user://cache/plots, so a plot is fetched once and never again. A campaign that
+# did not fly over the square answers with a blank white one, which is what `_has_ground` is for;
+# that is remembered too. Or, where the older flights are only files (Latvia's LĢIA cycles), the
+# pipeline cuts them over the tile and they are cropped like today's photograph, no request at all.
 class_name PlotHistory
 extends RefCounted
-
-const WMS := "https://kaart.maaamet.ee/wms/ajalooline"
-# The nationwide latest orthophoto, the same service and layer the terrain pipeline asks for the
-# tile's own texture (tools/pipeline/fetch_tile.py). Asked here for one plot's square instead of a
-# whole square kilometre, so it answers from whatever flight covers that square - in a city that is
-# a finer one than the 25 cm nationwide flight the tile texture is made of.
-const WMS_CURRENT := "https://kaart.maaamet.ee/wms/fotokaart"
-const CURRENT_LAYER := "EESTIFOTO"
 
 # Godot's HTTPRequest cannot read this endpoint over TLS: a GetMap comes back RESULT_CONNECTION_ERROR
 # every time, while the same URL over plain http, the same host's other paths over https, and curl
@@ -31,17 +25,6 @@ const PX := 200                  # thumbnail size, and the WMS request size
 const PAD := 12.0                # metres of context around the plot, so it is not edge to edge
 const MIN_SPAN := 60.0           # a tiny plot still gets a legible square
 
-# The campaigns to show, oldest first. Each names the layers to try in order: the national flights
-# are split by purpose (asulad = settlements, aero = the year's main flight, mets = forestry) and
-# which of them covers a given square is not knowable in advance, so they are tried until one comes
-# back with something on it.
-const EPOCHS := [
-	{"label": "1993-2000", "layers": ["of1993-2000_10k"]},
-	{"label": "2005", "layers": ["of2005", "of2005"]},
-	{"label": "2010", "layers": ["of2010aero", "of2010mets"]},
-	{"label": "2015", "layers": ["of2015asulad", "of2015aero", "of2015mets"]},
-	{"label": "2020", "layers": ["of2020asulad", "of2020aero", "of2020mets"]},
-]
 
 
 ## The square to photograph for a plot: its outline's bounds, padded, made square so the thumbnails
@@ -73,13 +56,30 @@ static func outline_in(poly: PackedVector2Array, square: Rect2, georef: TerrainG
 	return out
 
 
+## Where a pack's photographs come from: its country's "photos".
+static func _photos(pack: String) -> Dictionary:
+	return Countries.of_pack(pack).get("photos", {})
+
+
+## The campaigns a pack's plots are shown in, oldest first. From the WMS: {label, layers}, the layers
+## tried in order (Estonia's flights are split by purpose - asulad settlements, aero the main flight,
+## mets forestry - and which covers a square is not knowable in advance). From the tile:
+## {label, texture}, the files terrain_meta.json lists as "history".
+static func epochs(pack: String) -> Array:
+	var photos := _photos(pack)
+	if bool(photos.get("from_tile", false)):
+		return TerrainGeoref.load_dir(Sites.tile_dir_of(pack if pack != "" else Sites.active)).meta.get("history", [])
+	return photos.get("epochs", [])
+
+
 ## The newest picture, cropped out of the tile's own orthophoto - no request, and it is by
 ## definition the one that matches the world the player is standing in. Null if the tile has none.
 ## `px` is what the crop is scaled to; the older years are re-requested from the service at the
 ## large view's size, so this one is asked for the same size or it alone stays a blurry thumbnail.
 ## The orthophoto is 25 cm to the pixel, so a plot's square usually has the detail to answer.
-static func current(square: Rect2, georef: TerrainGeoref, tile_dir: String, px: int = PX) -> Texture2D:
-	var path := tile_dir + "/ortho.jpg"
+## `file` names another photograph of the same tile: a Latvian tile's older cycles lie beside it.
+static func current(square: Rect2, georef: TerrainGeoref, tile_dir: String, px: int = PX, file: String = "ortho.jpg") -> Texture2D:
+	var path := tile_dir + "/" + file
 	if not FileAccess.file_exists(path) or not georef.is_valid():
 		return null
 	var img := Image.new()
@@ -106,7 +106,13 @@ static func fetch(pack: String, tunnus: String, square: Rect2) -> Array:
 	var out: Array = []
 	var dir := "user://cache/plots/%s" % pack
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(dir))
-	for e in EPOCHS:
+	for e in epochs(pack):
+		if e.has("texture"):   # the tile's own photograph of that year: a crop, nothing to fetch
+			var tile := Sites.tile_dir_of(pack)
+			var own := current(square, TerrainGeoref.load_dir(tile), tile, PX, str(e.texture))
+			if own != null:
+				out.append({"label": str(e.label), "texture": own})
+			continue
 		var base := "%s/%s_%s" % [dir, tunnus.replace(":", "_"), e.label]
 		# The book refills while pictures are in flight, so a second pass must wait for the first
 		# rather than skip the epoch: skipping would show fewer pictures than are already on disk.
@@ -115,15 +121,15 @@ static func fetch(pack: String, tunnus: String, square: Rect2) -> Array:
 		var tex: Texture2D = _load(base + ".jpg")       # a picture we already have always wins
 		if tex == null and not FileAccess.file_exists(base + ".none"):
 			_busy[base] = true
-			tex = await _fetch_one(e.layers, square, base)
+			tex = await _fetch_one(e.layers, square, base, str(_photos(pack).get("wms", "")))
 			_busy.erase(base)
 		if tex != null:
 			out.append({"label": e.label, "texture": tex})
 	return out
 
 
-static func _fetch_one(layers: Array, square: Rect2, base: String) -> Texture2D:
-	var img := await _fetch_image(layers, square, base, PX)
+static func _fetch_one(layers: Array, square: Rect2, base: String, wms: String) -> Texture2D:
+	var img := await _fetch_image(layers, square, base, PX, wms)
 	if img != null:
 		DirAccess.rename_absolute(ProjectSettings.globalize_path(base + ".part"),
 				ProjectSettings.globalize_path(base + ".jpg"))
@@ -159,9 +165,12 @@ static func fetch_current_large(pack: String, tunnus: String, square: Rect2, px:
 	var tex := _load(base + ".jpg")
 	if tex != null:
 		return tex
+	var photos := _photos(pack)
+	if str(photos.get("current_wms", "")) == "":
+		return current_large(pack, square, px)   # no national photograph service to ask: the tile's own
 	if tunnus != "" and not _busy.has(base):
 		_busy[base] = true
-		var img := await _fetch_image([CURRENT_LAYER], square, base, px, WMS_CURRENT)
+		var img := await _fetch_image([str(photos.get("current_layer", ""))], square, base, px, str(photos.current_wms))
 		_busy.erase(base)
 		if img != null:
 			DirAccess.rename_absolute(ProjectSettings.globalize_path(base + ".part"),
@@ -180,14 +189,17 @@ static func fetch_large(pack: String, tunnus: String, label: String, square: Rec
 	if tex != null:
 		return tex
 	var epoch: Dictionary = {}
-	for e in EPOCHS:
+	for e in epochs(pack):
 		if str(e.label) == label:
 			epoch = e
 			break
+	if epoch.has("texture"):
+		var tile := Sites.tile_dir_of(pack if pack != "" else Sites.active)
+		return current(square, TerrainGeoref.load_dir(tile), tile, px, str(epoch.texture))
 	if epoch.is_empty() or _busy.has(base):
 		return null
 	_busy[base] = true
-	var img := await _fetch_image(epoch.layers, square, base, px)
+	var img := await _fetch_image(epoch.layers, square, base, px, str(_photos(pack).get("wms", "")))
 	_busy.erase(base)
 	if img == null:
 		return null
@@ -199,8 +211,10 @@ static func fetch_large(pack: String, tunnus: String, label: String, square: Rec
 ## The first of `layers` that answers with a picture that has ground on it, at `px` square. Sets
 ## `_answered` to whether anything answered at all, so the caller can tell "no coverage here" from
 ## "the service could not be reached".
-static func _fetch_image(layers: Array, square: Rect2, base: String, px: int, wms: String = WMS) -> Image:
+static func _fetch_image(layers: Array, square: Rect2, base: String, px: int, wms: String) -> Image:
 	_answered = false
+	if wms == "":
+		return null
 	for layer in layers:
 		var q := {
 			"SERVICE": "WMS", "VERSION": "1.3.0", "REQUEST": "GetMap", "LAYERS": layer, "STYLES": "",

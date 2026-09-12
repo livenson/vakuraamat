@@ -109,7 +109,7 @@ func links_for(pos: Vector3, target: Node, layer: Node) -> Dictionary:
 	var out := {}
 	var u := Parcels.at(pos)
 	if not u.is_empty():
-		out["cadastre"] = str(u.get("link", ""))
+		out["cadastre"] = Countries.parcel_link(u)   # the pack's link, else the country's; never "<null>"
 		if u.get("land_registry"):
 			out["land_registry_number"] = str(u.land_registry)
 	var fb: Node = null
@@ -125,6 +125,10 @@ func links_for(pos: Vector3, target: Node, layer: Node) -> Dictionary:
 			if d < best and c.is_visible_in_tree():
 				best = d
 				fb = c
+	var geo: TerrainGeoref = GameState.world.georef if GameState.world and GameState.world.georef else null
+	# the country's own registers and map (assets/data/countries/<id>.json): the place's by the tile,
+	# a building's by its code, since a tile on the border carries buildings of both countries
+	var here: Dictionary = Countries.of_meta(geo.meta) if geo else Countries.by_id(Countries.DEFAULT)
 	if fb:
 		var text := FileAccess.get_file_as_string(Sites.path("buildings.json"))
 		var parsed = JSON.parse_string(text) if text != "" else null
@@ -132,14 +136,19 @@ func links_for(pos: Vector3, target: Node, layer: Node) -> Dictionary:
 			for b in parsed.get("buildings", []):
 				if int(b.id) == fb.building_id:
 					out["etak_id"] = int(b.id)
-					if b.get("ehr"):
-						out["ehr"] = "https://livekluster.ehr.ee/ui/ehr/v1/building/%s" % str(b.ehr)
-					out["etak_search"] = "https://geoportaal.maaamet.ee/est/ruumiandmed/eesti-topograafia-andmekogu/etaki-kirje-otsing-p872.html"
+					var code := str(b.ehr) if b.get("ehr") else ""
+					if code != "":
+						out["building_code"] = code
+					var theirs := Countries.for_building_code(code, here)
+					for key in theirs.get("building_links", {}):
+						var t := str(theirs.building_links[key])
+						if code != "" or not t.contains("{code}"):
+							out[key] = Countries.fill(t, {"code": code})
 					break
-	var geo: TerrainGeoref = GameState.world.georef if GameState.world and GameState.world.georef else null
 	if geo and geo.is_valid():
 		var e: Vector2 = geo.world_to_lest97(pos)
-		out["xgis_map"] = "https://xgis.maaamet.ee/xgis2/page/app/maainfo?punkt=%d,%d&moot=500" % [int(e.x), int(e.y)]
+		for key in here.get("place_links", {}):
+			out[key] = Countries.fill(str(here.place_links[key]), {"x": int(e.x), "y": int(e.y)})
 		out["lest97"] = "%d %d" % [int(e.x), int(e.y)]
 	return out
 

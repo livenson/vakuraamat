@@ -1,0 +1,112 @@
+{
+  "name": "valka",
+  "country": "lv",
+  "crs": "EPSG:3301",
+  "sheet": "5411-14-54",
+  "xmin": 618603,
+  "ymin": 6404659,
+  "xmax": 619627,
+  "ymax": 6405683,
+  "size_m": 1024,
+  "size_px": 1024,
+  "resolution_m": 1.0,
+  "dtm_res_m": 1,
+  "heightmap": "heightmap.r32",
+  "heightmap_format": "float32 little-endian, row-major, row 0 = north edge (ymax), metres LAS-2000,5 (EVRF2007 like EH2000)",
+  "z_min": 47.13,
+  "z_max": 68.68,
+  "z_scale": 1.0,
+  "texture": "ortho.jpg",
+  "texture_px": 4096,
+  "canopy": {
+    "file": "canopy.r32",
+    "source": "LĢIA laser points, highest vegetation return (classes 3-5) above the ground (5411-14-54, 5411-14-55, 5411-24-14, 5411-24-15)",
+    "max_height": 72.2,
+    "format": "float32 little-endian, row-major, row 0 = north; metres above ground; 0 = nothing"
+  },
+  "era_maps": {},
+  "world_mapping": "Godot x = easting - xmin; Godot z = ymax - northing (north is -Z); y = height * z_scale; L-EST97 grid, the Latvian sources reprojected from LKS-92 (EPSG:3059)",
+  "source": {
+    "laser": {
+      "sheets": [
+        "5411-14-54",
+        "5411-14-55",
+        "5411-24-14",
+        "5411-24-15"
+      ],
+      "missing": [],
+      "ground_filled": 0.125,
+      "coverage": 0.995,
+      "ground_pts_per_cell": 4.58,
+      "urls": [
+        "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/5411/5411-14-54.las",
+        "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/5411/5411-14-55.las",
+        "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/5411/5411-24-14.las",
+        "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/5411/5411-24-15.las"
+      ]
+    },
+    "ortho": {
+      "ortho_sheets": [
+        "5411-14_4",
+        "5411-24_2"
+      ],
+      "ortho_urls": [
+        "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v6/5411/5411-14_4.tif",
+        "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v6/5411/5411-24_2.tif"
+      ],
+      "ortho_cycle": "LĢIA 6th cycle, 2016-2018, 25 cm"
+    },
+    "index": [
+      "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/las/LGIA_OpenData_las_saites.txt",
+      "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v6/LGIA_OpenData_Ortofoto_rgb_v6_saites.txt"
+    ],
+    "history": [
+      "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v2/",
+      "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v3/",
+      "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v4/",
+      "https://s3.storage.pub.lvdc.gov.lv/lgia-opendata/ortofoto_rgb_v5/"
+    ]
+  },
+  "fetched": "2026-09-12",
+  "attribution": "Map data: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA), 2026, CC BY 4.0",
+  "license": "CC BY 4.0 (LĢIA open data licence)",
+  "history": [
+    {
+      "label": "2003-05",
+      "texture": "ortho_2003-05.jpg",
+      "cycle": 2,
+      "sheets": [
+        "5411-14",
+        "5411-24"
+      ]
+    },
+    {
+      "label": "2007-08",
+      "texture": "ortho_2007-08.jpg",
+      "cycle": 3,
+      "sheets": [
+        "5411-14_4",
+        "5411-24_2"
+      ]
+    },
+    {
+      "label": "2010-11",
+      "texture": "ortho_2010-11.jpg",
+      "cycle": 4,
+      "sheets": [
+        "5411-14_4",
+        "5411-24_2"
+      ]
+    },
+    {
+      "label": "2013-15",
+      "texture": "ortho_2013-15.jpg",
+      "cycle": 5,
+      "sheets": [
+        "5411-14_4",
+        "5411-24_2"
+      ]
+    }
+  ],
+  "refined": true
+}

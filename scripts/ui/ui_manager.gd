@@ -165,11 +165,21 @@ func focus_parcel(tunnus: String) -> void:
 ## ones that are a colour per plot, so choosing a layer on the map and closing it leaves the town
 ## colour-coded around you.
 func set_map_mode(which: String) -> void:
+	if which.begins_with("focus:"):   # the one-sector layer with its sector: focus:trade
+		MapPalette.focus_sector = which.trim_prefix("focus:")
+		which = "focus"
 	_map_mode = which
 	var views: Node = world.get_node_or_null("InfoViews") if world else null
 	if views:
 		views.set_mode(_map_mode)
 	_refresh_legend()
+
+
+## The layer's name as the button, the notice and both legends say it; the one-sector layer names
+## its sector.
+func _mode_title() -> String:
+	var t := tr("UI_MAP_MODE_" + _map_mode.to_upper())
+	return t + ": " + tr("SECTOR_" + MapPalette.focus_sector.to_upper()) if _map_mode == "focus" else t
 
 
 ## The key to the layer on the ground: one row per class, the same colours and the same words the
@@ -185,7 +195,7 @@ func _refresh_legend() -> void:
 	var box := VBoxContainer.new()
 	box.add_theme_constant_override("separation", 3)
 	legend_card.add_child(box)
-	BookTheme.label(tr("UI_MAP_MODE_" + _map_mode.to_upper()), "DetailLabel", box)
+	BookTheme.label(_mode_title(), "DetailLabel", box)
 	for item in MapPalette.legend(_map_mode):
 		var row := HBoxContainer.new()
 		row.add_theme_constant_override("separation", 8)
@@ -538,16 +548,21 @@ func _unhandled_input(event: InputEvent) -> void:
 		_toggle(journal, _fill_journal)
 	elif event.is_action_pressed("debug_map"):
 		_toggle(debug_map, _fill_debug_map)
+	elif event.is_action_pressed("info_sector"):
+		# Shift+I, before plain I (whose action matches Shift+I too): the one-sector layer on the
+		# ground, the next sector with each further press, without opening the map for it
+		set_map_mode("focus:" + (MapPalette.next_sector() if _map_mode == "focus" else MapPalette.focus_sector))
+		show_notice(tr("UI_MAP_MODE") + ": " + _mode_title())
+		if debug_map.visible:
+			_fill_debug_map()
 	elif event.is_action_pressed("info_view"):
 		# step through the layers the ground can show, without opening the map for it
 		var fills: Array = ["off"] + InfoViews.FILLS
 		var at := fills.find(_map_mode)
 		set_map_mode(str(fills[(at + 1) % fills.size()] if at >= 0 else fills[1]))
-		show_notice(tr("UI_MAP_MODE") + ": " + tr("UI_MAP_MODE_" + _map_mode.to_upper()))
+		show_notice(tr("UI_MAP_MODE") + ": " + _mode_title())
 	elif event.is_action_pressed("language"):
-		var next := "en" if TranslationServer.get_locale().begins_with("et") else "et"
-		TranslationServer.set_locale(next)
-		show_notice("English" if next == "en" else "Eesti keel")
+		show_notice(Lang.cycle())
 		_refresh_era_label()
 		if _open_panel:
 			var p := _open_panel
@@ -631,8 +646,8 @@ func _toggle_codes() -> void:
 		_refresh_codes()
 		var links: Dictionary = Reporter.links_for(player.global_position, interactor.target, world.get_node("EraLayers").get_node_or_null(GameState.current_era))
 		var urls := []
-		for k in ["cadastre", "ehr", "xgis_map"]:
-			if links.has(k):
+		for k in links:   # every register and map link the place has, whichever country's
+			if str(links[k]).begins_with("http"):
 				urls.append(str(links[k]))
 		if not urls.is_empty():
 			DisplayServer.clipboard_set("\n".join(urls))
@@ -655,7 +670,7 @@ func _refresh_codes() -> void:
 	var u := Parcels.at(pos)
 	lines.append(tr("UI_CODES_PARCEL") + ": " + (Parcels.describe(u) if not u.is_empty() else "-"))
 	if not u.is_empty():
-		lines.append("   " + str(u.get("link", "")))
+		lines.append("   " + Countries.parcel_link(u))
 		if u.get("land_value") != null:
 			lines.append("   %s: %s   %s: %s" % [tr("UI_CODES_OWNER"), str(u.get("ownership", "")),
 				tr("UI_BOOK_COL_VALUE"), BookTheme.money(int(u.land_value))])
@@ -666,7 +681,7 @@ func _refresh_codes() -> void:
 				lines.append("      " + Tenants.headline(t) + ("   " + Tenants.facts(t) if Tenants.facts(t) != "" else ""))
 	var links := Reporter.links_for(pos, interactor.target, layer)
 	if links.has("etak_id"):
-		lines.append(tr("UI_CODES_BUILDING") + ": ETAK %d   %s" % [int(links.etak_id), str(links.get("ehr", ""))])
+		lines.append(tr("UI_CODES_BUILDING") + ": #%d   %s" % [int(links.etak_id), str(links.get("ehr", links.get("building_code", "")))])
 	var road := Reporter._nearest_road(layer, pos)
 	if not road.is_empty():
 		lines.append(tr("UI_CODES_ROAD") + ": %s %s %s m %s (%.0f m)" % [str(road.get("name", "") if road.get("name") else ""), str(road.get("type", "")), str(road.get("width", "")), str(road.get("surface", "") if road.get("surface") else ""), float(road.get("distance", 0))])
@@ -755,8 +770,7 @@ func _fill_pause() -> void:
 	WindowMode.changed.connect(relabel, CONNECT_REFERENCE_COUNTED)
 	fs.tree_exiting.connect(func(): WindowMode.changed.disconnect(relabel))
 	_pause_button(body, tr("MENU_LANGUAGE"), func():
-		var next := "en" if TranslationServer.get_locale().begins_with("et") else "et"
-		TranslationServer.set_locale(next)
+		Lang.cycle()
 		_refresh_era_label()
 		_fill_pause())
 	_pause_button(body, tr("MENU_LOCATIONS"), func():
@@ -799,11 +813,18 @@ func _fill_debug_map() -> void:
 	row.add_theme_constant_override("separation", 6)
 	body.add_child(row)
 	var bm := Button.new()
-	bm.text = tr("UI_MAP_MODE") + ": " + tr("UI_MAP_MODE_" + _map_mode.to_upper())
+	bm.text = tr("UI_MAP_MODE") + ": " + tr("UI_MAP_MODE_" + _map_mode.to_upper())   # the sector has its own button
 	bm.pressed.connect(func():
 		set_map_mode(MapPalette.MODES[(MapPalette.MODES.find(_map_mode) + 1) % MapPalette.MODES.size()])
 		_fill_debug_map())
 	row.add_child(bm)
+	if _map_mode == "focus":
+		var bs := Button.new()
+		bs.text = tr("UI_MAP_FOCUS_PICK") % tr("SECTOR_" + MapPalette.focus_sector.to_upper())
+		bs.pressed.connect(func():
+			set_map_mode("focus:" + MapPalette.next_sector())
+			_fill_debug_map())
+		row.add_child(bs)
 	var hint := Label.new()
 	hint.text = tr("UI_DEBUG_MAP_HINT")
 	hint.add_theme_font_size_override("font_size", 13)
@@ -830,8 +851,23 @@ func _fill_debug_map() -> void:
 
 
 func _map_frame(c: Control) -> Array:
-	var side := minf(c.size.x, c.size.y)
-	return [(c.size - Vector2(side, side)) * 0.5, side]
+	# with a company layer on, the square leaves room on the right for its legend, which then stands
+	# beside the map instead of over the plots it explains
+	var room := _legend_width(ThemeDB.fallback_font) + 16.0 if _map_mode != "off" else 0.0
+	var side := minf(c.size.x - room, c.size.y)
+	return [Vector2((c.size.x - room - side) * 0.5, (c.size.y - side) * 0.5), side]
+
+
+## How wide the company layer's legend is drawn: its title, its longest entry, its note.
+func _legend_width(font: Font) -> float:
+	var w := font.get_string_size(_mode_title(), HORIZONTAL_ALIGNMENT_LEFT, -1, 12).x + 14.0
+	w = maxf(w, 150.0)
+	for it in MapPalette.legend(_map_mode):
+		w = maxf(w, font.get_string_size(tr(str(it[0])), HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x + 30.0)
+	var note := MapPalette.note(_map_mode)
+	if note != "":
+		w = maxf(w, 240.0 if tr(note).length() > 160 else 190.0)   # the health note runs to four sentences
+	return w
 
 
 ## Draws on the canvas that emitted `draw` (bound at connect time): when the panel is rebuilt, the
@@ -845,6 +881,9 @@ func _draw_debug_map(c: Control) -> void:
 	var f := _map_frame(c)
 	var origin: Vector2 = f[0]
 	var side: float = f[1]
+	if is_instance_valid(_debug_bg):   # the photograph under the square moves aside with it for the legend
+		_debug_bg.position = origin
+		_debug_bg.size = Vector2(side, side)
 	var font := ThemeDB.fallback_font
 	# the map shows the 1024 m tile the player stands in: the site's tile or a streamed neighbour
 	var loc := Vector2i.ZERO
@@ -861,7 +900,7 @@ func _draw_debug_map(c: Control) -> void:
 			or _map_layout.origin != origin or pp.distance_to(_map_layout.at) > side * 0.06:
 		_lay_out_map(origin, side, loc, pack, pp)
 	if _map_mode != "off":
-		_draw_company_layer(c, origin, side, pack, font)
+		_draw_company_layer(c, origin, side, pack)
 	_draw_focus_layer(c, origin, side, pack)
 	for d in _map_layout.dots:
 		c.draw_circle(d.pos, 4, d.col)
@@ -875,6 +914,8 @@ func _draw_debug_map(c: Control) -> void:
 		else:
 			c.draw_string(font, l.pos + Vector2(1, 1), l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.size, Color(0, 0, 0, 0.8))
 			c.draw_string(font, l.pos, l.text, HORIZONTAL_ALIGNMENT_LEFT, -1, l.size, l.col)
+	if _map_mode != "off":
+		_draw_company_legend(c, origin, side, font)
 	# what is under the mouse, on a slip of paper, on top of everything
 	_draw_hover_card(c, origin, side, pack, font)
 	# the player and heading
@@ -1034,16 +1075,21 @@ func _hover_card_lines(title: String, tunnus: String, pack: String) -> Array:
 
 ## The company layer: parcels filled by their dominant tenant (sector, health, founding age), dots
 ## sized by employees, or lines between parcels whose companies share an owner; with a legend.
-func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String, font: Font) -> void:
+func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String) -> void:
 	var k := side / 1024.0
 	var layer := _map_layer(pack)
 	var parcels: Array = layer.get("parcels", [])
 	for pr in parcels:
-		var col: Color = MapPalette.colour(_map_mode, pr.tenant)
-		if _map_mode in ["size", "owners"] and pr.tenant.is_empty():
+		# the company this layer shows: the worst verdict in the health layer, the largest active one else
+		var tenant: Dictionary = MapPalette.pick(_map_mode, pr.get("rows", [])) if pr.has("rows") else pr.tenant
+		if _map_mode in ["mix", "focus"]:
+			_draw_share_fill(c, origin, k, pr)
+			continue
+		var col: Color = MapPalette.colour(_map_mode, tenant)
+		if _map_mode in ["size", "owners"] and tenant.is_empty():
 			continue
 		if _map_mode == "size":
-			var n := float(pr.tenant.get("employees", 0) if pr.tenant.get("employees") != null else 0)
+			var n := float(tenant.get("employees", 0) if tenant.get("employees") != null else 0)
 			if n <= 0.0:
 				continue
 			var r := clampf(3.0 + sqrt(n) * 2.2, 3.0, 40.0) * k * (1024.0 / 700.0)
@@ -1052,11 +1098,11 @@ func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String,
 			continue
 		if _map_mode == "owners":
 			continue
-		var pts := PackedVector2Array()
-		for q in pr.poly:
-			pts.append(origin + Vector2(float(q[0]), float(q[1])) * k)
-		if pts.size() >= 3:
-			col.a = 0.38 if not pr.tenant.is_empty() else col.a
+		col.a = 0.38 if not tenant.is_empty() else col.a
+		for piece in pr.get("polys", []):
+			var pts := PackedVector2Array()
+			for q in piece:
+				pts.append(origin + q * k)
 			c.draw_colored_polygon(pts, col)
 			c.draw_polyline(pts + PackedVector2Array([pts[0]]), Color(col.r, col.g, col.b, 0.8), 1.0)
 	if _map_mode == "owners":
@@ -1077,18 +1123,67 @@ func _draw_company_layer(c: Control, origin: Vector2, side: float, pack: String,
 		for pr in parcels:
 			if not pr.get("owners", []).is_empty():
 				c.draw_circle(origin + Vector2(pr.at) * k, 3.0, Color(1.0, 0.85, 0.3))
+
+
+## A plot in the two layers that show all of its companies rather than the largest: striped by its
+## sectors' shares ("mix") or shaded by the chosen sector's share ("focus"). The shares and the
+## stripes are worked out once per plot, in tile metres, and kept on the cached parcel.
+func _draw_share_fill(c: Control, origin: Vector2, k: float, pr: Dictionary) -> void:
+	var polys: Array = pr.get("polys", [])
+	if polys.is_empty():
+		return
+	if not pr.has("shares"):
+		pr["shares"] = MapPalette.shares(pr.get("rows", []))
+	var parts: Dictionary = pr.shares
+	var pieces: Array = []
+	if _map_mode == "mix" and not parts.is_empty():
+		if not pr.has("stripes"):
+			var cut: Array = []
+			for poly in polys:
+				cut.append_array(MapPalette.stripes(poly, parts, MapPalette.STRIPE_M))
+			pr["stripes"] = cut
+		pieces = pr.stripes
+	else:
+		var share := float(parts.get(MapPalette.focus_sector, 0.0))
+		var fill: Color = MapPalette.focus_colour(share) if _map_mode == "focus" and share > 0.0 else MapPalette.NO_TENANT
+		for poly in polys:
+			pieces.append([poly, fill])
+	for piece in pieces:
+		var pts := PackedVector2Array()
+		for q in piece[0]:
+			pts.append(origin + q * k)
+		var col: Color = piece[1]
+		if col != MapPalette.NO_TENANT:
+			col.a = 0.55   # stronger than the one-colour layers' 0.38: a stripe is thin
+		var tris: PackedInt32Array = piece[2] if piece.size() > 2 else PackedInt32Array()
+		if not tris.is_empty():
+			# the stripe's own triangles (MapPalette.stripes): the canvas does not triangulate again
+			var cols := PackedColorArray()
+			cols.resize(pts.size())
+			cols.fill(col)
+			RenderingServer.canvas_item_add_triangle_array(c.get_canvas_item(), tris, pts, cols)
+		elif pts.size() >= 3:
+			c.draw_colored_polygon(pts, col)
+	for poly in polys:
+		var outline := PackedVector2Array()
+		for q in poly:
+			outline.append(origin + q * k)
+		outline.append(outline[0])
+		c.draw_polyline(outline, Color(0.1, 0.1, 0.1, 0.45), 1.0)
+
+
+## The company layer's legend: one line per class and the layer's note. Drawn after the dots and the
+## street labels, so a legend that has to sit inside the map is not written over.
+func _draw_company_legend(c: Control, origin: Vector2, side: float, font: Font) -> void:
 	# legend: one line per class, in the page beside the map. The map is square and the panel is not,
 	# so there is a margin either side of it; putting the legend there stops it covering the plots it
 	# is explaining. Only if that margin is too narrow does it sit inside, bottom right, as it used to.
 	var items: Array = MapPalette.legend(_map_mode)
-	var title := tr("UI_MAP_MODE_" + _map_mode.to_upper())
-	var w := 150.0
-	for it in items:
-		w = maxf(w, font.get_string_size(tr(str(it[0])), HORIZONTAL_ALIGNMENT_LEFT, -1, 11).x + 30.0)
+	var title := _mode_title()
+	var w := _legend_width(font)
 	var note := tr(MapPalette.note(_map_mode)) if MapPalette.note(_map_mode) != "" else ""
 	var note_h := 0.0
 	if note != "":
-		w = maxf(w, 190.0)
 		note_h = 6.0 + font.get_multiline_string_size(note, HORIZONTAL_ALIGNMENT_LEFT, w - 12.0, 10).y
 	var h := 20.0 + items.size() * 15.0 + note_h
 	var margin := c.size.x - (origin.x + side)
@@ -1235,8 +1330,15 @@ func _map_layer(pack: String) -> Dictionary:
 		for t in rows:
 			for h in t.get("owners", []):
 				owners[str(h)] = true
-		parcels.append({"tunnus": str(u.get("tunnus", "")), "poly": poly, "at": Vector2(float(u.get("x", 0.0)), float(u.get("z", 0.0))),
-			"tenant": dom, "owners": owners.keys()})
+		# what the layer fills, clipped to the tile: a unit that runs on past the edge (a street, the
+		# river) was painted over the page around the map
+		var ring := PackedVector2Array()
+		for q in poly:
+			ring.append(Vector2(float(q[0]), float(q[1])))
+		var polys: Array = Geometry2D.intersect_polygons(ring,
+				PackedVector2Array([Vector2.ZERO, Vector2(1024, 0), Vector2(1024, 1024), Vector2(0, 1024)]))
+		parcels.append({"tunnus": str(u.get("tunnus", "")), "poly": poly, "polys": polys, "at": Vector2(float(u.get("x", 0.0)), float(u.get("z", 0.0))),
+			"tenant": dom, "rows": rows, "owners": owners.keys()})
 	_map_layers[pack] = {"streets": streets, "numbers": numbers, "parcels": parcels}
 	return _map_layers[pack]
 

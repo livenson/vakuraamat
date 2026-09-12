@@ -1,0 +1,65 @@
+{
+ "colors": {
+  "darkwood": [
+   0.3,
+   0.22,
+   0.14
+  ],
+  "stone": [
+   0.55,
+   0.53,
+   0.5
+  ]
+ },
+ "fragments": {},
+ "eras": {
+  "era_2026": {
+   "nodes": [
+    {
+     "type": "group",
+     "name": "Landmark",
+     "at": "landmark",
+     "children": [
+      {
+       "type": "examine",
+       "name": "LandmarkExamine",
+       "key": "EX_LANDMARK_2026",
+       "loc": "LOC_LANDMARK",
+       "label": "LOC_LANDMARK"
+      }
+     ]
+    },
+    {
+     "type": "footprints",
+     "source": "buildings.json",
+     "year": 2026,
+     "include_undated": true
+    },
+    {
+     "type": "roads",
+     "source": "roads.json"
+    },
+    {
+     "type": "parcels",
+     "source": "parcels.json",
+     "year": 2026
+    },
+    {
+     "type": "traffic",
+     "year": 2026
+    },
+    {
+     "type": "bicycle",
+     "name": "Bicycle",
+     "at": {
+      "ref": "register",
+      "offset": [
+       4,
+       5
+      ]
+     }
+    }
+   ]
+  }
+ }
+}

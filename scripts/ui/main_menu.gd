@@ -1,25 +1,27 @@
 # Main menu: the first page of the book. A rubric rule down the margin, the running head (the place
 # and when you were last in it), the menu as ruled entries with their detail in the right column,
 # and the plate: the pack's square kilometre with its cadastral units drawn over the orthophoto.
-# The Locations page (packs you have, packs on the tile service, suggested places, a search, the town)
-# is the second page.
+# The Locations page (the search, your worlds beside the map, ideas; storage behind it) is the
+# second page.
 extends Control
 
 const SUGGESTED := "res://assets/data/suggested_places.json"
+const PLAYED := "user://played.cfg"   # when each world was last entered: the Locations page's order
 const MARGIN := 72.0
 
 var box: VBoxContainer          # the left column (menu) or the page body (locations)
 var _page: Control
-var _picked: Dictionary = {}
 var _status: Label
 var _results: VBoxContainer
-var _name_edit: LineEdit
 var _query: LineEdit
-var _service_box: VBoxContainer
-var _estimate: Label
 var _suggest_timer: Timer
 var _suggest_serial := 0
+var _result_serial := 0          # the results on the page; a late estimate for older ones is dropped
+var _estimates: Dictionary = {}  # 1 km cell -> the service's download estimate, for the session
 var _storage_box: VBoxContainer
+var _map: EstoniaMap
+var _map_actions: Array = []     # what a click on each of the map's marks does, by mark index
+var _service_packs: Array = []   # worlds the tile service has built and you have not installed
 
 
 func _ready() -> void:
@@ -106,9 +108,9 @@ func _build() -> void:
 			# menu's first frames, as a player would
 			get_tree().create_timer(0.5).timeout.connect(_continue_game.bind(summary))
 	_entry("UI_NEW_GAME", Sites.display_name(Sites.active), func(): _start_new_game())
-	_entry("MENU_LOCATIONS", tr("MENU_PACKS_COUNT") % Sites.available.size(), _build_locations_panel)
-	_entry("MENU_LANGUAGE", "English" if TranslationServer.get_locale().begins_with("et") else "Eesti", func():
-		TranslationServer.set_locale("en" if TranslationServer.get_locale().begins_with("et") else "et")
+	_entry("MENU_LOCATIONS", tr("MENU_PACKS_COUNT") % _worlds({}).size(), _build_locations_panel)
+	_entry("MENU_LANGUAGE", str(Lang.NAMES[Lang.next()]), func():
+		Lang.cycle()
 		_build())
 	var fs := _entry("MENU_FULLSCREEN", "", func(): WindowMode.set_fullscreen(not WindowMode.is_fullscreen()))
 	var relabel := func(on: bool):
@@ -154,6 +156,7 @@ func _entry(key: String, detail: String, cb: Callable) -> Button:
 ## service has it ready: the install clears the tile's region data and the world rebuilds it on the
 ## way in. A moment at most, and nothing at all when the ground is already fine or no service answers.
 func _enter_world() -> void:
+	_mark_played(Sites.active)
 	if Locator.ground_is_coarse(Sites.active):
 		await Locator.take_refined(Sites.active)
 	# The tile the world starts on cannot be swapped from under a running world: World never unloads
@@ -220,132 +223,270 @@ func _button(key: String, cb: Callable) -> void:
 
 
 # ---------------------------------------------------------------- Locations
+## The Locations page. The search is on top and has the cursor; its results come straight under it,
+## each saying what choosing it means and with one button that goes there. Below, your worlds, last
+## played first, beside the map, whose marks and the ideas under it go the same way. Storage is a page
+## of its own. Going anywhere is one click (_go): a world you have opens, one the tile service has
+## built is installed, anything else is created under a progress sheet that can be cancelled.
 func _build_locations_panel() -> void:
 	var body := _new_page()
-	_picked = {}
 	box = VBoxContainer.new()
 	box.add_theme_constant_override("separation", 10)
 	body.add_child(box)
 	var title := BookTheme.label(tr("MENU_LOCATIONS").trim_suffix("..."), "TitleLabel", box)
 	title.add_theme_font_size_override("font_size", 40)
+
+	# --- the search, first and focused
+	var srow := HBoxContainer.new()
+	srow.add_theme_constant_override("separation", 8)
+	box.add_child(srow)
+	_query = LineEdit.new()
+	_query.placeholder_text = tr("MENU_SEARCH_PLACES") + ":   Kvissentali tee, Tartu   /   Doma laukums, Rīga"
+	_query.tooltip_text = tr("MENU_LOCATION_HINT")
+	_query.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_query.custom_minimum_size = Vector2(0, 46)
+	_query.add_theme_font_size_override("font_size", 20)
+	_query.text_submitted.connect(func(_t): _search())
+	_query.text_changed.connect(_on_query_changed)   # suggestions while typing
+	srow.add_child(_query)
+	_small(srow, "MENU_USE_MY_LOCATION", _use_my_location)
+	_results = VBoxContainer.new()
+	_results.add_theme_constant_override("separation", 2)
+	box.add_child(_results)
+	_status = BookTheme.label("", "DetailLabel", box)
+	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+
+	# --- your worlds beside the map
+	var columns := HBoxContainer.new()
+	columns.add_theme_constant_override("separation", 40)
+	columns.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	box.add_child(columns)
+	var left := VBoxContainer.new()
+	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	left.size_flags_stretch_ratio = 1.3
+	columns.add_child(left)
+	BookTheme.label(tr("MENU_YOUR_WORLDS"), "HeadLabel", left)
+	BookTheme.rule(left)
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	left.add_child(scroll)
+	var inset := MarginContainer.new()   # the buttons clear the scrollbar
+	inset.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	inset.add_theme_constant_override("margin_right", 18)
+	scroll.add_child(inset)
+	var list := VBoxContainer.new()
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", 4)
+	inset.add_child(list)
+	var saved := SaveManager.saved_site()
+	var played := _played()
+	var worlds := _worlds(played)
+	for id in worlds:
+		var row := _row(list, Sites.display_name(id), _world_detail(id, int(played.get(id, 0))))
+		if saved == id:
+			_row_button(row, "UI_CONTINUE_GAME", _continue_in.bind(id))
+		_row_button(row, "MENU_GO", _start_new_game.bind(id))
+
+	# --- the map: your worlds, the ideas, what the service has ready; a click on a mark goes there
+	var right := VBoxContainer.new()
+	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	right.add_theme_constant_override("separation", 6)
+	columns.add_child(right)
+	_map = EstoniaMap.new()
+	_map.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_map.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_map.picked.connect(_on_mark)
+	right.add_child(_map)
+	_map_actions = []
+	for id in worlds:
+		var terrain: Dictionary = Sites.manifest_for(id).get("terrain", {})
+		var c: Array = terrain.get("focus", terrain.get("center", []))   # the place it was asked for
+		if c.size() == 2:
+			_add_mark(Sites.display_name(id), float(c[0]), float(c[1]), "current" if id == Sites.active else "installed", _start_new_game.bind(id))
+	var legend := BookTheme.label(tr("MENU_MAP_GO"), "DetailLabel", right)
+	legend.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	var ideas_head := BookTheme.label(tr("MENU_IDEAS"), "HeadLabel", right)
+	ideas_head.add_theme_font_size_override("font_size", 20)
+	var ideas := HFlowContainer.new()
+	right.add_child(ideas)
+	var text := FileAccess.get_file_as_string(SUGGESTED)
+	var places = JSON.parse_string(text) if text != "" else []
+	var note_key := "note_" + Lang.current()   # note_et, note_en, note_lv
+	for p in (places if typeof(places) == TYPE_ARRAY else []):
+		var go := _go.bind(str(p.name), float(p.x), float(p.y))
+		var mark := _add_mark(str(p.name), float(p.x), float(p.y), "suggested", go)
+		var b := Button.new()
+		BookTheme.hand(b)
+		b.theme_type_variation = "TextButton"
+		b.text = str(p.name)
+		b.tooltip_text = str(p.get(note_key, p.get("note_en", "")))
+		b.pressed.connect(go)
+		b.mouse_entered.connect(func(): _map.highlight(mark))   # the idea lights its mark on the map
+		b.mouse_exited.connect(func(): _map.highlight(-1))
+		ideas.add_child(b)
+	_fill_service_packs()
+
+	# --- the foot: back, and storage on a page of its own
+	var foot := HBoxContainer.new()
+	foot.add_theme_constant_override("separation", 12)
+	box.add_child(foot)
+	var back := Button.new()
+	BookTheme.hand(back)
+	back.text = tr("MENU_BACK")
+	back.pressed.connect(_build)
+	foot.add_child(back)
+	_small(foot, "MENU_MANAGE_STORAGE", _build_storage_panel)   # beside Back: the page's corner holds the credit
+	_query.grab_focus.call_deferred()
+
+
+## Storage on a page of its own: each installed world with its size and a Remove button, the
+## streamed neighbour tiles as one line, the service's cache and the free space.
+func _build_storage_panel() -> void:
+	var body := _new_page()
+	box = VBoxContainer.new()
+	box.add_theme_constant_override("separation", 10)
+	body.add_child(box)
+	var title := BookTheme.label(tr("MENU_STORAGE"), "TitleLabel", box)
+	title.add_theme_font_size_override("font_size", 40)
 	var scroll := ScrollContainer.new()
 	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	box.add_child(scroll)
-	var list := VBoxContainer.new()
-	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	list.add_theme_constant_override("separation", 6)
-	scroll.add_child(list)
-
-	# --- what you have
-	_section(list, "MENU_AVAILABLE")
-	var saved := SaveManager.saved_site()
-	for id in Sites.available:
-		if _is_tile_pack(id):
-			continue   # streamed neighbour tiles are ground, not worlds to start in (see Storage)
-		var m := Sites.manifest_for(id)
-		var t: Dictionary = m.get("terrain", {})
-		var tags := [tr("MENU_INSTALLED") if Sites.is_user_pack(id) else tr("MENU_SHIPPED")]
-		if id == Sites.active:
-			tags.append(tr("MENU_CURRENT"))
-		var story: Dictionary = m.get("story", {})
-		var detail := "L-EST97 %s   %s" % [_fmt_center(t.get("center", [])), ", ".join(tags)]
-		if not story.is_empty():
-			detail += "   " + ", ".join(story.get("blocks", []))
-		var row := _row(list, Sites.display_name(id), detail)
-		if saved == id:
-			_row_button(row, "UI_CONTINUE_GAME", func():
-				Sites.select(id)
-				GameState.pending_load = true
-				await _enter_world())
-		_row_button(row, "MENU_PLAY", func(): _start_new_game(id))
-
-	# --- ready on the tile service (filled in when it answers)
-	_section(list, "MENU_ON_SERVICE")
-	_service_box = VBoxContainer.new()
-	list.add_child(_service_box)
-	var waiting := Label.new()
-	waiting.text = "..."
-	_service_box.add_child(waiting)
-	_fill_service_packs()
-
-	# --- suggested places, on a small map of the country: a coordinate says nothing, a mark on
-	# Estonia says whether the place is on an island, by Peipsi or an hour from where you already are
-	_section(list, "MENU_SUGGESTED")
-	var map := EstoniaMap.new()
-	map.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	for id in Sites.available:
-		if _is_tile_pack(id):
-			continue
-		var c: Array = Sites.manifest_for(id).get("terrain", {}).get("center", [])
-		if c.size() == 2:
-			map.places.append({"name": Sites.display_name(id), "x": c[0], "y": c[1],
-				"kind": "current" if id == Sites.active else "installed"})
-	list.add_child(map)
-	BookTheme.label(tr("MENU_MAP_LEGEND"), "DetailLabel", list)
-	var text := FileAccess.get_file_as_string(SUGGESTED)
-	var places = JSON.parse_string(text) if text != "" else []
-	var et := TranslationServer.get_locale().begins_with("et")
-	for p in (places if typeof(places) == TYPE_ARRAY else []):
-		var mark := map.places.size()
-		map.places.append({"name": str(p.name), "x": p.x, "y": p.y, "kind": "suggested"})
-		var row := _row(list, str(p.name), "%s   L-EST97 %d %d" % [str(p.get("note_et" if et else "note_en", "")), int(p.x), int(p.y)])
-		row.mouse_entered.connect(func(): map.highlight(mark))   # the row lights its mark on the map
-		row.mouse_exited.connect(func(): map.highlight(-1))
-		_row_button(row, "MENU_CREATE", func(): _create(str(p.name), float(p.x), float(p.y)))
-
-	# --- search
-	_section(list, "MENU_SEARCH_PLACES")
-	var hint := BookTheme.label(tr("MENU_LOCATION_HINT"), "DetailLabel", list)
-	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	var srow := HBoxContainer.new()
-	list.add_child(srow)
-	_query = LineEdit.new()
-	_query.placeholder_text = "Kvissentali tee, Tartu"
-	_query.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_query.text_submitted.connect(func(_t): _search())
-	_query.text_changed.connect(_on_query_changed)   # suggestions while typing
-	srow.add_child(_query)
-	_small(srow, "MENU_SEARCH", _search)
-	_small(srow, "MENU_USE_MY_LOCATION", _use_my_location)
-	_results = VBoxContainer.new()
-	list.add_child(_results)
-	_estimate = BookTheme.label("", "DetailLabel", list)
-	_estimate.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	var nrow := HBoxContainer.new()
-	list.add_child(nrow)
-	var nl := Label.new()
-	nl.text = tr("MENU_LOCATION_NAME") + ": "
-	nrow.add_child(nl)
-	_name_edit = LineEdit.new()
-	_name_edit.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	nrow.add_child(_name_edit)
-	_small(nrow, "MENU_CREATE_WORLD", func():
-		if _picked.is_empty():
-			_status.text = tr("MENU_NO_RESULTS")
-			return
-		var n := _name_edit.text.strip_edges()
-		_create(n if n != "" else str(_picked.name), float(_picked.x), float(_picked.y)))
-
-	# --- storage: what created worlds and streamed tiles take on disk, and how to drop them
-	_section(list, "MENU_STORAGE")
+	var inset := MarginContainer.new()   # the buttons clear the scrollbar
+	inset.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	inset.add_theme_constant_override("margin_right", 18)
+	scroll.add_child(inset)
 	_storage_box = VBoxContainer.new()
+	_storage_box.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_storage_box.add_theme_constant_override("separation", 6)
-	list.add_child(_storage_box)
-	_fill_storage()
-
+	inset.add_child(_storage_box)
 	_status = BookTheme.label("", "DetailLabel", box)
 	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	var back := Button.new()
 	BookTheme.hand(back)
 	back.text = tr("MENU_BACK")
 	back.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
-	back.pressed.connect(_build)
+	back.pressed.connect(_build_locations_panel)
 	box.add_child(back)
+	_fill_storage()
 
 
-func _fmt_center(c: Array) -> String:
-	return "%d %d" % [int(c[0]), int(c[1])] if c.size() == 2 else "?"
+## When each world was last entered, unix seconds by pack id.
+static func _played() -> Dictionary:
+	var out := {}
+	var cfg := ConfigFile.new()
+	if cfg.load(PLAYED) == OK and cfg.has_section("played"):
+		for id in cfg.get_section_keys("played"):
+			out[id] = int(cfg.get_value("played", id, 0))
+	return out
+
+
+static func _mark_played(id: String) -> void:
+	var cfg := ConfigFile.new()
+	cfg.load(PLAYED)   # absent before the first world: set_value starts it
+	cfg.set_value("played", id, int(Time.get_unix_time_from_system()))
+	cfg.save(PLAYED)
+
+
+## The worlds to start in, last played first, then by name. Streamed neighbour tiles are ground, not
+## places anyone chose; the storage page counts them.
+func _worlds(played: Dictionary) -> Array:
+	var ids := []
+	for id in Sites.available:
+		if not _is_tile_pack(id):
+			ids.append(id)
+	ids.sort_custom(func(a, b):
+		var ta := int(played.get(a, 0))
+		var tb := int(played.get(b, 0))
+		return ta > tb if ta != tb else Sites.display_name(a) < Sites.display_name(b))
+	return ids
+
+
+## "yesterday   ·   Latvia": when you were last there and which country it is in.
+func _world_detail(id: String, at: int) -> String:
+	var when := tr("MENU_PLAYED_NEVER")
+	if at > 0:
+		var days := int((Time.get_unix_time_from_system() - at) / 86400.0)
+		when = tr("MENU_PLAYED_TODAY") if days == 0 else (tr("MENU_PLAYED_YESTERDAY") if days == 1 else tr("MENU_PLAYED_DAYS") % days)
+	var key := str(Countries.of_pack(id).get("name_key", ""))
+	return when + ("   ·   " + tr(key) if key != "" else "")
+
+
+func _continue_in(id: String) -> void:
+	Sites.select(id)
+	GameState.pending_load = true
+	await _enter_world()
+
+
+## An installed world whose square holds the point, or "". The square, not a distance from the
+## centre: a world is centred where its data is cheapest (a Latvian one on its laser sheet), up to
+## half a tile from the place it was asked for.
+func _world_at(x: float, y: float) -> String:
+	for id in Sites.available:
+		if _is_tile_pack(id):
+			continue
+		var t: Dictionary = Sites.manifest_for(id).get("terrain", {})
+		var c: Array = t.get("center", [])
+		var half := float(t.get("size", 1024)) * 0.5
+		if c.size() == 2 and absf(float(c[0]) - x) < half and absf(float(c[1]) - y) < half:
+			return id
+	return ""
+
+
+## A world the tile service has built, and you have not installed, whose square holds the point.
+func _service_pack_at(x: float, y: float) -> Dictionary:
+	for p in _service_packs:
+		var half := float(p.get("size", 1024)) * 0.5
+		if absf(float(p.x) - x) < half and absf(float(p.y) - y) < half:
+			return p
+	return {}
+
+
+## A mark on the map and what clicking it does. Returns its index, for highlight().
+func _add_mark(name: String, x: float, y: float, kind: String, action: Callable) -> int:
+	_map.places.append({"name": name, "x": x, "y": y, "kind": kind})
+	_map_actions.append(action)
+	_map.queue_redraw()
+	return _map.places.size() - 1
+
+
+func _on_mark(index: int) -> void:
+	if index >= 0 and index < _map_actions.size():
+		_map_actions[index].call()
+
+
+## Go to a place, in one click from wherever the page offers it: a world you have there opens, one
+## the service has built is installed, anything else is created. Creating takes minutes and a few
+## hundred megabytes, which the result's row says before the click; its sheet can be cancelled.
+func _go(name: String, x: float, y: float) -> void:
+	var have := _world_at(x, y)
+	if have != "":
+		_start_new_game(have)
+		return
+	var ready := _service_pack_at(x, y)
+	if not ready.is_empty():
+		_create(str(ready.name), float(ready.x), float(ready.y), str(ready.id))
+		return
+	_create(_short_name(name), x, y)
+
+
+## A world's name from a gazetteer's answer: the part with a house number ("Kvissentali tee 1"), else
+## the most specific part that is not a county or municipality. In-ADS lists the general first
+## ("Tartu maakond, Tartu linn, ..."), the Latvian register the specific first ("Cēsis, Cēsu nov.").
+static func _short_name(full: String) -> String:
+	var parts := []
+	for p in full.split(","):
+		var s := p.strip_edges()
+		if s != "" and not (s.ends_with("maakond") or s.ends_with("vald") or s.ends_with("nov.") or s.ends_with("novads") or s.ends_with("pagasts")):
+			parts.append(s)
+	if parts.is_empty():
+		return full.strip_edges()
+	var digit := RegEx.create_from_string("\\d")
+	for s in parts:
+		if digit.search(str(s)) != null:
+			return str(s)
+	return str(parts[-1]) if full.contains("maakond") else str(parts[0])
 
 
 func _section(list: VBoxContainer, key: String) -> void:
@@ -373,7 +514,7 @@ func _row_button(row: HBoxContainer, key: String, cb: Callable) -> void:
 	BookTheme.hand(b)
 	b.text = tr(key)
 	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	if key in ["MENU_PLAY", "UI_CONTINUE_GAME", "MENU_INSTALL_PLAY"]:
+	if key in ["UI_CONTINUE_GAME", "MENU_GO"]:
 		b.theme_type_variation = "PrimaryButton"
 	b.pressed.connect(cb)
 	row.add_child(b)
@@ -387,73 +528,83 @@ func _small(parent: Node, key: String, cb: Callable) -> void:
 	parent.add_child(b)
 
 
+## What the tile service has built and you have not installed: remembered for the search (a result
+## there is "ready") and marked on the map. Streamed neighbour tiles are not places anyone chose, so
+## they are left out. Quiet when no service answers: going to a new place says so on its sheet.
 func _fill_service_packs() -> void:
-	var alive: bool = await Locator.ensure_service()
-	if not is_instance_valid(_service_box):
-		return
-	for c in _service_box.get_children():
-		c.queue_free()
-	if not alive:
-		var l := BookTheme.label(tr("MENU_SERVICE_DOWN") % Locator.service_url(), "DetailLabel", _service_box)
-		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_service_packs = []
+	if not await Locator.ensure_service():
 		return
 	var packs: Array = await Locator.list_service_packs()
-	if not is_instance_valid(_service_box):
+	if not is_instance_valid(_map):
 		return
-	var shown := 0
 	for p in packs:
-		if Sites.available.has(str(p.id)):
+		var id := str(p.id)
+		if Sites.available.has(id) or _is_tile_pack(id):
 			continue
-		var row := _row(_service_box, str(p.name), "L-EST97 %d %d   %s" % [int(p.x), int(p.y), ", ".join(p.get("blocks", []) if p.get("blocks") != null else [])])
-		_row_button(row, "MENU_INSTALL_PLAY", func(): _create(str(p.name), float(p.x), float(p.y), str(p.id)))
-		shown += 1
-	if shown == 0:
-		var l := Label.new()
-		l.text = "-"
-		_service_box.add_child(l)
+		_service_packs.append(p)
+		_add_mark(str(p.name), float(p.x), float(p.y), "ready", _create.bind(str(p.name), float(p.x), float(p.y), id))
 
 
+## The search's answers under the field. Each says what choosing it means - a world of yours, one the
+## service has ready, or a new one with its download and time, estimated one after another as the
+## service answers - and has the one button that goes there.
 func _show_results(results: Array) -> void:
+	_result_serial += 1
+	var serial := _result_serial
 	for c in _results.get_children():
 		c.queue_free()
 	if results.is_empty():
 		_status.text = tr("MENU_NO_RESULTS")
 		return
+	_status.text = ""
+	var cells := {}   # 1 km cell -> {x, y, labels}: results a street apart share one estimate
 	for r in results.slice(0, 6):
-		var b := Button.new()
-		BookTheme.hand(b)
-		b.theme_type_variation = "TextButton"
-		b.text = "%s   (%d, %d)" % [r.name, r.x, r.y]
-		b.pressed.connect(func():
-			_pick(r)
-			_status.text = "%s: %d, %d" % [r.name, r.x, r.y])
-		_results.add_child(b)
+		var x := float(r.x)
+		var y := float(r.y)
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 12)
+		_results.add_child(row)
+		var n := BookTheme.label(str(r.name), "", row)
+		n.add_theme_font_size_override("font_size", 17)
+		n.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		n.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		var what := BookTheme.label("", "DetailLabel", row)
+		what.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		var have := _world_at(x, y)
+		if have != "":
+			what.text = tr("MENU_RESULT_YOURS") % Sites.display_name(have)
+		elif not _service_pack_at(x, y).is_empty():
+			what.text = tr("MENU_RESULT_READY")
+		else:
+			var key := "%d_%d" % [int(x / 1024.0), int(y / 1024.0)]
+			if _estimates.has(key):
+				what.text = _new_world_text(_estimates[key])
+			else:
+				what.text = tr("MENU_ESTIMATING")
+				cells.get_or_add(key, {"x": x, "y": y, "labels": []}).labels.append(what)
+		_row_button(row, "MENU_GO", _go.bind(str(r.name), x, y))
+	for key in cells:
+		_estimate_cell(key, cells[key], serial)   # not awaited: the cells are asked side by side
 
 
-## A chosen place: the name field follows it and the service estimates its download.
-func _pick(r: Dictionary) -> void:
-	_picked = r
-	_name_edit.text = str(r.name).split(",")[-1].strip_edges() if "," in str(r.name) else str(r.name)
-	_show_estimate(float(r.x), float(r.y))
+## One cell's download estimate into every result row waiting for it, and kept for the session.
+func _estimate_cell(key: String, cell: Dictionary, serial: int) -> void:
+	var e: Dictionary = await Locator.estimate(float(cell.x), float(cell.y))
+	if not e.is_empty():
+		_estimates[key] = e
+	if serial != _result_serial:
+		return   # the results changed while the service was asked
+	for label in cell.labels:
+		if is_instance_valid(label):
+			label.text = _new_world_text(e)
 
 
-func _show_estimate(x: float, y: float) -> void:
-	if not is_instance_valid(_estimate):
-		return
-	_estimate.text = tr("MENU_ESTIMATING")
-	var e: Dictionary = await Locator.estimate(x, y)
-	if not is_instance_valid(_estimate) or _picked.is_empty() or float(_picked.x) != x:
-		return
+func _new_world_text(e: Dictionary) -> String:
 	if e.is_empty():
-		_estimate.text = tr("MENU_ESTIMATE_UNKNOWN")
-		return
-	var free := Locator.free_bytes()
-	var total := float(e.get("seconds_download", 0)) + float(e.get("seconds_process", 0))
-	_estimate.text = tr("MENU_ESTIMATE") % [Locator.fmt_bytes(float(e.get("bytes", 0))), Locator.fmt_bytes(float(e.get("cached_bytes", 0))),
-		Locator.fmt_seconds(total), Locator.fmt_seconds(float(e.get("seconds_download", 0))), Locator.fmt_seconds(float(e.get("seconds_process", 0))),
-		Locator.fmt_bytes(float(free)) if free >= 0 else "?"]
-	if free >= 0 and free < Locator.MIN_FREE_BYTES:
-		_estimate.text += "  " + tr("MENU_LOW_DISK") % [Locator.fmt_bytes(float(free)), Locator.fmt_bytes(float(Locator.MIN_FREE_BYTES))]
+		return tr("MENU_RESULT_NEW_PLAIN")
+	var secs := float(e.get("seconds_download", 0)) + float(e.get("seconds_process", 0))
+	return tr("MENU_RESULT_NEW") % [Locator.fmt_seconds(secs), Locator.fmt_bytes(float(e.get("download_bytes", e.get("bytes", 0))))]
 
 
 ## Suggestions while typing: a short pause after the last key, then the gazetteer; late answers to
@@ -486,8 +637,6 @@ func _search() -> void:
 	_suggest_serial += 1   # a submitted search outranks pending suggestions
 	var results: Array = await Locator.geocode(_query.text)
 	_show_results(results)
-	if results.size() == 1:
-		_pick(results[0])
 
 
 func _use_my_location() -> void:
@@ -496,12 +645,10 @@ func _use_my_location() -> void:
 	if not d.get("ok", false):
 		_status.text = tr("MENU_NO_RESULTS")
 		return
-	if not Locator.in_estonia(d.x, d.y):
+	if not Locator.in_coverage(d.x, d.y):
 		_status.text = tr("MENU_OUTSIDE_ESTONIA") + "  (%s)" % d.name
 		return
 	_show_results([d])
-	_pick(d)
-	_name_edit.text = str(d.name).split(",")[0].strip_edges()
 
 
 ## The storage section: each installed world with its size and a Remove button (two presses),
@@ -593,13 +740,19 @@ func _remove_button(row: HBoxContainer, ids: Array, key: String = "MENU_DELETE")
 
 ## Generate (or fetch from the service cache) a pack for a place and start a new game there.
 ## The page is frozen under a progress sheet until the world is ready or the job fails.
+## Cancel (or Esc) on the sheet stops the job on the service and any download under way.
 func _create(name: String, x: float, y: float, id_override: String = "") -> void:
-	var sheet := _progress_sheet(name)
+	var id := id_override if id_override != "" else Locator.slug(name)
+	var sheet := _progress_sheet(name, "MENU_GENERATING", "MENU_CREATE_NOTE", Locator.cancel_job.bind(id))
 	var cb := func(text: String, f: float): sheet.get_meta("stage").call(text, f)
 	Locator.progress.connect(cb)
 	var res: Dictionary = await Locator.create_world(name, x, y, 1024, "2026", id_override)
 	Locator.progress.disconnect(cb)
 	if not is_instance_valid(sheet):
+		return
+	if str(res.get("error", "")) == Locator.CANCELLED:
+		sheet.get_meta("dismiss").call()
+		_status.text = tr("MENU_CANCELLED")
 		return
 	if not res.ok:
 		sheet.get_meta("fail").call(str(res.error))
@@ -613,7 +766,7 @@ func _create(name: String, x: float, y: float, id_override: String = "") -> void
 ## A modal sheet over the page: the heading, a note on what is fetched, the stage line, a bar and the
 ## elapsed time. Blocks the page (input and focus) while it is up; `stage(text, f)` advances it,
 ## `fail(error)` turns it into an error notice with a Close button that thaws the page.
-func _progress_sheet(name: String, head_key := "MENU_GENERATING", note_key := "MENU_CREATE_NOTE") -> Control:
+func _progress_sheet(name: String, head_key := "MENU_GENERATING", note_key := "MENU_CREATE_NOTE", on_cancel := Callable()) -> Control:
 	var page := _page
 	page.process_mode = Node.PROCESS_MODE_DISABLED
 	get_viewport().gui_release_focus()
@@ -663,16 +816,34 @@ func _progress_sheet(name: String, head_key := "MENU_GENERATING", note_key := "M
 	error.add_theme_color_override("font_color", BookTheme.RUBRIC)
 	error.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	error.visible = false
+	var buttons := HBoxContainer.new()
+	buttons.alignment = BoxContainer.ALIGNMENT_END
+	col.add_child(buttons)
+	# Cancel while it runs (a job can take minutes and a slow register longer), Close once it failed
+	var cancel := Button.new()
+	BookTheme.hand(cancel)
+	cancel.text = tr("MENU_CANCEL")
+	cancel.visible = on_cancel.is_valid()
+	cancel.pressed.connect(func():
+		cancel.disabled = true
+		cancel.text = tr("MENU_CANCELLING")
+		on_cancel.call())
+	buttons.add_child(cancel)
 	var close := Button.new()
 	BookTheme.hand(close)
 	close.text = tr("UI_CLOSE")
-	close.size_flags_horizontal = Control.SIZE_SHRINK_END
 	close.visible = false
-	close.pressed.connect(func():
+	var dismiss := func():
 		if is_instance_valid(page):
 			page.process_mode = Node.PROCESS_MODE_INHERIT
-		overlay.queue_free())
-	col.add_child(close)
+		overlay.queue_free()
+	close.pressed.connect(dismiss)
+	buttons.add_child(close)
+	overlay.set_meta("dismiss", dismiss)
+	overlay.gui_input.connect(func(e: InputEvent):
+		if e.is_action_pressed("ui_cancel") and cancel.visible and not cancel.disabled:
+			cancel.pressed.emit()
+			overlay.accept_event())
 	var started := Time.get_ticks_msec()
 	var frac := [0.0]
 	var refresh := func():
@@ -690,6 +861,7 @@ func _progress_sheet(name: String, head_key := "MENU_GENERATING", note_key := "M
 		refresh.call())
 	overlay.set_meta("fail", func(text: String):
 		tick.stop()
+		cancel.visible = false
 		stage.text = tr("MENU_CREATE_FAILED")
 		error.text = text
 		error.visible = true

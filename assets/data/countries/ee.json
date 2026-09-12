@@ -1,0 +1,40 @@
+{
+  "id": "ee",
+  "name": "Estonia",
+  "name_key": "COUNTRY_EE",
+  "parcel_code": "^\\d{5}:\\d{3}:\\d{4}$",
+  "outline": "res://assets/data/estonia.json",
+  "coverage": [369000, 6377000, 740000, 6635000],
+  "geocoder": {
+    "url": "https://inaadress.maaamet.ee/inaadress/gazetteer?results=8&features=EHAK,TANAV,KATASTRIYKSUS,EHITISHOONE&address={q}",
+    "results": "addresses",
+    "name": ["pikkaadress", "ipikkaadress"],
+    "x": "viitepunkt_x",
+    "y": "viitepunkt_y"
+  },
+  "refine": "ground",
+  "photos": {
+    "wms": "https://kaart.maaamet.ee/wms/ajalooline",
+    "current_wms": "https://kaart.maaamet.ee/wms/fotokaart",
+    "current_layer": "EESTIFOTO",
+    "epochs": [
+      {"label": "1993-2000", "layers": ["of1993-2000_10k"]},
+      {"label": "2005", "layers": ["of2005"]},
+      {"label": "2010", "layers": ["of2010aero", "of2010mets"]},
+      {"label": "2015", "layers": ["of2015asulad", "of2015aero", "of2015mets"]},
+      {"label": "2020", "layers": ["of2020asulad", "of2020aero", "of2020mets"]}
+    ]
+  },
+  "building_code": {
+    "pattern": "^\\d{1,12}$",
+    "register_key": "UI_SHEET_REGISTER",
+    "code_key": "UI_SHEET_CODE_EE"
+  },
+  "building_links": {
+    "ehr": "https://livekluster.ehr.ee/ui/ehr/v1/building/{code}",
+    "etak_search": "https://geoportaal.maaamet.ee/est/ruumiandmed/eesti-topograafia-andmekogu/etaki-kirje-otsing-p872.html"
+  },
+  "place_links": {
+    "xgis_map": "https://xgis.maaamet.ee/xgis2/page/app/maainfo?punkt={x},{y}&moot=500"
+  }
+}

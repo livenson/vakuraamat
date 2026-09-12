@@ -1,26 +1,32 @@
 #!/usr/bin/env python3
-"""Local tile service: turns a point in Estonia into a playable site pack plus its terrain tile.
+"""Local tile service: turns a point in a covered country into a playable site pack plus its terrain tile.
+What differs per country - the agency, the download estimate, the register stages, the refine pass, the
+address search - is the country's adapter in tools/pipeline/sources.py; nothing here names one.
 
     python3 tools/tile_service.py [--port 8765] [--workspace data_raw/service] [--raw-dir data_raw]
 
 The game (scripts/autoload/locator.gd) talks to it:
     GET  /health                     -> {"ok": true}
-    GET  /geocode?q=<text>           -> [{"name", "x", "y"}]           (Maa-amet in-ADS gazetteer)
-    GET  /estimate?x=&y=&size=       -> what a pack for the point would download (HEAD requests to the
+    GET  /geocode?q=<text>[&country=<id>] -> [{"name", "x", "y"}]      (every country's address search, or one's)
+    GET  /geocode_lv?q=<text>        -> the same as /geocode?country=lv (the name older games ask for)
+    GET  /estimate?x=&y=&size=       -> what a pack for the point would download, centred where /tile
+                                        would centre it ("center"; a Latvian world on its laser sheet) (HEAD requests to the
                                         geoportal for each DTM and nDSM sheet, cached ones marked), the
                                         service's measured rate and the mean job time: {"items", "bytes",
                                         "cached_bytes", "rate_bps", "seconds_download", "seconds_process", "free_bytes"}
     GET  /cache                      -> the service workspace: {"bytes", "packs", "free_bytes", "path"}
     POST /tile  {"id","name","x","y","size","eras","seed","blocks"} -> 202 {"id"}   starts a job (or reuses a cached zip)
-    GET  /status?id=<id>             -> {"stage","progress","done","error"}
-    GET  /packs                      -> [{"id","name","x","y","size","eras","seed","blocks"}]  packs ready in the cache
+    GET  /status?id=<id>             -> {"stage","progress","done","error"}   (error "cancelled" after /cancel)
+    POST /cancel?id=<id>             -> 202: the job stops at its next stage or download chunk
+    GET  /packs                      -> [{"id","name","x","y","size","eras","seed","blocks","focus"}]  packs ready in the cache
+                                        (x, y the centre; focus the place it was asked for, where it starts)
     GET  /download?id=<id>           -> zip with site/<pack files> and tile/<engine files>
 A job runs the same tools as `make site` + `make tile`, in a workspace outside the repo, with the
 download cache shared (data_raw/, or --raw-dir). Needs python3 with numpy, Pillow, rasterio, pyogrio, shapely and pyproj;
 the same script frozen with tools/service/build.sh ships beside the exported game as the tile_service sidecar.
 Nothing here is exposed beyond the loopback interface unless you bind it so.
 """
-import argparse, concurrent.futures, time, json, os, re, shutil, sys, threading, traceback, urllib.parse, urllib.request, zipfile
+import argparse, concurrent.futures, functools, time, json, os, re, shutil, sys, threading, traceback, urllib.parse, urllib.request, zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -42,11 +48,9 @@ if getattr(sys, "frozen", False):
         print("[tile_service] warning: certifi is missing; https calls will fail to verify", flush=True)
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the repository, or the bundle directory of the frozen sidecar (tools/service/build.sh)
-import new_site, gen_era_scenes, extract_features, fetch_buildings, fetch_trees, fetch_parcels, fetch_roads, fetch_stops, fetch_tenants, fetch_fields, market  # noqa: E402
-import fetch_tile, fetch_departures, validate_site  # noqa: E402
+import new_site, gen_era_scenes, extract_features  # noqa: E402
+import fetch_tile, validate_site, sources  # noqa: E402
 MIN_FREE_BYTES = 2 * 1024 ** 3   # a job needs raw sheets, the workspace and the zip: refuse under 2 GB
-ORTHO_BYTES = 6 * 1024 ** 2      # the WMS orthophoto JPEG (4096 px) and the small historical maps
-GEOCODER = "https://inaadress.maaamet.ee/inaadress/gazetteer?results=8&features=EHAK,TANAV,KATASTRIYKSUS,EHITISHOONE&address="
 JOBS = {}
 LOCK = threading.Lock()
 WORKSPACE = os.path.join(paths.raw_root(), "service")   # data_raw/service in the repo; the game's user directory for the sidecar
@@ -61,21 +65,16 @@ def log(msg):
 
 
 def slug(name):
-    s = re.sub(r"[^a-z0-9]+", "_", name.lower().replace("õ", "o").replace("ä", "a").replace("ö", "o").replace("ü", "u").replace("š", "s").replace("ž", "z")).strip("_")
+    import unicodedata   # õ, ä, ö, ü, š, ž and Latvian ā, ē, ī, ķ, ļ, ņ ... lose their marks: "Rīga" is "riga"
+    folded = "".join(c for c in unicodedata.normalize("NFKD", name.lower()) if not unicodedata.combining(c))
+    s = re.sub(r"[^a-z0-9]+", "_", folded).strip("_")
     return (s if s and s[0].isalpha() else "site_" + s) or "site"
 
 
-def geocode(q):
-    """Maa-amet in-ADS: returns [{name, x, y}] with L-EST97 reference points."""
-    with urllib.request.urlopen(GEOCODER + urllib.parse.quote(q), timeout=20) as r:
-        data = json.load(r)
-    out = []
-    for a in data.get("addresses", []):
-        try:
-            out.append({"name": a.get("pikkaadress") or a.get("ipikkaadress") or q, "x": float(a["viitepunkt_x"]), "y": float(a["viitepunkt_y"])})
-        except (KeyError, ValueError):
-            continue
-    return out
+def country_of(x, y):
+    """The adapter covering an L-EST97 point ("ee", "lv"), or None."""
+    s = sources.for_point(x, y)
+    return s.id if s else None
 
 
 def load_stats():
@@ -109,18 +108,31 @@ def note_job(seconds):
     save_stats(st)
 
 
-def with_deadline(name, seconds, fn, *args, **kwargs):
+class Cancelled(Exception):
+    """The client cancelled the job (POST /cancel): raised at its next stage or download chunk."""
+
+
+def with_deadline(name, seconds, fn, *args, job=None, **kwargs):
     """Run an optional stage with a hard time budget. A stage that reaches national services can
     stall for minutes on a slow feed (the notices XML has a 180 s socket timeout, twice); the pack
     must not wait for it. On timeout the worker is abandoned to finish or die on its own and the
-    job carries on without that layer. Returns (ok, result)."""
+    job carries on without that layer. With `job`, a cancel is noticed within a second the same way,
+    and raises Cancelled rather than carrying on. Returns (ok, result)."""
     ex = concurrent.futures.ThreadPoolExecutor(max_workers=1)   # not a with-block: shutdown must not wait
     fut = ex.submit(fn, *args, **kwargs)
+    deadline = time.time() + seconds
     try:
-        return True, fut.result(timeout=seconds)
-    except concurrent.futures.TimeoutError:
-        log(f"{name}: still running after {seconds} s; the pack goes without it")
-        return False, None
+        while True:
+            try:
+                return True, fut.result(timeout=max(0.0, min(1.0, deadline - time.time())))
+            except concurrent.futures.TimeoutError:
+                if job is not None and job.get("cancel"):
+                    raise Cancelled() from None
+                if time.time() >= deadline:
+                    log(f"{name}: still running after {seconds} s; the pack goes without it")
+                    return False, None
+    except Cancelled:
+        raise
     except Exception as e:  # noqa: BLE001 - every one of these layers is optional
         log(f"{name}: unavailable ({e})")
         return False, None
@@ -135,31 +147,15 @@ def head_size(url):
 
 
 def estimate(x, y, size):
-    """What a pack for (x, y) downloads: the DTM sheets of the tile's corners, the 1:2000 nDSM sheets,
-    the orthophoto; each with its size (HEAD) and whether data_raw already holds it."""
+    """What a pack for (x, y) downloads, each item with its size (HEAD) and whether data_raw already
+    holds it - the country's adapter lists them (sources.py: Estonia's DTM and nDSM sheets and
+    orthophoto, Latvia's laser sheets) - and how long that, the job and the refine pass should take."""
     raw_dir = paths.raw_root()
     half = size / 2
-    xmin, ymin, xmax, ymax = x - half, y - half, x + half, y + half
     items = []
-
-    def add(name, url, fname):
-        cached = os.path.exists(os.path.join(raw_dir, fname))
-        n = os.path.getsize(os.path.join(raw_dir, fname)) if cached else head_size(url)
-        items.append({"name": name, "bytes": n, "cached": cached})
-
-    sheets = sorted({fetch_tile.sheet_for_point(px, py, raw_dir) for px, py in [(xmin + 1, ymin + 1), (xmax - 1, ymin + 1), (xmin + 1, ymax - 1), (xmax - 1, ymax - 1)]})
-    refine = 0
-    for sh in sheets:
-        url = fetch_tile.dtm_download_url(sh, "dem_5m_geotiff")   # the ground the first pack ships
-        add("DTM %s (5 m)" % sh, url, urllib.parse.parse_qs(urllib.parse.urlparse(url).query)["f"][0])
-        fine = fetch_tile.dtm_download_url(sh)                     # fetched afterwards, not part of the wait
-        fname = urllib.parse.parse_qs(urllib.parse.urlparse(fine).query)["f"][0]
-        refine += 0 if os.path.exists(os.path.join(raw_dir, fname)) else head_size(fine)
-    for sheet in fetch_tile.sheets_2000_for_bbox(xmin, ymin, xmax, ymax, raw_dir):
-        links = sorted(fetch_tile.geoportal_links(sheet, "ndsm_rel_1m_geotiff"), key=fetch_tile.link_year)
-        if links:
-            add("nDSM %s" % sheet, links[-1], urllib.parse.parse_qs(urllib.parse.urlparse(links[-1]).query)["f"][0])
-    items.append({"name": "orthophoto, maps", "bytes": ORTHO_BYTES, "cached": False})
+    src = sources.for_point(x, y)
+    x, y = src.place(x, y)   # where the world would be centred (a Latvian one on its laser sheet), as /tile does
+    refine = src.estimate((x - half, y - half, x + half, y + half), raw_dir, items, head_size)
     st = load_stats()
     rate = float(st.get("rate_bps") or 0.0) or 4e6
     jobs = st.get("jobs") or []
@@ -168,7 +164,7 @@ def estimate(x, y, size):
             "download_bytes": to_get, "rate_bps": rate, "seconds_download": round(to_get / rate),
             "seconds_process": round(sum(jobs) / len(jobs)) if jobs else 120,
             "refine_bytes": refine, "seconds_refine": round(refine / rate),   # the 1 m ground, fetched after the pack is playable
-            "free_bytes": shutil.disk_usage(WORKSPACE).free}
+            "free_bytes": shutil.disk_usage(WORKSPACE).free, "center": [x, y]}
 
 
 def cache_info():
@@ -216,10 +212,16 @@ def run_job(job):
     marks = []   # (seconds since the job started, stage name): printed as a breakdown when it is ready
 
     def stage(name, frac):
+        # every stage and every download chunk (fetch_tile.PROGRESS below) passes here, so a cancel
+        # stops the job at its next step, a download mid-file
+        if job.get("cancel"):
+            raise Cancelled()
         with LOCK:
             job["stage"] = name; job["progress"] = frac
         marks.append((time.time() - started, name))
         log(f"{sid}: {name} [{time.time() - started:.0f} s]")
+
+    run = functools.partial(with_deadline, job=job)   # the time-boxed runner, cancellable
     try:
         free = shutil.disk_usage(WORKSPACE).free
         if free < MIN_FREE_BYTES:
@@ -236,13 +238,14 @@ def run_job(job):
         os.makedirs(os.path.join(ws, "sites"), exist_ok=True)
         os.makedirs(os.path.join(ws, "assets", "terrain"), exist_ok=True)
         open(os.path.join(ws, ".gdignore"), "a").close()
+        source = sources.for_point(job["x"], job["y"])   # the country's adapter: its agency, registers, refine pass
         stage("scaffold", 0.05)
         new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid,
-                          force=True, root=ws, texture_mode="path", seed=job.get("seed"), block_ids=job.get("blocks"))
-        stage("Maa-amet data", 0.1)
+                          force=True, root=ws, texture_mode="path", seed=job.get("seed"), block_ids=job.get("blocks"), focus=job.get("focus"))
+        stage(f"{source.label} data", 0.1)
 
         def on_progress(frac, text):   # the fetcher's steps become the job's stage
-            stage("Maa-amet: " + text, 0.1 + 0.35 * float(frac))
+            stage(f"{source.label}: " + text, 0.1 + 0.35 * float(frac))
             note_rate(text)
         fetch_tile.PROGRESS = on_progress
         try:
@@ -256,28 +259,14 @@ def run_job(job):
                 fetch_tile.main(["--project", ws, "--site", sid, "--raw-dir", paths.raw_root(), "--dem-res", "5"])
         finally:
             fetch_tile.PROGRESS = None
-        stage("building register", 0.5)
-        with_deadline(f"{sid}: building register", 240, fetch_buildings.fetch, sid, root=ws,
-                      progress=lambda f, t: stage(t, 0.5 + 0.1 * f))
-        stage("cadastre", 0.61)
-        with_deadline(f"{sid}: cadastre", 120, fetch_parcels.fetch, sid, root=ws)
-        stage("roads", 0.63)
-        with_deadline(f"{sid}: roads", 120, fetch_roads.fetch, sid, root=ws)
-        # Overpass queues requests for tens of seconds: the stops fetch runs beside the register stages
-        def stops_job():
-            try:
-                fetch_stops.fetch(sid, root=ws)
-            except Exception as e:  # noqa: BLE001 - optional layer
-                log(f"{sid}: fetch_stops unavailable ({e})")
-        stops_thread = threading.Thread(target=stops_job, daemon=True)
-        stops_thread.start()
-        stage("fields (PRIA)", 0.635)
-        with_deadline(f"{sid}: fields", 120, fetch_fields.fetch, sid, root=ws)
-        stage("tenants (business register)", 0.64)
-        with_deadline(f"{sid}: tenants", 180, fetch_tenants.fetch, sid, root=ws)
-        stage("market snapshot", 0.66)
-        with_deadline(f"{sid}: market", 60, market.derive, sid, root=ws)
-        if stops_thread.is_alive():
+        # the country's registers: cadastre, buildings, companies, roads, stops (sources.py); the
+        # timetables come in the refine pass
+        stops_thread = source.registers(sid, ws, stage, run)
+        # a tile on a border: the neighbour's registers for its side
+        stage("the other side of the border", 0.66)
+        import cross_border
+        run(f"{sid}: across the border", 900, cross_border.complete, sid, root=ws)
+        if stops_thread is not None and stops_thread.is_alive():
             stage("bus stops (OpenStreetMap)", 0.665)
             stops_thread.join(60)
             if stops_thread.is_alive():
@@ -287,7 +276,7 @@ def run_job(job):
         stage("layout", 0.7)
         new_site.apply_anchors(sid, anchors, root=ws)
         new_site.scaffold(sid, job["name"], (job["x"], job["y"]), job["size"], job["eras"], tile=sid, force=True,
-                          root=ws, texture_mode="path", anchors=anchors, seed=job.get("seed"), block_ids=job.get("blocks"))
+                          root=ws, texture_mode="path", anchors=anchors, seed=job.get("seed"), block_ids=job.get("blocks"), focus=job.get("focus"))
         new_site.relink_era_maps(sid, root=ws, texture_mode="path")
         stage("scenes", 0.75)
         if not gen_era_scenes.generate(sid, root=ws):
@@ -310,6 +299,13 @@ def run_job(job):
         spans = [(marks[i + 1][0] - marks[i][0], marks[i][1]) for i in range(len(marks) - 1)]
         log(f"{sid}: stages " + ", ".join(f"{n} {d:.0f}s" for d, n in sorted(spans, reverse=True)[:8] if d >= 1))
         log(f"{sid}: ready ({os.path.getsize(zpath) / 1e6:.1f} MB, {time.time() - started:.0f} s)")
+    except Cancelled:
+        # the half-built workspace goes; what was downloaded stays in the raw cache, so going there
+        # again starts from it
+        log(f"{sid}: cancelled [{time.time() - started:.0f} s]")
+        shutil.rmtree(ws, ignore_errors=True)
+        with LOCK:
+            job.update(stage="cancelled", done=True, error="cancelled")
     except (Exception, SystemExit) as e:  # noqa: BLE001 - report anything to the client (the tools sys.exit on bad input)
         traceback.print_exc()
         with LOCK:
@@ -329,20 +325,15 @@ def refine_job(job, ws):
             job["refine_stage"] = name
         log(f"{sid}: refining - {name} [{time.time() - started:.0f} s]")
     try:
-        rstage("1 m ground model")
-        ok, _ = with_deadline(f"{sid}: 1 m ground model", 900, fetch_tile.main,
-                              ["--project", ws, "--site", sid, "--raw-dir", paths.raw_root(), "--dem-res", "1", "--only-dem"])
-        rstage("measured trees")
-        with_deadline(f"{sid}: measured trees", 600, fetch_trees.fetch, sid, root=ws)
-        rstage("bus departures (public transport register)")
-        # the national GTFS is one 52 MB zip for the whole country, cached a week like the register dumps
-        with_deadline(f"{sid}: departures", 300, fetch_departures.fetch, sid, root=ws)
+        # the country's own pass (sources.py): Estonia's 1 m ground, measured trees and timetables,
+        # Latvia's older photographs and timetables; (ok, the ground's resolution in metres)
+        ok, res = sources.for_point(job["x"], job["y"]).refine(sid, ws, rstage, with_deadline)
         rstage("packing")
         write_zip(sid, ws)
         if ok:
             open(os.path.join(WORKSPACE, sid + ".refined"), "w").close()   # JOBS is memory only; this survives a restart
         with LOCK:
-            job.update(refined=True, refine_stage="ready", ground_res_m=1 if ok else 5)
+            job.update(refined=True, refine_stage="ready", ground_res_m=res)
         log(f"{sid}: refined ({time.time() - started:.0f} s)")
     except Exception as e:  # noqa: BLE001 - the pack already stands; a failed refinement is not fatal
         traceback.print_exc()
@@ -364,22 +355,30 @@ class Handler(BaseHTTPRequestHandler):
         qs = urllib.parse.parse_qs(u.query)
         if u.path == "/health":
             return self._json(200, {"ok": True, "version": 1})
-        if u.path == "/geocode":
+        if u.path in ("/geocode", "/geocode_lv"):
+            # every country's address search (sources.py), or one's with ?country=<id>; /geocode_lv is
+            # Latvia's under the name games from before the descriptors ask for
             q = qs.get("q", [""])[0].strip()
             if not q:
-                return self._json(400, {"error": "q missing"})
-            try:
-                return self._json(200, geocode(q))
-            except Exception as e:  # noqa: BLE001
-                return self._json(502, {"error": str(e)})
+                return self._json(400, {"error": "q missing"}) if u.path == "/geocode" else self._json(200, [])
+            only = "lv" if u.path == "/geocode_lv" else qs.get("country", [""])[0]
+            out = []
+            for s in sources.SOURCES:
+                if only and s.id != only:
+                    continue
+                try:
+                    out += s.geocode(q)
+                except Exception as e:  # noqa: BLE001 - one country's search down is not the others'
+                    log(f"geocode: {s.name} unavailable ({e})")
+            return self._json(200, out)
         if u.path == "/estimate":
             try:
                 x, y = float(qs.get("x", [""])[0]), float(qs.get("y", [""])[0])
                 size = int(qs.get("size", ["1024"])[0])
             except ValueError:
                 return self._json(400, {"error": "need x and y (EPSG:3301)"})
-            if not (369000 < x < 740000 and 6377000 < y < 6635000):
-                return self._json(400, {"error": "outside Estonia"})
+            if country_of(x, y) is None:
+                return self._json(400, {"error": "outside every country the service covers (tools/pipeline/sources.py --list)"})
             try:
                 return self._json(200, estimate(x, y, size))
             except Exception as e:  # noqa: BLE001
@@ -396,7 +395,8 @@ class Handler(BaseHTTPRequestHandler):
                         m = json.load(open(mpath))
                         packs.append({"id": sid, "name": m.get("description", sid).split(":")[0], "x": m["terrain"]["center"][0], "y": m["terrain"]["center"][1],
                                       "size": m["terrain"]["size"], "eras": ",".join(str(e).rsplit("_", 1)[-1] for e in sorted(os.listdir(os.path.join(WORKSPACE, sid, "sites", sid, "data", "eras"))) if e.endswith(".tres")).replace(".tres", ""),
-                                      "seed": m.get("story", {}).get("seed"), "blocks": m.get("story", {}).get("blocks")})
+                                      "seed": m.get("story", {}).get("seed"), "blocks": m.get("story", {}).get("blocks"),
+                                      "focus": m["terrain"].get("focus")})
             return self._json(200, packs)
         if u.path == "/status":
             sid = qs.get("id", [""])[0]
@@ -431,6 +431,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         u = urllib.parse.urlparse(self.path)
+        if u.path == "/cancel":
+            sid = urllib.parse.parse_qs(u.query).get("id", [""])[0]
+            with LOCK:
+                job = JOBS.get(sid)
+                if not job or job.get("done"):
+                    return self._json(404, {"error": "no running job"})
+                job["cancel"] = True   # run_job raises Cancelled at its next stage or download chunk
+            return self._json(202, {"id": sid, "stage": "cancelling"})
         if u.path != "/tile":
             return self._json(404, {"error": "no such route"})
         n = int(self.headers.get("Content-Length", "0"))
@@ -443,17 +451,24 @@ class Handler(BaseHTTPRequestHandler):
         sid = slug(str(req.get("id") or name))
         size = int(req.get("size") or 1024)
         eras = "2026"   # the present-day layer; older eras belong to the historical game (tag v0.9-historical)
-        if not (369000 < x < 740000 and 6377000 < y < 6635000):
-            return self._json(400, {"error": "outside Estonia"})
+        if country_of(x, y) is None:
+            return self._json(400, {"error": "outside every country the service covers (tools/pipeline/sources.py --list)"})
+        rebuild = bool(req.get("force")) or bool(req.get("refresh"))
+        focus = None
+        # A new world is centred where its data is cheapest (a Latvian one on its laser sheet: one
+        # download instead of four) and remembers the place it was asked for, where the player starts.
+        # A rebuild keeps its centre, and a streamed neighbour (t<E>_<N>) is laid out from its origin's.
+        if not rebuild and not re.fullmatch(r"t\d+_\d+", sid):
+            focus = [x, y]
+            x, y = sources.for_point(x, y).place(x, y)
         with LOCK:
             job = JOBS.get(sid)
             if job and not job.get("done"):
                 return self._json(202, {"id": sid, "stage": job["stage"]})
-            rebuild = bool(req.get("force")) or bool(req.get("refresh"))
             if os.path.exists(os.path.join(WORKSPACE, sid + ".zip")) and not rebuild:
                 JOBS[sid] = {"id": sid, "stage": "ready", "progress": 1.0, "done": True}
                 return self._json(202, {"id": sid, "stage": "ready"})
-            job = {"id": sid, "name": name, "x": x, "y": y, "size": size, "eras": eras,
+            job = {"id": sid, "name": name, "x": x, "y": y, "focus": focus, "size": size, "eras": eras,
                    "force": bool(req.get("force")), "refresh": bool(req.get("refresh")),
                    "seed": int(req["seed"]) if req.get("seed") is not None else None, "blocks": req.get("blocks") or None,
                    "stage": "queued", "progress": 0.0, "done": False}

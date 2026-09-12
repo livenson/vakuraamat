@@ -1,0 +1,10468 @@
+{
+"attribution": "Uzņēmumu reģistra atvērtie dati (CC0); samaksāto VID administrēto nodokļu kopsummas: Valsts ieņēmumu dienests (CC0)",
+"source": "data.gov.lv: Uzņēmumu reģistrs, Valsts ieņēmumu dienests",
+"sources": {
+"register": "register.csv",
+"vid_quarters": [
+"cet_2026Q2.csv"
+],
+"vid_annual": [
+"nm_3gadi_2025-04.csv"
+]
+},
+"fetched": "2026-09-12",
+"register_date": "2026-09-12",
+"ehak": [
+"0053200",
+"0940100",
+"0940201"
+],
+"country": "lv",
+"stats": {
+"scanned": 488110,
+"skipped_person": 37,
+"terminated": 189,
+"exact_var": 24,
+"exact_address": 12,
+"street": 127,
+"kept": 163,
+"exact": 36,
+"with_tax": 103,
+"with_report": 103,
+"health": {
+"sound": 136,
+"watch": 20,
+"distressed": 7
+},
+"sectors": {
+"trade": 35,
+"industry": 17,
+"services": 7,
+"transport": 15,
+"hospitality": 4,
+"construction": 10,
+"farm": 4,
+"public": 1,
+"culture": 3,
+"finance": 1,
+"media": 2,
+"property": 4
+},
+"elapsed_s": 8.3
+},
+"tenants": [
+{
+"registry_code": "50008284461",
+"name": "\"Domes bulvāris 1\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2019-02-05",
+"address": "Domes bulvāris 1 - 1",
+"ehak": "",
+"tunnus": "94010060316",
+"building_id": 94010060316001,
+"match": "exact",
+"via": "address",
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2019,
+3
+],
+[
+2020,
+3
+],
+[
+2021,
+3
+],
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+],
+[
+2025,
+3
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"c4578957-5357-5b86-881c-3415399b1aa3",
+"c67134b0-4cf7-5841-8816-69df01c6d888"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008342772",
+"name": "\"Tirgus iela 12\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-12-28",
+"address": "Tirgus iela 12 - 25",
+"ehak": "",
+"tunnus": "94010060441",
+"building_id": 94010060441001,
+"match": "exact",
+"via": "address",
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2024,
+2
+],
+[
+2025,
+2
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"78555e22-4c0f-5aa8-83f9-7e4a57829597",
+"dc7f03a5-bac5-52eb-b9ce-f25ec6b2c9a9"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008302661",
+"name": "\"Tirgus iela 14\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2020-12-03",
+"address": "Tirgus iela 14 - 31",
+"ehak": "0940201",
+"tunnus": "94010060439",
+"building_id": 94010060439001,
+"match": "exact",
+"via": "address",
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2020,
+3
+],
+[
+2021,
+3
+],
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+],
+[
+2025,
+3
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"6908e5ad-778a-5fb9-9e32-55383a55b4af",
+"8697461a-54d1-5839-b0d3-288d9dd54606",
+"f920c3ef-0be9-5986-9101-eaa0bd8bf74b"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008302445",
+"name": "\"Tirgus iela 16\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2020-11-23",
+"address": "Tirgus iela 16 - 3",
+"ehak": "0940201",
+"tunnus": "94010060440",
+"building_id": 94010060440001,
+"match": "exact",
+"via": "address",
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2020,
+3
+],
+[
+2021,
+3
+],
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+],
+[
+2025,
+3
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"2a265da6-c792-50f3-9277-bbeaa850236d",
+"4f905bf8-0b59-517e-87bf-dc5892071bba",
+"b002c039-8824-54c5-adcd-42af3f7ed415"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44102018211",
+"name": "Budmax SIA",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1998-07-02",
+"address": "Merķeļa iela 18",
+"ehak": "",
+"tunnus": "94010010919",
+"building_id": null,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4711",
+"text": null,
+"nace": "47.11",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 90,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"81a6cb0f-eedb-5b80-bca1-e82cb5329923"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008350962",
+"name": "Deju studija StarStruck",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2025-08-27",
+"address": "Tālavas iela 31A",
+"ehak": "0053200",
+"tunnus": "94010060511",
+"building_id": 94010060511003,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2025,
+1
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"2d36d39f-21a6-5236-b05a-b57ea498ac8f"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008016207",
+"name": "Mednieku Sporta Klubs \"Akots\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1996-09-09",
+"address": "Tālavas iela 29 - 1",
+"ehak": "0940100",
+"tunnus": "94010060510",
+"building_id": 94010060510001,
+"match": "exact",
+"via": "address",
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+0
+],
+[
+2013,
+0
+],
+[
+2014,
+0
+],
+[
+2016,
+0
+],
+[
+2017,
+0
+],
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+3
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"15828345-84c3-55d6-af3f-cca93f690a1a",
+"55f60443-9cc5-5130-a05d-d91f8b88a189",
+"a753e9da-cf02-53d4-8615-637756a1c3a1"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008012667",
+"name": "Medību klubs \"SALAINIS\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1996-04-09",
+"address": "Tālavas iela 29 - 1",
+"ehak": "0940100",
+"tunnus": "94010060510",
+"building_id": 94010060510001,
+"match": "exact",
+"via": "address",
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+0
+],
+[
+2013,
+0
+],
+[
+2014,
+0
+],
+[
+2016,
+0
+],
+[
+2017,
+0
+],
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+5
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 6,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"15828345-84c3-55d6-af3f-cca93f690a1a",
+"2d8d4dd0-7cfb-5d12-8939-401ce512272a",
+"3e9fd3da-8aa6-5f42-9e5b-ab6e397797f3",
+"813e8004-9fa3-53db-a18a-6e3574cb0f26",
+"a753e9da-cf02-53d4-8615-637756a1c3a1",
+"c22b61c3-f2fa-59ef-8cae-da3f367d715f"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008179152",
+"name": "Motoklubs \"VALKAS VANAGI\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2011-05-27",
+"address": "Blaumaņa iela 12A",
+"ehak": "",
+"tunnus": "94010050134",
+"building_id": 94010050134003,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+0
+],
+[
+2013,
+0
+],
+[
+2014,
+0
+],
+[
+2016,
+0
+],
+[
+2017,
+0
+],
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"bbc5eb9c-4638-5b74-8075-10e6b625278e",
+"d612b6b4-b4e3-54f7-8045-fb49e79f19e4",
+"eb1e88a8-dcfc-531b-881d-250b448e35dd"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "43603024222",
+"name": "SIA \"AP KOMFORTS\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2005-07-29",
+"address": "Domes bulvāris 1 - 26",
+"ehak": "0053200",
+"tunnus": "94010060316",
+"building_id": 94010060316001,
+"match": "exact",
+"via": "address",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "1722",
+"text": null,
+"nace": "17.22",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"b74d98b7-dfad-567b-b083-9d7519461cda"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103052581",
+"name": "SIA \"ARODA PARTNERI\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2008-07-14",
+"address": "Apvienības iela 12",
+"ehak": "0940201",
+"tunnus": "94010050426",
+"building_id": 94010050426001,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "6920",
+"text": null,
+"nace": "69.20",
+"section": "services"
+},
+"sector": "services",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"5e2a8916-c492-56af-85f3-2485a5011b53"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "45403051283",
+"name": "SIA \"Artway-1\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2018-07-17",
+"address": "Cimzes iela 7",
+"ehak": "0940201",
+"tunnus": "94010040104",
+"building_id": 94010040104001,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "5221",
+"text": null,
+"nace": "52.21",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2024,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"7e2abe88-e2df-5534-8555-59395a4a5ad9"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103022464",
+"name": "SIA \"BENA UN PARTNERI\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2001-03-02",
+"address": "Jaunā iela 7",
+"ehak": "0940100",
+"tunnus": "94010050253",
+"building_id": 94010050253001,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4711",
+"text": null,
+"nace": "47.11",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 250,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"3c0a8e9e-6d33-57b7-aa9d-9e14e61d9e9e"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40003153405",
+"name": "SIA \"ELSTON\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1993-10-04",
+"address": "Burtnieku iela 15",
+"ehak": "0940100",
+"tunnus": "94010050327",
+"building_id": null,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4719",
+"text": null,
+"nace": "47.19",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 8,
+"turnover": 170806,
+"turnover_year": 2025,
+"taxes": 34280,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+7
+],
+[
+2023,
+7
+],
+[
+2024,
+7
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+8
+]
+],
+"board_size": 2,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"1876bf6a-c5e9-5ff0-ba33-51f536ad0ad3",
+"7668f00e-2fec-5fe1-b4c7-80ee8cd7aa1a"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103049562",
+"name": "SIA \"HPE Serviss\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2008-01-17",
+"address": "Raiņa iela 53",
+"ehak": "0940100",
+"tunnus": "94010040408",
+"building_id": 94010040408001,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "6920",
+"text": null,
+"nace": "69.20",
+"section": "services"
+},
+"sector": "services",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": 10976,
+"turnover_year": 2025,
+"taxes": 4200,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+2
+],
+[
+2023,
+2
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"f08eeb33-b0b7-5b53-9470-80bd885f914b"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103110150",
+"name": "SIA \"LV1918\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2017-01-27",
+"address": "Tirgus iela 16 - 17",
+"ehak": "",
+"tunnus": "94010060440",
+"building_id": 94010060440001,
+"match": "exact",
+"via": "address",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4617",
+"text": null,
+"nace": "46.17",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 1930,
+"turnover_year": 2025,
+"taxes": -780,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"c3966fd4-0815-5120-a6f5-8e5fc1f42f5f"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203395600",
+"name": "SIA \"MALVIL\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2022-04-26",
+"address": "Domes bulvāris 1 - 28",
+"ehak": "",
+"tunnus": "94010060316",
+"building_id": 94010060316001,
+"match": "exact",
+"via": "address",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "5610",
+"text": null,
+"nace": "56.10",
+"section": "hospitality"
+},
+"sector": "hospitality",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 662,
+"turnover_year": 2025,
+"taxes": 660,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"a9edf640-969c-5917-aa5e-7391dc13641d"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2024,
+5327
+],
+"to": [
+2025,
+662
+]
+}
+},
+{
+"registry_code": "44103040775",
+"name": "SIA \"MJ EIROBŪVE\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2006-06-06",
+"address": "Tālavas iela 31A",
+"ehak": "0940201",
+"tunnus": "94010060511",
+"building_id": 94010060511003,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4333",
+"text": null,
+"nace": "43.33",
+"section": "construction"
+},
+"sector": "construction",
+"capital": null,
+"web": null,
+"employees": 9,
+"turnover": 241236,
+"turnover_year": 2025,
+"taxes": -11500,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+7
+],
+[
+2023,
+7
+],
+[
+2024,
+8
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+9
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"1fe26959-7491-5577-b8cf-d49e387e1f65"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103065266",
+"name": "SIA \"Minty\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2011-03-04",
+"address": "Domes bulvāris 1 - 1",
+"ehak": "0940201",
+"tunnus": "94010060316",
+"building_id": 94010060316001,
+"match": "exact",
+"via": "address",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "7420",
+"text": null,
+"nace": "74.20",
+"section": "services"
+},
+"sector": "services",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2022,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"9da2858f-bcca-5755-9e67-5199d39ee5a6"
+],
+"deleted": null,
+"report_overdue": true,
+"health": "watch",
+"health_why": {
+"rule": "report"
+}
+},
+{
+"registry_code": "43903000204",
+"name": "SIA \"ORTOPROFITS\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1991-10-19",
+"address": "Raiņa iela 44",
+"ehak": "0940100",
+"tunnus": "94010060431",
+"building_id": 94010060431001,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4774",
+"text": null,
+"nace": "47.74",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": 87585,
+"turnover_year": 2025,
+"taxes": 14260,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"ce921643-d738-5917-8963-fbe202e98fbf"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103012860",
+"name": "SIA \"PARKS KM\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1997-08-20",
+"address": "Tālavas iela 31E",
+"ehak": "0940100",
+"tunnus": "94010060511",
+"building_id": 94010060511006,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4520",
+"text": null,
+"nace": "45.20",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 10,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+3
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 2,
+"shareholders": 2,
+"owner_managed": true,
+"owners": [
+"4faa9556-830c-59bd-a292-39c912654b36",
+"5b27d24c-4102-5e20-a45c-3f36bb8fece6"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40103632832",
+"name": "SIA \"Robotiem\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2013-02-04",
+"address": "Kārļa Skalbes iela 8 - 1",
+"ehak": "0940201",
+"tunnus": "94010010935",
+"building_id": 94010010935001,
+"match": "exact",
+"via": "address",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4791",
+"text": null,
+"nace": "47.91",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 31483,
+"turnover_year": 2025,
+"taxes": 1970,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+4
+],
+[
+2023,
+6
+],
+[
+2024,
+5
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"0e733fa9-a4c4-5fce-9c86-12dd3e31d856"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203318565",
+"name": "SIA \"TEHPRO\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-05-18",
+"address": "Burtnieku iela 22",
+"ehak": "0940201",
+"tunnus": "94010050415",
+"building_id": 94010050415002,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4120",
+"text": null,
+"nace": "41.20",
+"section": "construction"
+},
+"sector": "construction",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"d670f4e4-e89b-5355-a223-f994610e66b6"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203143039",
+"name": "SIA \"Trīs vienā\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2018-05-11",
+"address": "Rīgas iela 58",
+"ehak": "0940201",
+"tunnus": "94010040114",
+"building_id": 94010040114001,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4778",
+"text": null,
+"nace": "47.78",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 2,
+"shareholders": 2,
+"owner_managed": true,
+"owners": [
+"2a1a8b68-b274-5656-a5a9-a5e73d567c00",
+"9a1d683b-a89d-5e6c-95b2-b5df6105377d"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2024,
+1275
+],
+"to": [
+2025,
+0
+]
+}
+},
+{
+"registry_code": "40203552853",
+"name": "SIA \"VGV Grauds\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-04-05",
+"address": "Raiņa iela 36",
+"ehak": "",
+"tunnus": "94010060404",
+"building_id": 94010060404002,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "0111",
+"text": null,
+"nace": "01.11",
+"section": "farm"
+},
+"sector": "farm",
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": 559698,
+"turnover_year": 2025,
+"taxes": -36100,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+3
+]
+],
+"board_size": 3,
+"shareholders": 3,
+"owner_managed": true,
+"owners": [
+"012ca76c-e9ef-512f-92e4-d52a892fe161",
+"99dd431c-2832-5be4-b540-7089f879b042",
+"e81c0c9c-a310-5344-9c74-7a88e9ade3cb"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103112575",
+"name": "SIA \"Valkas ceļi\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2017-07-20",
+"address": "Domes bulvāris 11",
+"ehak": "0940201",
+"tunnus": "94010060012",
+"building_id": 94010060311006,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4211",
+"text": null,
+"nace": "42.11",
+"section": "construction"
+},
+"sector": "construction",
+"capital": null,
+"web": null,
+"employees": 57,
+"turnover": 15700679,
+"turnover_year": 2025,
+"taxes": -541040,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+26
+],
+[
+2023,
+31
+],
+[
+2024,
+43
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+57
+]
+],
+"board_size": 2,
+"shareholders": 2,
+"owner_managed": true,
+"owners": [
+"97968c68-1655-5080-b4d1-fbfb235e54c3",
+"fba5dfa0-ad86-503b-8f7f-c8831c09a11f"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103147191",
+"name": "SIA \"Ziemeļvārti\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2020-07-07",
+"address": "Raiņa iela 38 - 5",
+"ehak": "",
+"tunnus": "94010060401",
+"building_id": 94010060401001,
+"match": "exact",
+"via": "address",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "5621",
+"text": null,
+"nace": "56.21",
+"section": "hospitality"
+},
+"sector": "hospitality",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 44547,
+"turnover_year": 2023,
+"taxes": 5720,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+2
+],
+[
+2023,
+2
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"7f09dd9e-ce75-5690-92a8-d07b1f772030"
+],
+"deleted": null,
+"report_overdue": true,
+"health": "watch",
+"health_why": {
+"rule": "report"
+}
+},
+{
+"registry_code": "40103851801",
+"name": "SIA Folkland Home",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2014-12-05",
+"address": "Rīgas iela 62A",
+"ehak": "0940201",
+"tunnus": "94010040119",
+"building_id": 94010040119001,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "3109",
+"text": null,
+"nace": "31.09",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": 56984,
+"turnover_year": 2025,
+"taxes": 8490,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+9
+],
+[
+2023,
+6
+],
+[
+2024,
+3
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+3
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"0223a566-0dc7-5872-8dba-9e28d80affd8"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203641615",
+"name": "SIA JJMR",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2025-04-14",
+"address": "Mazā Jaunā iela 15",
+"ehak": "",
+"tunnus": "94010040478",
+"building_id": 94010040451001,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 5379,
+"turnover_year": 2025,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2025,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"e08aa998-9872-5f36-b8f7-ebb8a6ec962d"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203594772",
+"name": "SIA MS Shop",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-10-09",
+"address": "Cimzes iela 1",
+"ehak": "",
+"tunnus": "94010040116",
+"building_id": 94010040116001,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4712",
+"text": null,
+"nace": "47.12",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": 15648,
+"turnover_year": 2025,
+"taxes": -170,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+3
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"2aceec00-ca36-5658-bf9e-248133277a7d"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203457879",
+"name": "SIA RS SPĒKRATS",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2023-01-30",
+"address": "Tālavas iela 31E",
+"ehak": "",
+"tunnus": "94010060511",
+"building_id": 94010060511006,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4520",
+"text": null,
+"nace": "45.20",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 4,
+"turnover": 56322,
+"turnover_year": 2024,
+"taxes": 2160,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2023,
+3
+],
+[
+2024,
+4
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+4
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"f916d86c-1e86-52b9-abb2-b870341fbfd5"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203700336",
+"name": "SIA S forest",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2025-11-27",
+"address": "Pumpura iela 12",
+"ehak": "0053200",
+"tunnus": "94010050121",
+"building_id": 94010050121002,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"f84006a8-bee7-5f3a-ac5c-94c22c77ec3d"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "50203559001",
+"name": "SIA STARSTRUCK",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-04-30",
+"address": "Tālavas iela 31A",
+"ehak": "",
+"tunnus": "94010060511",
+"building_id": 94010060511003,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "8552",
+"text": null,
+"nace": "85.52",
+"section": "public"
+},
+"sector": "public",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 9907,
+"turnover_year": 2025,
+"taxes": 410,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"2d36d39f-21a6-5236-b05a-b57ea498ac8f"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103120248",
+"name": "SIA Sculpt athletics",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2019-01-03",
+"address": "Merķeļa iela 18",
+"ehak": "0940201",
+"tunnus": "94010010919",
+"building_id": null,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "9319",
+"text": null,
+"nace": "93.19",
+"section": "culture"
+},
+"sector": "culture",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": 19806,
+"turnover_year": 2025,
+"taxes": 3700,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"0a83f4b4-4a03-5776-ab70-a0cd3350718e"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008261359",
+"name": "Sabiedrībai svarīgo procesu veicināšanas biedrība \"Latvija 1918\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2017-02-20",
+"address": "Raiņa iela 64",
+"ehak": "0940201",
+"tunnus": "94010050238",
+"building_id": 94010050238001,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2017,
+0
+],
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"c3966fd4-0815-5120-a6f5-8e5fc1f42f5f"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008269494",
+"name": "Valkas novada Brīvprātīgo Ugunsdzēsēju Biedrība",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2017-10-18",
+"address": "Raiņa iela 64",
+"ehak": "0940201",
+"tunnus": "94010050238",
+"building_id": 94010050238001,
+"match": "exact",
+"via": "var",
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"c3966fd4-0815-5120-a6f5-8e5fc1f42f5f"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008315026",
+"name": "\"BIBLIOTĒJA\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2022-04-04",
+"address": "Rīgas iela 22",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 5,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+5
+],
+[
+2024,
+5
+],
+[
+2025,
+5
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"1207a160-82e9-51f7-a1b5-59451e7521ae",
+"eabb5fbf-6645-5c61-b30b-144b287fb937"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008121548",
+"name": "\"Cerība nākotnei\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2007-12-03",
+"address": "Varoņu iela 37A - 6",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2016,
+0
+],
+[
+2017,
+2
+],
+[
+2018,
+2
+],
+[
+2019,
+2
+],
+[
+2020,
+2
+],
+[
+2021,
+2
+],
+[
+2022,
+2
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"7ba82775-86ca-52de-ad44-2a341789eabc",
+"b669489c-d9dd-5ac5-8c0e-2826d8e82f7a"
+],
+"deleted": null,
+"report_overdue": true,
+"health": "watch",
+"health_why": {
+"rule": "report"
+}
+},
+{
+"registry_code": "40008300232",
+"name": "\"Denārs\"",
+"legal_form": "Biedrība",
+"status": "L",
+"status_text": "Likvidācijas process",
+"active": false,
+"since": "2020-09-03",
+"address": "Varoņu iela 40 - 54",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2020,
+0
+],
+[
+2021,
+3
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"836f713d-3d84-5cd3-8160-77e43742acfa"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "distressed",
+"health_why": {
+"rule": "status"
+}
+},
+{
+"registry_code": "40008340112",
+"name": "\"European Academy of Innovative Neuro-Impulse Technologies\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-09-25",
+"address": "Varoņu iela 40 - 33",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": null,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"6f49b3c5-bb20-51b5-866a-e04cc178e694",
+"958dd875-4f76-56ee-a656-0008f900e40f"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008034058",
+"name": "\"Fonds Valkas pilsētas teātris\"",
+"legal_form": "Nodibinājums",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1998-04-16",
+"address": "Tālavas iela 7 - 22",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+1
+],
+[
+2013,
+1
+],
+[
+2014,
+0
+],
+[
+2016,
+2
+],
+[
+2017,
+20
+],
+[
+2018,
+1
+],
+[
+2019,
+1
+],
+[
+2020,
+1
+],
+[
+2021,
+1
+],
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+],
+[
+2025,
+1
+]
+],
+"quarters": [],
+"board_size": 4,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"4d572b94-7378-5790-a715-3aa40829d4cc",
+"91d2ad41-7b71-5b13-874e-251cef1c9461",
+"956ee3d8-0241-5964-9ebb-d744f0d09be0",
+"f5861fb0-3b26-5b06-b26a-6c50e5b16558"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008199549",
+"name": "\"Futbola klubs \"Valka Junior\"\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2012-09-18",
+"address": "Rīgas iela 41",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+0
+],
+[
+2013,
+0
+],
+[
+2014,
+0
+],
+[
+2016,
+0
+],
+[
+2017,
+0
+],
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 4,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"a04ad32f-fd2a-5bd9-b90c-ee83e83ff8e2",
+"c04a8919-bf11-5280-8e7a-ec1e8f6859cd",
+"f85a9dd7-c08b-55ab-ae9f-7a06a5e26185",
+"fea06938-ced0-557b-b942-4964976c416c"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103018030",
+"name": "\"LATVIJAS-IGAUNIJAS INSTITŪTS\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1999-10-29",
+"address": "Rīgas iela 25",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+3
+],
+[
+2013,
+4
+],
+[
+2014,
+3
+],
+[
+2016,
+2
+],
+[
+2017,
+2
+],
+[
+2018,
+2
+],
+[
+2019,
+2
+],
+[
+2020,
+2
+],
+[
+2021,
+2
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"8a6e198d-84ed-5e4c-bd8c-caf0470430aa",
+"fd76edb7-6439-57f6-8d17-dcc76cd91fa4"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008342753",
+"name": "\"Raiņa iela 12\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-12-28",
+"address": "Raiņa iela 12 - 14",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2024,
+2
+],
+[
+2025,
+2
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"43b3eff3-4074-5f20-8897-b36eb9ee6559",
+"f5805196-a792-5092-9865-a54c028011cb"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008306771",
+"name": "\"Raiņa iela 12a\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-04-23",
+"address": "Raiņa iela 12A - 23",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2021,
+3
+],
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+],
+[
+2025,
+2
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"b43ee14c-3f50-5d7b-ba69-8e223f6701c2",
+"eb4314de-8a68-5ff5-a6a6-dc7a9a5b4e21"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008310758",
+"name": "\"Raiņa iela 5\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-10-08",
+"address": "Raiņa iela 5 - 33",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2021,
+3
+],
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+],
+[
+2025,
+3
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"263aedfa-6200-5578-96d4-7581f8561467",
+"6f79c7f1-1265-55c0-8f9c-e30d32ad9fe4",
+"8ad57f69-922a-5315-b0bc-ebcfbfc9befd"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008304677",
+"name": "\"Rīgas iela 5\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-02-15",
+"address": "Rīgas iela 5 - 3",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2021,
+3
+],
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+],
+[
+2025,
+3
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"0eec0b0a-cc90-5fd3-ba5f-79274eccc3c4",
+"5f95a17a-f075-5657-986b-458e23350091",
+"faa0cf70-3254-5fc5-8db4-7dbd576e714c"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008303262",
+"name": "\"Rīgas iela 6\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2020-12-23",
+"address": "Rīgas iela 6 - 11",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2020,
+3
+],
+[
+2021,
+3
+],
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+],
+[
+2025,
+3
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"44a558bb-4b5e-58e9-a188-da38f8ec7f30",
+"4c882b7d-c806-5844-a85e-b8bcce20483a",
+"7aba3693-af5a-58c3-953f-6769b79528eb"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008287451",
+"name": "\"Rīgas iela 6a\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2019-05-15",
+"address": "Rīgas iela 6A - 14",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2019,
+3
+],
+[
+2020,
+3
+],
+[
+2021,
+3
+],
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+],
+[
+2025,
+3
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"b1317dc3-3dcc-5424-bab3-f345ccb6cca9",
+"d640de2e-af75-599b-b235-0d97a7358c8b",
+"f8043268-8019-5ba1-9c92-df9ddd1795fa"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008287466",
+"name": "\"Rīgas iela 6b\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2019-05-15",
+"address": "Rīgas iela 6B - 16",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2019,
+3
+],
+[
+2020,
+3
+],
+[
+2021,
+3
+],
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+],
+[
+2025,
+3
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"7aba3693-af5a-58c3-953f-6769b79528eb",
+"abad9fb8-5e7f-53e4-b3eb-f3fe7c093ec7",
+"cf24a857-9b6e-5cee-8ca7-135febfa3af3"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008333055",
+"name": "\"Rīgas iela 8\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-02-05",
+"address": "Rīgas iela 8 - 2",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 4,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2024,
+4
+],
+[
+2025,
+4
+]
+],
+"quarters": [],
+"board_size": 4,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"7af4197b-cd3e-52a7-afc3-5a54634bb52d",
+"80cf86e6-1370-5850-9bff-3d07826ee1a1",
+"8a7d739b-b1b3-5477-a06b-996f3af3a9e2",
+"ccb8eea9-76db-5ceb-a817-a1f9e25b2d00"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008287593",
+"name": "\"Stendera iela 2\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2019-05-17",
+"address": "Merķeļa iela 23 - 25",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2019,
+3
+],
+[
+2020,
+3
+],
+[
+2021,
+3
+],
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+],
+[
+2025,
+3
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"1f4f1cb7-3c39-5705-bded-3d9d55b3133d",
+"68954ebe-7024-56fa-8cba-40927b5dd478",
+"ed811197-4dbd-5827-a308-edfa39725ffc"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008311541",
+"name": "\"Tālavas iela 19\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-11-13",
+"address": "Tālavas iela 19 - 5",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2021,
+3
+],
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+],
+[
+2025,
+2
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"3927cba3-1355-5206-8b98-5aa2717dd218",
+"a6f43fb1-5464-5962-82d0-d2371bbbb610",
+"f6ab8138-2fa4-5f6b-8b60-f01f4eb28c25"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008147208",
+"name": "\"Valkas attīstībai\"",
+"legal_form": "Biedrība",
+"status": "L",
+"status_text": "Darbības izbeigšana",
+"active": false,
+"since": "2009-09-30",
+"address": "Cimzes iela 27",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2013,
+1
+],
+[
+2014,
+1
+],
+[
+2016,
+1
+],
+[
+2017,
+1
+],
+[
+2018,
+1
+],
+[
+2019,
+1
+],
+[
+2020,
+1
+],
+[
+2021,
+1
+],
+[
+2022,
+1
+]
+],
+"quarters": [],
+"board_size": null,
+"shareholders": null,
+"owner_managed": null,
+"owners": [],
+"deleted": null,
+"report_overdue": false,
+"health": "distressed",
+"health_why": {
+"rule": "status"
+}
+},
+{
+"registry_code": "40008312392",
+"name": "\"Valkas iniciatīvas grupa\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-12-21",
+"address": "Raiņa iela 7",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+2
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"66810f98-8dd1-54dd-9d34-6090676320b4",
+"dd09b430-b5bd-5285-b183-2fef072be10b"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008179970",
+"name": "\"Valkas ģimnāzijas vecāku biedrība\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2011-06-16",
+"address": "Raiņa iela 28A",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+0
+],
+[
+2016,
+0
+],
+[
+2017,
+0
+],
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"35a66b6d-7a41-54d5-9956-82e0ed620a18",
+"bc0b6472-11e8-5d37-9ae8-1b402e3d5144",
+"fbbd0ef3-4bb6-5adb-8f40-ccda06312a15"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008293829",
+"name": "\"Velohooligans\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2019-12-19",
+"address": "Rīgas iela 74",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2019,
+2
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"52ae4523-709b-5abe-bd90-9604fdd54da2",
+"d424a76e-7dd8-5f49-9034-6523b9b5ae61"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "50008243961",
+"name": "\"Ziemeļgarša\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2015-11-04",
+"address": "Rīgas iela 22",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2016,
+0
+],
+[
+2017,
+0
+],
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"425d28d9-3c2a-5184-adb7-ab759df231bd"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103112645",
+"name": "ARVEL SIA",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2017-07-27",
+"address": "Varoņu iela 61",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "1629",
+"text": null,
+"nace": "16.29",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 428657,
+"turnover_year": 2023,
+"taxes": 13990,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+5
+],
+[
+2023,
+6
+],
+[
+2024,
+5
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"7e9aebac-f897-52f2-a2a7-cf46f121a5b9"
+],
+"deleted": null,
+"report_overdue": true,
+"health": "watch",
+"health_why": {
+"rule": "report"
+}
+},
+{
+"registry_code": "40008039712",
+"name": "ATBALSTS cilvēkiem ar īpašām vajadzībām",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1999-02-04",
+"address": "Rīgas iela 35",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+3
+],
+[
+2013,
+3
+],
+[
+2014,
+4
+],
+[
+2016,
+0
+],
+[
+2017,
+0
+],
+[
+2018,
+1
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 7,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"0fdb548a-5b1e-51b6-8b79-4a7a3f0928c7",
+"374e928a-40f4-565c-84de-14ba3ae4b56d",
+"534eb909-cf0a-5fdd-ac5c-b43fab58e647",
+"5dfa0d23-43d3-5c18-aaf9-f3d1b4cdc433",
+"9c81d791-6402-5c04-b775-e7525ac1a6b1",
+"c0f2a518-eee9-577d-923f-e388cb9c8411",
+"d6a45823-9199-5e28-b6a5-93b3df80aa2a"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008128616",
+"name": "Biedrība \"FLORBOLA KLUBS \"VALKA\"\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2008-06-09",
+"address": "Raiņa iela 28A",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+0
+],
+[
+2013,
+0
+],
+[
+2014,
+0
+],
+[
+2016,
+0
+],
+[
+2017,
+0
+],
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 6,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"1e11a2ee-8f18-5c64-8f58-d96103fc2612",
+"4f8de819-c525-5693-bd89-b73d86df45fc",
+"5e4504ea-6300-53d1-aa9b-1a9a23d5a874",
+"7a7b2edd-ec07-5b16-bc39-446e31824eea",
+"b172f7be-a46a-5ef6-a747-7c91d9e132d6",
+"fd5a96c1-4420-52f7-a43c-ce8c9ccb77c5"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008188263",
+"name": "Biedrība \"Ērģemes bruņinieku pils\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2012-01-09",
+"address": "Tālavas iela 70",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+0
+],
+[
+2013,
+0
+],
+[
+2014,
+0
+],
+[
+2016,
+0
+],
+[
+2017,
+0
+],
+[
+2018,
+4
+],
+[
+2019,
+4
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 4,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"076db677-b8d7-59af-8e9a-8b66c71ef9f1",
+"11f8d319-382c-55a5-96bd-752efd850d6d",
+"5fa1e273-dac3-5757-af14-e9a106c7a9d4",
+"db9dca97-027c-5612-9f2d-fe6f59f00165"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008349427",
+"name": "Dzīvokļu īpašnieku biedrība \"Raiņa iela 14\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2025-07-11",
+"address": "Raiņa iela 14 - 18",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2025,
+3
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"58a620b4-d007-5c25-a7a8-6a7309bd07f2",
+"6cf5d707-fa8f-5e23-bfd0-acfde555acb8",
+"e0fbb01c-fcff-5227-929c-fa9d51e7afac"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008332986",
+"name": "Dzīvokļu īpašnieku biedrība \"Tālavas iela 3\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-02-02",
+"address": "Tālavas iela 3 - 39",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2024,
+3
+],
+[
+2025,
+3
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"3c36e2d2-e362-5d0e-9f32-4c479450a5f2",
+"4c694986-c46e-5f51-b0fd-5dcc1e26a041",
+"f6498ac0-2051-5ef5-b3a9-2e100126d6be"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008346702",
+"name": "Dzīvokļu īpašnieku biedrība \"Varoņu iela\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2025-04-11",
+"address": "Varoņu iela 36 - 7",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2025,
+2
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"8a72b8f9-28ec-5c42-9270-1ca20699f9e1",
+"bc7241fb-8467-5f11-a24c-d62e80e1fd01"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203272240",
+"name": "EAC AUTO Filiāle Latvija",
+"legal_form": "Ārvalsts komersanta filiāle",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2020-11-09",
+"address": "Rīgas iela 16 - 42",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4941",
+"text": null,
+"nace": "49.41",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 27,
+"turnover": null,
+"turnover_year": null,
+"taxes": 289780,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+25
+],
+[
+2023,
+38
+],
+[
+2024,
+35
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+27
+]
+],
+"board_size": null,
+"shareholders": null,
+"owner_managed": null,
+"owners": [],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "90001085601",
+"name": "Evaņģēlisko kristiešu baznīcas \"Jaunā paaudze\" Valkas draudze",
+"legal_form": "Draudze",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1993-01-20",
+"address": "Merķeļa iela 23 - 21",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": null,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [],
+"board_size": 1,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"bc8a1a0d-d82a-5618-9c8a-599601c04e95"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008100885",
+"name": "Futbola klubs \"Valka\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2006-03-23",
+"address": "Rīgas iela 41",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+0
+],
+[
+2013,
+0
+],
+[
+2014,
+0
+],
+[
+2016,
+0
+],
+[
+2017,
+0
+],
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"d2d0e4b0-7c5c-53ae-9f51-df72d250eb03",
+"fea06938-ced0-557b-b942-4964976c416c"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203503612",
+"name": "IGLU Holdings SIA",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2023-08-24",
+"address": "Parka iela 25",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "6420",
+"text": null,
+"nace": "64.20",
+"section": "finance"
+},
+"sector": "finance",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 42000,
+"turnover_year": 2025,
+"taxes": 17620,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2023,
+1
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 2,
+"shareholders": 2,
+"owner_managed": false,
+"owners": [
+"40203425712",
+"6a9463ec-320f-5186-952d-90e3a8d008d5",
+"88a3f9ff-31bd-54e7-980a-9c8dac768dde",
+"a00a987c-9baa-5427-ac26-b99dcf90f245"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2024,
+15270357
+],
+"to": [
+2025,
+42000
+]
+}
+},
+{
+"registry_code": "54103119541",
+"name": "Kooperatīvā krājaizdevu sabiedrība \"Ziemeļvidzeme\"",
+"legal_form": "Kooperatīvā sabiedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2018-11-12",
+"address": "Rīgas iela 22",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": null,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"425d28d9-3c2a-5184-adb7-ab759df231bd",
+"aaafab3f-4006-5013-b49e-0d4c7a9b7bd5",
+"f1526bbe-da58-5a75-93d9-894a9acb2d16"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "90000539987",
+"name": "LATVIJAS EVAŅĢĒLISKI LUTERISKĀS BAZNĪCAS VALKAS-LUGAŽU DRAUDZE",
+"legal_form": "Draudze",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1991-03-27",
+"address": "Rīgas iela 9",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": null,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [],
+"board_size": 1,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"6b736103-6b83-5ce2-92e7-3e654470b94a"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008253775",
+"name": "Latvijas hidromelioratīvo būvnieku asociācija",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2016-07-12",
+"address": "Tālavas iela 70",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2016,
+1
+],
+[
+2017,
+22
+],
+[
+2018,
+5
+],
+[
+2019,
+1
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"a7b68ff2-13a6-5af2-ac56-cac47ddfd4b0"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008086204",
+"name": "Lauku un reģionu attīstības biedrība",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2004-11-10",
+"address": "Rīgas iela 24",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2016,
+0
+],
+[
+2017,
+0
+],
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"4352928f-0542-5c90-b077-a6b7c25842d1",
+"d1d15c22-98e6-5e52-8832-0e78a3dfb06d",
+"fea06938-ced0-557b-b942-4964976c416c"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008344152",
+"name": "Lācis un Līdaka",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2025-02-10",
+"address": "Tālavas iela 5 - 37",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"1d35002e-358a-5d10-96e6-3c4600c53d47",
+"dc197392-851c-5dc1-8616-683c22f6bd1d"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008014634",
+"name": "Medību klubs \"EZERKALNI\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1996-06-20",
+"address": "Rīgas iela 16 - 6",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 34,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+40
+],
+[
+2013,
+40
+],
+[
+2014,
+40
+],
+[
+2016,
+42
+],
+[
+2017,
+30
+],
+[
+2018,
+30
+],
+[
+2019,
+32
+],
+[
+2020,
+33
+],
+[
+2021,
+32
+],
+[
+2022,
+34
+],
+[
+2023,
+34
+],
+[
+2024,
+34
+],
+[
+2025,
+34
+]
+],
+"quarters": [],
+"board_size": 5,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"116d10d1-0873-53fc-9539-8977926b951a",
+"4faa9556-830c-59bd-a292-39c912654b36",
+"6f3758f1-91cb-5f37-a573-6e310f6383b1",
+"dc7764f9-ce13-58c1-b997-bfb7a010d19a",
+"e40e80fb-67d5-54c5-86b5-3bce3c01e7a0"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103123850",
+"name": "NOPLSTC SIA",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2019-07-17",
+"address": "Varoņu iela 40 - 3",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4690",
+"text": null,
+"nace": "46.90",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2024,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"774732f4-94c5-5b07-8762-796e42c3a7bb"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "distressed",
+"health_why": {
+"rule": "zero_taxes"
+}
+},
+{
+"registry_code": "40203340744",
+"name": "PS \"ETE-VM\"",
+"legal_form": "Pilnsabiedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-08-25",
+"address": "Tālavas iela 70",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4299",
+"text": null,
+"nace": "42.99",
+"section": "construction"
+},
+"sector": "construction",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 50,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 2,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"40103839781",
+"44103005549"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203553384",
+"name": "SIA \"3ogas\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-04-08",
+"address": "Raiņa iela 26 - 1",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4711",
+"text": null,
+"nace": "47.11",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 91,
+"turnover_year": 2025,
+"taxes": 50,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"66810f98-8dd1-54dd-9d34-6090676320b4"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2024,
+253
+],
+"to": [
+2025,
+91
+]
+}
+},
+{
+"registry_code": "40203301643",
+"name": "SIA \"ABJ\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-03-18",
+"address": "Tālavas iela 8F",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "6201",
+"text": null,
+"nace": "62.01",
+"section": "media"
+},
+"sector": "media",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 1215,
+"turnover_year": 2025,
+"taxes": 530,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"09881796-15bc-562d-a4b6-4fca0c0e6621"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103121578",
+"name": "SIA \"AGM Serviss\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2019-03-06",
+"address": "Rīgas iela 69",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "2511",
+"text": null,
+"nace": "25.11",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 6,
+"turnover": 136552,
+"turnover_year": 2025,
+"taxes": 29150,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+8
+],
+[
+2023,
+7
+],
+[
+2024,
+7
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+6
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"41095bf6-5a70-526e-aba1-f9e4a377e4b4"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203703313",
+"name": "SIA \"ALEN Serviss\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2025-12-08",
+"address": "Zemgales iela 13",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 2,
+"shareholders": 2,
+"owner_managed": true,
+"owners": [
+"1a2b7b0d-3274-573f-805a-ddaab36ad442",
+"8e8be15b-d088-5be0-8f90-ceb4e4462997"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103018897",
+"name": "SIA \"ANDRĒ N\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2000-02-21",
+"address": "Raiņa iela 7",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "6820",
+"text": null,
+"nace": "68.20",
+"section": "property"
+},
+"sector": "property",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": 79276,
+"turnover_year": 2025,
+"taxes": 13970,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+2
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"dd09b430-b5bd-5285-b183-2fef072be10b"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "53903001381",
+"name": "SIA \"ANIMO LTD\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1992-10-29",
+"address": "Parka iela 21",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4669",
+"text": null,
+"nace": "46.69",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 14,
+"turnover": 2470687,
+"turnover_year": 2025,
+"taxes": 634420,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+12
+],
+[
+2023,
+12
+],
+[
+2024,
+13
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+14
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"2c8dd34c-7ca4-5551-843c-12541ef64b50"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103013565",
+"name": "SIA \"APTIEKA VALKA\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1998-01-16",
+"address": "Rīgas iela 13",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4773",
+"text": null,
+"nace": "47.73",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 6,
+"turnover": 733098,
+"turnover_year": 2025,
+"taxes": 81990,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+9
+],
+[
+2023,
+9
+],
+[
+2024,
+9
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+6
+]
+],
+"board_size": 1,
+"shareholders": 6,
+"owner_managed": true,
+"owners": [
+"0d61ecd5-c22d-5e96-aad6-33f9598cc19f",
+"4fa3e4fa-8aeb-5215-aad2-c6d9da2dc643",
+"9edeef40-1113-5f23-94d9-e489b117bac9",
+"b4e6ee6a-6e7e-5dfa-bc82-9c1ca24355c5",
+"e7dad60e-09eb-5b90-ab7d-f295f42ed045"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44102016047",
+"name": "SIA \"ARKA PLUSS\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1996-10-15",
+"address": "Raiņa iela 5",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4752",
+"text": null,
+"nace": "47.52",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": 111732,
+"turnover_year": 2025,
+"taxes": 19040,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+4
+],
+[
+2023,
+5
+],
+[
+2024,
+4
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+3
+]
+],
+"board_size": 2,
+"shareholders": 2,
+"owner_managed": true,
+"owners": [
+"6f79c7f1-1265-55c0-8f9c-e30d32ad9fe4",
+"dbc03caa-9db0-5ed6-ac10-fbaf98052338"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203071671",
+"name": "SIA \"Albus Bit\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2017-05-26",
+"address": "Merķeļa iela 2",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4741",
+"text": null,
+"nace": "47.41",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": 66189,
+"turnover_year": 2025,
+"taxes": 5370,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"a5b0036c-ff08-52ce-b985-eb5322ca1484"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40003447685",
+"name": "SIA \"Alfa Log Houses\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1999-06-04",
+"address": "Tālavas iela 66B",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "1610",
+"text": null,
+"nace": "16.10",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 7380,
+"turnover_year": 2025,
+"taxes": 750,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+2
+],
+[
+2023,
+2
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"ee876554-9b5c-51eb-9708-5490d14b6fc3"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40103783609",
+"name": "SIA \"Anvelli\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2014-04-28",
+"address": "Blaumaņa iela 35A",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4932",
+"text": null,
+"nace": "49.32",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 4623,
+"turnover_year": 2022,
+"taxes": 1600,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": null,
+"shareholders": 1,
+"owner_managed": null,
+"owners": [
+"05a85435-6f68-5097-821a-18ee2b164526"
+],
+"deleted": null,
+"report_overdue": true,
+"health": "watch",
+"health_why": {
+"rule": "report"
+}
+},
+{
+"registry_code": "54103036201",
+"name": "SIA \"BEBISRIPO\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2005-07-12",
+"address": "Tālavas iela 3 - 35",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4531",
+"text": null,
+"nace": "45.31",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": 267795,
+"turnover_year": 2025,
+"taxes": 34000,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 2,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"000d558b-3c9a-5e38-863f-df12c79e47a7",
+"637190e2-39c4-5bbc-bdf8-dd93558b0ff6"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40103853037",
+"name": "SIA \"BUDBERG\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2014-12-09",
+"address": "Rīgas iela 24",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4511",
+"text": null,
+"nace": "45.11",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": -120,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"81a6cb0f-eedb-5b80-bca1-e82cb5329923"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2024,
+367464
+],
+"to": [
+2025,
+0
+]
+}
+},
+{
+"registry_code": "44103082482",
+"name": "SIA \"Berkut KS\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2013-01-15",
+"address": "Raiņa iela 2 - 3",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4941",
+"text": null,
+"nace": "49.41",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"8ac10729-8667-50f0-9b43-0548ba44cb39"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "54103093401",
+"name": "SIA \"DD TOOLS\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2014-05-27",
+"address": "Merķeļa iela 23 - 9",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4799",
+"text": null,
+"nace": "47.99",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 134309,
+"turnover_year": 2025,
+"taxes": 30460,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"d1fa2866-e63e-5b7b-a303-f7a2d2c9da28"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203522897",
+"name": "SIA \"Dvīņu koks\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2023-11-21",
+"address": "Tālavas iela 70",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "0220",
+"text": null,
+"nace": "02.20",
+"section": "farm"
+},
+"sector": "farm",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 1100,
+"turnover_year": 2025,
+"taxes": 1390,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2023,
+0
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"fa9ba51c-b4a1-55a3-a5ac-120042409b3e"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2024,
+21748
+],
+"to": [
+2025,
+1100
+]
+}
+},
+{
+"registry_code": "44103099309",
+"name": "SIA \"EL14\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2015-03-27",
+"address": "Merķeļa iela 17",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "5229",
+"text": null,
+"nace": "52.29",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 4070,
+"turnover_year": 2025,
+"taxes": 140,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+4
+],
+[
+2023,
+2
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 2,
+"shareholders": 2,
+"owner_managed": true,
+"owners": [
+"68954ebe-7024-56fa-8cba-40927b5dd478",
+"f0737dca-d0dd-5e8b-a4f3-5d056356bb04"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103088930",
+"name": "SIA \"ERDEG\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2013-10-24",
+"address": "Apvienības iela 16",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4730",
+"text": null,
+"nace": "47.30",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 19450,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 2,
+"shareholders": 2,
+"owner_managed": true,
+"owners": [
+"27d5522f-d9c3-53a5-a2e2-4f5faca13c83",
+"4c68a200-7803-5867-8154-19b7e1293380"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2024,
+193062
+],
+"to": [
+2025,
+0
+]
+}
+},
+{
+"registry_code": "44103095241",
+"name": "SIA \"Ekolatvia\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2014-09-02",
+"address": "Tālavas iela 3 - 4",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4791",
+"text": null,
+"nace": "47.91",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": -380,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"b3a03c58-a153-55dd-b92b-f3a899bff07b"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203612226",
+"name": "SIA \"FOREST CHAIN\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-12-17",
+"address": "Raiņa iela 18 - 33",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "3312",
+"text": null,
+"nace": "33.12",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 17428,
+"turnover_year": 2025,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"075b08c5-78cc-51f4-8fc4-30d9219a1d8b"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103104489",
+"name": "SIA \"FRK\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2016-01-15",
+"address": "Cimzes iela 29",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4321",
+"text": null,
+"nace": "43.21",
+"section": "construction"
+},
+"sector": "construction",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 76268,
+"turnover_year": 2025,
+"taxes": 13960,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+3
+],
+[
+2023,
+4
+],
+[
+2024,
+4
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"c01c5855-3cba-5bdf-8050-38bbf4c54cea"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103072075",
+"name": "SIA \"GOLD TRANSPORT\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2011-12-01",
+"address": "Rīgas iela 44 - 6",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4941",
+"text": null,
+"nace": "49.41",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": 19400,
+"turnover_year": 2025,
+"taxes": 3390,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+2
+],
+[
+2023,
+2
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"819dc9f4-1526-51d3-bbe6-4717b91e2d2c"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2024,
+40150
+],
+"to": [
+2025,
+19400
+]
+}
+},
+{
+"registry_code": "40203720188",
+"name": "SIA \"Gurmann Food\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2026-02-11",
+"address": "Rīgas iela 6B - 27",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"df676500-6785-594e-890e-2cc6aa342ff9"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103116558",
+"name": "SIA \"IGMAS\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2018-04-20",
+"address": "Apvienības iela 16",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4711",
+"text": null,
+"nace": "47.11",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 5,
+"turnover": 353792,
+"turnover_year": 2025,
+"taxes": 27880,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+4
+],
+[
+2023,
+5
+],
+[
+2024,
+6
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+5
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"4c68a200-7803-5867-8154-19b7e1293380"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103112081",
+"name": "SIA \"IGTRANS\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2017-06-09",
+"address": "Apvienības iela 16",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4941",
+"text": null,
+"nace": "49.41",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 11760,
+"turnover_year": 2025,
+"taxes": -2520,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+2
+],
+[
+2023,
+2
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"27d5522f-d9c3-53a5-a2e2-4f5faca13c83"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2024,
+65860
+],
+"to": [
+2025,
+11760
+]
+}
+},
+{
+"registry_code": "44103070731",
+"name": "SIA \"IZOMAT\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2011-10-06",
+"address": "Merķeļa iela 17",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4619",
+"text": null,
+"nace": "46.19",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2022,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"da0f185a-5316-50c1-b12b-2609769f41f2"
+],
+"deleted": null,
+"report_overdue": true,
+"health": "watch",
+"health_why": {
+"rule": "report"
+}
+},
+{
+"registry_code": "44103030870",
+"name": "SIA \"JB LAUKU TEHNIKA\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2004-03-03",
+"address": "Tālavas iela 66D",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "6820",
+"text": null,
+"nace": "68.20",
+"section": "property"
+},
+"sector": "property",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 5870,
+"turnover_year": 2025,
+"taxes": 1020,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": false,
+"owners": [
+"67c8b5f9-2a26-54ff-9705-4017e4db8cac",
+"bcce002f-9fb6-5845-b3e5-3ef8531f7254"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203355909",
+"name": "SIA \"Janetas Šperliņas privātprakse\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-10-27",
+"address": "Merķeļa iela 13A - 41",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "7490",
+"text": null,
+"nace": "74.90",
+"section": "services"
+},
+"sector": "services",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": 21851,
+"turnover_year": 2024,
+"taxes": 4370,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"a919685e-e22f-53c1-bcb6-77d08287b4bd"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "43903001089",
+"name": "SIA \"K\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1992-07-29",
+"address": "Parka iela 23",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4520",
+"text": null,
+"nace": "45.20",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 44477,
+"turnover_year": 2025,
+"taxes": 8750,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+3
+],
+[
+2023,
+2
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"98990d26-c13c-568f-92df-99255c21851b"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103033909",
+"name": "SIA \"KEIDE PLUS\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2004-12-30",
+"address": "Varoņu iela 61",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "1629",
+"text": null,
+"nace": "16.29",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 7,
+"turnover": 419982,
+"turnover_year": 2025,
+"taxes": 37340,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+5
+],
+[
+2023,
+7
+],
+[
+2024,
+6
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+7
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"44e448db-c482-5e33-a477-2c2c3c102622"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203365220",
+"name": "SIA \"Krūzewelding\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-12-07",
+"address": "Varoņu iela 53",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "3311",
+"text": null,
+"nace": "33.11",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 2414,
+"turnover_year": 2025,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"6a5cd28e-f247-589d-8f2f-a1c3bc50577a"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203770418",
+"name": "SIA \"LAVREX\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2026-08-14",
+"address": "Merķeļa iela 23 - 9",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": null,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"5f4418f7-e69d-5413-9779-7b58617239ff"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203375318",
+"name": "SIA \"LAZO\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2022-01-25",
+"address": "Beverīnas iela 11",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4939",
+"text": null,
+"nace": "49.39",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 58286,
+"turnover_year": 2025,
+"taxes": 11630,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+1
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"8585a744-01ca-5cbc-9763-c0dd720eaab9"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103128256",
+"name": "SIA \"LB Services\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2019-09-20",
+"address": "Raiņa iela 1 - 601",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "7739",
+"text": null,
+"nace": "77.39",
+"section": "services"
+},
+"sector": "services",
+"capital": null,
+"web": null,
+"employees": 14,
+"turnover": 292895,
+"turnover_year": 2025,
+"taxes": 63300,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+8
+],
+[
+2023,
+9
+],
+[
+2024,
+9
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+14
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"80ab77bb-264a-5eb3-aff8-d6484eaae7cf"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103072056",
+"name": "SIA \"LG Enerģija\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2011-12-01",
+"address": "Varoņu iela 15A",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "0220",
+"text": null,
+"nace": "02.20",
+"section": "farm"
+},
+"sector": "farm",
+"capital": null,
+"web": null,
+"employees": 4,
+"turnover": 362720,
+"turnover_year": 2025,
+"taxes": 5220,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+2
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+4
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"94092c26-0e71-53e2-887a-93378b01de2a"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103091926",
+"name": "SIA \"Laikraksts Ziemeļlatvija\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2014-03-26",
+"address": "Rīgas iela 25",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "5813",
+"text": null,
+"nace": "58.13",
+"section": "media"
+},
+"sector": "media",
+"capital": null,
+"web": null,
+"employees": 8,
+"turnover": 161554,
+"turnover_year": 2025,
+"taxes": 30820,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+8
+],
+[
+2023,
+9
+],
+[
+2024,
+8
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+8
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": false,
+"owners": [
+"4684ef11-41e4-5458-9d4c-4a74c3344af4",
+"50103305231"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103059857",
+"name": "SIA \"MELA\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2010-06-15",
+"address": "Rīgas iela 19 - 2",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4771",
+"text": null,
+"nace": "47.71",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 42920,
+"turnover_year": 2025,
+"taxes": 6390,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+4
+],
+[
+2023,
+4
+],
+[
+2024,
+3
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"0cabbe1c-869c-5967-b610-b2cf3faf4e32"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103028344",
+"name": "SIA \"MEŽGALIETIS\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2003-04-24",
+"address": "Merķeļa iela 23 - 18",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "5224",
+"text": null,
+"nace": "52.24",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": 64698,
+"turnover_year": 2025,
+"taxes": 6410,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+3
+],
+[
+2023,
+3
+],
+[
+2024,
+3
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"0b8621e0-e7ee-5c9b-9b2b-f905f281f91b"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103123259",
+"name": "SIA \"Melio būve\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2019-05-31",
+"address": "Tālavas iela 70",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "7120",
+"text": null,
+"nace": "71.20",
+"section": "services"
+},
+"sector": "services",
+"capital": null,
+"web": null,
+"employees": 4,
+"turnover": 5150,
+"turnover_year": 2025,
+"taxes": 7510,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+5
+],
+[
+2023,
+5
+],
+[
+2024,
+4
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+4
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"db9dca97-027c-5612-9f2d-fe6f59f00165"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2024,
+19200
+],
+"to": [
+2025,
+5150
+]
+}
+},
+{
+"registry_code": "40203323405",
+"name": "SIA \"NORDISTA\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-06-03",
+"address": "Raiņa iela 1 - 602",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4690",
+"text": null,
+"nace": "46.90",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 11,
+"turnover": 167247,
+"turnover_year": 2025,
+"taxes": 50,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+11
+]
+],
+"board_size": 3,
+"shareholders": 1,
+"owner_managed": false,
+"owners": [
+"1ad26158-def6-51d4-b295-cc8e05dc5bcf",
+"83caf1da-d7c5-5f6d-a1b9-e1e5686d7ba2",
+"cac71259-3a1c-58e4-89d8-ce0302b09632",
+"f0a0a944-4f23-539b-9c6f-95bb056b9e1b"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103015405",
+"name": "SIA \"OĻUPE\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1998-11-03",
+"address": "Raiņa iela 12 - 602",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4711",
+"text": null,
+"nace": "47.11",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 5,
+"turnover": 450864,
+"turnover_year": 2025,
+"taxes": 53630,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+9
+],
+[
+2023,
+10
+],
+[
+2024,
+10
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+5
+]
+],
+"board_size": 1,
+"shareholders": 2,
+"owner_managed": true,
+"owners": [
+"7be08a7f-8051-5d61-b213-ec54c833aa31",
+"e07a1308-6536-502d-ae4c-12daee334c91"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103079707",
+"name": "SIA \"PARINI\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "L",
+"status_text": "Likvidācijas process",
+"active": false,
+"since": "2012-09-28",
+"address": "Tālavas iela 19 - 40",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4711",
+"text": null,
+"nace": "47.11",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2023,
+"taxes": 260,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"91c8984e-5f1a-5c8c-9883-1006b5d194ff"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "distressed",
+"health_why": {
+"rule": "status"
+}
+},
+{
+"registry_code": "40203495955",
+"name": "SIA \"PARTSTORE\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2023-07-14",
+"address": "Blaumaņa iela 35A",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4531",
+"text": null,
+"nace": "45.31",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 469328,
+"turnover_year": 2024,
+"taxes": 33860,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": null,
+"shareholders": 1,
+"owner_managed": null,
+"owners": [
+"1d56082c-d6ca-5264-b25d-8b90bd8e3826"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103013226",
+"name": "SIA \"PEDELĪTE\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1997-10-28",
+"address": "Rīgas iela 12A",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "5610",
+"text": null,
+"nace": "56.10",
+"section": "hospitality"
+},
+"sector": "hospitality",
+"capital": null,
+"web": null,
+"employees": 26,
+"turnover": 910384,
+"turnover_year": 2025,
+"taxes": 249130,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+25
+],
+[
+2023,
+25
+],
+[
+2024,
+25
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+26
+]
+],
+"board_size": 2,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"4c1297b2-1756-576e-9e21-96de8223dede",
+"b628b347-3e2c-5bea-bc8f-47612c797ff6"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103026983",
+"name": "SIA \"PEPI RER\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2002-09-20",
+"address": "Parka iela 25",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "2221",
+"text": null,
+"nace": "22.21",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 209,
+"turnover": 15209394,
+"turnover_year": 2025,
+"taxes": null,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+187
+],
+[
+2023,
+188
+],
+[
+2024,
+203
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+209
+]
+],
+"board_size": 2,
+"shareholders": 1,
+"owner_managed": false,
+"owners": [
+"40203503612",
+"88a3f9ff-31bd-54e7-980a-9c8dac768dde",
+"a00a987c-9baa-5427-ac26-b99dcf90f245"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203174611",
+"name": "SIA \"PREMIUM DELIVERY\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2018-10-12",
+"address": "Blaumaņa iela 35A",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "1085",
+"text": null,
+"nace": "10.85",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2024,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+2
+],
+[
+2023,
+1
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": null,
+"shareholders": 1,
+"owner_managed": null,
+"owners": [
+"05a85435-6f68-5097-821a-18ee2b164526"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2023,
+7261
+],
+"to": [
+2024,
+0
+]
+}
+},
+{
+"registry_code": "40203266193",
+"name": "SIA \"PRIMERAKO\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2020-10-12",
+"address": "Blaumaņa iela 35A",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4719",
+"text": null,
+"nace": "47.19",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 33435,
+"turnover_year": 2024,
+"taxes": 9640,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+5
+],
+[
+2023,
+5
+],
+[
+2024,
+7
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": null,
+"shareholders": 1,
+"owner_managed": null,
+"owners": [
+"05a85435-6f68-5097-821a-18ee2b164526"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103024342",
+"name": "SIA \"R & O\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "L",
+"status_text": "Darbības izbeigšana",
+"active": false,
+"since": "2001-09-21",
+"address": "Merķeļa iela 17",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "0220",
+"text": null,
+"nace": "02.20",
+"section": "farm"
+},
+"sector": "farm",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2018,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": false,
+"owners": [
+"425d28d9-3c2a-5184-adb7-ab759df231bd",
+"b2a0492e-a293-59ce-890a-6e63fce6d05e"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "distressed",
+"health_why": {
+"rule": "status"
+}
+},
+{
+"registry_code": "44103090460",
+"name": "SIA \"RAC tehnika\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "L",
+"status_text": "Likvidācijas process",
+"active": false,
+"since": "2014-01-22",
+"address": "Tālavas iela 38",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "3317",
+"text": null,
+"nace": "33.17",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2024,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"c91bbab4-6d97-54d8-91d1-99c2ef4d191f"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "distressed",
+"health_why": {
+"rule": "status"
+}
+},
+{
+"registry_code": "44103019407",
+"name": "SIA \"ROZI\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2000-04-10",
+"address": "Rīgas iela 23",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "5629",
+"text": null,
+"nace": "56.29",
+"section": "hospitality"
+},
+"sector": "hospitality",
+"capital": null,
+"web": null,
+"employees": 18,
+"turnover": 518043,
+"turnover_year": 2025,
+"taxes": 110490,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+18
+],
+[
+2023,
+18
+],
+[
+2024,
+16
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+18
+]
+],
+"board_size": 2,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"35867e42-5fbb-55ce-94dc-73a46d7131e9",
+"6030397e-8428-5440-96a8-63808139dc1f"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103112560",
+"name": "SIA \"Recruitment Group\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2017-07-19",
+"address": "Rīgas iela 17",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "9411",
+"text": null,
+"nace": "94.11",
+"section": "culture"
+},
+"sector": "culture",
+"capital": null,
+"web": null,
+"employees": 29,
+"turnover": 484075,
+"turnover_year": 2025,
+"taxes": 94320,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+25
+],
+[
+2023,
+21
+],
+[
+2024,
+22
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+29
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"d2d0e4b0-7c5c-53ae-9f51-df72d250eb03"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203532503",
+"name": "SIA \"SA Partners\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-01-12",
+"address": "Blaumaņa iela 35A",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4931",
+"text": null,
+"nace": "49.31",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 45240,
+"turnover_year": 2024,
+"taxes": 5220,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": null,
+"shareholders": 1,
+"owner_managed": null,
+"owners": [
+"c38f2dcb-4486-5bb7-bc34-aa9398b4a951"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40103659019",
+"name": "SIA \"SMILE SERVICE\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2013-04-12",
+"address": "Tālavas iela 5 - 22",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "3250",
+"text": null,
+"nace": "32.50",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 48509,
+"turnover_year": 2025,
+"taxes": 2500,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"1e7d557a-c04d-5b6c-9148-68fba7126211"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "43902000300",
+"name": "SIA \"SPĀRĪTE\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1993-08-03",
+"address": "Rīgas iela 33",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4711",
+"text": null,
+"nace": "47.11",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 5,
+"turnover": 454763,
+"turnover_year": 2025,
+"taxes": 47900,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+6
+],
+[
+2023,
+5
+],
+[
+2024,
+5
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+5
+]
+],
+"board_size": 2,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"17b04a43-21d3-5911-8952-b93fb3d6fb45",
+"bcfb264e-0da8-5205-962c-29f04e26841a"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "43903002239",
+"name": "SIA \"VALKA-1004\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1993-04-16",
+"address": "Varoņu iela 53",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4941",
+"text": null,
+"nace": "49.41",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 10,
+"turnover": 516027,
+"turnover_year": 2025,
+"taxes": 84880,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+10
+],
+[
+2023,
+10
+],
+[
+2024,
+9
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+10
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"76124aa5-1b30-5ce1-bd8c-79b83e79fca8"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40003159639",
+"name": "SIA \"VALKAS MD\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1993-10-29",
+"address": "Parka iela 25B",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "2511",
+"text": null,
+"nace": "25.11",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 296000,
+"turnover_year": 2025,
+"taxes": 22690,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+8
+],
+[
+2023,
+7
+],
+[
+2024,
+4
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 3,
+"owner_managed": true,
+"owners": [
+"074134f1-4ae8-5321-8fa2-3449a7d5f1b3",
+"52a4a550-a97c-5bb1-b915-c0df0dac647d",
+"ad355b8e-cef4-5e92-b5cb-d308032ab8a9"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103005549",
+"name": "SIA \"VALKAS MELIORĀCIJA\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1994-02-17",
+"address": "Tālavas iela 70",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4312",
+"text": null,
+"nace": "43.12",
+"section": "construction"
+},
+"sector": "construction",
+"capital": null,
+"web": null,
+"employees": 20,
+"turnover": 4026268,
+"turnover_year": 2025,
+"taxes": 88240,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+43
+],
+[
+2023,
+36
+],
+[
+2024,
+28
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+20
+]
+],
+"board_size": 1,
+"shareholders": 5,
+"owner_managed": true,
+"owners": [
+"40203577217",
+"55b5f9cb-ca07-562f-b4d4-2dc26d08508f",
+"899c305f-0314-55d7-823e-63834c8f6f9b",
+"d8943f7b-9cee-5443-887d-787e2f4b610a",
+"db9dca97-027c-5612-9f2d-fe6f59f00165"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103048143",
+"name": "SIA \"VALVIKS TRANS\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2007-10-22",
+"address": "Raiņa iela 2 - 3",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4941",
+"text": null,
+"nace": "49.41",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"8ac10729-8667-50f0-9b43-0548ba44cb39"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103033877",
+"name": "SIA \"VENDRA\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "L",
+"status_text": "Likvidācijas process",
+"active": false,
+"since": "2004-12-28",
+"address": "Rīgas iela 11",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4649",
+"text": null,
+"nace": "46.49",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": null,
+"turnover_year": null,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"424fa8cf-339f-5f9f-b234-f9afa49932f7"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "distressed",
+"health_why": {
+"rule": "status"
+}
+},
+{
+"registry_code": "43903001661",
+"name": "SIA \"VERA\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1993-01-21",
+"address": "Tālavas iela 19 - 19",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4711",
+"text": null,
+"nace": "47.11",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"4f54e1aa-c5dd-5c03-8141-cfe94b40e7ce"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "50203508611",
+"name": "SIA \"VLADKOR\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2023-09-18",
+"address": "Blaumaņa iela 35A",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4932",
+"text": null,
+"nace": "49.32",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 3,
+"turnover": 27285,
+"turnover_year": 2024,
+"taxes": 4680,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2023,
+2
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+3
+]
+],
+"board_size": null,
+"shareholders": 1,
+"owner_managed": null,
+"owners": [
+"c38f2dcb-4486-5bb7-bc34-aa9398b4a951"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103111921",
+"name": "SIA \"VM Tehnika\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2017-05-26",
+"address": "Tālavas iela 70",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "9609",
+"text": null,
+"nace": "96.09",
+"section": "culture"
+},
+"sector": "culture",
+"capital": null,
+"web": null,
+"employees": 6,
+"turnover": 92228,
+"turnover_year": 2024,
+"taxes": 48880,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+14
+],
+[
+2023,
+10
+],
+[
+2024,
+7
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+6
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"db9dca97-027c-5612-9f2d-fe6f59f00165"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2023,
+167199
+],
+"to": [
+2024,
+92228
+]
+}
+},
+{
+"registry_code": "44103104402",
+"name": "SIA \"Valkas Gaisma\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2016-01-11",
+"address": "Raiņa iela 12 - 13",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4321",
+"text": null,
+"nace": "43.21",
+"section": "construction"
+},
+"sector": "construction",
+"capital": null,
+"web": null,
+"employees": 7,
+"turnover": 207541,
+"turnover_year": 2025,
+"taxes": 41140,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+9
+],
+[
+2023,
+6
+],
+[
+2024,
+7
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+7
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"e59c700a-0436-5417-8259-e81775356108"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103055060",
+"name": "SIA \"Valkas Namsaimnieks\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2009-04-01",
+"address": "Rīgas iela 22",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "6832",
+"text": null,
+"nace": "68.32",
+"section": "property"
+},
+"sector": "property",
+"capital": null,
+"web": null,
+"employees": 29,
+"turnover": 890642,
+"turnover_year": 2025,
+"taxes": 328540,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+37
+],
+[
+2023,
+41
+],
+[
+2024,
+42
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+29
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": false,
+"owners": [
+"2c4c845b-b5d9-558d-a821-c49c815b2b4f",
+"f5cd9a3d-950a-5077-be0d-093d55343ae8"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "50203456131",
+"name": "SIA \"WeldMet\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2023-01-23",
+"address": "Rīgas iela 63",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "3311",
+"text": null,
+"nace": "33.11",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 10967,
+"turnover_year": 2025,
+"taxes": 5570,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"a3c81c4c-b9ab-5812-a05a-bb3107cf390b"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2024,
+20190
+],
+"to": [
+2025,
+10967
+]
+}
+},
+{
+"registry_code": "44103074146",
+"name": "SIA \"Wooden Houses Plus\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2012-03-01",
+"address": "Tālavas iela 7 - 10",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4120",
+"text": null,
+"nace": "41.20",
+"section": "construction"
+},
+"sector": "construction",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": 87668,
+"turnover_year": 2025,
+"taxes": 4240,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"ee876554-9b5c-51eb-9708-5490d14b6fc3"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40003407108",
+"name": "SIA \"Zaņas ūdensdzirnavas\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1998-08-25",
+"address": "Raiņa iela 21",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "3511",
+"text": null,
+"nace": "35.11",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 33303,
+"turnover_year": 2025,
+"taxes": 7860,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+2
+],
+[
+2023,
+2
+],
+[
+2024,
+3
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 3,
+"shareholders": 3,
+"owner_managed": true,
+"owners": [
+"9592791e-73fb-55a2-afcc-61299a6f4d1d",
+"e0e8af4b-6aef-534c-8334-4347b143e478",
+"e4cc211e-8cf4-5feb-bcc5-3ba24515a57e"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203295667",
+"name": "SIA \"beberbrokska\"",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-02-24",
+"address": "Blaumaņa iela 35A",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4649",
+"text": null,
+"nace": "46.49",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 6954,
+"turnover_year": 2024,
+"taxes": 410,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": null,
+"shareholders": 1,
+"owner_managed": null,
+"owners": [
+"05a85435-6f68-5097-821a-18ee2b164526"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203626885",
+"name": "SIA BW Grupa",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2025-02-18",
+"address": "Raiņa iela 18 - 10",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"683920eb-3ff2-59d5-bc42-bbaf58904ee7"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203331760",
+"name": "SIA Cooperante",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-07-14",
+"address": "Tērauda iela 11",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4120",
+"text": null,
+"nace": "41.20",
+"section": "construction"
+},
+"sector": "construction",
+"capital": null,
+"web": null,
+"employees": 9,
+"turnover": 100166,
+"turnover_year": 2025,
+"taxes": -270,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+9
+]
+],
+"board_size": 3,
+"shareholders": 3,
+"owner_managed": true,
+"owners": [
+"7b27dbfd-5c97-5e33-9d69-69e0a9e52bb4",
+"c82b72b6-383d-5e88-83e2-e32f09e50889",
+"e12b1e0f-ca26-5ffe-b4d4-d576106c6970"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203564655",
+"name": "SIA ECO COSY CANDLES",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-05-27",
+"address": "Merķeļa iela 23 - 43",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "?",
+"text": null,
+"nace": "?",
+"section": ""
+},
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"77fab03a-b652-571f-a685-fd638ca83284"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203591920",
+"name": "SIA EcoElegance Surfaces",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2024-09-27",
+"address": "Tālavas iela 7 - 36",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4333",
+"text": null,
+"nace": "43.33",
+"section": "construction"
+},
+"sector": "construction",
+"capital": null,
+"web": null,
+"employees": 7,
+"turnover": 391822,
+"turnover_year": 2025,
+"taxes": -590,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+7
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"159a91bb-ce9b-5c8a-8049-82d1625f8017"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103139207",
+"name": "SIA KERIS TRANS",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2020-01-29",
+"address": "Merķeļa iela 4",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4941",
+"text": null,
+"nace": "49.41",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 123571,
+"turnover_year": 2024,
+"taxes": 16610,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+2
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"e55d4def-c609-5350-8e77-8d45d99447de"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203401305",
+"name": "SIA LASA",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2022-05-20",
+"address": "Blaumaņa iela 35A",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "6820",
+"text": null,
+"nace": "68.20",
+"section": "property"
+},
+"sector": "property",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 201935,
+"turnover_year": 2024,
+"taxes": 450,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+1
+],
+[
+2023,
+1
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": null,
+"shareholders": 1,
+"owner_managed": null,
+"owners": [
+"8e24478b-2d1f-577b-86d8-32e2a3240c30"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203673767",
+"name": "SIA Masterik",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2025-08-25",
+"address": "Rīgas iela 6A - 21",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 23,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [
+[
+2026,
+2,
+null,
+23
+]
+],
+"board_size": 2,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"2dae7ac8-c0e1-5f12-84b1-e2438cafd6fb",
+"618f998b-13b6-5f67-9be9-eb0ef7190c68"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203636972",
+"name": "SIA Ramiwood",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2025-03-26",
+"address": "Rīgas iela 90 - 2",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2025,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"78e11e77-4ac5-53ab-9822-c021acb65dd4"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203428028",
+"name": "SIA SIBR",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2022-09-21",
+"address": "Merķeļa iela 15 - 60",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4932",
+"text": null,
+"nace": "49.32",
+"section": "transport"
+},
+"sector": "transport",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 140,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+2
+],
+[
+2023,
+1
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"62161170-7c37-52f5-842c-fa4c215804d5"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203369627",
+"name": "SIA Wise Media",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2021-12-28",
+"address": "Blaumaņa iela 35A",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "7311",
+"text": null,
+"nace": "73.11",
+"section": "services"
+},
+"sector": "services",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 16790,
+"turnover_year": 2024,
+"taxes": 10390,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+2
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": null,
+"shareholders": 1,
+"owner_managed": null,
+"owners": [
+"05a85435-6f68-5097-821a-18ee2b164526"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40203408587",
+"name": "SIA play2know",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2022-06-21",
+"address": "Tālavas iela 7 - 37",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "3240",
+"text": null,
+"nace": "32.40",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": 652,
+"turnover_year": 2024,
+"taxes": 660,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+1
+],
+[
+2024,
+1
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"494d06db-e788-534c-8521-c6fb51220a5c"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "watch",
+"health_why": {
+"rule": "turnover",
+"from": [
+2023,
+1242
+],
+"to": [
+2024,
+652
+]
+}
+},
+{
+"registry_code": "50203671081",
+"name": "SIA resiliEd",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2025-08-14",
+"address": "Muzeja iela 6",
+"ehak": "0053200",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 1,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [
+[
+2026,
+2,
+null,
+1
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"6c5d4b31-5136-5543-909f-d8260b1d2144"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "44103123672",
+"name": "Saules Parks SIA",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2019-07-05",
+"address": "Varoņu iela 15A",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "3511",
+"text": null,
+"nace": "35.11",
+"section": "industry"
+},
+"sector": "industry",
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": 0,
+"turnover_year": 2025,
+"taxes": 0,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+0
+]
+],
+"board_size": 1,
+"shareholders": 1,
+"owner_managed": true,
+"owners": [
+"94092c26-0e71-53e2-887a-93378b01de2a"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "90000411238",
+"name": "Septītās dienas adventistu Valkas draudze",
+"legal_form": "Draudze",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1994-05-04",
+"address": "Beverīnas iela 1",
+"ehak": "0940100",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": null,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [],
+"board_size": 3,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"0243e907-4f4a-5f32-bf01-da87b39c7e54",
+"644931b2-a5cb-5aaf-9cd6-fd3389dd4723",
+"d523903b-6f25-58b1-9bf4-63bb84d195ba"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "50203117201",
+"name": "Vapista, SIA",
+"legal_form": "Sabiedrība ar ierobežotu atbildību",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2018-01-11",
+"address": "Raiņa iela 7",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": {
+"code": "4635",
+"text": null,
+"nace": "46.35",
+"section": "trade"
+},
+"sector": "trade",
+"capital": null,
+"web": null,
+"employees": 2,
+"turnover": 1789366,
+"turnover_year": 2025,
+"taxes": 582190,
+"taxes_year": 2024,
+"employees_hist": [
+[
+2022,
+8
+],
+[
+2023,
+15
+],
+[
+2024,
+11
+]
+],
+"quarters": [
+[
+2026,
+2,
+null,
+2
+]
+],
+"board_size": 2,
+"shareholders": 1,
+"owner_managed": false,
+"owners": [
+"66279150-9bbb-54f0-907e-cf6fcb2afc90",
+"985fb4b1-1723-57f3-9906-671c9a672b6b",
+"f0a0a944-4f23-539b-9c6f-95bb056b9e1b"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "40008160530",
+"name": "Volejbola klubs \"Valka\"",
+"legal_form": "Biedrība",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "2010-05-27",
+"address": "Rīgas iela 24",
+"ehak": "0940201",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": 0,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [
+[
+2012,
+0
+],
+[
+2013,
+0
+],
+[
+2014,
+0
+],
+[
+2016,
+0
+],
+[
+2017,
+0
+],
+[
+2018,
+0
+],
+[
+2019,
+0
+],
+[
+2020,
+0
+],
+[
+2021,
+0
+],
+[
+2022,
+0
+],
+[
+2023,
+0
+],
+[
+2024,
+0
+],
+[
+2025,
+0
+]
+],
+"quarters": [],
+"board_size": 1,
+"shareholders": null,
+"owner_managed": null,
+"owners": [
+"f86a537c-16d9-5164-810a-2f9239a04ecf"
+],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "000700422",
+"name": "laikraksts \"KOOPERATORS\"",
+"legal_form": "Masu informācijas līdzeklis",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1991-04-29",
+"address": "Rīgas iela 17",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": null,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [],
+"board_size": null,
+"shareholders": null,
+"owner_managed": null,
+"owners": [],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+},
+{
+"registry_code": "000700909",
+"name": "žurnāls \"IELA\"",
+"legal_form": "Masu informācijas līdzeklis",
+"status": "R",
+"status_text": "reģistrēts",
+"active": true,
+"since": "1992-03-18",
+"address": "Rīgas iela 13",
+"ehak": "",
+"tunnus": null,
+"building_id": null,
+"match": "street",
+"via": null,
+"link": null,
+"country": "lv",
+"emtak": null,
+"sector": null,
+"capital": null,
+"web": null,
+"employees": null,
+"turnover": null,
+"turnover_year": null,
+"taxes": null,
+"taxes_year": null,
+"employees_hist": [],
+"quarters": [],
+"board_size": null,
+"shareholders": null,
+"owner_managed": null,
+"owners": [],
+"deleted": null,
+"report_overdue": false,
+"health": "sound",
+"health_why": null
+}
+]
+}

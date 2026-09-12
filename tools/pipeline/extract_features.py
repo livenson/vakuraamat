@@ -63,10 +63,12 @@ def box_fraction(mask, r):
     return total / ((y1 - y0) * (x1 - x0))
 
 
-def find_anchors(heights, canopy, ortho, buildings):
+def find_anchors(heights, canopy, ortho, buildings, focus=None):
     """Named spots for a generated story: register/spawn on open ground near the centre, the landmark at
     the largest building (else the tallest trees), the farm on the widest open ground, the trade post by a
-    road, the field on crops or soil. Heuristics; the author moves them afterwards."""
+    road, the field on crops or soil. Heuristics; the author moves them afterwards. With `focus` (tile
+    metres: the place the world was asked for, when its centre was moved onto a laser sheet) the
+    register and the spawn are found around it instead of the centre."""
     size = heights.shape[0]
     r, g, b = ortho[..., 0], ortho[..., 1], ortho[..., 2]
     v = ortho.max(axis=2)
@@ -84,7 +86,9 @@ def find_anchors(heights, canopy, ortho, buildings):
     open_ground = ~tall & ~built
     ys, xs = np.mgrid[0:size, 0:size]
     c = size / 2.0
-    dist_c = np.hypot(xs - c, ys - c)
+    # kept within 400 m of the centre, so the layout around the register still has room on the tile
+    fx, fz = (c, c) if focus is None else (float(np.clip(focus[0], c - 400, c + 400)), float(np.clip(focus[1], c - 400, c + 400)))
+    dist_c = np.hypot(xs - fx, ys - fz)
 
     def best(score, mask):
         s = np.where(mask, score, -np.inf)
@@ -92,7 +96,7 @@ def find_anchors(heights, canopy, ortho, buildings):
         return [float(i % size), float(i // size)] if np.isfinite(s.flat[i]) else None
 
     open25 = box_fraction(open_ground & ~gravel, 12)
-    register = best(open25 - dist_c / 1500.0, (dist_c <= 150) & open_ground & ~gravel) or [c, c]
+    register = best(open25 - dist_c / 1500.0, (dist_c <= 150) & open_ground & ~gravel) or [fx, fz]
     rx, rz = register
     spawn = [rx, rz + 20] if rz + 20 < size and open_ground[int(rz + 20), int(rx)] else [rx, rz - 20]
     dist_r = np.hypot(xs - rx, ys - rz)
@@ -115,7 +119,8 @@ def find_anchors(heights, canopy, ortho, buildings):
     crop60 = box_fraction(field | soil, 30)
     dist_f = np.hypot(xs - farm[0], ys - farm[1])
     fld = best(crop60, (dist_f >= 100) & (dist_r <= 400) & open_ground) or [rx + 80, rz + 90]
-    return {k: [round(p[0], 1), round(p[1], 1)] for k, p in
+    lo, hi = 16.0, size - 16.0   # the fallbacks are offsets from the register: near an edge they would leave the tile
+    return {k: [round(float(np.clip(p[0], lo, hi)), 1), round(float(np.clip(p[1], lo, hi)), 1)] for k, p in
             {"register": register, "spawn": spawn, "landmark": landmark, "farm": farm, "trade": trade, "field": fld}.items()}
 
 
@@ -281,7 +286,9 @@ def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2
 
     reg_path = os.path.join(site_dir, "buildings.json")
     reg = json.load(open(reg_path)).get("buildings", []) if os.path.exists(reg_path) else []
-    anchors = find_anchors(heights, canopy, ortho, reg or buildings)
+    focus = m.get("terrain", {}).get("focus")   # the place the world was asked for, in tile metres
+    focus = [float(focus[0]) - float(meta["xmin"]), float(meta["ymax"]) - float(focus[1])] if focus and "xmin" in meta else None
+    anchors = find_anchors(heights, canopy, ortho, reg or buildings, focus)
     log("anchors " + ", ".join(f"{k} ({v[0]:.0f},{v[1]:.0f})" for k, v in anchors.items()))
     bfile = os.path.join(site_dir, m.get("buildings", "buildings_2026.json"))
     wfile = os.path.join(site_dir, m.get("water", "water_2026.json"))

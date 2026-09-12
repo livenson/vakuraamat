@@ -30,8 +30,33 @@ PACK_VERSION = 3
 sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar
-CREDIT_ET = 'Maa maksustamishind 2022: Maakataster, Maa- ja Ruumiamet. Ettevõtted: Äriregistri avaandmed, Registrite ja Infosüsteemide Keskus (CC BY 4.0).'
-CREDIT_EN = 'Land values 2022: the cadastre, Maa- ja Ruumiamet. Companies: e-Business Register open data, Centre of Registers and Information Systems (CC BY 4.0).'
+
+
+def lv_text(row, name, country):
+    """The Latvian column of a scaffold string ("lv" for the header); what has no Latvian of its own
+    here takes the English, and the game falls back to English for anything a pack leaves out."""
+    key, en = row[0], row[2]
+    if key == "keys":
+        return "lv"
+    import sources
+    codex = sources.by_id(country).codex(name)   # what the pack is made of, in its country's words
+    if key in codex:
+        return codex[key]["lv"]
+    table = {"ERA_2026_NAME": "2026. gads", "LOC_LANDMARK": "Orientieris", "LOC_FARMSTEAD": "Sēta",
+             "EX_LANDMARK_2026": f"{name}: šeit sākas tava grāmata.", "CODEX_REAL_TITLE": "Īsts", "CODEX_INVENTED_TITLE": "Izdomāts",
+             "CODEX_DATA_TITLE": "Dati"}
+    if key.endswith("_SUBTITLE"):
+        return f"{name}: īsta zeme, īstas vērtības."
+    if key.startswith("SITE_"):
+        return name
+    return table.get(key, en)
+
+
+def country_of(center):
+    """The adapter id covering the centre ("ee", "lv"), "ee" when none does (the old default)."""
+    import sources
+    s = sources.for_point(float(center[0]), float(center[1]))
+    return s.id if s else "ee"
 
 # ---------------------------------------------------------------- EPSG:3301 (L-EST97) -> WGS84
 A_GRS80 = 6378137.0
@@ -196,8 +221,10 @@ def apply_anchors(site, anchors, root=ROOT):
 
 
 def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
-             force=False, root=ROOT, texture_mode="import", anchors=None, seed=None, block_ids=None):
-    """A present-day site pack. `eras`, `seed` and `block_ids` are accepted for older callers and ignored."""
+             force=False, root=ROOT, texture_mode="import", anchors=None, seed=None, block_ids=None, focus=None):
+    """A present-day site pack. `eras`, `seed` and `block_ids` are accepted for older callers and ignored.
+    `focus` is the place the world was asked for when its centre was moved (terrain.focus: where the
+    player starts); a rescaffold without one keeps the manifest's."""
     if not re.fullmatch(r"[a-z][a-z0-9_]*", site):
         sys.exit("--id must be lowercase letters, digits, underscores")
     site_dir = os.path.join(root, "sites", site)
@@ -208,6 +235,8 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
             shutil.rmtree(os.path.join(site_dir, sub), ignore_errors=True)
     tile = tile or site
     tile_dir = os.path.join(root, "assets/terrain", tile)
+    if focus is None and os.path.exists(os.path.join(site_dir, "site.json")):
+        focus = json.load(open(os.path.join(site_dir, "site.json"))).get("terrain", {}).get("focus")
     e, y = "era_2026", 2026
     lat, lon = lest97_to_wgs84(*center)
     half = size / 2
@@ -248,15 +277,18 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
     json.dump(scenes, open(os.path.join(site_dir, "scenes.json"), "w"), indent=1)
     S("LOC_LANDMARK", "Maamärk", "The landmark"); S("LOC_FARMSTEAD", "Talu", "The farmstead")
     S(f"EX_LANDMARK_{y}", f"{name}: siit algab sinu raamat.", f"{name}: your book starts here.")
-    S("CODEX_REAL_TITLE", "Päris", "Real"); S("CODEX_REAL", f"Maa: {name}, Maa- ja Ruumiameti kõrgusandmed, ortofoto, hooned, katastriüksused ja maa väärtused, meetri täpsusega.", f"The ground: {name}, from the Land Board's elevation data, orthophoto, buildings, cadastral units and land values, to the metre.")
-    S("CODEX_INVENTED_TITLE", "Välja mõeldud", "Invented"); S("CODEX_INVENTED", "Majade seinad ja katused on taastatud ehitisregistri mõõtude ja Maa-ameti LOD2 mudeli järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.", "The walls and roofs are reconstructed from the Building Register's measurements and Maa-amet's LOD2 model; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one.")
-    S("CODEX_DATA_TITLE", "Andmed", "Data"); S("CODEX_DATA", "Kaardiandmed: Maa- ja Ruumiamet 2026. %s" % CREDIT_ET, "Map data: Maa- ja Ruumiamet 2026. %s" % CREDIT_EN)
+    country = country_of(center)
+    S("CODEX_REAL_TITLE", "Päris", "Real"); S("CODEX_INVENTED_TITLE", "Välja mõeldud", "Invented"); S("CODEX_DATA_TITLE", "Andmed", "Data")
+    import sources
+    for key, text in sources.by_id(country).codex(name).items():   # what the pack is made of, in its country's words
+        S(key, text["et"], text["en"])
 
     # --- manifest + strings ---------------------------------------------------------------------------
     manifest = {
-        "id": site, "pipeline": PACK_VERSION, "name_key": SITE_KEY, "subtitle_key": f"{SITE_KEY}_SUBTITLE",
+        "id": site, "country": country, "pipeline": PACK_VERSION, "name_key": SITE_KEY, "subtitle_key": f"{SITE_KEY}_SUBTITLE",
         "description": f"{name}: generated site pack.",
-        "terrain": {"tile": tile, "center": [float(center[0]), float(center[1])], "size": size, "latitude": lat, "longitude": lon, "utc_offset": 3.0, "date": [2026, 9, 3]},
+        "terrain": {"tile": tile, "center": [float(center[0]), float(center[1])], "size": size, "latitude": lat, "longitude": lon, "utc_offset": 3.0, "date": [2026, 9, 3],
+                    **({"focus": [float(focus[0]), float(focus[1])]} if focus else {})},
         "start": {"era": e, "spawn": layout["spawn"], "yaw_deg": yaw},
         "water": "water_2026.json", "buildings": "buildings_2026.json",
         "locations": {"LOC_LANDMARK": "landmark", "LOC_FARMSTEAD": "farm"},
@@ -270,7 +302,7 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
     with open(os.path.join(site_dir, "strings.csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f, lineterminator="\n")
         for r in rows:
-            w.writerow(r)
+            w.writerow(r + [lv_text(r, name, country)])
     for fn in ("buildings_2026.json", "water_2026.json"):
         p = os.path.join(site_dir, fn)
         if not os.path.exists(p):

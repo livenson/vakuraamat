@@ -1,0 +1,43 @@
+{
+  "id": "riga_vecpilseta",
+  "country": "lv",
+  "pipeline": 3,
+  "name_key": "SITE_RIGA_VECPILSETA",
+  "subtitle_key": "SITE_RIGA_VECPILSETA_SUBTITLE",
+  "description": "R\u012bga, Vecpils\u0113ta: generated site pack.",
+  "terrain": {
+    "tile": "riga_vecpilseta",
+    "center": [
+      506400.0,
+      6311650.0
+    ],
+    "size": 1024,
+    "latitude": 56.94879,
+    "longitude": 24.10513,
+    "utc_offset": 3.0,
+    "date": [
+      2026,
+      9,
+      3
+    ]
+  },
+  "start": {
+    "era": "era_2026",
+    "spawn": [
+      512.0,
+      532.0
+    ],
+    "yaw_deg": 0.0
+  },
+  "water": "water_2026.json",
+  "buildings": "buildings_2026.json",
+  "locations": {
+    "LOC_LANDMARK": "landmark",
+    "LOC_FARMSTEAD": "farm"
+  },
+  "codex": [
+    "CODEX_REAL",
+    "CODEX_INVENTED",
+    "CODEX_DATA"
+  ]
+}

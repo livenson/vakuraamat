@@ -1,16 +1,18 @@
-# The locator: Estonia at a glance on the Locations page, so a suggested place is a spot on the map
-# and not only a name with a coordinate under it. The coastline is the county division unioned and
-# simplified (assets/data/estonia.json, tools/pipeline/fetch_outline.py), drawn as an engraved plate
+# The locator: Estonia and Latvia at a glance on the Locations page, so a suggested place is a spot on
+# the map and not only a name with a coordinate under it. Estonia's coastline is the county division
+# unioned and simplified (assets/data/estonia.json), Latvia's its municipalities (assets/data/latvia.json,
+# both from tools/pipeline/fetch_outline.py, on the same L-EST97 grid), drawn as an engraved plate
 # in the book's ink: land on lighter paper, Peipsi and the gulf as the page itself, Võrtsjärv in the
 # cadastre's blue. Every place the page offers is a mark on it; the world you are in is filled.
-# Hovering a mark names it, and hovering a row on the page lights that row's mark (`highlight`).
+# Hovering a mark names it, clicking it emits `picked`, and hovering a row on the page lights that
+# row's mark (`highlight`).
 class_name EstoniaMap
 extends Control
 
-const OUTLINE := "res://assets/data/estonia.json"
 const PICK_RADIUS := 12.0   # how near the pointer has to come to a mark, in pixels
 
 signal hovered(index: int)   # -1 when the pointer leaves every mark
+signal picked(index: int)    # a mark clicked: the page decides what going there means
 
 ## [{name, x, y, kind}] in L-EST97; kind is "suggested", "installed" or "current".
 var places: Array = []
@@ -24,7 +26,7 @@ var _lit := -1              # lit from the page: the row the pointer is on
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	custom_minimum_size = Vector2(380, 268)
+	custom_minimum_size = Vector2(380, 340)   # the two countries together are about as tall as wide
 	_load()
 	mouse_exited.connect(func():
 		if _hover != -1:
@@ -33,12 +35,26 @@ func _ready() -> void:
 			queue_redraw())
 
 
-## The outline file, read once per session.
+## The outline files, read once per session and merged: every country's land and lakes on one
+## plate, the bounds around them all.
 static func _load() -> Dictionary:
 	if _map.is_empty():
-		var text := FileAccess.get_file_as_string(OUTLINE)
-		var d = JSON.parse_string(text) if text != "" else null
-		_map = d if typeof(d) == TYPE_DICTIONARY else {"bounds": [369034, 6377141, 739153, 6634019], "land": [], "lakes": []}
+		var land := []
+		var lakes := []
+		var b := [INF, INF, -INF, -INF]
+		for path in Countries.outlines():   # every described country's (assets/data/countries)
+			var text := FileAccess.get_file_as_string(path)
+			var d = JSON.parse_string(text) if text != "" else null
+			if typeof(d) != TYPE_DICTIONARY or d.get("bounds", []).size() != 4:
+				continue
+			land.append_array(d.get("land", []))
+			lakes.append_array(d.get("lakes", []))
+			for i in 2:
+				b[i] = minf(b[i], float(d.bounds[i]))
+				b[i + 2] = maxf(b[i + 2], float(d.bounds[i + 2]))
+		if land.is_empty():
+			b = [369034, 6377141, 739153, 6634019]
+		_map = {"bounds": b, "land": land, "lakes": lakes}
 	return _map
 
 
@@ -53,10 +69,16 @@ func highlight(index: int) -> void:
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		var near := _nearest(event.position)
+		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if near >= 0 else Control.CURSOR_ARROW
 		if near != _hover:
 			_hover = near
 			hovered.emit(near)
 			queue_redraw()
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var at := _nearest(event.position)
+		if at >= 0:
+			picked.emit(at)
+			accept_event()
 
 
 func _nearest(at: Vector2) -> int:
@@ -119,7 +141,7 @@ func _draw() -> void:
 		if kind == "current" or lit:
 			draw_circle(at, 4.5 if lit else 3.5, color)
 			draw_arc(at, 7.0, 0.0, TAU, 24, Color(color, 0.6), 1.0, true)
-		elif kind == "installed":
+		elif kind in ["installed", "ready"]:   # ready: built on the tile service, blue
 			draw_circle(at, 3.0, color)
 		else:
 			draw_circle(at, 3.0, Color(BookTheme.PAGE_LIGHT, 0.9))

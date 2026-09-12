@@ -8,6 +8,34 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
+## Unreleased
+
+**Latvia.**
+
+- **Latvian places.** Search for any address in Latvia and walk it: Rīga's Old Town and Valka come
+  with the game, and any other place is built from Latvia's own open data. That covers the ground and
+  trees from laser scans, the orthophoto, and plots with their land values. Buildings get Rīga's 3D
+  models or roofs fitted to the laser points, and companies come with their taxes. Roads, bus stops
+  and timetables are there too. A town on the border, such as Valga and Valka, shows both sides.
+- **Latviešu valoda.** The interface is now in Latvian as well as Estonian and English (L).
+- **Older photographs in Latvia.** A Latvian plot's page shows the land in 2003–05, 2007–08,
+  2010–11 and 2013–15 as well as today, like an Estonian plot's.
+- **A new Latvian place is ready in about two minutes.** It downloads one laser-scan sheet instead
+  of four (Cēsis: 299 MB instead of 1.2 GB), and neighbouring areas join without a step in the ground.
+- **The Locations page is simpler.** The search comes first. Each result says whether it is one of
+  your worlds, ready, or new with its download size and time, and one Go button takes you there.
+  There is no separate "Create" step. Your worlds are listed with the most recently visited first,
+  beside the map, and storage has a page of its own.
+- **Creating a world can be cancelled** while it downloads (the Cancel button or Esc).
+- **See every industry on a plot.** The map (M) and the ground layer (I) have two new layers:
+  - industry mix stripes each plot in the colours of all its companies' sectors;
+  - one sector shades plots by how much of them one sector holds. Shift+I shows it on the ground and
+    steps through the sectors.
+- **Bankrupt and liquidating companies turn their plot red** in the health layer, and every layer's
+  legend explains what its colours mean.
+- **St James's Cathedral in Rīga has its whole spire again**, and 24 other Rīga buildings got back
+  tops (towers, turrets) that were missing.
+
 ## v0.9.0 — 2026-09-11
 
 **No more frozen window on the way in.**

@@ -1,304 +1,338 @@
-keys,et,en
-UI_REGISTER_TITLE,Vakuraamat,The register
-UI_REGISTER_HINT,Vali lehekülg,Choose a page
-UI_JOURNAL,Päevik,Journal
-UI_MAPS,Kaardid,Maps
-UI_INVENTORY,Kott,Bag
-UI_ARTIFACTS,Ajast välja,Out of time
-UI_LOCAL_ITEMS,Siit ja praegu,Here and now
-UI_EMPTY,(tühi),(empty)
-UI_CLOSE,Sulge,Close
-UI_CONTINUE,Edasi,Continue
-UI_NEW_GAME,Mine kohale,Go there
-UI_CONTINUE_GAME,Tagasi sinna,Back to where I was
-UI_QUIT,Välju,Quit
-UI_MENU,Menüü,Menu
-UI_SAVE_MENU,Salvesta ja mine peamenüüsse,Save and go to main menu
-UI_SAVE_QUIT,Salvesta ja välju,Save and quit
-UI_CHAPTER_COMMIT,"%s. peatükk lõppes. See, mis on tehtud, jääb nüüd tehtuks.",Chapter %s ends. What is done now stays done.
-UI_CHAPTER_COMMIT_FIRST,Peatükk lõppes. Igal peatüki lõpul jäävad sinu valikud lõplikuks. Peatüki sees võid ümber otsustada.,A chapter has ended. At the end of every chapter your choices become permanent. Within a chapter you may change your mind.
-UI_PROMPT_EXAMINE,Vaata,Look
-UI_PROMPT_TALK,Räägi,Talk
-UI_PROMPT_TAKE,Võta,Take
-UI_PROMPT_OPEN,Ava,Open
-UI_PROMPT_USE,Kasuta,Use
-NOTICE_REGISTER_NEW_LINE,Vakuraamatu %s lehel on uus rida.,The register's %s page has a new line on it.
-NOTICE_LEFT_BEHIND,"%s jäi sinna, kus sa seisid. Ainult see, mis raamatusse kuulub, tuleb kaasa.",%s stayed where you stood. Only what belongs to the book comes along.
-NOTICE_ARTIFACT_TAKEN,%s. See kuulub raamatusse; see tuleb sinuga läbi aastate.,%s. It belongs to the book; it comes with you through the years.
-NOTICE_SAVED,Salvestatud.,Saved.
-NOTICE_ERA,%s,%s
-UI_CHAPTER,%s. peatükk,Chapter %s
-UI_EPILOGUE,Epiloog,Epilogue
-UI_REGISTER_LOCKED,Sul pole veel raamatut.,You don't have the book yet.
-UI_PLAY_AGAIN,Mängi uuesti,Play again
-MENU_LANGUAGE,Keel / Language,Keel / Language
-MENU_FULLSCREEN,Täisekraan,Fullscreen
-MENU_ON,sees,on
-MENU_OFF,väljas,off
-MENU_CREDIT,Kaardiandmed: Maa- ja Ruumiamet 2026,Map data: Maa- ja Ruumiamet 2026
-UI_CODEX,Mis on tõsi,What's real
-FARM_PLOT,Peenar,Plot
-FARM_PLANT,Külva,Sow
-FARM_HARVEST,Lõika,Harvest
-FARM_WAIT,Oota,Wait
-FARM_EMPTY_HINT,Tühi peenar. Seemet pole kotis.,An empty plot. No seed in the bag.
-FARM_EMPTY_READY,Tühi peenar. Kotis on %s.,An empty plot. The bag has %s.
-FARM_READY_TEXT,%s on valmis.,%s is ready.
-FARM_GROWING_TEXT,"%s kasvab, %d%%.","%s is growing, %d%%."
-FARM_PLANTED,Külvatud: %s.,Sown: %s.
-FARM_HARVESTED,Lõigatud: %d × %s.,Harvested: %d × %s.
-FARM_SEED_BIN,Seemnesalv,Seed bin
-FARM_SEED_BIN_TEXT,Seemnekotid. Võta üks korraga; keegi ei loe.,Seed sacks. Take one at a time; nobody's counting.
-HUNT_PROMPT,Küti,Hunt
-HUNT_HINT,"%s. Õnnestumine umbes %d%%. Ligemale, aeglaselt.","%s. About %d%% chance. Closer, slowly."
-HUNT_SUCCESS,Saak: %s.,Taken: %s.
-HUNT_MISS,%s pääses.,The %s got away.
-TRADE_PROMPT,Kauple,Trade
-UI_TRADE,Kauplemine,Trading
-UI_BUY,Osta,Buy
-UI_SELL,Müü,Sell
-UI_BALANCE,Rahakott: %s,Purse: %s
-TRADE_NO_MONEY,Raha ei jätku.,Not enough money.
-TRADE_NOTHING_TO_SELL,"Sul pole midagi, mida siin ostetakse.",You have nothing they buy here.
-BUILD_PROMPT,Ehita,Build
-UI_BUILD,Ehitamine,Building
-BUILD_LEVEL,%s: %d / %d ehitatud.,%s: %d of %d built.
-BUILD_LOCKED,Siin ei saa veel midagi ehitada. Maa pole teie oma – veel.,Nothing can be built here yet. The land isn't yours – yet.
-BUILD_DONE,%s on valmis (%s).,%s is finished (%s).
-BUILD_ALREADY,Juba ehitatud.,Already built.
-BUILD_REQUIRES,Vajab enne: %s.,Needs first: %s.
-BUILD_NO_MONEY,Raha ei jätku.,Not enough money.
-BUILD_NO_MATERIALS,Materjali ei jätku.,Not enough materials.
-BUILD_COST,Hind: %s,Cost: %s
-UI_DEBUG_MAP,Silumiskaart,Debug map
-UI_DEBUG_MAP_HINT,"Klõps kaardil: teleport. Parem klõps: seosed. Hiir näitab, mida register kohast ütleb. M sulgeb.",Click the map to teleport. Right click for links. Hover to read what the register says. M closes.
-UI_KEYS,E tegutse   Tab vakuraamat   / otsi   B maatükk siin   J päevik   L keel   M kaart   I kiht   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   Tab vakuraamat   / find   B this plot   J journal   L language   M map   I layer   K codes   F fly   T teleport   H home   F8 report   Esc menu
-MENU_SITE,Asukoht,Location
-UI_BUILDING_GROUND,Maa ehitatakse laserandmetest...,Building the ground from the laser data...
-MENU_NEW_LOCATION,Uus asukoht...,New location...
-MENU_SEARCH,Otsi,Search
-MENU_USE_MY_LOCATION,Kasuta minu asukohta,Use my location
-MENU_BACK,Tagasi,Back
-MENU_CREATE_WORLD,Loo maailm,Create the world
-MENU_LOCATION_HINT,"Aadress, koht või koordinaadid (L-EST97 ""E N"" või ""lat, lon"")","An address, a place, or coordinates (L-EST97 ""E N"" or ""lat, lon"")"
-MENU_SERVICE_DOWN,"Kaarditeenus ei vasta (%s) ja seda ei õnnestunud käivitada. Käivita mäng skriptiga tools/play.sh","The tile service is not answering (%s) and could not be started. Launch the game with tools/play.sh"
-MENU_OUTSIDE_ESTONIA,See koht ei ole Eestis. Praegu on andmed ainult Eesti kohta.,That point is outside Estonia. Data is only available for Estonia so far.
-MENU_NO_RESULTS,Midagi ei leitud.,Nothing found.
-MENU_WORLD_READY,Maailm on valmis.,The world is ready.
-MENU_LOCATION_NAME,Nimi,Name
-MENU_GENERATING,Maailma luuakse: %s,Creating the world: %s
-MENU_STAGE_SERVICE,kaarditeenus,tile service
-MENU_STAGE_REQUEST,tellimus,request
-MENU_STAGE_DOWNLOAD,allalaadimine,download
-MENU_STAGE_INSTALL,paigaldus,install
-MENU_CREATE_FAILED,Maailma ei õnnestunud luua.,The world could not be created.
-MENU_CREATE_NOTE,"Maa-ameti andmed, hoonete register, katastri ja äriregistri kihid laetakse ja pakitakse. See võtab tavaliselt paar minutit.","Maa-amet data, the building register, the cadastre and the business register are fetched and packed. This usually takes a couple of minutes."
-MENU_REFRESHING,"Paika värskendatakse: %s","Bringing %s up to date"
-MENU_REFRESH_NOTE,"Selle paiga andmed on kogutud vanema torustikuga. Registrid laetakse uuesti; maapind jääb paigale.","This place's data was gathered by an older pipeline. The registers are fetched again; the ground stays as it is."
-MENU_LOCATIONS,Asukohad...,Locations...
-MENU_AVAILABLE,Olemas,Available
-MENU_ON_SERVICE,Valmis teenuses,Ready on the service
-MENU_SUGGESTED,Soovitatud kohad,Suggested places
-MENU_MAP_LEGEND,"Ring: soovitatud koht. Täidetud: sinu maailmad, praegune paksem. Vii kursor rea või märgi peale.","Ring: a suggested place. Filled: your own worlds, the current one ringed. Point at a row or a mark."
-MENU_SEARCH_PLACES,Otsi kohta,Search for a place
-MENU_PLAY,Mängi,Play
-MENU_INSTALL_PLAY,Paigalda ja mängi,Install and play
-MENU_CREATE,Loo,Create
-MENU_SHIPPED,kaasas,shipped
-MENU_INSTALLED,paigaldatud,installed
-MENU_FRIENDS,Sõbrad,Friends
-MENU_SHARE_WORLD,Jaga seda maailma,Share this world
-MENU_VISIT,Külasta sõbra maailma (kood),Visit a friend's world (code)
-MENU_VISIT_GO,Mine,Go
-MENU_WORLD_CODE,Maailma kood: %s,World code: %s
-MENU_VISITING,"Külas: %s (%s)","Visiting: %s (%s)"
-MENU_WORLDS_DOWN,"Maailmateenus ei vasta (%s). Käivita: make world-service","The world service is not answering (%s). Start it with: make world-service"
-MENU_NO_SUCH_WORLD,Sellist maailma ei ole.,No such world.
-NOTICE_FRIEND_DELIVERY,"Sõber %s tegi sinu maailmas midagi: %s","A friend, %s, did something in your world: %s"
-MENU_CURRENT,praegune,current
-UI_REPORT_TITLE,Teata probleemist,Report an issue
-UI_REPORT_HINT,"Pilt on juba tehtud. Kirjuta, mis on valesti, kus, ja kuidas see peaks olema. Salvestatakse koos asukoha, sihtmärgi ja mänguseisuga.","The frame is already captured. Say what is wrong, where, and how it should be. Saved with your position, what you are looking at and the game state."
-UI_REPORT_SEND,Saada,Send
-UI_REPORT_SENT,Teade salvestatud: %s,Report saved: %s
-UI_CODES_PARCEL,Katastriüksus,Cadastral unit
-UI_CODES_BUILDING,Hoone,Building
-UI_CODES_ROAD,Tee,Road
-UI_CODES_TARGET,Sihtmärk,Target
-UI_CODES_COPIED,%d registrilinki kopeeritud lõikelauale,%d registry links copied to the clipboard
-NOTICE_FLY_ON,"Lend sees (F): Shift ja Ctrl kiirendavad, vaata ja liigu",Fly on (F): Shift and Ctrl speed up; move where you look
-NOTICE_FLY_OFF,Lend väljas,Fly off
-NOTICE_TELEPORT,"Teleport %d, %d","Teleported to %d, %d"
-NOTICE_HOME,Algus,Back at the start
-UI_PROMPT_RIDE,Sõida,Ride
-ITEM_BICYCLE,Jalgratas,Bicycle
-EX_BICYCLE,"Jalgratas. E: sõida; E uuesti, kui midagi ei vaata: tule maha.","A bicycle. E to ride; E again, looking at nothing, to get off."
-NOTICE_BIKE_ON,"Rattal. Shift kiiremini, E maha.","On the bike. Shift to go faster, E to get off."
-NOTICE_BIKE_OFF,Maha tuldud.,Off the bike.
-UI_LOADING_TILE,Naabertükk laeb: %s,Loading the neighbour tile: %s
-UI_LOADING_WORLD,%s laeb...,Loading %s...
-UI_LOADING_TOWN,Linn kerkib... %d%%,Building the town... %d%%
-UI_LOADING_GRAPHICS,Graafika valmib... %d varjutajat,Preparing graphics... %d shaders
-NOTICE_EDGE_PENDING,Sealpoolne maa on alles mõõtmisel – oota hetk,The land beyond is still being surveyed. Wait a moment
-NOTICE_EDGE_NONE,Sealpool kaarti ei ole,There is no map beyond here
-NOTICE_TILE_READY,Naaberala on valmis,The next stretch of land is ready
-UI_BOOK_TITLE,Vakuraamat,Vakuraamat
-UI_BOOK_PLOTS,Maatükid,Plots
-UI_BOOK_PLOT,Maatükk,Plot
-UI_BOOK_COL_ADDRESS,Aadress,Address
-UI_BOOK_COL_PURPOSE,Sihtotstarve,Purpose
-UI_BOOK_COL_AREA,Pindala,Area
-UI_BOOK_COL_VALUE,Maa väärtus,Land value
-UI_BOOK_MORE,"… ja veel %d kaugemal","… and %d more further away"
-UI_BOOK_PICK,"Vali maatükk nimekirjast või seisa sellel ja vajuta B.","Pick a plot from the list, or stand on one and press B."
-UI_BOOK_REGISTERED_HERE,Siia registreeritud,Registered here
-UI_BOOK_NONE_REGISTERED,Ühtegi ettevõtet ei ole siia registreeritud.,No company is registered here.
-UI_BOOK_OVER_THE_YEARS,Krunt läbi aastate,This plot over the years
-UI_BOOK_TODAY,täna,today
-UI_BOOK_ENLARGE,Klõpsa suuremalt vaatamiseks,Click to see it larger
-UI_BOOK_SORT_BY,Järjesta: %s,Sort by %s
-UI_SHEET_OPEN_PLOT,Ava krunt vakuraamatus,Open the plot in the book
-UI_BOOK_FIND_PLACEHOLDER,Otsi aadressi või ettevõtet,Find an address or a company
-UI_BOOK_NO_MATCH,Midagi ei vasta otsingule "%s".,Nothing matches "%s".
-UI_FIND_PLOTS_ON,%d krunti,%d plots
-UI_FIND_PLACEHOLDER,"Aadress, ettevõte või tänav","An address, a company or a street"
-UI_FIND_HINT,Nooled valivad · Enter juhatab · Shift+Enter hüppab · Esc sulgeb,Arrows choose · Enter points the way · Shift+Enter jumps · Esc closes
-UI_FIND_NOTHING,Selles linnas ei leidu midagi sellist.,Nothing like that in this town.
-UI_FIND_KIND_PLOT,krunt,plot
-UI_FIND_KIND_BUILDING,hoone,building
-UI_FIND_KIND_COMPANY,ettevõte,company
-UI_FIND_KIND_STREET,tänav,street
-NOTICE_TELEPORT_TO,Hüppasid: %s,Jumped to %s
-UI_IN_USE_SINCE,kasutusel alates %d,in use since %d
-UI_BOOK_SOURCES,"Kõik siinsed arvud on avaandmed, nagu registrid need annavad.","Every figure here is open data, as the registers give it."
-UI_SINCE,alates,since
-UI_TENANT_INACTIVE,ei tegutse,inactive
-UI_CODES_TENANT,Üürnikud,Tenants
-UI_CODES_OWNER,Omanik,Owner
-BTN_LINK,Ava link,Open link
-BTN_SHOW,Näita,Show
-PURPOSE_ELAMUMAA,elamumaa,residential
-PURPOSE_ARIMAA,ärimaa,commercial
-PURPOSE_TOOTMISMAA,tootmismaa,industrial
-PURPOSE_TRANSPORDIMAA,transpordimaa,transport
-PURPOSE_ULDKASUTATAV_MAA,üldkasutatav maa,public land
-PURPOSE_UHISKONDLIKE_EHITISTE_MAA,ühiskondlike ehitiste maa,public buildings
-PURPOSE_MAATULUNDUSMAA,maatulundusmaa,agricultural/forest
-PURPOSE_SIHTOTSTARBETA_MAA,sihtotstarbeta maa,no purpose set
-PURPOSE_JAATMEHOIDLA_MAA,jäätmehoidla maa,waste
-PURPOSE_VEEKOGUDE_MAA,veekogude maa,water
-PURPOSE_KAITSEALUNE_MAA,kaitsealune maa,protected
-BTN_GUIDE,Juhata,Guide
-BTN_GUIDE_TIP,Näita kompassil ja ekraanil teed selle maatükini,Point the compass and the screen marker at this plot
-BTN_TELEPORT,Mine,Go
-BTN_TELEPORT_TIP,Hüppa kohe sinna,Jump there now
-NOTICE_GUIDE_SET,Teejuht: %s,Guiding you to %s
-NOTICE_GUIDE_ARRIVED,Kohal: %s,You are at %s
-UI_PROMPT_SWITCH_ON,Lülita sisse,Switch on
-UI_PROMPT_SWITCH_OFF,Lülita välja,Switch off
-UI_PROMPT_READ,Loe,Read
-UI_NO_REGISTER,Registris seda hoonet ei ole (laserskaneeringu massiiv).,Not in the register (a shape from the laser scan).
-UI_LAMP,Lamp,Lamp
-UI_NOTICE_BOARD,Teadetetahvel,Notice board
-UI_SHEET_CLOSE,Esc sulgeb,Esc closes
-UI_SHEET_REGISTER,"Ehitisregister: %s","Building register: %s"
-UI_SHEET_TENANTS,Üürnikud,Tenants
-UI_SHEET_OWNER,Katastriüksus %s · omanik %s,Cadastral unit %s · owner %s
-UI_SHEET_NO_TENANTS,Ühtegi ettevõtet ei ole siia registreeritud.,No company is registered at this address.
-UI_PROMPT_ENTER,Sisene,Enter
-UI_PROMPT_LEAVE,Välju,Leave
-UI_BUILDING,Hoone,Building
-UI_FLOORS,%d korrust,%d floors
-NOTICE_ENTERED,Sees: %s,Inside: %s
-MENU_PACKS_COUNT,%d kohta,%d places
-MENU_ESTIMATING,Hindan allalaadimist...,Estimating the download...
-MENU_ESTIMATE,"Allalaadimine umbes %s (%s juba vahemälus), aeg umbes %s: laadimine %s ja töötlus %s. Kettal vaba %s.","Download about %s (%s already cached), roughly %s: %s to download and %s to process. %s free on disk."
-MENU_ESTIMATE_UNKNOWN,Allalaadimise mahtu ei õnnestunud hinnata.,The download size could not be estimated.
-MENU_LOW_DISK,"Kettal on vaba vaid %s; maailma jaoks on vaja vähemalt %s. Kustuta vanu maailmu jaotisest Salvestatud.","Only %s free on disk; a world needs at least %s. Remove old worlds under Storage."
-MENU_STORAGE,Salvestatud maailmad,Storage
-MENU_STORAGE_LINE,"%s paigaldatud maailmades, %s naabruse ruutudes, kettal vaba %s","%s in installed worlds, %s in neighbour tiles, %s free on disk"
-MENU_SERVICE_CACHE,"Kaarditeenuse vahemälu: %s (%s)","Tile service cache: %s (%s)"
-MENU_NEIGHBOUR_TILES,"Naabruse ruudud (%d)","Neighbour tiles (%d)"
-MENU_OUTDATED,vananenud,out of date
-MENU_TILES_OUTDATED,"%d vananenud","%d out of date"
-MENU_REFRESH,Värskenda,Refresh
-MENU_REFRESH_QUEUED,"%d paika värskendatakse taustal.","%d place(s) are being brought up to date in the background."
-MENU_DELETE,Kustuta,Remove
-MENU_CONFIRM_DELETE,Kindlasti kustuta,Really remove
-MENU_DELETE_ALL_TILES,Kustuta kõik naabruse ruudud,Remove all neighbour tiles
-MENU_REMOVED,Prügikasti viidud.,Moved to the trash.
-UI_BUS_STOP,Bussipeatus,Bus stop
-UI_BUS_LINES,Liinid: %s,Lines: %s
-UI_MAP_MODE,Kiht,Layer
-UI_MAP_MODE_OFF,väljas,off
-UI_MAP_MODE_SECTOR,tegevusala,sector
-UI_MAP_MODE_SIZE,töötajad,employees
-UI_MAP_MODE_HEALTH,ettevõtte seis,company health
-UI_MAP_MODE_AGE,asutamisaasta,founded
-UI_MAP_MODE_OWNERS,ühised omanikud,shared owners
-UI_MAP_HEALTH_NOTE,"Krundil tegutseva ettevõtte seis, mitte hoone seisukord. Kollane: majandusaasta aruanne hilineb või käive langes aastaga üle 40 %. Punane: likvideerimisel või pankrotis, või aasta jooksul null makse, kuigi töötajaid on.","The health of the company on the plot, not the state of the building. Yellow: the annual report is overdue, or turnover fell by more than 40 % on the year before. Red: in liquidation or bankrupt, or a year of zero taxes while employing staff."
-UI_MAP_AGE_NOTE,"Krundil tegutseva ettevõtte asutamisaasta, mitte hoone vanus.","The year the company on the plot was founded, not the age of the building."
-UI_MAP_SIZE_LEGEND,ring: töötajate arv,circle: employees
-UI_MAP_OWNERS_LEGEND,joon: sama omanik või juhatuse liige,line: same owner or board member
-SECTOR_FARM,põllumajandus ja metsandus,farming and forestry
-SECTOR_INDUSTRY,tööstus ja energia,industry and energy
-SECTOR_CONSTRUCTION,ehitus,construction
-SECTOR_TRADE,kaubandus,trade and repair
-SECTOR_TRANSPORT,transport,transport and storage
-SECTOR_HOSPITALITY,majutus ja toitlustus,hotels and restaurants
-SECTOR_MEDIA,meedia ja IT,media and IT
-SECTOR_FINANCE,rahandus,finance and insurance
-SECTOR_PROPERTY,kinnisvara,real estate
-SECTOR_SERVICES,teenused,professional services
-SECTOR_PUBLIC,"avalik sektor, haridus, tervis","public, education, health"
-SECTOR_CULTURE,"kultuur, sport, muud teenused","arts, sport, other services"
-HEALTH_SOUND,korras,sound
-HEALTH_WATCH,jälgimisel,watch
-HEALTH_DISTRESSED,raskustes,distressed
-HEALTH_WHY_REPORT,majandusaasta aruanne hilineb,annual report overdue
-HEALTH_WHY_TURNOVER,käive langes %s → %s (%d → %d),turnover fell %s → %s (%d → %d)
-HEALTH_WHY_TURNOVER_RULE,käive langes aastaga üle 40 %,turnover fell by more than 40 % on the year before
-HEALTH_WHY_STATUS,registri staatus: %s,register status: %s
-HEALTH_WHY_ZERO_TAXES,"aasta jooksul null makse, kuigi töötajaid on",a year of zero taxes while employing staff
-UI_EMPLOYEES,%d töötajat,%d employees
-UI_TURNOVER,käive %s/a,turnover %s/yr
-UI_TAXES,maksud %s/a,taxes %s/yr
-UI_BOARD,juhatuses %d,board of %d
-UI_OWNER_MANAGED,omanik juhib,owner-managed
-UI_CAPITAL,kapital %s,capital %s
-UI_ALL,Kõik,All
-UI_BOOK_COMPANIES,Ettevõtted,Companies
-UI_BOOK_COL_COMPANY,Ettevõte,Company
-UI_BOOK_COL_SECTOR,Tegevusala,Sector
-UI_BOOK_COL_EMPLOYEES,Töötajaid,Employees
-UI_BOOK_COL_TURNOVER,Käive,Turnover
-UI_BOOK_PLACE,Paik,Place
-UI_BOOK_COL_OWNERSHIP,Omandivorm,Ownership
-UI_BOOK_LAND_REGISTRY,Kinnistu,Land registry
-UI_BOOK_REGISTERED,Katastrisse kantud,Entered in the cadastre
-UI_BOOK_IN_THE_REGISTER,Vaata registris,See it in the register
-UI_BOOK_VINTAGE,Andmed seisuga %s,Data as of %s
-UI_BOOK_COUNTS,%d maatükki · %d hoonet · %d ettevõtet,%d plots · %d buildings · %d companies
-UI_BOOK_VALUES,"Maa maksustamishind %d, mediaan","Land taxation value %d, median"
-UI_BOOK_OF_PLOTS,%d maatükil,over %d plots
-UI_NO_PLOT_HERE,Sa ei seisa ühelgi katastriüksusel.,You are not standing on a cadastral unit.
-UI_BUS_TIMETABLE,Sõiduplaan,Timetable
-UI_BUS_NEXT,Järgmised väljumised,Next departures
-UI_BUS_IN_MIN,%d min pärast,in %d min
-UI_BUS_NO_SERVICE,Selle peatuse sõiduplaani registris ei ole.,The register has no timetable for this stop.
-UI_BOOK_LOADING,Laadin…,Loading…
-BTN_FOCUS,Näita seoseid,Show links
-BTN_FOCUS_TIP,Tõsta see maatükk ja sellega seotu esile igal lehel ja maastikul,Highlight this plot and what it is linked to on every page and on the ground
-UI_LINK_HEAD,Seosed,Linked
-UI_LINK_BUILDINGS,Hooneid sellel maatükil: %d,Buildings on this plot: %d
-UI_LINK_OWNERS_NOTE,Ühine omanik on äriregistri järgi siinsete ettevõtete omanik; maa ise ei ole registri järgi ühisomandis,The shared owner is an owner of the companies here in the Business Register; the register does not say the land itself is jointly held
-UI_FOCUS_ON,Seosed: %s,Links: %s
-UI_FOCUS_CLEARED,Seosed kustutatud,Links cleared
-UI_MORE_COMPANIES,"… ja veel %d","… and %d more"
-UI_LINK_PLOTS,Seotud maatükke: %d,Linked plots: %d
-UI_LINK_NONE,Register ei seo seda maatükki ühegi teisega,The registers tie this plot to no other
-UI_LINK_WHY_OWNER,ühiseid omanikke: %d,owners in common: %d
-UI_LINK_WHY_REGISTRY,sama kinnistu,the same registered immovable
-UI_LINK_WHY_BUILDING,ühine hoone,a building stands on both
-UI_BOOK_FORMERLY_HERE,Varem siia registreeritud,Formerly registered here
-UI_STARTER_DOWNLOADING,"ümbruse kohad: allalaadimine %d%%","the places around: downloading %d%%"
-UI_STARTER_INSTALLING,"ümbruse kohad: lahtipakkimine","the places around: unpacking"
+keys,et,en,lv
+UI_REGISTER_TITLE,Vakuraamat,The register,Vakuraamat
+UI_REGISTER_HINT,Vali lehekülg,Choose a page,Izvēlies lapu
+UI_JOURNAL,Päevik,Journal,Dienasgrāmata
+UI_MAPS,Kaardid,Maps,Kartes
+UI_INVENTORY,Kott,Bag,Soma
+UI_ARTIFACTS,Ajast välja,Out of time,Ārpus laika
+UI_LOCAL_ITEMS,Siit ja praegu,Here and now,Šeit un tagad
+UI_EMPTY,(tühi),(empty),(tukšs)
+UI_CLOSE,Sulge,Close,Aizvērt
+UI_CONTINUE,Edasi,Continue,Tālāk
+UI_NEW_GAME,Mine kohale,Go there,Doties turp
+UI_CONTINUE_GAME,Tagasi sinna,Back to where I was,"Atpakaļ, kur biju"
+UI_QUIT,Välju,Quit,Iziet
+UI_MENU,Menüü,Menu,Izvēlne
+UI_SAVE_MENU,Salvesta ja mine peamenüüsse,Save and go to main menu,Saglabāt un doties uz galveno izvēlni
+UI_SAVE_QUIT,Salvesta ja välju,Save and quit,Saglabāt un iziet
+UI_CHAPTER_COMMIT,"%s. peatükk lõppes. See, mis on tehtud, jääb nüüd tehtuks.",Chapter %s ends. What is done now stays done.,"%s. nodaļa beidzas. Kas izdarīts, tas paliek izdarīts."
+UI_CHAPTER_COMMIT_FIRST,Peatükk lõppes. Igal peatüki lõpul jäävad sinu valikud lõplikuks. Peatüki sees võid ümber otsustada.,A chapter has ended. At the end of every chapter your choices become permanent. Within a chapter you may change your mind.,Nodaļa ir beigusies. Katras nodaļas beigās tavas izvēles kļūst galīgas. Nodaļas laikā vari pārdomāt.
+UI_PROMPT_EXAMINE,Vaata,Look,Skatīt
+UI_PROMPT_TALK,Räägi,Talk,Runāt
+UI_PROMPT_TAKE,Võta,Take,Ņemt
+UI_PROMPT_OPEN,Ava,Open,Atvērt
+UI_PROMPT_USE,Kasuta,Use,Lietot
+NOTICE_REGISTER_NEW_LINE,Vakuraamatu %s lehel on uus rida.,The register's %s page has a new line on it.,Reģistra lapā %s ir jauna rinda.
+NOTICE_LEFT_BEHIND,"%s jäi sinna, kus sa seisid. Ainult see, mis raamatusse kuulub, tuleb kaasa.",%s stayed where you stood. Only what belongs to the book comes along.,"%s palika tur, kur tu stāvēji. Līdzi nāk tikai tas, kas pieder grāmatai."
+NOTICE_ARTIFACT_TAKEN,%s. See kuulub raamatusse; see tuleb sinuga läbi aastate.,%s. It belongs to the book; it comes with you through the years.,%s. Tas pieder grāmatai; tas nāk tev līdzi cauri gadiem.
+NOTICE_SAVED,Salvestatud.,Saved.,Saglabāts.
+NOTICE_ERA,%s,%s,%s
+UI_CHAPTER,%s. peatükk,Chapter %s,%s. nodaļa
+UI_EPILOGUE,Epiloog,Epilogue,Epilogs
+UI_REGISTER_LOCKED,Sul pole veel raamatut.,You don't have the book yet.,Tev vēl nav grāmatas.
+UI_PLAY_AGAIN,Mängi uuesti,Play again,Spēlēt vēlreiz
+MENU_LANGUAGE,Keel / Language,Keel / Language,Valoda / Language
+MENU_FULLSCREEN,Täisekraan,Fullscreen,Pilnekrāns
+MENU_ON,sees,on,ieslēgts
+MENU_OFF,väljas,off,izslēgts
+MENU_CREDIT,"Kaardiandmed: Maa- ja Ruumiamet 2026; Läti: LĢIA, VZD","Map data: Maa- ja Ruumiamet 2026; Latvia: LĢIA, VZD","Kartes dati: Maa- ja Ruumiamet 2026; Latvija: LĢIA, VZD"
+UI_CODEX,Mis on tõsi,What's real,Kas ir patiess
+FARM_PLOT,Peenar,Plot,Dobe
+FARM_PLANT,Külva,Sow,Sēt
+FARM_HARVEST,Lõika,Harvest,Novākt
+FARM_WAIT,Oota,Wait,Gaidīt
+FARM_EMPTY_HINT,Tühi peenar. Seemet pole kotis.,An empty plot. No seed in the bag.,Tukša dobe. Somā nav sēklu.
+FARM_EMPTY_READY,Tühi peenar. Kotis on %s.,An empty plot. The bag has %s.,Tukša dobe. Somā ir %s.
+FARM_READY_TEXT,%s on valmis.,%s is ready.,%s ir gatavs.
+FARM_GROWING_TEXT,"%s kasvab, %d%%.","%s is growing, %d%%.","%s aug, %d%%."
+FARM_PLANTED,Külvatud: %s.,Sown: %s.,Iesēts: %s.
+FARM_HARVESTED,Lõigatud: %d × %s.,Harvested: %d × %s.,Novākts: %d × %s.
+FARM_SEED_BIN,Seemnesalv,Seed bin,Sēklu tvertne
+FARM_SEED_BIN_TEXT,Seemnekotid. Võta üks korraga; keegi ei loe.,Seed sacks. Take one at a time; nobody's counting.,Sēklu maisi. Ņem pa vienam; neviens neskaita.
+HUNT_PROMPT,Küti,Hunt,Medīt
+HUNT_HINT,"%s. Õnnestumine umbes %d%%. Ligemale, aeglaselt.","%s. About %d%% chance. Closer, slowly.","%s. Izdošanās iespēja ap %d%%. Tuvāk, lēnām."
+HUNT_SUCCESS,Saak: %s.,Taken: %s.,Nomedīts: %s.
+HUNT_MISS,%s pääses.,The %s got away.,%s aizbēga.
+TRADE_PROMPT,Kauple,Trade,Tirgoties
+UI_TRADE,Kauplemine,Trading,Tirdzniecība
+UI_BUY,Osta,Buy,Pirkt
+UI_SELL,Müü,Sell,Pārdot
+UI_BALANCE,Rahakott: %s,Purse: %s,Maciņš: %s
+TRADE_NO_MONEY,Raha ei jätku.,Not enough money.,Nepietiek naudas.
+TRADE_NOTHING_TO_SELL,"Sul pole midagi, mida siin ostetakse.",You have nothing they buy here.,"Tev nav nekā, ko šeit pērk."
+BUILD_PROMPT,Ehita,Build,Būvēt
+UI_BUILD,Ehitamine,Building,Būvniecība
+BUILD_LEVEL,%s: %d / %d ehitatud.,%s: %d of %d built.,%s: uzbūvēti %d no %d.
+BUILD_LOCKED,Siin ei saa veel midagi ehitada. Maa pole teie oma – veel.,Nothing can be built here yet. The land isn't yours – yet.,Šeit vēl neko nevar būvēt. Zeme nav jūsu – pagaidām.
+BUILD_DONE,%s on valmis (%s).,%s is finished (%s).,%s ir pabeigts (%s).
+BUILD_ALREADY,Juba ehitatud.,Already built.,Jau uzbūvēts.
+BUILD_REQUIRES,Vajab enne: %s.,Needs first: %s.,Vispirms vajag: %s.
+BUILD_NO_MONEY,Raha ei jätku.,Not enough money.,Nepietiek naudas.
+BUILD_NO_MATERIALS,Materjali ei jätku.,Not enough materials.,Nepietiek materiālu.
+BUILD_COST,Hind: %s,Cost: %s,Cena: %s
+UI_DEBUG_MAP,Silumiskaart,Debug map,Atkļūdošanas karte
+UI_DEBUG_MAP_HINT,"Klõps kaardil: teleport. Parem klõps: seosed. Hiir näitab, mida register kohast ütleb. M sulgeb.",Click the map to teleport. Right click for links. Hover to read what the register says. M closes.,"Klikšķis kartē: teleports. Labais klikšķis: saites. Pele rāda, ko reģistrs saka par vietu. M aizver."
+UI_KEYS,E tegutse   Tab vakuraamat   / otsi   B maatükk siin   J päevik   L keel   M kaart   I kiht   Shift+I tegevusala   K koodid   F lenda   T teleport   H algus   F8 teata   Esc menüü,E interact   Tab vakuraamat   / find   B this plot   J journal   L language   M map   I layer   Shift+I sector   K codes   F fly   T teleport   H home   F8 report   Esc menu,E darbība   Tab vakuraamat   / meklēt   B šis gabals   J dienasgrāmata   L valoda   M karte   I slānis   Shift+I nozare   K kodi   F lidot   T teleports   H sākums   F8 ziņot   Esc izvēlne
+MENU_SITE,Asukoht,Location,Vieta
+UI_BUILDING_GROUND,Maa ehitatakse laserandmetest...,Building the ground from the laser data...,Zeme tiek būvēta no lāzerdatiem...
+MENU_NEW_LOCATION,Uus asukoht...,New location...,Jauna vieta...
+MENU_SEARCH,Otsi,Search,Meklēt
+MENU_USE_MY_LOCATION,Kasuta minu asukohta,Use my location,Izmantot manu atrašanās vietu
+MENU_BACK,Tagasi,Back,Atpakaļ
+MENU_CREATE_WORLD,Loo maailm,Create the world,Radīt pasauli
+MENU_LOCATION_HINT,"Aadress, koht või koordinaadid (L-EST97 ""E N"" või ""lat, lon""). Läti kohti otsib Läti aadressiregistrist kohalik teenus.","An address, a place, or coordinates (L-EST97 ""E N"" or ""lat, lon""). Latvian places are searched in Latvia's address register by the local service.","Adrese, vieta vai koordinātas (L-EST97 ""E N"" vai ""lat, lon""). Latvijas vietas meklē Latvijas adrešu reģistrā vietējais serviss."
+MENU_SERVICE_DOWN,Kaarditeenus ei vasta (%s) ja seda ei õnnestunud käivitada. Käivita mäng skriptiga tools/play.sh,The tile service is not answering (%s) and could not be started. Launch the game with tools/play.sh,"Karšu serviss neatbild (%s), un to neizdevās palaist. Palaid spēli ar tools/play.sh"
+MENU_OUTSIDE_ESTONIA,See koht ei ole Eestis ega Lätis. Praegu on andmed ainult nende kahe kohta.,That point is outside Estonia and Latvia. Data is only available for those two so far.,"Šī vieta nav ne Igaunijā, ne Latvijā. Pagaidām dati ir tikai par šīm divām."
+MENU_NO_RESULTS,Midagi ei leitud.,Nothing found.,Nekas netika atrasts.
+MENU_WORLD_READY,Maailm on valmis.,The world is ready.,Pasaule ir gatava.
+MENU_LOCATION_NAME,Nimi,Name,Nosaukums
+MENU_GENERATING,Maailma luuakse: %s,Creating the world: %s,Pasaule tiek radīta: %s
+MENU_STAGE_SERVICE,kaarditeenus,tile service,karšu serviss
+MENU_STAGE_REQUEST,tellimus,request,pieprasījums
+MENU_STAGE_DOWNLOAD,allalaadimine,download,lejupielāde
+MENU_STAGE_INSTALL,paigaldus,install,uzstādīšana
+MENU_CREATE_FAILED,Maailma ei õnnestunud luua.,The world could not be created.,Pasauli neizdevās radīt.
+MENU_CREATE_NOTE,"Kõrgusandmed, ortofoto, hoonete register, kataster ja äriregister laetakse ja pakitakse selle maa ametlikest avaandmetest. See võtab tavaliselt paar minutit.","Height data, the orthophoto, the building register, the cadastre and the business register are fetched from the country's official open data and packed. This usually takes a couple of minutes.","Augstuma dati, ortofoto, būvju reģistrs, kadastrs un uzņēmumu reģistrs tiek ielādēti no valsts oficiālajiem atvērtajiem datiem un sapakoti. Tas parasti aizņem pāris minūtes."
+MENU_REFRESHING,Paika värskendatakse: %s,Bringing %s up to date,Vieta tiek atjaunināta: %s
+MENU_REFRESH_NOTE,Selle paiga andmed on kogutud vanema torustikuga. Registrid laetakse uuesti; maapind jääb paigale.,This place's data was gathered by an older pipeline. The registers are fetched again; the ground stays as it is.,Šīs vietas dati savākti ar vecāku apstrādes ķēdi. Reģistri tiek ielādēti no jauna; zeme paliek kā ir.
+MENU_LOCATIONS,Asukohad...,Locations...,Vietas...
+MENU_AVAILABLE,Olemas,Available,Pieejamās
+MENU_ON_SERVICE,Valmis teenuses,Ready on the service,Gatavas servisā
+MENU_SUGGESTED,Soovitatud kohad,Suggested places,Ieteiktās vietas
+MENU_MAP_LEGEND,"Ring: soovitatud koht. Täidetud: sinu maailmad, praegune paksem. Vii kursor rea või märgi peale.","Ring: a suggested place. Filled: your own worlds, the current one ringed. Point at a row or a mark.","Aplis: ieteikta vieta. Aizpildīts: tavas pasaules, pašreizējā apvilkta. Norādi uz rindu vai zīmi."
+MENU_SEARCH_PLACES,Otsi kohta,Search for a place,Meklēt vietu
+MENU_PLAY,Mängi,Play,Spēlēt
+MENU_INSTALL_PLAY,Paigalda ja mängi,Install and play,Uzstādīt un spēlēt
+MENU_CREATE,Loo,Create,Radīt
+MENU_SHIPPED,kaasas,shipped,komplektā
+MENU_INSTALLED,paigaldatud,installed,uzstādīta
+MENU_FRIENDS,Sõbrad,Friends,Draugi
+MENU_SHARE_WORLD,Jaga seda maailma,Share this world,Dalīties ar šo pasauli
+MENU_VISIT,Külasta sõbra maailma (kood),Visit a friend's world (code),Apmeklēt drauga pasauli (kods)
+MENU_VISIT_GO,Mine,Go,Iet
+MENU_WORLD_CODE,Maailma kood: %s,World code: %s,Pasaules kods: %s
+MENU_VISITING,Külas: %s (%s),Visiting: %s (%s),Ciemos: %s (%s)
+MENU_WORLDS_DOWN,Maailmateenus ei vasta (%s). Käivita: make world-service,The world service is not answering (%s). Start it with: make world-service,Pasauļu serviss neatbild (%s). Palaid to ar: make world-service
+MENU_NO_SUCH_WORLD,Sellist maailma ei ole.,No such world.,Tādas pasaules nav.
+NOTICE_FRIEND_DELIVERY,Sõber %s tegi sinu maailmas midagi: %s,"A friend, %s, did something in your world: %s",Draugs %s kaut ko izdarīja tavā pasaulē: %s
+MENU_CURRENT,praegune,current,pašreizējā
+UI_REPORT_TITLE,Teata probleemist,Report an issue,Ziņot par problēmu
+UI_REPORT_HINT,"Pilt on juba tehtud. Kirjuta, mis on valesti, kus, ja kuidas see peaks olema. Salvestatakse koos asukoha, sihtmärgi ja mänguseisuga.","The frame is already captured. Say what is wrong, where, and how it should be. Saved with your position, what you are looking at and the game state.","Kadrs jau ir uzņemts. Uzraksti, kas ir nepareizi, kur un kā tam vajadzētu būt. Saglabā kopā ar tavu atrašanās vietu, to, uz ko skaties, un spēles stāvokli."
+UI_REPORT_SEND,Saada,Send,Sūtīt
+UI_REPORT_SENT,Teade salvestatud: %s,Report saved: %s,Ziņojums saglabāts: %s
+UI_CODES_PARCEL,Katastriüksus,Cadastral unit,Zemes vienība
+UI_CODES_BUILDING,Hoone,Building,Ēka
+UI_CODES_ROAD,Tee,Road,Ceļš
+UI_CODES_TARGET,Sihtmärk,Target,Mērķis
+UI_CODES_COPIED,%d registrilinki kopeeritud lõikelauale,%d registry links copied to the clipboard,%d reģistra saites nokopētas starpliktuvē
+NOTICE_FLY_ON,"Lend sees (F): Shift ja Ctrl kiirendavad, vaata ja liigu",Fly on (F): Shift and Ctrl speed up; move where you look,"Lidošana ieslēgta (F): Shift un Ctrl paātrina; kusties, kur skaties"
+NOTICE_FLY_OFF,Lend väljas,Fly off,Lidošana izslēgta
+NOTICE_TELEPORT,"Teleport %d, %d","Teleported to %d, %d","Teleports uz %d, %d"
+NOTICE_HOME,Algus,Back at the start,Atpakaļ sākumā
+UI_PROMPT_RIDE,Sõida,Ride,Braukt
+ITEM_BICYCLE,Jalgratas,Bicycle,Velosipēds
+EX_BICYCLE,"Jalgratas. E: sõida; E uuesti, kui midagi ei vaata: tule maha.","A bicycle. E to ride; E again, looking at nothing, to get off.","Velosipēds. E, lai brauktu; vēlreiz E, uz neko neskatoties, lai nokāptu."
+NOTICE_BIKE_ON,"Rattal. Shift kiiremini, E maha.","On the bike. Shift to go faster, E to get off.","Uz velosipēda. Shift ātrāk, E nokāpt."
+NOTICE_BIKE_OFF,Maha tuldud.,Off the bike.,Nokāpts.
+UI_LOADING_TILE,Naabertükk laeb: %s,Loading the neighbour tile: %s,Ielādē kaimiņu laukumu: %s
+UI_LOADING_WORLD,%s laeb...,Loading %s...,Ielādē %s...
+UI_LOADING_TOWN,Linn kerkib... %d%%,Building the town... %d%%,Pilsēta ceļas... %d%%
+UI_LOADING_GRAPHICS,Graafika valmib... %d varjutajat,Preparing graphics... %d shaders,Gatavo grafiku... %d ēnotāji
+NOTICE_EDGE_PENDING,Sealpoolne maa on alles mõõtmisel – oota hetk,The land beyond is still being surveyed. Wait a moment,Zeme tālāk vēl tiek uzmērīta – pagaidi mirkli
+NOTICE_EDGE_NONE,Sealpool kaarti ei ole,There is no map beyond here,Tālāk karšu nav
+NOTICE_TILE_READY,Naaberala on valmis,The next stretch of land is ready,Nākamais zemes gabals ir gatavs
+UI_BOOK_TITLE,Vakuraamat,Vakuraamat,Vakuraamat
+UI_BOOK_PLOTS,Maatükid,Plots,Zemes gabali
+UI_BOOK_PLOT,Maatükk,Plot,Zemes gabals
+UI_BOOK_COL_ADDRESS,Aadress,Address,Adrese
+UI_BOOK_COL_PURPOSE,Sihtotstarve,Purpose,Lietošanas mērķis
+UI_BOOK_COL_AREA,Pindala,Area,Platība
+UI_BOOK_COL_VALUE,Maa väärtus,Land value,Zemes vērtība
+UI_BOOK_MORE,… ja veel %d kaugemal,… and %d more further away,… un vēl %d tālāk
+UI_BOOK_PICK,Vali maatükk nimekirjast või seisa sellel ja vajuta B.,"Pick a plot from the list, or stand on one and press B.",Izvēlies zemes gabalu sarakstā vai nostājies uz tā un nospied B.
+UI_BOOK_REGISTERED_HERE,Siia registreeritud,Registered here,Šeit reģistrēti
+UI_BOOK_NONE_REGISTERED,Ühtegi ettevõtet ei ole siia registreeritud.,No company is registered here.,Šeit nav reģistrēts neviens uzņēmums.
+UI_BOOK_OVER_THE_YEARS,Krunt läbi aastate,This plot over the years,Šis zemes gabals gadu gaitā
+UI_BOOK_TODAY,täna,today,šodien
+UI_BOOK_ENLARGE,Klõpsa suuremalt vaatamiseks,Click to see it larger,"Klikšķini, lai redzētu lielāku"
+UI_BOOK_SORT_BY,Järjesta: %s,Sort by %s,Kārtot pēc: %s
+UI_SHEET_OPEN_PLOT,Ava krunt vakuraamatus,Open the plot in the book,Atvērt zemes gabalu grāmatā
+UI_BOOK_FIND_PLACEHOLDER,Otsi aadressi või ettevõtet,Find an address or a company,Meklē adresi vai uzņēmumu
+UI_BOOK_NO_MATCH,"Midagi ei vasta otsingule ""%s"".","Nothing matches ""%s"".","Nekas neatbilst ""%s""."
+UI_FIND_PLOTS_ON,%d krunti,%d plots,%d zemes gabali
+UI_FIND_PLACEHOLDER,"Aadress, ettevõte või tänav","An address, a company or a street","Adrese, uzņēmums vai iela"
+UI_FIND_HINT,Nooled valivad · Enter juhatab · Shift+Enter hüppab · Esc sulgeb,Arrows choose · Enter points the way · Shift+Enter jumps · Esc closes,Bultiņas izvēlas · Enter rāda ceļu · Shift+Enter pārlec · Esc aizver
+UI_FIND_NOTHING,Selles linnas ei leidu midagi sellist.,Nothing like that in this town.,Šajā pilsētā nekā tāda nav.
+UI_FIND_KIND_PLOT,krunt,plot,zemes gabals
+UI_FIND_KIND_BUILDING,hoone,building,ēka
+UI_FIND_KIND_COMPANY,ettevõte,company,uzņēmums
+UI_FIND_KIND_STREET,tänav,street,iela
+NOTICE_TELEPORT_TO,Hüppasid: %s,Jumped to %s,Pārlēci uz: %s
+UI_IN_USE_SINCE,kasutusel alates %d,in use since %d,ekspluatācijā kopš %d
+UI_BOOK_SOURCES,"Kõik siinsed arvud on avaandmed, nagu registrid need annavad.","Every figure here is open data, as the registers give it.","Katrs skaitlis šeit ir atvērtie dati, kā tos sniedz reģistri."
+UI_SINCE,alates,since,kopš
+UI_TENANT_INACTIVE,ei tegutse,inactive,nedarbojas
+UI_CODES_TENANT,Üürnikud,Tenants,Nomnieki
+UI_CODES_OWNER,Omanik,Owner,Īpašnieks
+BTN_LINK,Ava link,Open link,Atvērt saiti
+BTN_SHOW,Näita,Show,Rādīt
+PURPOSE_ELAMUMAA,elamumaa,residential,dzīvojamā apbūve
+PURPOSE_ARIMAA,ärimaa,commercial,komercdarbības apbūve
+PURPOSE_TOOTMISMAA,tootmismaa,industrial,ražošanas apbūve
+PURPOSE_TRANSPORDIMAA,transpordimaa,transport,transporta infrastruktūra
+PURPOSE_ULDKASUTATAV_MAA,üldkasutatav maa,public land,publiskā ārtelpa
+PURPOSE_UHISKONDLIKE_EHITISTE_MAA,ühiskondlike ehitiste maa,public buildings,sabiedriskas nozīmes objekti
+PURPOSE_MAATULUNDUSMAA,maatulundusmaa,agricultural/forest,lauksaimniecība un mežsaimniecība
+PURPOSE_SIHTOTSTARBETA_MAA,sihtotstarbeta maa,no purpose set,bez noteikta mērķa
+PURPOSE_JAATMEHOIDLA_MAA,jäätmehoidla maa,waste,atkritumu apsaimniekošana
+PURPOSE_VEEKOGUDE_MAA,veekogude maa,water,ūdeņi
+PURPOSE_KAITSEALUNE_MAA,kaitsealune maa,protected,aizsargājama teritorija
+BTN_GUIDE,Juhata,Guide,Vadīt
+BTN_GUIDE_TIP,Näita kompassil ja ekraanil teed selle maatükini,Point the compass and the screen marker at this plot,Rādīt kompasā un ekrānā ceļu līdz šim zemes gabalam
+BTN_TELEPORT,Mine,Go,Iet
+BTN_TELEPORT_TIP,Hüppa kohe sinna,Jump there now,Pārlēkt turp tūlīt
+NOTICE_GUIDE_SET,Teejuht: %s,Guiding you to %s,Ceļvedis: %s
+NOTICE_GUIDE_ARRIVED,Kohal: %s,You are at %s,Esi klāt: %s
+UI_PROMPT_SWITCH_ON,Lülita sisse,Switch on,Ieslēgt
+UI_PROMPT_SWITCH_OFF,Lülita välja,Switch off,Izslēgt
+UI_PROMPT_READ,Loe,Read,Lasīt
+UI_NO_REGISTER,Registris seda hoonet ei ole (laserskaneeringu massiiv).,Not in the register (a shape from the laser scan).,Reģistrā šīs ēkas nav (forma no lāzerskenēšanas).
+UI_LAMP,Lamp,Lamp,Lampa
+UI_NOTICE_BOARD,Teadetetahvel,Notice board,Ziņojumu dēlis
+UI_SHEET_CLOSE,Esc sulgeb,Esc closes,Esc aizver
+UI_SHEET_REGISTER,Ehitisregister: %s,Building register: %s,Igaunijas būvju reģistrs: %s
+UI_SHEET_REGISTER_LV,Läti kinnisvarakataster: %s,Latvian real-property cadastre: %s,Nekustamā īpašuma valsts kadastrs: %s
+UI_SHEET_CODE_LV,Ehitise katastritähis %s,Building cadastral designation %s,Būves kadastra apzīmējums %s
+UI_SHEET_TENANTS,Üürnikud,Tenants,Nomnieki
+UI_SHEET_OWNER,Katastriüksus %s · omanik %s,Cadastral unit %s · owner %s,Zemes vienība %s · īpašnieks %s
+UI_SHEET_NO_TENANTS,Ühtegi ettevõtet ei ole siia registreeritud.,No company is registered at this address.,Šajā adresē nav reģistrēts neviens uzņēmums.
+UI_PROMPT_ENTER,Sisene,Enter,Ieiet
+UI_PROMPT_LEAVE,Välju,Leave,Iziet
+UI_BUILDING,Hoone,Building,Ēka
+UI_FLOORS,%d korrust,%d floors,%d stāvi
+NOTICE_ENTERED,Sees: %s,Inside: %s,Iekšā: %s
+MENU_PACKS_COUNT,%d kohta,%d places,%d vietas
+MENU_ESTIMATING,Hindan allalaadimist...,Estimating the download...,Novērtēju lejupielādi...
+MENU_ESTIMATE,"Allalaadimine umbes %s (%s juba vahemälus), aeg umbes %s: laadimine %s ja töötlus %s. Kettal vaba %s.","Download about %s (%s already cached), roughly %s: %s to download and %s to process. %s free on disk.","Lejupielāde ap %s (%s jau kešatmiņā), aptuveni %s: %s lejupielādei un %s apstrādei. Diskā brīvi %s."
+MENU_ESTIMATE_UNKNOWN,Allalaadimise mahtu ei õnnestunud hinnata.,The download size could not be estimated.,Lejupielādes apjomu neizdevās novērtēt.
+MENU_LOW_DISK,Kettal on vaba vaid %s; maailma jaoks on vaja vähemalt %s. Kustuta vanu maailmu jaotisest Salvestatud.,Only %s free on disk; a world needs at least %s. Remove old worlds under Storage.,Diskā brīvi tikai %s; pasaulei vajag vismaz %s. Izdzēs vecas pasaules sadaļā Krātuve.
+MENU_STORAGE,Salvestatud maailmad,Storage,Krātuve
+MENU_STORAGE_LINE,"%s paigaldatud maailmades, %s naabruse ruutudes, kettal vaba %s","%s in installed worlds, %s in neighbour tiles, %s free on disk","%s uzstādītajās pasaulēs, %s kaimiņu laukumos, diskā brīvi %s"
+MENU_SERVICE_CACHE,Kaarditeenuse vahemälu: %s (%s),Tile service cache: %s (%s),Karšu servisa kešatmiņa: %s (%s)
+MENU_NEIGHBOUR_TILES,Naabruse ruudud (%d),Neighbour tiles (%d),Kaimiņu laukumi (%d)
+MENU_OUTDATED,vananenud,out of date,novecojis
+MENU_TILES_OUTDATED,%d vananenud,%d out of date,%d novecojuši
+MENU_REFRESH,Värskenda,Refresh,Atjaunināt
+MENU_REFRESH_QUEUED,%d paika värskendatakse taustal.,%d place(s) are being brought up to date in the background.,%d vietas tiek atjauninātas fonā.
+MENU_DELETE,Kustuta,Remove,Dzēst
+MENU_CONFIRM_DELETE,Kindlasti kustuta,Really remove,Tiešām dzēst
+MENU_DELETE_ALL_TILES,Kustuta kõik naabruse ruudud,Remove all neighbour tiles,Dzēst visus kaimiņu laukumus
+MENU_REMOVED,Prügikasti viidud.,Moved to the trash.,Pārvietots uz miskasti.
+MENU_YOUR_WORLDS,Sinu maailmad,Your worlds,Tavas pasaules
+MENU_IDEAS,Ideid,Ideas,Idejas
+MENU_MANAGE_STORAGE,Halda salvestatut...,Manage storage...,Pārvaldīt krātuvi...
+MENU_GO,Mine,Go,Iet
+MENU_RESULT_YOURS,sinu maailm: %s,your world: %s,tava pasaule: %s
+MENU_RESULT_READY,valmis teenuses,ready on the service,gatava servisā
+MENU_RESULT_NEW,"uus maailm, umbes %s, laadida %s","new world, about %s, %s to download","jauna pasaule, apmēram %s, lejupielāde %s"
+MENU_RESULT_NEW_PLAIN,uus maailm,new world,jauna pasaule
+MENU_PLAYED_TODAY,täna,today,šodien
+MENU_PLAYED_YESTERDAY,eile,yesterday,vakar
+MENU_PLAYED_DAYS,%d päeva tagasi,%d days ago,pirms %d dienām
+MENU_PLAYED_NEVER,külastamata,not visited yet,vēl nav apmeklēta
+MENU_CANCEL,Katkesta,Cancel,Atcelt
+MENU_CANCELLING,Katkestan...,Cancelling...,Atceļ...
+MENU_CANCELLED,Maailma loomine katkestati.,Creating the world was cancelled.,Pasaules radīšana atcelta.
+MENU_MAP_GO,"Täidetud: sinu maailmad, praegune rõngaga. Rõngas: idee. Sinine täpp: valmis teenuses. Klõpsa märgil, et sinna minna.","Filled: your worlds, the current one ringed. Ring: an idea. Blue dot: ready on the service. Click a mark to go there.","Aizpildīts: tavas pasaules, pašreizējā ar loku. Loks: ideja. Zils punkts: gatava servisā. Noklikšķini uz zīmes, lai dotos turp."
+COUNTRY_EE,Eesti,Estonia,Igaunija
+COUNTRY_LV,Läti,Latvia,Latvija
+UI_BUS_STOP,Bussipeatus,Bus stop,Autobusa pietura
+UI_BUS_LINES,Liinid: %s,Lines: %s,Maršruti: %s
+UI_MAP_MODE,Kiht,Layer,Slānis
+UI_MAP_MODE_OFF,väljas,off,izslēgts
+UI_MAP_MODE_SECTOR,tegevusala,sector,nozare
+UI_MAP_MODE_SIZE,töötajad,employees,darbinieki
+UI_MAP_MODE_HEALTH,ettevõtte seis,company health,uzņēmuma stāvoklis
+UI_MAP_MODE_AGE,asutamisaasta,founded,dibināšanas gads
+UI_MAP_MODE_OWNERS,ühised omanikud,shared owners,kopīgi īpašnieki
+UI_MAP_HEALTH_NOTE,"Krundil tegutseva suurima ettevõtte seis, mitte hoone seisukord. Kui krundil ei tegutse ühtegi ettevõtet, näitab värv sinna registreeritud ettevõtete halvimat seisu. Roheline: korras. Kollane: majandusaasta aruanne hilineb või käive langes aastaga üle 40 %. Punane: likvideerimisel või pankrotis, või aasta jooksul null makse, kuigi töötajaid on.","The health of the plot's largest active company, not the state of the building. When no company on the plot is active, the colour shows the worst verdict among those registered there. Green: sound. Yellow: the annual report is overdue, or turnover fell by more than 40 % on the year before. Red: in liquidation or bankrupt, or a year of zero taxes while employing staff.","Zemes gabala lielākā darbojošā uzņēmuma stāvoklis, nevis ēkas stāvoklis. Ja gabalā neviens uzņēmums nedarbojas, krāsa rāda sliktāko stāvokli starp tur reģistrētajiem. Zaļš: kārtībā. Dzeltens: gada pārskats kavējas vai apgrozījums gada laikā krities vairāk nekā par 40 %. Sarkans: likvidācijā vai maksātnespējā, vai gads bez nodokļiem, lai gan ir darbinieki."
+UI_MAP_AGE_NOTE,"Krundi suurima tegutseva ettevõtte asutamisaasta, mitte hoone vanus.","The year the plot's largest active company was founded, not the age of the building.","Zemes gabala lielākā darbojošā uzņēmuma dibināšanas gads, nevis ēkas vecums."
+UI_MAP_SECTOR_NOTE,"Krunt saab värvi oma suurimalt tegutsevalt ettevõttelt (kõige rohkem töötajaid, siis suurim käive). Teised samal krundil tegutsevad ettevõtted värvi ei muuda – nad on krundi lehel. Värvimata: krundile pole ühtegi tegutsevat ettevõtet registreeritud.","A plot takes the colour of its largest active company (most employees, then highest turnover). Other companies on the same plot don't change the colour; the plot's page lists them. Uncoloured: no active company is registered on the plot.","Zemes gabals iegūst sava lielākā darbojošā uzņēmuma krāsu (visvairāk darbinieku, tad lielākais apgrozījums). Citi uzņēmumi tajā pašā gabalā krāsu nemaina – tie ir zemes gabala lapā. Bez krāsas: gabalā nav reģistrēts neviens darbojošs uzņēmums."
+UI_MAP_SIZE_NOTE,"Ringi suurus: krundi suurima tegutseva ettevõtte töötajate arv (maksuameti viimasest kvartalist, muidu majandusaasta aruandest).","Circle size: the employees of the plot's largest active company (from the tax office's latest quarter, else the annual report).","Apļa lielums: zemes gabala lielākā darbojošā uzņēmuma darbinieku skaits (no nodokļu dienesta pēdējā ceturkšņa, citādi no gada pārskata)."
+UI_MAP_OWNERS_NOTE,"Joon ühendab krunte, mille ettevõtetel on äriregistri järgi ühine omanik või juhatuse liige. Inimesi ei nimetata; register annab ainult ühise tunnuse.",A line joins plots whose companies share an owner or a board member in the business register. No person is named; the register gives only a shared identifier.,"Līnija savieno zemes gabalus, kuru uzņēmumiem uzņēmumu reģistrā ir kopīgs īpašnieks vai valdes loceklis. Neviens cilvēks netiek nosaukts; reģistrs dod tikai kopīgu identifikatoru."
+UI_MAP_SIZE_LEGEND,ring: töötajate arv,circle: employees,aplis: darbinieku skaits
+UI_MAP_OWNERS_LEGEND,joon: sama omanik või juhatuse liige,line: same owner or board member,līnija: tas pats īpašnieks vai valdes loceklis
+UI_MAP_MODE_MIX,tegevusalade segu,industry mix,nozaru sajaukums
+UI_MAP_MODE_FOCUS,üks tegevusala,one sector,viena nozare
+UI_MAP_FOCUS_PICK,Tegevusala: %s,Sector: %s,Nozare: %s
+UI_SHEET_CODE_EE,EHR %s,EHR %s,EHR %s
+UI_MAP_SECTOR_UNKNOWN,tegevusala teadmata,sector not given,nozare nav norādīta
+UI_MAP_FOCUS_ALL,kogu krunt,the whole plot,viss zemes gabals
+UI_MAP_FOCUS_HALF,umbes pool,about half,apmēram puse
+UI_MAP_FOCUS_SOME,väike osa,a small part,neliela daļa
+UI_MAP_FOCUS_NONE,selle ala ettevõtteid pole,none of this sector,šīs nozares uzņēmumu nav
+UI_MAP_MIX_NOTE,"Iga krunt on triibuline oma tegutsevate ettevõtete tegevusalade värvides. Triibu laius on selle tegevusala osa krundi töötajatest või, kui ükski ettevõte töötajaid ei näita, ettevõtetest. Üks värv: üks tegevusala. Hallid triibud: ettevõtted, millele register tegevusala ei anna.","Each plot is striped in the colours of its active companies' sectors. A stripe's width is that sector's share of the plot's employees, or of its companies where none of them reports staff. One colour: one sector. Grey stripes: companies the register gives no activity code.","Katrs zemes gabals ir svītrots tā darbojošos uzņēmumu nozaru krāsās. Svītras platums ir šīs nozares daļa no gabala darbiniekiem vai, ja neviens uzņēmums darbiniekus neuzrāda, no uzņēmumiem. Viena krāsa: viena nozare. Pelēkas svītras: uzņēmumi, kuriem reģistrā nav norādīta darbības joma."
+UI_MAP_FOCUS_NOTE,"Kui suur osa krundist kuulub valitud tegevusalale: selle osa krundi tegutsevate ettevõtete töötajatest või, kui ükski töötajaid ei näita, ettevõtetest. Tegevusala vahetab nupp kaardi kohal; maapind näitab sama.","How much of each plot is in the chosen sector: its share of the employees of the plot's active companies, or of the companies themselves where none reports staff. The button above the map changes the sector; the ground shows the same one.","Cik liela daļa no katra zemes gabala pieder izvēlētajai nozarei: tās daļa no gabala darbojošos uzņēmumu darbiniekiem vai, ja neviens darbiniekus neuzrāda, no pašiem uzņēmumiem. Nozari maina poga virs kartes; zeme rāda to pašu."
+SECTOR_FARM,põllumajandus ja metsandus,farming and forestry,lauksaimniecība un mežsaimniecība
+SECTOR_INDUSTRY,tööstus ja energia,industry and energy,rūpniecība un enerģētika
+SECTOR_CONSTRUCTION,ehitus,construction,būvniecība
+SECTOR_TRADE,kaubandus,trade and repair,tirdzniecība un remonts
+SECTOR_TRANSPORT,transport,transport and storage,transports un uzglabāšana
+SECTOR_HOSPITALITY,majutus ja toitlustus,hotels and restaurants,izmitināšana un ēdināšana
+SECTOR_MEDIA,meedia ja IT,media and IT,mediji un IT
+SECTOR_FINANCE,rahandus,finance and insurance,finanses un apdrošināšana
+SECTOR_PROPERTY,kinnisvara,real estate,nekustamais īpašums
+SECTOR_SERVICES,teenused,professional services,profesionālie pakalpojumi
+SECTOR_PUBLIC,"avalik sektor, haridus, tervis","public, education, health","publiskais sektors, izglītība, veselība"
+SECTOR_CULTURE,"kultuur, sport, muud teenused","arts, sport, other services","māksla, sports, citi pakalpojumi"
+HEALTH_SOUND,korras,sound,kārtībā
+HEALTH_WATCH,jälgimisel,watch,uzraudzībā
+HEALTH_DISTRESSED,raskustes,distressed,grūtībās
+HEALTH_WHY_REPORT,majandusaasta aruanne hilineb,annual report overdue,gada pārskats kavējas
+HEALTH_WHY_TURNOVER,käive langes %s → %s (%d → %d),turnover fell %s → %s (%d → %d),apgrozījums krities %s → %s (%d → %d)
+HEALTH_WHY_TURNOVER_RULE,käive langes aastaga üle 40 %,turnover fell by more than 40 % on the year before,apgrozījums gada laikā krities vairāk nekā par 40 %
+HEALTH_WHY_STATUS,registri staatus: %s,register status: %s,reģistra statuss: %s
+HEALTH_WHY_ZERO_TAXES,"aasta jooksul null makse, kuigi töötajaid on",a year of zero taxes while employing staff,"gads bez nodokļiem, lai gan ir darbinieki"
+UI_EMPLOYEES,%d töötajat,%d employees,%d darbinieki
+UI_TURNOVER,käive %s/a,turnover %s/yr,apgrozījums %s/g.
+UI_TAXES,maksud %s/a,taxes %s/yr,nodokļi %s/g.
+UI_BOARD,juhatuses %d,board of %d,valdē %d
+UI_OWNER_MANAGED,omanik juhib,owner-managed,vada īpašnieks
+UI_CAPITAL,kapital %s,capital %s,kapitāls %s
+UI_ALL,Kõik,All,Visi
+UI_BOOK_COMPANIES,Ettevõtted,Companies,Uzņēmumi
+UI_BOOK_COL_COMPANY,Ettevõte,Company,Uzņēmums
+UI_BOOK_COL_SECTOR,Tegevusala,Sector,Nozare
+UI_BOOK_COL_EMPLOYEES,Töötajaid,Employees,Darbinieki
+UI_BOOK_COL_TURNOVER,Käive,Turnover,Apgrozījums
+UI_BOOK_PLACE,Paik,Place,Vieta
+UI_BOOK_COL_OWNERSHIP,Omandivorm,Ownership,Īpašuma forma
+UI_BOOK_LAND_REGISTRY,Kinnistu,Land registry,Zemesgrāmata
+UI_BOOK_REGISTERED,Katastrisse kantud,Entered in the cadastre,Ierakstīts kadastrā
+UI_BOOK_IN_THE_REGISTER,Vaata registris,See it in the register,Skatīt reģistrā
+UI_BOOK_VINTAGE,Andmed seisuga %s,Data as of %s,Dati uz %s
+UI_BOOK_COUNTS,%d maatükki · %d hoonet · %d ettevõtet,%d plots · %d buildings · %d companies,%d zemes gabali · %d ēkas · %d uzņēmumi
+UI_BOOK_VALUES,"Maa maksustamishind %d, mediaan","Land taxation value %d, median","Zemes kadastrālā vērtība %d, mediāna"
+UI_BOOK_OF_PLOTS,%d maatükil,over %d plots,%d zemes gabalos
+UI_NO_PLOT_HERE,Sa ei seisa ühelgi katastriüksusel.,You are not standing on a cadastral unit.,Tu nestāvi ne uz vienas zemes vienības.
+UI_BUS_TIMETABLE,Sõiduplaan,Timetable,Kustības saraksts
+UI_BUS_NEXT,Järgmised väljumised,Next departures,Nākamie atiešanas laiki
+UI_BUS_IN_MIN,%d min pärast,in %d min,pēc %d min
+UI_BUS_NO_SERVICE,Selle peatuse sõiduplaani registris ei ole.,The register has no timetable for this stop.,Reģistrā šai pieturai nav kustības saraksta.
+UI_BOOK_LOADING,Laadin…,Loading…,Ielādē…
+BTN_FOCUS,Näita seoseid,Show links,Rādīt saites
+BTN_FOCUS_TIP,Tõsta see maatükk ja sellega seotu esile igal lehel ja maastikul,Highlight this plot and what it is linked to on every page and on the ground,Izcelt šo zemes gabalu un ar to saistīto katrā lapā un apvidū
+UI_LINK_HEAD,Seosed,Linked,Saistīts
+UI_LINK_BUILDINGS,Hooneid sellel maatükil: %d,Buildings on this plot: %d,Ēkas uz šī zemes gabala: %d
+UI_LINK_OWNERS_NOTE,Ühine omanik on äriregistri järgi siinsete ettevõtete omanik; maa ise ei ole registri järgi ühisomandis,The shared owner is an owner of the companies here in the Business Register; the register does not say the land itself is jointly held,"Kopīgais īpašnieks pēc uzņēmumu reģistra ir šeit esošo uzņēmumu īpašnieks; reģistrs nesaka, ka pati zeme ir kopīpašumā"
+UI_FOCUS_ON,Seosed: %s,Links: %s,Saites: %s
+UI_FOCUS_CLEARED,Seosed kustutatud,Links cleared,Saites notīrītas
+UI_MORE_COMPANIES,… ja veel %d,… and %d more,… un vēl %d
+UI_LINK_PLOTS,Seotud maatükke: %d,Linked plots: %d,Saistīti zemes gabali: %d
+UI_LINK_NONE,Register ei seo seda maatükki ühegi teisega,The registers tie this plot to no other,Reģistri šo zemes gabalu nesaista ne ar vienu citu
+UI_LINK_WHY_OWNER,ühiseid omanikke: %d,owners in common: %d,kopīgi īpašnieki: %d
+UI_LINK_WHY_REGISTRY,sama kinnistu,the same registered immovable,tas pats nekustamais īpašums
+UI_LINK_WHY_BUILDING,ühine hoone,a building stands on both,ēka stāv uz abiem
+UI_BOOK_FORMERLY_HERE,Varem siia registreeritud,Formerly registered here,Agrāk reģistrēti šeit
+UI_STARTER_DOWNLOADING,ümbruse kohad: allalaadimine %d%%,the places around: downloading %d%%,apkārtnes vietas: lejupielāde %d%%
+UI_STARTER_INSTALLING,ümbruse kohad: lahtipakkimine,the places around: unpacking,apkārtnes vietas: izpakošana

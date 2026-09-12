@@ -6,23 +6,22 @@ var wait := 30
 func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--out="): path = a.trim_prefix("--out=")
+		if a.begins_with("--locale="): TranslationServer.set_locale(a.trim_prefix("--locale="))   # --locale=lv
 		if a.begins_with("--wait="): wait = int(a.trim_prefix("--wait="))   # frames before the shot (1: the renderer warm-up's splash)
 	var menu: Control = load("res://scenes/ui/main_menu.tscn").instantiate()
 	add_child(menu)
 	var args := OS.get_cmdline_user_args()
-	if "--locations" in args:   # the Locations page; --query=<text> searches it and picks the first place
+	if "--locations" in args:   # the Locations page; --query=<text> searches it (results and their estimates, nothing pressed)
 		menu.call("_build_locations_panel")
 		for a in args:
 			if a.begins_with("--query="):
-				wait = 600
+				wait = 480
 				menu.get("_query").text = a.trim_prefix("--query=")
 				menu.call("_search")
-				get_tree().create_timer(2.0).timeout.connect(func():
-					var results: VBoxContainer = menu.get("_results")
-					if results.get_child_count() > 0:
-						results.get_child(0).pressed.emit())
-	if "--creating" in args or "--failed" in args:   # the progress sheet, mid-job or after a failure
-		var sheet: Control = menu.call("_progress_sheet", "Kvissentali, Tartu")
+	if "--storage" in args:     # the storage page behind "Manage storage..."
+		menu.call("_build_storage_panel")
+	if "--creating" in args or "--failed" in args:   # the progress sheet, mid-job (with Cancel) or after a failure
+		var sheet: Control = menu.call("_progress_sheet", "Kvissentali, Tartu", "MENU_GENERATING", "MENU_CREATE_NOTE", func(): pass)
 		sheet.get_meta("stage").call("cadastre and roads", 0.58)
 		if "--failed" in args:
 			sheet.get_meta("fail").call(tr("MENU_SERVICE_DOWN") % "http://127.0.0.1:8765")

@@ -1,14 +1,18 @@
-# Autoload "Locator": finds places (Maa-amet in-ADS geocoder, coarse IP geolocation) and asks the
+# Autoload "Locator": finds places (each country's address search, assets/data/countries/<id>.json;
+# coarse IP geolocation) and asks the
 # tile service (tools/tile_service.py) for a playable pack for a point, which it installs under
 # user://sites/<id> and user://tiles/<id>. The world then builds the Terrain3D data on first visit.
 extends Node
 
 signal progress(text: String, fraction: float)
 
+const CANCELLED := "cancelled"   # fetch_pack's error when cancel_job stopped it (the service says the same)
+var _cancelled: Dictionary = {}  # pack id -> true once cancel_job asked
+var _live: Dictionary = {}       # pack id -> the HTTPRequest bringing its zip down
+
 const SETTINGS := "user://settings.cfg"
 const MIN_FREE_BYTES := 1024 * 1024 * 1024   # a pack installs ~150 MB plus its built region data; keep a margin
 const DEFAULT_SERVICE := "http://127.0.0.1:8765"
-const GEOCODER := "https://inaadress.maaamet.ee/inaadress/gazetteer?results=8&features=EHAK,TANAV,KATASTRIYKSUS,EHITISHOONE&address="
 const IP_API := "http://ip-api.com/json/?fields=status,country,countryCode,city,lat,lon"
 
 # EPSG:3301 (L-EST97): Lambert conformal conic 2SP on GRS80
@@ -30,7 +34,8 @@ func service_url() -> String:
 
 
 ## One HTTP round trip. Returns {code, body(String), ok}. code 0 = no connection.
-func http(url: String, method: int = HTTPClient.METHOD_GET, body: String = "", download_to: String = "") -> Dictionary:
+## `tag` names the request so cancel_job can abandon it (a pack's zip, by pack id).
+func http(url: String, method: int = HTTPClient.METHOD_GET, body: String = "", download_to: String = "", tag: String = "") -> Dictionary:
 	var r := HTTPRequest.new()
 	r.timeout = 60.0
 	if download_to != "":
@@ -41,7 +46,11 @@ func http(url: String, method: int = HTTPClient.METHOD_GET, body: String = "", d
 	if err != OK:
 		r.queue_free()
 		return {"code": 0, "body": "", "ok": false}
+	if tag != "":
+		_live[tag] = r
 	var res: Array = await r.request_completed
+	if tag != "":
+		_live.erase(tag)
 	r.queue_free()
 	var code: int = res[1]
 	var text := ""
@@ -229,15 +238,38 @@ func geocode(q: String) -> Array:
 		if a > 50.0 and a < 70.0:
 			var p := wgs84_to_lest97(a, b)
 			return [{"name": "%.4f N %.4f E" % [a, b], "x": p.x, "y": p.y}]
-	var r := await http(GEOCODER + q.uri_encode())
-	if not r.ok:
-		return []
-	var parsed = JSON.parse_string(r.body)
 	var out := []
-	if typeof(parsed) == TYPE_DICTIONARY:
-		for a in parsed.get("addresses", []):
-			if a.has("viitepunkt_x") and a.has("viitepunkt_y"):
-				out.append({"name": str(a.get("pikkaadress", a.get("ipikkaadress", q))), "x": float(a.viitepunkt_x), "y": float(a.viitepunkt_y)})
+	for c in Countries.all().values():
+		out.append_array(await _geocode_with(c.get("geocoder", {}), q))
+	return out
+
+
+## One country's address search. A public gazetteer asked directly: its `url` with {q}, and where in
+## the answer the list (`results`), the name (the first non-empty of `name`) and the grid coordinates
+## (`x`, `y`) are. Or the tile service's search for it (`service`, a path with {q}), for a register
+## that has no public search (Latvia's, tools/pipeline/geocode_lv.py); without the service it is quiet.
+func _geocode_with(g: Dictionary, q: String) -> Array:
+	var out := []
+	if g.has("url"):
+		var r := await http(Countries.fill(str(g.url), {"q": q.uri_encode()}))
+		var parsed = JSON.parse_string(r.body) if r.ok else null
+		if typeof(parsed) == TYPE_DICTIONARY:
+			for a in parsed.get(str(g.get("results", "results")), []):
+				if typeof(a) != TYPE_DICTIONARY or not a.has(str(g.x)) or not a.has(str(g.y)):
+					continue
+				var name := q
+				for k in g.get("name", []):
+					if str(a.get(k, "")) != "":
+						name = str(a[k])
+						break
+				out.append({"name": name, "x": float(a[str(g.x)]), "y": float(a[str(g.y)])})
+	elif g.has("service"):
+		var r := await http(service_url() + Countries.fill(str(g.service), {"q": q.uri_encode()}))
+		var found = JSON.parse_string(r.body) if r.ok else null
+		if typeof(found) == TYPE_ARRAY:
+			for a in found:
+				if typeof(a) == TYPE_DICTIONARY and a.has("x") and a.has("y"):
+					out.append({"name": str(a.get("name", q)), "x": float(a.x), "y": float(a.y)})
 	return out
 
 
@@ -253,8 +285,10 @@ func locate_by_ip() -> Dictionary:
 	return {"ok": true, "x": p.x, "y": p.y, "name": "%s, %s" % [d.get("city", ""), d.get("country", "")], "country": str(d.get("countryCode", ""))}
 
 
-func in_estonia(x: float, y: float) -> bool:
-	return x > 369000.0 and x < 740000.0 and y > 6377000.0 and y < 6635000.0
+## Whether the service may have data for an L-EST97 point: inside some country's box (every country
+## is built on the same grid). The service decides the border exactly.
+func in_coverage(x: float, y: float) -> bool:
+	return Countries.covers(x, y)
 
 
 static func _m(phi: float, e: float) -> float:
@@ -319,6 +353,7 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 		refresh: bool = false, quiet: bool = false) -> Dictionary:
 	var base := service_url()
 	var error := ""
+	_cancelled.erase(id)   # a new attempt at a place cancelled before
 	var say := func(text: String, at: float):
 		if not quiet:
 			progress.emit(text, at)
@@ -326,7 +361,7 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 	var free := free_bytes()
 	if not await ensure_service():
 		error = tr("MENU_SERVICE_DOWN") % base
-	elif not in_estonia(x, y):
+	elif not in_coverage(x, y):
 		error = tr("MENU_OUTSIDE_ESTONIA")
 	elif free >= 0 and free < MIN_FREE_BYTES:
 		error = tr("MENU_LOW_DISK") % [fmt_bytes(free), fmt_bytes(MIN_FREE_BYTES)]
@@ -355,8 +390,11 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cache"))
 		var zip_path := "user://cache/%s.zip" % id
 		say.call(tr("MENU_STAGE_DOWNLOAD"), 0.93)
-		var dl := await http(base + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path)
-		if not dl.ok:
+		var dl := await http(base + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path, id)
+		if _cancelled.has(id):
+			error = CANCELLED
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(zip_path))
+		elif not dl.ok:
 			error = "download: HTTP %d" % dl.code
 		else:
 			say.call(tr("MENU_STAGE_INSTALL"), 0.97)
@@ -374,7 +412,14 @@ static func ground_is_coarse(id: String) -> bool:
 	if not FileAccess.file_exists(meta_path):
 		return false
 	var m = JSON.parse_string(FileAccess.get_file_as_string(meta_path))
-	return typeof(m) == TYPE_DICTIONARY and float(m.get("dtm_res_m", 1.0)) > 1.0
+	if typeof(m) != TYPE_DICTIONARY:
+		return false
+	# How the country's refine pass shows (its descriptor's "refine"). "ground": it replaces a 5 m
+	# ground with the 1 m one, so a coarse ground is the cue. "flag": the ground is fine from the start
+	# (Latvia's laser points) and the pass - older photographs, timetables - marks the meta when it is in
+	if str(Countries.of_meta(m).get("refine", "ground")) == "flag":
+		return not bool(m.get("refined", false))
+	return float(m.get("dtm_res_m", 1.0)) > 1.0
 
 
 ## Take the refined pack (1 m ground, measured trees) when the service has it ready. The
@@ -532,8 +577,22 @@ func _eras_of(id: String) -> String:
 
 
 ## Poll the job until it is done; "" on success, else the error text.
+## Stop a world being made. The service drops the job at its next step - a download stops mid-file,
+## a register stage within a second - and a pack already coming down is abandoned; fetch_pack then
+## answers CANCELLED. What the service fetched stays in its cache, so going there again is quicker.
+func cancel_job(id: String) -> void:
+	_cancelled[id] = true
+	var live: HTTPRequest = _live.get(id)
+	if is_instance_valid(live):
+		live.cancel_request()   # emits nothing, so the waiting request is released by hand
+		live.request_completed.emit(HTTPRequest.RESULT_REQUEST_FAILED, 0, PackedStringArray(), PackedByteArray())
+	await http(service_url() + "/cancel?id=" + id, HTTPClient.METHOD_POST, "{}")
+
+
 func _wait_for_job(base: String, id: String, quiet: bool = false) -> String:
 	while true:
+		if _cancelled.has(id):
+			return CANCELLED
 		var st := await http(base + "/status?id=" + id)
 		if not st.ok:
 			return "status: HTTP %d" % st.code

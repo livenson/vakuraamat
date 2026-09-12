@@ -2,6 +2,10 @@
 """Estonia's outline for the menu's locator map: where a suggested place actually is.
 
     python3 tools/pipeline/fetch_outline.py [--tolerance 700] [--min-island 10] [--no-lakes]
+    python3 tools/pipeline/fetch_outline.py --country lv      # assets/data/latvia.json
+
+Latvia's comes from the address register's municipality polygons (VZD, `aw_shp.zip`: the novadi and
+the state cities), moved from LKS-92 onto the same L-EST97 grid, without lakes.
 
 Takes the county polygons from Maa-amet's administrative division download (maakond_shp.zip,
 cached in data_raw/haldus/), unions them into the coastline, simplifies it to the tolerance a
@@ -50,6 +54,27 @@ def counties():
     return [g for _p, g in geo.features(shp) if g is not None]
 
 
+def latvia():
+    """Latvia's municipalities and state cities (shapely, on the L-EST97 grid), from the address register."""
+    import fetch_cadastre_lv
+    from pyproj import Transformer
+    from shapely.ops import transform
+    d = paths.raw("lv", "aw")
+    url = fetch_cadastre_lv.resource_url(fetch_cadastre_lv.VARIS, lambda r: r["url"].endswith("/aw_shp.zip"))
+    rz = None
+    parts = []
+    t = Transformer.from_crs("EPSG:3059", "EPSG:3301", always_xy=True)
+    for layer in ("Novadi", "Pilsetas"):
+        if not os.path.exists(os.path.join(d, layer + ".shp")):
+            rz = rz or fetch_cadastre_lv.RemoteZip(url)
+            for ext in ("shp", "shx", "dbf", "prj", "cpg"):
+                rz.extract(f"{layer}.{ext}", os.path.join(d, f"{layer}.{ext}"))
+        for props, g in geo.features(os.path.join(d, layer + ".shp")):
+            if g is not None and (layer == "Novadi" or props.get("VKUR_TIPS") == 101):
+                parts.append(transform(t.transform, g).buffer(1))   # the buffer closes slivers between neighbours
+    return parts
+
+
 def lake(name):
     """One named standing water body (ETAK WFS), its map-sheet pieces unioned, or None."""
     import shapely
@@ -86,20 +111,22 @@ def main(argv):
     ap.add_argument("--tolerance", type=float, default=700.0, help="simplification in metres (default 700)")
     ap.add_argument("--min-island", type=float, default=10.0, help="smallest island kept, km² (default 10)")
     ap.add_argument("--no-lakes", action="store_true", help="coastline only")
-    ap.add_argument("--out", default=os.path.join(ROOT, "assets", "data", "estonia.json"))
+    ap.add_argument("--country", choices=["ee", "lv"], default="ee")
+    ap.add_argument("--out")
     a = ap.parse_args(argv)
+    a.out = a.out or os.path.join(ROOT, "assets", "data", "latvia.json" if a.country == "lv" else "estonia.json")
     from shapely.ops import unary_union
-    land = unary_union(counties())
+    land = unary_union(latvia() if a.country == "lv" else counties())
     log(f"{len(list(land.geoms)) if hasattr(land, 'geoms') else 1} land parts, bounds {tuple(round(v) for v in land.bounds)}")
     out = {
-        "attribution": ATTRIBUTION,
-        "source": COUNTIES,
+        "attribution": "Administratīvās teritorijas: Valsts adrešu reģistrs, VZD (CC BY 4.0)" if a.country == "lv" else ATTRIBUTION,
+        "source": "data.gov.lv varis-atvertie-dati aw_shp.zip" if a.country == "lv" else COUNTIES,
         "fetched": datetime.date.today().isoformat(),
         "bounds": [round(v) for v in land.bounds],
         "land": rings(land, a.tolerance, a.min_island * 1e6),
         "lakes": [],
     }
-    if not a.no_lakes:
+    if not a.no_lakes and a.country == "ee":
         for name in LAKES:
             g = lake(name)
             if g is None:

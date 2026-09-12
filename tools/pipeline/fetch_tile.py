@@ -285,12 +285,16 @@ def main(argv=None):
 
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import sources
-    if sources.for_point(a.center[0], a.center[1]) is None:
-        sys.exit("no data adapter covers this point (tools/pipeline/sources.py --list); only Estonia is implemented")
+    source = sources.for_point(a.center[0], a.center[1])
+    if source is None:
+        sys.exit("no data adapter covers this point (tools/pipeline/sources.py --list)")
     half = a.size / 2
     xmin, ymin = int(round(a.center[0] - half)), int(round(a.center[1] - half))
     xmax, ymax = xmin + a.size, ymin + a.size
-    log(f"AOI EPSG:3301 x {xmin}..{xmax}  y {ymin}..{ymax}  ({a.size} m)")
+    log(f"AOI EPSG:3301 x {xmin}..{xmax}  y {ymin}..{ymax}  ({a.size} m), {source.name}")
+    if source.own_tile:
+        # a country whose ground comes from its own module (sources.py); the files and the meta are the same
+        return source.build_tile(a, raw_dir, out_dir, (xmin, ymin, xmax, ymax))
 
     meta_path = os.path.join(out_dir, "terrain_meta.json")
     if a.only_era_maps:
@@ -376,6 +380,7 @@ def main(argv=None):
     today = dt.date.today().isoformat()
     meta = {
         "name": a.name,
+        "country": source.id,   # the game's descriptor (assets/data/countries/<id>.json); readers default to "ee"
         "crs": "EPSG:3301",
         "sheet": sheets[0],
         "xmin": xmin, "ymin": ymin, "xmax": xmax, "ymax": ymax,

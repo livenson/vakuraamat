@@ -55,10 +55,12 @@ static func facts(t: Dictionary) -> String:
 		bits.append(TranslationServer.translate("SECTOR_" + str(t.sector).to_upper()))
 	if t.get("employees") != null and int(t.employees) > 0:
 		bits.append(TranslationServer.translate("UI_EMPLOYEES") % int(t.employees))
+	# a Latvian row names the year of each figure: the turnover is the last annual report's, the taxes
+	# the last year VID has in full, and the two need not be the same year
 	if t.get("turnover") != null and int(t.turnover) > 0:
-		bits.append(TranslationServer.translate("UI_TURNOVER") % BookTheme.money(int(t.turnover)))
+		bits.append(TranslationServer.translate("UI_TURNOVER") % BookTheme.money(int(t.turnover)) + _year(t, "turnover_year"))
 	if t.get("taxes") != null and int(t.taxes) > 0:
-		bits.append(TranslationServer.translate("UI_TAXES") % BookTheme.money(int(t.taxes)))
+		bits.append(TranslationServer.translate("UI_TAXES") % BookTheme.money(int(t.taxes)) + _year(t, "taxes_year"))
 	if t.get("board_size") != null:
 		bits.append(TranslationServer.translate("UI_BOARD") % int(t.board_size))
 	if t.get("owner_managed") == true:
@@ -70,6 +72,11 @@ static func facts(t: Dictionary) -> String:
 		var why := health_reason(t)
 		bits.append(verdict + (": " + why if why != "" else ""))
 	return " · ".join(bits)
+
+
+## " (2024)" when the row names the year of a figure (Latvian packs), else "".
+static func _year(t: Dictionary, key: String) -> String:
+	return " (%d)" % int(t[key]) if t.get(key) != null else ""
 
 
 ## Why a company is on watch or in distress. Packs built since 2026-09-11 carry the pipeline's own

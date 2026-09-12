@@ -10,6 +10,9 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 |---|---|---|---|
 | Maa-amet geoportal, 1 m DTM sheets (`dem_1m_geotiff`) | ground heights, EH2000 | `tools/pipeline/fetch_tile.py` | `assets/terrain/<tile>/heightmap.r32`, `terrain_meta.json` |
 | the same sheets at 5 m (`dem_5m_geotiff`, `--dem-res 5`) | the ground a new place ships with; the tile service fetches the 5 m model first and replaces it with the 1 m one in its refine pass (`--only-dem`) | `fetch_tile.py`, `tools/tile_service.py` | the same files, `dtm_res_m: 5` in the meta |
+| LĢIA laser points (LAS 1.2, 1 km sheets; Latvia) and the 6th-cycle orthophoto (2016-18, 25 cm) | a Latvian tile's ground (classes 2 and 14 averaged per metre, holes filled, open water at its level), canopy (vegetation classes 3-5 only) and orthophoto, reprojected from LKS-92 onto the L-EST97 grid. A new world is centred on the sheet that holds the searched place and downloads only that sheet (`Latvia.place`, `select_sheets`); the strips it merely grazes are filled, and blended into any tile already built beside it (`blend_edges`) | `tools/pipeline/fetch_tile_lv.py` (through the `Latvia` adapter; see [latvia-plan.md](latvia-plan.md)) | the same tile files |
+| LĢIA orthophoto cycles 2-5 (2003-05, 2007-08, 2010-11, 2013-15; Latvia) | a Latvian plot's square in each cycle, for the plot page's history strip (Maa-amet's historical WMS stops at the border) | `fetch_tile_lv.add_history`, in the tile service's refine pass | `assets/terrain/<tile>/ortho_<years>.jpg`, listed as `history` in `terrain_meta.json` |
+| VZD cadastre (spatial shapefiles per municipality, descriptive XML per municipality out of the national zips), the address register's municipality polygons, Rīgas dome's LOD2 CityGML (Latvia) | a Latvian pack's parcels (the universal cadastral value, purposes mapped to the game's classes, the owner's kind, the land-book folio) and buildings (use, year, floors, materials, heights from the laser points, Rīga's roofs) | `tools/pipeline/fetch_cadastre_lv.py` | `sites/<id>/parcels.json`, `buildings.json` |
 | Maa-amet map sheet grids (`epk10T_SHP.zip`, `epk2T_SHP.zip`) | which 1:10 000 and 1:2000 sheets lie under the tile | `fetch_tile.py` (`GRID_ZIP`, `GRID2T_ZIP`) | cached in `data_raw/epk10T/`, `data_raw/epk2T/` |
 | Maa-amet nDSM (1:2000 sheets); the 1:20 000 CHM (`chm_geotiff`, trees only, coarser) where no nDSM exists | canopy and object heights | `fetch_tile.py` | `assets/terrain/<tile>/canopy.r32` |
 | Maa-amet WMS `fotokaart` (`EESTIFOTO`) | 25 cm orthophoto; and one plot's square at a time, at the size the book shows it, for the plot page's "today" | `fetch_tile.py`, `scripts/ui/plot_history.gd` | `assets/terrain/<tile>/ortho.jpg`, `user://cache/plots/<pack>/` |
@@ -24,17 +27,25 @@ version with a diagram is in the [README](../README.md#data-sources-and-how-they
 | PRIA field register, WFS `pria_avalik:pria_pollud` and `pria_massiivid` on kls.pria.ee | farmed fields: polygon, the crop declared for this year's area aid | `tools/pipeline/fetch_fields.py` | `sites/<id>/fields_2026.json` (crops planted by `scripts/world/crops.gd`) |
 | OpenStreetMap, Overpass `highway=bus_stop` nodes (ODbL) | bus stops, snapped to the nearest ETAK road with a heading | `tools/pipeline/fetch_stops.py` | `sites/<id>/stops.json` (shelters by `RoadNetwork._bus_stops`) |
 | Public transport register GTFS (`eu-gtfs.remix.com` mirror of the national feed) | the lines calling at the tile's stops, their destinations, departure times per service day and the route geometry | `tools/pipeline/fetch_departures.py` | `sites/<id>/departures.json` |
+| OpenStreetMap via Overpass, `way[highway]` (Latvia) | a Latvian tile's streets, paths and trails, split at every node two ways share so the road graph can turn there | `tools/pipeline/fetch_roads_lv.py` | `sites/<id>/roads.json` |
+| ATD and Rīgas satiksme GTFS (Latvia, CC0) | the buses and trolleybuses calling at a Latvian tile's stops | `tools/pipeline/fetch_departures.py` (`fetch_lv`, chosen by the pack's `country`) | `sites/<id>/departures.json` |
+| the other country's registers, for a tile on the Estonian-Latvian border | the parcels, buildings, companies and (for an Estonian pack) OpenStreetMap roads on the other side, merged into the pack | `tools/pipeline/cross_border.py` (every tile-service job) | the pack's own files |
 | derived from `parcels.json` (optional Maa-amet transaction export) | euro per m² medians by purpose | `tools/pipeline/market.py` | `sites/<id>/market.json` |
 | e-Business Register open data (daily CSV, CC BY 4.0) | companies matched to the tile's addresses | `tools/pipeline/fetch_tenants.py` | `sites/<id>/tenants.json` |
 | e-Business Register general data, persons and shareholders (daily JSON dumps, CC BY 4.0) | EMTAK activity and the sector, share capital, web address, annual-report employee counts, deletion date; board and shareholder counts and hashed ids (structure only, no names) | `tools/pipeline/register_extra.py` (slimmed once per download into `data_raw/ariregister/*.slim.jsonl`) | the same rows in `tenants.json` |
 | Tax Board "tasutud maksud" quarterly open data (EMTA) | taxes paid, turnover and employees per company per quarter, the activity sector | `register_extra.py` (`data_raw/emta/`) | `tenants.json`: `employees`, `turnover`, `taxes`, `quarters`, `health` |
+| Latvian Enterprise Register (UR) and State Revenue Service (VID) open data, CC0 | a Latvian pack's companies: matched by address code or address to the tile's buildings and plots, status from liquidation and insolvency, board and owners as counts and hashed ids, annual-report turnover (`turnover_year`), VID taxes (`taxes_year`) and employees, the NACE sector, the health verdict | `tools/pipeline/fetch_tenants_lv.py` | `sites/<id>/tenants.json` |
 | Maa-amet in-ADS gazetteer | address and place search; the municipality under a point (reverse EHAK lookup) | `tools/tile_service.py` (`/geocode`), `scripts/autoload/locator.gd` (directly), `fetch_buildings.py` (which municipality's LOD2 and tree files to fetch) | menu results |
+| VZD address register: place centroids and every address with its point (Latvia) | the menu's Latvian search: places at once, addresses from an SQLite index built on first use | `tools/pipeline/geocode_lv.py` (`sources.Latvia.geocode`: the service's `/geocode?country=lv`, which `Locator.geocode` asks as `lv.json`'s geocoder) | `data_raw/lv/var/addresses.sqlite` |
+| VZD address register: the municipality polygons (Latvia) | Latvia's outline beside Estonia's on the menu's map | `tools/pipeline/fetch_outline.py --country lv` (run by hand, the file is committed) | `assets/data/latvia.json` |
 | ip-api.com IP geolocation (optional, "Use my location" in the menu) | a coarse city-level point; free for non-commercial use, no key | `scripts/autoload/locator.gd` | the menu's suggested place |
 | Poly Haven (CC0) | ground and facade PBR textures | `tools/pipeline/fetch_polyhaven.py` | `assets/terrain/textures/`, `assets/textures/buildings/` |
 | Sketchfab (CC BY, via the MCP server, `make mcp`) and Poly Pizza (CC0 / CC BY) models | cars, street lamps, benches, bus shelters, the spruce and juniper, hay bales, tractor, farm plants; playground, boats and stairs | downloaded, split with `tools/blender/split_glb.py`, listed in `assets/vendor/sketchfab/CREDITS.md` | `assets/vendor/sketchfab/`, `assets/vendor/polypizza/`, `assets/models/trees/spruce_src.glb` |
 
 Licences, attribution strings and fetch dates are in `THIRD_PARTY.md`. Endpoints and the per-country
-adapter interface are in `tools/pipeline/sources.py`; only Estonia is implemented.
+adapter interface are in `tools/pipeline/sources.py`, the game's side in `assets/data/countries/<id>.json`;
+Estonia and Latvia ([latvia-plan.md](latvia-plan.md)) are implemented, and
+[adding-a-country.md](adding-a-country.md) is the checklist for the next.
 
 ## Transformations
 
@@ -58,11 +69,23 @@ adapter interface are in `tools/pipeline/sources.py`; only Estonia is implemente
    instancer, and saves `data/terrain3d_00_00.res` and `terrain_assets.tres`.
 6. **Validation** (`make validate`): `tools/validate_site.py` checks every pack without Godot.
 
-The tile service (`tools/tile_service.py`) runs steps 1 to 4 and 6 for any point in Estonia on
-request from the menu (the terrain with the 5 m ground model; the registers including the bus stops
-and the PRIA fields) and packs the result as a zip the game installs under `user://`. It skips step 5:
-the game builds the Terrain3D region itself when it loads the tile. A refine pass after the pack is
-playable fetches the 1 m ground model, the measured trees and the departures and rewrites the zip.
+The tile service (`tools/tile_service.py`) runs steps 1 to 4 and 6 on request from the menu, for
+any point a country adapter covers (`tools/pipeline/sources.py`: Estonia and Latvia). It packs the
+result as a zip the game installs under `user://`. It skips step 5: the game builds the Terrain3D
+region itself when it loads the tile. `POST /cancel?id=` stops a job at its next stage or download
+chunk.
+
+The adapter decides what differs per country:
+
+- **Where a new world is centred:** a Latvian one on its laser sheet.
+- **The download estimate.**
+- **The register stages:**
+  - Estonia: the terrain on the 5 m ground model, the Building Register, the cadastre, ETAK roads,
+    PRIA fields and the e-Business Register;
+  - Latvia: the VZD cadastre and buildings, UR and VID companies, and OpenStreetMap roads.
+- **The refine pass,** which runs after the pack is playable and rewrites the zip:
+  - Estonia: the 1 m ground model, the measured trees and the departures;
+  - Latvia: the older orthophoto cycles and the departures.
 
 ## Where the game reads them
 
@@ -205,8 +228,9 @@ data_raw/                            downloads and intermediates (git-ignored)
 
 Maa-amet open data, free for commercial use with attribution. In-game credit line (also in
 `terrain_meta.json`): "Map data: Maa- ja Ruumiamet (Estonian Land and Spatial Development Board),
-2026". Companies: e-Business Register open data, CC BY 4.0. Everything else is listed in
-`THIRD_PARTY.md`.
+2026". Companies: e-Business Register open data, CC BY 4.0. Latvian packs carry LĢIA's credit ("Map
+data: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA)") and each register's own attribution.
+Everything else is listed in `THIRD_PARTY.md`.
 
 ## The tile service as a sidecar
 
@@ -234,8 +258,8 @@ or removing a Terrain3D region.
 
 ## Starter places
 
-A fresh build ships Kvissentali, Palupera and Pirita with their ground baked by CI, so entering them
-builds nothing. The tiles around Kvissentali and Pirita come as one download instead of sixteen tile
+A fresh build ships every pack in `sites/` with its ground baked by CI, so entering one builds
+nothing. Those are Kvissentali, Palupera and Pirita, and in Latvia Rīga Old Town and Valka. The tiles around Kvissentali and Pirita come as one download instead of sixteen tile
 service jobs: `tools/starter_places.py build` asks the running service for each neighbour (refreshing a
 stale cached pack, making a missing one, waiting for its 1 m ground), drops files the current pipeline
 no longer writes, checks the `PACK_VERSION` stamp and writes `build/starter-places.zip` and

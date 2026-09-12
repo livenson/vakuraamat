@@ -40,7 +40,9 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   the key is *absent*: `int(null)` then fails with "Nonexistent 'int' constructor" and takes the rest
   of the loop with it. Read those fields through a helper that treats null as empty (`PlaceSearch._text`
   and `_num` are the pattern).
-- Country data adapters: `tools/pipeline/sources.py` (Estonia implemented; add a class per country).
+- Countries: an adapter in `tools/pipeline/sources.py` (pipeline, tile service) and a descriptor in
+  `assets/data/countries/<id>.json` (game, via `Countries`); no other code names a country. Estonia and
+  Latvia are implemented; `docs/adding-a-country.md` is the checklist.
 - A pack for a new place is built in two passes. The job ships what the place needs to be walked in
   (the 5 m ground model, 4 MB a sheet against 75 MB for the 1 m one; the register, cadastre, roads,
   tenants), then `refine_job` fetches the 1 m ground, the measured trees and the departures in the
@@ -178,10 +180,10 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
 - Prop checks without a world: `tools/godot/figure_preview.tscn` (the eight figures), `bike_preview.tscn`
   (bicycles with riders, side-on, a red block marking the riding direction).
 - Main-menu screenshot: `godot --path . res://tools/godot/menu_shot.tscn -- --windowed --out=/abs.png`
-  (or `--fullscreen`; `--locations` for the second page, `--creating` / `--failed` for the world-creation
+  (or `--fullscreen`; `--locations` for the second page, `--query=<place>` with its results, `--storage` for the storage page, `--creating` / `--failed` for the world-creation
   sheet). Menu strings come from compiled translations: run `godot --headless --import` after editing
   `strings.csv` or the screenshot shows raw keys.
-- Strings: `assets/i18n/strings.csv` (keys, et, en). Add keys, never hard-code text.
+- Strings: `assets/i18n/strings.csv` (keys, et, en, lv). Add keys with all three languages, never hard-code text; a pack's `strings.csv` may leave `lv` out (the fallback locale is English). The language key and menus cycle through `Lang.LOCALES` (scripts/ui/lang.gd); screenshots take `--locale=lv`.
 - UI look: `BookTheme` (scripts/ui/book_theme.gd) is the one theme; new panels set `theme =
   BookTheme.theme()` and use its type variations (HeadLabel, DetailLabel, PrimaryButton, TextButton,
   RowButton) instead of font or colour overrides; euro figures through `BookTheme.money()`, no " · " joins.

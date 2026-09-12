@@ -2,12 +2,19 @@
 
 Everything that ties Vakuraamat to one place and one story lives in a **site pack**, a directory
 under `sites/<id>/`. The engine (scripts, scenes, shaders, models, the terrain pipeline) never
-names a site; it reads the active pack through the `Sites` autoload. `sites/palupera/` is the
-original slice; `sites/kvissentali/` is a scaffold for a Tartu location.
+names a site; it reads the active pack through the `Sites` autoload. No code outside a country's
+adapter and descriptor names a country either ([adding-a-country.md](adding-a-country.md)).
+
+The repository carries five packs:
+- `palupera`: the original rural slice;
+- `kvissentali`: Tartu;
+- `pirita`: Tallinn;
+- `riga_vecpilseta`: Rīga Old Town, in Latvia;
+- `valka`: in Latvia, on the Estonian border.
 
 The active pack is chosen by `--site=<id>` on the command line, else by the last choice in
-`user://settings.cfg`, else `palupera`. The main menu shows a **Location** button when more than
-one pack exists. Saves record their site and switch to it on Continue.
+`user://settings.cfg`, else `palupera`. The main menu's *Locations...* page lists every pack you
+have. Saves record their site and switch to it on Continue.
 
 ## A pack, file by file
 
@@ -46,13 +53,16 @@ except the bus stops, departures and PRIA fields: `make stops`, `make departures
 Choosing the centre: open the Maa-amet map (kaart.maaamet.ee), read the L-EST97 easting and
 northing of the point you want in the middle, or geocode an address with
 `https://inaadress.maaamet.ee/inaadress/gazetteer?address=<name>`. The 1:10 000 sheet grid
-does not matter; sheets are mosaicked.
+does not matter; sheets are mosaicked. `make site` takes the centre as given. The tile service
+instead asks the country's adapter where to centre a new world (`place`). A Latvian one moves onto
+the LĢIA laser sheet that holds the point, up to half a tile away, so it downloads one sheet instead
+of four. The point itself is kept as `terrain.focus`, and the start is found around it.
 
-## Any point in Estonia from inside the game
+## Any point from inside the game
 
-The **New location...** button in the main menu takes an address, a place name, L-EST97
-`"E N"` or `"lat, lon"` (or *Use my location*, a city-level IP lookup) and asks the **tile service**
-for a pack:
+The search on the *Locations...* page takes an address, a place name, L-EST97 `"E N"` or
+`"lat, lon"`, or *Use my location* (a city-level IP lookup). **Go** on a result asks the **tile
+service** for a pack, for any point a country adapter covers:
 
 ```sh
 make tile-service          # tools/tile_service.py on the loopback port 8765 (the venv's Python; tools/play.sh and the game start it for you)
@@ -60,7 +70,7 @@ make tile-service          # tools/tile_service.py on the loopback port 8765 (th
 
 The service runs the same steps as `make site` + `make tile` in a workspace under `data_raw/service/`
 (downloads shared with `data_raw/`), places the story skeleton on **anchors** found in the data
-(register on open ground near the centre, landmark at the largest building or tallest trees, farm on
+(register on open ground near the searched place, landmark at the largest building or tallest trees, farm on
 the widest open ground, trade post by a road, field on crops), and returns a zip. The game installs
 it under `user://sites/<id>/` and `user://tiles/<id>/`; the world builds the Terrain3D data on the
 first visit (about 15 s, progress on the fade) and saves it next to the tile. Runtime packs are
@@ -71,23 +81,44 @@ Scripted equivalent: `curl -X POST :8765/tile -d '{"name":"Aakre","x":629807,"y"
 `/status?id=aakre`, `/download?id=aakre`, then
 `godot --headless --path . res://tools/godot/install_pack.tscn -- --zip=aakre.zip --id=aakre`.
 
-## The Locations panel
+## The Locations page
 
-*Locations...* in the main menu (and in the pause menu, which saves first) lists the packs you have
-(shipped and installed, with Play / Continue), the packs already generated on the tile service
-(Install and play), suggested Estonian places to generate with one click
-(`assets/data/suggested_places.json`), a place search (address, place name, coordinates, or your IP
-location), and the storage section.
+*Locations...* in the main menu (and in the pause menu, which saves first) is one screen.
 
-The suggested places sit on a small map of the country (`EstoniaMap`, `scripts/ui/estonia_map.gd`):
-a ring for every place offered, a filled mark for a world you already have and a ringed one for the
-world you are in. Pointing at a mark names it, pointing at a row lights its mark. The coastline is
-`assets/data/estonia.json` - the county division unioned and simplified to 300 m by
-`tools/pipeline/fetch_outline.py`, with Võrtsjärv from the ETAK water layer; Peipsi needs no drawing,
-since no county covers it and the union's own edge is its shore. The file is committed; re-run the
-script only to follow a new administrative division.
-`tools/godot/menu_shot.tscn -- --locations --scroll=2870 --map=<n>` screenshots the map with one
-mark lit.
+**The search** comes first, with the cursor already in it:
+- Typing asks every country's address search after a short pause (each descriptor's `geocoder`);
+  Enter asks at once. Estonia's is Maa-amet's in-ADS, asked directly. Latvia's is its address
+  register, asked through the tile service's `/geocode?country=lv`.
+- Up to six results appear under the field. Each says what choosing it means and has one **Go**
+  button:
+  - *your world: <name>* when the place lies inside a world you have;
+  - *ready on the service* when the service has already built one there;
+  - *new world, about <time>, <size> to download* otherwise (see below).
+
+**Your worlds** are listed last visited first (`user://played.cfg`), with their country.
+
+**The map** beside them (`EstoniaMap`, `scripts/ui/estonia_map.gd`) draws every described country's
+outline:
+- filled marks for your worlds, with the current one ringed;
+- rings for the ideas (`assets/data/suggested_places.json`), which are also listed as names under
+  the map;
+- blue dots for what the service has ready.
+
+A click on a mark goes there. **Manage storage...** opens the storage page.
+
+**Go** opens a world you have, installs one the service has built, and creates anything else under a
+progress sheet with **Cancel** (Esc does the same). `Locator.cancel_job` abandons a pack that is
+still downloading and asks the service to stop (`POST /cancel`). The service stops at the job's next
+stage or download chunk and drops the half-built workspace.
+
+The outlines are committed files, both from `tools/pipeline/fetch_outline.py`; re-run it only to
+follow a new administrative division:
+- `assets/data/estonia.json`: the county division unioned and simplified to 300 m, with Võrtsjärv
+  from ETAK;
+- `assets/data/latvia.json`: the address register's municipalities.
+
+`tools/godot/menu_shot.tscn -- --locations` screenshots the page. `--query=<place>` adds its search
+results and `--map=<n>` lights one mark.
 
 ## Reading the place
 
@@ -118,14 +149,15 @@ variations rather than font overrides: `TitleLabel`, `HeadLabel`, `SubheadLabel`
 `DetailLabel`, `ColumnLabel` for text, `PrimaryButton`, `TextButton`, `RowButton` for buttons. Money
 goes through `BookTheme.money()` (thousands grouped). The front
 page's plate (`scripts/ui/map_plate.gd`) draws the pack's cadastral units over its orthophoto and
-fills the saved book's plots. *Create the world* and *Install and play* freeze the Locations page under
-a progress sheet (the service's stage, a bar, the elapsed time; `Locator.progress(text, fraction)`)
-until the pack is installed or the job fails with its error and a Close button.
+fills the saved book's plots. Going to a new place freezes the Locations page under a progress sheet
+(the service's stage, a bar, the elapsed time; `Locator.progress(text, fraction)`) with a Cancel
+button, until the pack is installed, the job is cancelled, or it fails with its error and a Close
+button.
 The debug map (M) lays its text out without overlaps: street names along their longest stretch (from
 `roads.json`), house numbers at the buildings (from `buildings.json` addresses), then the points'
 labels nearest the player; every point keeps its dot, and the dot under the mouse shows its name.
-`tools/godot/menu_shot.tscn` screenshots the menu (`--locations` for the second page, `--creating`
-or `--failed` for the sheet).
+`tools/godot/menu_shot.tscn` screenshots the menu (`--locations` for the second page, `--storage` for
+the storage page, `--creating` or `--failed` for the sheet).
 
 ## Real buildings: ETAK footprints, the Building Register, LOD2 roofs
 
@@ -319,16 +351,20 @@ grass. Tiles without coverage are unchanged.
 
 ## Other countries
 
-Everything the pipeline fetches for a place sits behind one interface, `tools/pipeline/sources.py`:
-a metric CRS and coverage box, `dem`, `ortho`, optional `canopy`, `historical`, `buildings`, `trees`,
-`geocode`, `reverse`. Estonia is the one implemented adapter (Maa-amet DTM, nDSM, orthophoto and
-historical WMS, in-ADS gazetteer, ETAK + Building Register + Geo3D buildings, Geo3D trees).
-`fetch_tile.py` refuses points no adapter covers, and `python3 tools/pipeline/sources.py --list`
-prints the implemented and planned adapters (Finland, Latvia, the Netherlands, Denmark, Switzerland,
-the UK, the US, and a coarse global fallback with what each would use). Adding a country means
-writing one adapter class and registering it; the game side (packs, blocks, services) is unchanged.
-The Estonian-specific parts that would still need a per-country answer are the historical map layers
-per era and the story blocks' cultural texture.
+A country is an adapter in `tools/pipeline/sources.py` and a descriptor in
+`assets/data/countries/<id>.json`, and nothing else names one.
+- **The adapter** handles the pipeline and the tile service: coverage, the ground, the download
+  estimate, the register stages, the refine pass, the cross-border rows, timetables, codex texts and
+  address search.
+- **The descriptor** is what the game reads: outline, coverage box, address search, where a plot's
+  older photographs come from, report links, the building-code pattern, and how a refined pack shows.
+
+Estonia and Latvia ([latvia-plan.md](latvia-plan.md)) are implemented. `fetch_tile.py` refuses points
+no adapter covers. `python3 tools/pipeline/sources.py --list` prints the implemented and planned
+adapters, with what each planned one would use: Finland, the Netherlands, Denmark, Switzerland, the
+UK, the US, and a coarse global fallback. [adding-a-country.md](adding-a-country.md) is the checklist.
+It also lists what is still one-country: outline fetching, land-register links, diacritic folding,
+and right-hand traffic.
 
 ## Endless map: neighbouring tiles
 
@@ -460,23 +496,26 @@ regenerated from data on every machine; a save holds only where you were standin
 Every data source a pack uses gets a row in `THIRD_PARTY.md`; the Maa-amet attribution is
 shown in the menu and must stay, and the codex names the register sources.
 
-## The Locations page: search, estimate, storage
+## Estimates and storage
 
-Typing in the search field asks the Maa-amet in-ADS gazetteer after a short pause and lists up to
-six places; Search or Enter does the same at once. Picking a place fills the name and asks the
-tile service for an estimate (`GET /estimate?x&y&size`): it resolves the tile's DTM and nDSM
-sheets, sends a HEAD request for each one not yet in `data_raw/`, and adds the orthophoto; the
-answer carries the bytes, what is cached, the service's last measured download rate and the mean
-duration of its past jobs (`data_raw/service_stats.json`). Creating a world is refused when the
-game's disk has under 1 GB free or the service's under 2 GB.
+A new-world result's estimate comes from the tile service (`GET /estimate?x&y&size`). There is one
+request per 1 km cell, and the answer is kept for the session.
+- **Centring:** the country's adapter centres the world as `/tile` would, and returns that centre as
+  `"center"`.
+- **The download list:** in Estonia the tile's DTM and nDSM sheets and the orthophoto; in Latvia the
+  one laser sheet the world needs. Each one not yet in `data_raw/` gets a HEAD request.
+- **The answer** carries the bytes, what is already cached, the service's last measured download
+  rate, and the mean duration of its past jobs (`data_raw/service_stats.json`).
 
-The Storage section lists installed worlds with their size (site files, tile files and built region
+Creating a world is refused when the game's disk has under 1 GB free or the service's under 2 GB.
+
+The storage page lists installed worlds with their size (site files, tile files and built region
 data, the downloaded zip), the streamed neighbour tiles (`t<E>_<N>` packs) as one line, the free
 space and the service cache (`GET /cache`). Remove moves a pack to the system trash after a second
 press; the current world cannot be removed. A pack an older pipeline built is marked out of date
 (the neighbour-tiles line carries the count, since every `t<E>_<N>` pack shares it) and carries a
-Refresh button that puts it in the rebuild queue. `tools/godot/menu_shot.tscn -- --locations
---bottom --query=<place>` screenshots the page.
+Refresh button that puts it in the rebuild queue. `tools/godot/menu_shot.tscn -- --storage`
+screenshots it.
 
 ## Packs that know how old they are
 
@@ -513,10 +552,13 @@ quarters), `taxes`, `employees_hist`, `quarters`, `board_size`, `shareholders`, 
 shown), `deleted`, `report_overdue` and `health` (sound, watch, distressed). The register dumps are
 slimmed once per download; a tile job then takes seconds.
 `python3 tools/pipeline/fetch_tenants.py --site <id> --stats` prints the sector histogram.
-The debug map (M) has a company layer: the Layer button cycles sector, employees, health, founded
-and shared owners (`scripts/ui/map_palette.gd`; `--open=map:<mode>` for a screenshot). Sector,
-health and founded are also laid on the ground around you (`scripts/world/info_views.gd`, I cycles
-them without the map), with their key on the HUD's bottom right while one is showing
+The debug map (M) has a company layer: the Layer button cycles sector, industry mix (a plot striped by
+its sectors' shares), one sector (a plot shaded by one sector's share; its own button picks the
+sector), employees, health, founded and shared owners (`scripts/ui/map_palette.gd`;
+`--open=map:<mode>`, `--open=map:focus:<sector>` for a screenshot). All but employees and owners are
+also laid on the ground around you (`scripts/world/info_views.gd`): I cycles them without the map,
+Shift+I shows the one-sector layer and steps to the next sector with each press, with their key on
+the HUD's bottom right while one is showing
 (`UiManager.legend_card`). The K overlay and the plot sheet list each tenant's activity, staff, turnover, taxes,
 board and health; the book's Companies page lists the tile's companies by employees with a sector
 filter and click-to-sort headings (`--open=companies`, `--open=companies:<name|sector|employees|turnover|address>`

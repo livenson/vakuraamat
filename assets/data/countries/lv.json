@@ -1,0 +1,23 @@
+{
+  "id": "lv",
+  "name": "Latvia",
+  "name_key": "COUNTRY_LV",
+  "parcel_code": "^\\d{11}$",
+  "parcel_link": "https://www.lursoft.lv/real-estate-properties/property/{property}",
+  "outline": "res://assets/data/latvia.json",
+  "coverage": [305000, 6165000, 770000, 6450000],
+  "geocoder": {
+    "service": "/geocode?country=lv&q={q}"
+  },
+  "refine": "flag",
+  "photos": {
+    "from_tile": true
+  },
+  "building_code": {
+    "pattern": "^\\d{14}$",
+    "register_key": "UI_SHEET_REGISTER_LV",
+    "code_key": "UI_SHEET_CODE_LV"
+  },
+  "building_links": {},
+  "place_links": {}
+}

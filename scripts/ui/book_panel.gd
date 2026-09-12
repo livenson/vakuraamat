@@ -303,7 +303,7 @@ func _fill_plot() -> void:
 	_fill_links(body, str(p.tunnus))
 	var lrow := HBoxContainer.new()
 	body.add_child(lrow)
-	_link_button(lrow, str(p.get("link", "")), tr("UI_BOOK_IN_THE_REGISTER"))
+	_link_button(lrow, Countries.parcel_link(p), tr("UI_BOOK_IN_THE_REGISTER"))   # the pack's link, else the country's (a Latvian plot: its property's Lursoft card)
 	_fill_plot_history(body, p.tunnus)
 	show_parcel.emit(p.tunnus)
 
