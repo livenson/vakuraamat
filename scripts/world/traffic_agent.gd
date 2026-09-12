@@ -176,11 +176,18 @@ func _clothes(fig: Node, col: Color) -> void:
 func _make_animal(which: String) -> Node3D:
 	var names: Array = ["pug", "beagle"] if which == "dog" else ["cat"]
 	var path := "res://assets/vendor/polypizza/%s.glb" % names[rng.randi() % names.size()]
+	var body := animal(path, 0.42 if which == "dog" else 0.3)
+	return body if body != null else _make_walker()
+
+
+## An animal model `height` metres at the shoulder, standing on its origin with its nose towards -Z;
+## null when the model is not there. Also the pug beside a parked bicycle (Bicycle).
+static func animal(path: String, height: float) -> Node3D:
 	if not ResourceLoader.exists(path):
-		return _make_walker()
+		return null
 	var model: Node3D = HumanFigure.scene(path).instantiate()
 	var b: AABB = Interiors._bounds(model)
-	var k := (0.42 if which == "dog" else 0.3) / maxf(b.size.y, 0.001)
+	var k := height / maxf(b.size.y, 0.001)
 	var holder := Node3D.new()
 	model.scale = Vector3.ONE * k
 	model.position = Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k)
