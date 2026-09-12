@@ -240,7 +240,25 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
      file names in `fetch_tenants_lv` updated.
 4. **Roofs from the laser points** for buildings without LOD2. Done when Valka's houses have
    pitched roofs (screenshot beside the orthophoto).
-5. **Roads, stops, departures, fields.** OSM roads, the GTFS feeds, LAD fields.
+5. **Roads, stops, departures, fields.** Roads, stops and departures done 2026-09-12:
+   - **Roads.** `fetch_roads_lv.py` takes the tile's `highway` ways from OpenStreetMap and splits
+     each at every node another way shares: the road graph joins edges only at their ends, and an
+     OSM way runs through crossings. Paved roads are streets, unpaved ones roads, footways, steps
+     and pedestrian streets paths (the Old Town's lanes, so no cars), tracks trails. Widths come
+     from `width`, else `lanes`, else a default per class. Old Town: 2,518 segments from 1,442 ways.
+   - **Stops.** `fetch_stops.py` was already country-neutral: 7 stops in the Old Town, all on a road.
+   - **Departures.** `fetch_departures.py` chooses the feeds by the pack's `country`. For Latvia:
+     ATD's regional buses and Rīgas satiksme's newest monthly zip. The GTFS reader now trims the
+     padded names and values ATD writes (Pirita's Estonian timetable came out identical). Only
+     buses and trolleybuses are kept: the game has no tram or train. Old Town: 132 routes, 2,449
+     departures on lines 2 … 63, the night lines and ATD's regional buses. The service fetches
+     them in the refine pass, as in Estonia.
+   - **Checks.** Screenshots of the streets from above and of a bus at the Grēcinieku iela stop at
+     08:00; `make test` green.
+   - **Left open: fields.** LAD's declared fields carry only a crop code (`product_code`: 710,
+     141, 720 …) and the code list is not among its open datasets. Drawing unknown crops would
+     be inventing, so Latvian packs have no fields until the classifier is found. Also left
+     open: tram and train routes, and tram stops (`railway=tram_stop`).
 6. **Language.** `lv` column, the locale cycle, the neutral use and sector labels, the menu map.
 7. **Streaming across the border.** Walk from Valga into Valka; starter places for Rīga.
 

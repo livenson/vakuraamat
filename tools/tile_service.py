@@ -313,7 +313,8 @@ def run_job(job):
             fetch_tile.PROGRESS = None
         if country == "lv":
             # Latvia (docs/latvia-plan.md): the cadastre gives parcels and buildings in one pass, the
-            # register and VID the companies; roads, stops, fields and timetables are later steps
+            # register and VID the companies, OpenStreetMap the roads and stops; the timetables come
+            # in the refine pass as in Estonia. Fields wait for LAD's crop codes
             stage("cadastre (VZD), buildings, Rīga's roofs", 0.5)
             import fetch_cadastre_lv
             ok, _ = with_deadline(f"{sid}: cadastre", 1500, fetch_cadastre_lv.fetch, sid, root=ws)
@@ -322,7 +323,11 @@ def run_job(job):
             stage("companies (UR) and taxes (VID)", 0.62)
             import fetch_tenants_lv
             with_deadline(f"{sid}: tenants", 600, fetch_tenants_lv.fetch, sid, root=ws)
-            stops_thread = None
+            stage("roads (OpenStreetMap)", 0.64)
+            import fetch_roads_lv
+            with_deadline(f"{sid}: roads", 180, fetch_roads_lv.fetch, sid, root=ws)
+            stops_thread = threading.Thread(target=lambda: with_deadline(f"{sid}: stops", 120, fetch_stops.fetch, sid, root=ws), daemon=True)
+            stops_thread.start()
         else:
             stops_thread = estonian_registers(sid, ws, stage)
         if stops_thread is not None and stops_thread.is_alive():
@@ -378,7 +383,12 @@ def refine_job(job, ws):
         log(f"{sid}: refining - {name} [{time.time() - started:.0f} s]")
     try:
         if country_of(job["x"], job["y"]) == "lv":
-            # the ground is 1 m from the start (the laser sheets), and trees and timetables are later steps
+            # the ground is 1 m from the start (the laser sheets) and measured trees are a later step:
+            # only the timetables (ATD, Rīgas satiksme) are left to fetch
+            rstage("bus departures (ATD, Rīgas satiksme)")
+            with_deadline(f"{sid}: departures", 300, fetch_departures.fetch, sid, root=ws)
+            rstage("packing")
+            write_zip(sid, ws)
             open(os.path.join(WORKSPACE, sid + ".refined"), "w").close()
             with LOCK:
                 job.update(refined=True, refine_stage="ready", ground_res_m=1)
