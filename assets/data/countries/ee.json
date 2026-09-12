@@ -1,6 +1,7 @@
 {
   "id": "ee",
   "name": "Estonia",
+  "name_key": "COUNTRY_EE",
   "outline": "res://assets/data/estonia.json",
   "coverage": [369000, 6377000, 740000, 6635000],
   "geocoder": {

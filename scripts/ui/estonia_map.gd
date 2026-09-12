@@ -4,13 +4,15 @@
 # both from tools/pipeline/fetch_outline.py, on the same L-EST97 grid), drawn as an engraved plate
 # in the book's ink: land on lighter paper, Peipsi and the gulf as the page itself, Võrtsjärv in the
 # cadastre's blue. Every place the page offers is a mark on it; the world you are in is filled.
-# Hovering a mark names it, and hovering a row on the page lights that row's mark (`highlight`).
+# Hovering a mark names it, clicking it emits `picked`, and hovering a row on the page lights that
+# row's mark (`highlight`).
 class_name EstoniaMap
 extends Control
 
 const PICK_RADIUS := 12.0   # how near the pointer has to come to a mark, in pixels
 
 signal hovered(index: int)   # -1 when the pointer leaves every mark
+signal picked(index: int)    # a mark clicked: the page decides what going there means
 
 ## [{name, x, y, kind}] in L-EST97; kind is "suggested", "installed" or "current".
 var places: Array = []
@@ -67,10 +69,16 @@ func highlight(index: int) -> void:
 func _gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		var near := _nearest(event.position)
+		mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND if near >= 0 else Control.CURSOR_ARROW
 		if near != _hover:
 			_hover = near
 			hovered.emit(near)
 			queue_redraw()
+	elif event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var at := _nearest(event.position)
+		if at >= 0:
+			picked.emit(at)
+			accept_event()
 
 
 func _nearest(at: Vector2) -> int:
@@ -133,7 +141,7 @@ func _draw() -> void:
 		if kind == "current" or lit:
 			draw_circle(at, 4.5 if lit else 3.5, color)
 			draw_arc(at, 7.0, 0.0, TAU, 24, Color(color, 0.6), 1.0, true)
-		elif kind == "installed":
+		elif kind in ["installed", "ready"]:   # ready: built on the tile service, blue
 			draw_circle(at, 3.0, color)
 		else:
 			draw_circle(at, 3.0, Color(BookTheme.PAGE_LIGHT, 0.9))

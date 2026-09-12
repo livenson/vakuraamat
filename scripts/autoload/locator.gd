@@ -6,6 +6,10 @@ extends Node
 
 signal progress(text: String, fraction: float)
 
+const CANCELLED := "cancelled"   # fetch_pack's error when cancel_job stopped it (the service says the same)
+var _cancelled: Dictionary = {}  # pack id -> true once cancel_job asked
+var _live: Dictionary = {}       # pack id -> the HTTPRequest bringing its zip down
+
 const SETTINGS := "user://settings.cfg"
 const MIN_FREE_BYTES := 1024 * 1024 * 1024   # a pack installs ~150 MB plus its built region data; keep a margin
 const DEFAULT_SERVICE := "http://127.0.0.1:8765"
@@ -30,7 +34,8 @@ func service_url() -> String:
 
 
 ## One HTTP round trip. Returns {code, body(String), ok}. code 0 = no connection.
-func http(url: String, method: int = HTTPClient.METHOD_GET, body: String = "", download_to: String = "") -> Dictionary:
+## `tag` names the request so cancel_job can abandon it (a pack's zip, by pack id).
+func http(url: String, method: int = HTTPClient.METHOD_GET, body: String = "", download_to: String = "", tag: String = "") -> Dictionary:
 	var r := HTTPRequest.new()
 	r.timeout = 60.0
 	if download_to != "":
@@ -41,7 +46,11 @@ func http(url: String, method: int = HTTPClient.METHOD_GET, body: String = "", d
 	if err != OK:
 		r.queue_free()
 		return {"code": 0, "body": "", "ok": false}
+	if tag != "":
+		_live[tag] = r
 	var res: Array = await r.request_completed
+	if tag != "":
+		_live.erase(tag)
 	r.queue_free()
 	var code: int = res[1]
 	var text := ""
@@ -344,6 +353,7 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 		refresh: bool = false, quiet: bool = false) -> Dictionary:
 	var base := service_url()
 	var error := ""
+	_cancelled.erase(id)   # a new attempt at a place cancelled before
 	var say := func(text: String, at: float):
 		if not quiet:
 			progress.emit(text, at)
@@ -380,8 +390,11 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 		DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("user://cache"))
 		var zip_path := "user://cache/%s.zip" % id
 		say.call(tr("MENU_STAGE_DOWNLOAD"), 0.93)
-		var dl := await http(base + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path)
-		if not dl.ok:
+		var dl := await http(base + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path, id)
+		if _cancelled.has(id):
+			error = CANCELLED
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(zip_path))
+		elif not dl.ok:
 			error = "download: HTTP %d" % dl.code
 		else:
 			say.call(tr("MENU_STAGE_INSTALL"), 0.97)
@@ -564,8 +577,22 @@ func _eras_of(id: String) -> String:
 
 
 ## Poll the job until it is done; "" on success, else the error text.
+## Stop a world being made. The service drops the job at its next step - a download stops mid-file,
+## a register stage within a second - and a pack already coming down is abandoned; fetch_pack then
+## answers CANCELLED. What the service fetched stays in its cache, so going there again is quicker.
+func cancel_job(id: String) -> void:
+	_cancelled[id] = true
+	var live: HTTPRequest = _live.get(id)
+	if is_instance_valid(live):
+		live.cancel_request()   # emits nothing, so the waiting request is released by hand
+		live.request_completed.emit(HTTPRequest.RESULT_REQUEST_FAILED, 0, PackedStringArray(), PackedByteArray())
+	await http(service_url() + "/cancel?id=" + id, HTTPClient.METHOD_POST, "{}")
+
+
 func _wait_for_job(base: String, id: String, quiet: bool = false) -> String:
 	while true:
+		if _cancelled.has(id):
+			return CANCELLED
 		var st := await http(base + "/status?id=" + id)
 		if not st.ok:
 			return "status: HTTP %d" % st.code

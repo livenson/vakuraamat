@@ -228,6 +228,24 @@ MENU_DELETE,Kustuta,Remove,Dzēst
 MENU_CONFIRM_DELETE,Kindlasti kustuta,Really remove,Tiešām dzēst
 MENU_DELETE_ALL_TILES,Kustuta kõik naabruse ruudud,Remove all neighbour tiles,Dzēst visus kaimiņu laukumus
 MENU_REMOVED,Prügikasti viidud.,Moved to the trash.,Pārvietots uz miskasti.
+MENU_YOUR_WORLDS,Sinu maailmad,Your worlds,Tavas pasaules
+MENU_IDEAS,Ideid,Ideas,Idejas
+MENU_MANAGE_STORAGE,Halda salvestatut...,Manage storage...,Pārvaldīt krātuvi...
+MENU_GO,Mine,Go,Iet
+MENU_RESULT_YOURS,sinu maailm: %s,your world: %s,tava pasaule: %s
+MENU_RESULT_READY,valmis teenuses,ready on the service,gatava servisā
+MENU_RESULT_NEW,"uus maailm, umbes %s, laadida %s","new world, about %s, %s to download","jauna pasaule, apmēram %s, lejupielāde %s"
+MENU_RESULT_NEW_PLAIN,uus maailm,new world,jauna pasaule
+MENU_PLAYED_TODAY,täna,today,šodien
+MENU_PLAYED_YESTERDAY,eile,yesterday,vakar
+MENU_PLAYED_DAYS,%d päeva tagasi,%d days ago,pirms %d dienām
+MENU_PLAYED_NEVER,mängimata,not played yet,vēl nav spēlēta
+MENU_CANCEL,Katkesta,Cancel,Atcelt
+MENU_CANCELLING,Katkestan...,Cancelling...,Atceļ...
+MENU_CANCELLED,Maailma loomine katkestati.,Creating the world was cancelled.,Pasaules radīšana atcelta.
+MENU_MAP_GO,"Täidetud: sinu maailmad, praegune rõngaga. Rõngas: idee. Sinine täpp: valmis teenuses. Klõpsa märgil, et sinna minna.","Filled: your worlds, the current one ringed. Ring: an idea. Blue dot: ready on the service. Click a mark to go there.","Aizpildīts: tavas pasaules, pašreizējā ar loku. Loks: ideja. Zils punkts: gatava servisā. Noklikšķini uz zīmes, lai dotos turp."
+COUNTRY_EE,Eesti,Estonia,Igaunija
+COUNTRY_LV,Läti,Latvia,Latvija
 UI_BUS_STOP,Bussipeatus,Bus stop,Autobusa pietura
 UI_BUS_LINES,Liinid: %s,Lines: %s,Maršruti: %s
 UI_MAP_MODE,Kiht,Layer,Slānis

@@ -1,6 +1,7 @@
 {
   "id": "lv",
   "name": "Latvia",
+  "name_key": "COUNTRY_LV",
   "outline": "res://assets/data/latvia.json",
   "coverage": [305000, 6165000, 770000, 6450000],
   "geocoder": {

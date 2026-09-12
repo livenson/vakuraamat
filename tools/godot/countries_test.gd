@@ -23,7 +23,7 @@ func _ready() -> void:
 		_check(c.get("coverage", []).size() == 4, "%s: coverage is not a box" % id)
 		_check(str(c.get("refine", "")) in ["ground", "flag"], "%s: refine is '%s'" % [id, c.get("refine")])
 		var bc: Dictionary = c.get("building_code", {})
-		for key in [bc.get("register_key", ""), bc.get("code_key", "")]:
+		for key in [bc.get("register_key", ""), bc.get("code_key", ""), c.get("name_key", "")]:
 			_check(str(key) != "" and tr(str(key)) != str(key), "%s: no string for '%s'" % [id, key])
 		var photos: Dictionary = c.get("photos", {})
 		_check(bool(photos.get("from_tile", false)) or (str(photos.get("wms", "")) != "" and not photos.get("epochs", []).is_empty()),

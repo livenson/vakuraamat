@@ -15,7 +15,8 @@ The game (scripts/autoload/locator.gd) talks to it:
                                         "cached_bytes", "rate_bps", "seconds_download", "seconds_process", "free_bytes"}
     GET  /cache                      -> the service workspace: {"bytes", "packs", "free_bytes", "path"}
     POST /tile  {"id","name","x","y","size","eras","seed","blocks"} -> 202 {"id"}   starts a job (or reuses a cached zip)
-    GET  /status?id=<id>             -> {"stage","progress","done","error"}
+    GET  /status?id=<id>             -> {"stage","progress","done","error"}   (error "cancelled" after /cancel)
+    POST /cancel?id=<id>             -> 202: the job stops at its next stage or download chunk
     GET  /packs                      -> [{"id","name","x","y","size","eras","seed","blocks"}]  packs ready in the cache
     GET  /download?id=<id>           -> zip with site/<pack files> and tile/<engine files>
 A job runs the same tools as `make site` + `make tile`, in a workspace outside the repo, with the
@@ -23,7 +24,7 @@ download cache shared (data_raw/, or --raw-dir). Needs python3 with numpy, Pillo
 the same script frozen with tools/service/build.sh ships beside the exported game as the tile_service sidecar.
 Nothing here is exposed beyond the loopback interface unless you bind it so.
 """
-import argparse, concurrent.futures, time, json, os, re, shutil, sys, threading, traceback, urllib.parse, urllib.request, zipfile
+import argparse, concurrent.futures, functools, time, json, os, re, shutil, sys, threading, traceback, urllib.parse, urllib.request, zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -105,18 +106,31 @@ def note_job(seconds):
     save_stats(st)
 
 
-def with_deadline(name, seconds, fn, *args, **kwargs):
+class Cancelled(Exception):
+    """The client cancelled the job (POST /cancel): raised at its next stage or download chunk."""
+
+
+def with_deadline(name, seconds, fn, *args, job=None, **kwargs):
     """Run an optional stage with a hard time budget. A stage that reaches national services can
     stall for minutes on a slow feed (the notices XML has a 180 s socket timeout, twice); the pack
     must not wait for it. On timeout the worker is abandoned to finish or die on its own and the
-    job carries on without that layer. Returns (ok, result)."""
+    job carries on without that layer. With `job`, a cancel is noticed within a second the same way,
+    and raises Cancelled rather than carrying on. Returns (ok, result)."""
     ex = concurrent.futures.ThreadPoolExecutor(max_workers=1)   # not a with-block: shutdown must not wait
     fut = ex.submit(fn, *args, **kwargs)
+    deadline = time.time() + seconds
     try:
-        return True, fut.result(timeout=seconds)
-    except concurrent.futures.TimeoutError:
-        log(f"{name}: still running after {seconds} s; the pack goes without it")
-        return False, None
+        while True:
+            try:
+                return True, fut.result(timeout=max(0.0, min(1.0, deadline - time.time())))
+            except concurrent.futures.TimeoutError:
+                if job is not None and job.get("cancel"):
+                    raise Cancelled() from None
+                if time.time() >= deadline:
+                    log(f"{name}: still running after {seconds} s; the pack goes without it")
+                    return False, None
+    except Cancelled:
+        raise
     except Exception as e:  # noqa: BLE001 - every one of these layers is optional
         log(f"{name}: unavailable ({e})")
         return False, None
@@ -194,10 +208,16 @@ def run_job(job):
     marks = []   # (seconds since the job started, stage name): printed as a breakdown when it is ready
 
     def stage(name, frac):
+        # every stage and every download chunk (fetch_tile.PROGRESS below) passes here, so a cancel
+        # stops the job at its next step, a download mid-file
+        if job.get("cancel"):
+            raise Cancelled()
         with LOCK:
             job["stage"] = name; job["progress"] = frac
         marks.append((time.time() - started, name))
         log(f"{sid}: {name} [{time.time() - started:.0f} s]")
+
+    run = functools.partial(with_deadline, job=job)   # the time-boxed runner, cancellable
     try:
         free = shutil.disk_usage(WORKSPACE).free
         if free < MIN_FREE_BYTES:
@@ -237,11 +257,11 @@ def run_job(job):
             fetch_tile.PROGRESS = None
         # the country's registers: cadastre, buildings, companies, roads, stops (sources.py); the
         # timetables come in the refine pass
-        stops_thread = source.registers(sid, ws, stage, with_deadline)
-        # a tile on the Estonian-Latvian border: the other country's registers for its side
+        stops_thread = source.registers(sid, ws, stage, run)
+        # a tile on a border: the neighbour's registers for its side
         stage("the other side of the border", 0.66)
         import cross_border
-        with_deadline(f"{sid}: across the border", 900, cross_border.complete, sid, root=ws)
+        run(f"{sid}: across the border", 900, cross_border.complete, sid, root=ws)
         if stops_thread is not None and stops_thread.is_alive():
             stage("bus stops (OpenStreetMap)", 0.665)
             stops_thread.join(60)
@@ -275,6 +295,13 @@ def run_job(job):
         spans = [(marks[i + 1][0] - marks[i][0], marks[i][1]) for i in range(len(marks) - 1)]
         log(f"{sid}: stages " + ", ".join(f"{n} {d:.0f}s" for d, n in sorted(spans, reverse=True)[:8] if d >= 1))
         log(f"{sid}: ready ({os.path.getsize(zpath) / 1e6:.1f} MB, {time.time() - started:.0f} s)")
+    except Cancelled:
+        # the half-built workspace goes; what was downloaded stays in the raw cache, so going there
+        # again starts from it
+        log(f"{sid}: cancelled [{time.time() - started:.0f} s]")
+        shutil.rmtree(ws, ignore_errors=True)
+        with LOCK:
+            job.update(stage="cancelled", done=True, error="cancelled")
     except (Exception, SystemExit) as e:  # noqa: BLE001 - report anything to the client (the tools sys.exit on bad input)
         traceback.print_exc()
         with LOCK:
@@ -399,6 +426,14 @@ class Handler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         u = urllib.parse.urlparse(self.path)
+        if u.path == "/cancel":
+            sid = urllib.parse.parse_qs(u.query).get("id", [""])[0]
+            with LOCK:
+                job = JOBS.get(sid)
+                if not job or job.get("done"):
+                    return self._json(404, {"error": "no running job"})
+                job["cancel"] = True   # run_job raises Cancelled at its next stage or download chunk
+            return self._json(202, {"id": sid, "stage": "cancelling"})
         if u.path != "/tile":
             return self._json(404, {"error": "no such route"})
         n = int(self.headers.get("Content-Length", "0"))
