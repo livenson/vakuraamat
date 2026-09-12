@@ -517,10 +517,13 @@ quarters), `taxes`, `employees_hist`, `quarters`, `board_size`, `shareholders`, 
 shown), `deleted`, `report_overdue` and `health` (sound, watch, distressed). The register dumps are
 slimmed once per download; a tile job then takes seconds.
 `python3 tools/pipeline/fetch_tenants.py --site <id> --stats` prints the sector histogram.
-The debug map (M) has a company layer: the Layer button cycles sector, employees, health, founded
-and shared owners (`scripts/ui/map_palette.gd`; `--open=map:<mode>` for a screenshot). Sector,
-health and founded are also laid on the ground around you (`scripts/world/info_views.gd`, I cycles
-them without the map), with their key on the HUD's bottom right while one is showing
+The debug map (M) has a company layer: the Layer button cycles sector, industry mix (a plot striped by
+its sectors' shares), one sector (a plot shaded by one sector's share; its own button picks the
+sector), employees, health, founded and shared owners (`scripts/ui/map_palette.gd`;
+`--open=map:<mode>`, `--open=map:focus:<sector>` for a screenshot). All but employees and owners are
+also laid on the ground around you (`scripts/world/info_views.gd`): I cycles them without the map,
+Shift+I shows the one-sector layer and steps to the next sector with each press, with their key on
+the HUD's bottom right while one is showing
 (`UiManager.legend_card`). The K overlay and the plot sheet list each tenant's activity, staff, turnover, taxes,
 board and health; the book's Companies page lists the tile's companies by employees with a sector
 filter and click-to-sort headings (`--open=companies`, `--open=companies:<name|sector|employees|turnover|address>`

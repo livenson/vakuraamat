@@ -548,6 +548,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		_toggle(journal, _fill_journal)
 	elif event.is_action_pressed("debug_map"):
 		_toggle(debug_map, _fill_debug_map)
+	elif event.is_action_pressed("info_sector"):
+		# Shift+I, before plain I (whose action matches Shift+I too): the one-sector layer on the
+		# ground, the next sector with each further press, without opening the map for it
+		set_map_mode("focus:" + (MapPalette.next_sector() if _map_mode == "focus" else MapPalette.focus_sector))
+		show_notice(tr("UI_MAP_MODE") + ": " + _mode_title())
+		if debug_map.visible:
+			_fill_debug_map()
 	elif event.is_action_pressed("info_view"):
 		# step through the layers the ground can show, without opening the map for it
 		var fills: Array = ["off"] + InfoViews.FILLS
