@@ -1,7 +1,7 @@
 # Playable builds for macOS, Windows and Linux: on a version tag (v*) they are attached to a GitHub
-# release; "Run workflow" builds them as artifacts. Each carries the shipped packs (Kvissentali,
-# Palupera) and the tile-service sidecar (tools/service, PyInstaller), so a build creates worlds for
-# any address by itself; the Windows sidecar is built on Windows, the others on their own platform.
+# release; "Run workflow" builds them as artifacts. Each carries every pack in sites/ and the
+# tile-service sidecar (tools/service, PyInstaller), so a build creates worlds for any address by
+# itself; the Windows sidecar is built on Windows, the others on their own platform.
 # LFS objects (models, textures, Terrain3D binaries, ~450 MB) are cached between runs and
 # platforms so a build does not spend the LFS bandwidth quota; the export presets exclude the
 # vendored source scenes the game never loads.
@@ -43,12 +43,12 @@ jobs:
             path: build/linux/Vakuraamat.x86_64
             artifact: Vakuraamat-linux
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           lfs: false
       - name: LFS object cache
         id: lfs-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: .git/lfs
           key: lfs-${{ hashFiles('.gitattributes') }}-${{ hashFiles('**/*.glb', 'assets/**/*.png', 'assets/**/*.jpg', 'assets/**/*.r32', 'assets/models/trees/*.res', 'addons/terrain_3d/bin/**') }}
@@ -57,7 +57,19 @@ jobs:
         run: |
           git lfs install --local
           git lfs pull --exclude="assets/vendor/forest_vegetation/Scenes/**,assets/vendor/forest_vegetation/Models/**"
-      - uses: actions/setup-python@v5
+      - name: "Godot's caches (.godot: imported assets, exported resources, compiled shaders)"
+        # Godot reimports only the sources that changed and reuses an exported resource whose source
+        # MD5 matches, so a warm cache skips most of the import and part of the export. The shader
+        # baker recompiles every variant regardless (4.7.2 source): that part only a faster runner cuts.
+        uses: actions/cache@v6
+        with:
+          path: |
+            .godot/imported
+            .godot/exported
+            .godot/shader_cache
+          key: godot-${{ matrix.preset }}-${{ env.GODOT_VERSION }}-${{ hashFiles('assets/**', 'sites/**', 'scenes/**', 'scripts/**', 'addons/**', 'project.godot', 'export_presets.cfg') }}
+          restore-keys: godot-${{ matrix.preset }}-${{ env.GODOT_VERSION }}-
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - name: "Tile-service sidecar (PyInstaller: the pipeline with rasterio, pyogrio, shapely, pyproj)"
@@ -136,7 +148,7 @@ jobs:
           cp ../../dist/tile_service Vakuraamat.app/Contents/MacOS/ && chmod +x Vakuraamat.app/Contents/MacOS/tile_service
           codesign --force --deep --sign - Vakuraamat.app || true
           rm -f "../../${{ matrix.path }}" && zip -qry "../../${{ matrix.path }}" Vakuraamat.app && cd ../.. && ls -la build
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
           path: ${{ matrix.preset == 'macOS' && matrix.path || format('build/{0}.zip', matrix.artifact) }}
@@ -147,10 +159,10 @@ jobs:
     needs: export
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0   # the tag's message and the commits since the previous tag make the notes
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: dist
       - name: "Name the builds after the release (Vakuraamat-v1.2.3-macos.zip)"
@@ -186,11 +198,11 @@ jobs:
             fi
             echo "## Builds"
             echo
-            echo "Playable builds with the shipped packs and the tile-service sidecar (any address in Estonia becomes a world from the Locations page). macOS: the app is not notarised; after unzipping run \`xattr -dr com.apple.quarantine Vakuraamat.app\` once, or right-click and Open."
+            echo "Playable builds with the shipped packs and the tile-service sidecar (any address in Estonia or Latvia becomes a world from the Locations page). macOS: the app is not notarised; after unzipping run \`xattr -dr com.apple.quarantine Vakuraamat.app\` once, or right-click and Open."
           } > notes.md
           cat notes.md
       - name: Attach the builds to the release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: dist/**/*.zip
           body_path: notes.md

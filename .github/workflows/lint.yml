@@ -15,8 +15,9 @@ jobs:
     name: gdlint (GDScript)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      # setup-uv publishes no floating major tag after v7 (there is no @v10): pin the release
+      - uses: astral-sh/setup-uv@v10.1.0
       - name: gdlint project scripts (addons are vendored, not linted)
         run: git ls-files '*.gd' | grep -v '^addons/' | xargs uvx --python 3.12 --from gdtoolkit==4.5.0 gdlint
 
@@ -24,15 +25,15 @@ jobs:
     name: ruff (Python tools)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.1.0
       - run: uvx ruff@0.16.6 check tools
 
   shell:
     name: shellcheck + actionlint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: git ls-files '*.sh' | xargs shellcheck
       - name: actionlint
         run: |

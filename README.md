@@ -37,7 +37,7 @@ ready-to-play build for macOS, Windows or Linux. No Godot, no Python, nothing el
 ## Install and run
 
 1. Open the **[latest release](https://github.com/livenson/vakuraamat/releases/latest)** and download
-   the zip for your platform (about 420–450 MB — the packs carry their terrain, models and textures):
+   the zip for your platform (about 460–560 MB — the packs carry their terrain, models and textures):
 
    | Platform | File | Run |
    |---|---|---|
