@@ -59,6 +59,32 @@ static func for_building_code(code: String, fallback: Dictionary) -> Dictionary:
 	return fallback
 
 
+## The country whose plot codes look like `code` (the descriptors' parcel_code patterns: Estonia's
+## "79514:036:0090", Latvia's eleven digits), or `fallback` when none claims it.
+static func for_parcel_code(code: String, fallback: Dictionary) -> Dictionary:
+	if code != "":
+		for c in all().values():
+			var pattern := str(c.get("parcel_code", ""))
+			if pattern != "" and RegEx.create_from_string(pattern).search(code) != null:
+				return c
+	return fallback
+
+
+## A plot's page in a public register: the link its pack gives it (Estonia's X-GIS), else its
+## country's `parcel_link` filled with its property number ({property}; the plot's own code when it
+## has none) and its code ({tunnus}). Latvia's is the property's Lursoft card: one property often
+## spans several plots, and the card is the property's. "" when there is neither.
+static func parcel_link(unit: Dictionary) -> String:
+	if unit.get("link") != null and str(unit.link) != "":
+		return str(unit.link)
+	var tunnus := str(unit.get("tunnus", ""))
+	var template := str(for_parcel_code(tunnus, of_pack(str(unit.get("pack", "")))).get("parcel_link", ""))
+	if template == "":
+		return ""
+	var prop := str(unit.property) if unit.get("property") != null else tunnus
+	return fill(template, {"property": prop, "tunnus": tunnus})
+
+
 ## Whether any country's box holds an L-EST97 point: where the tile service may have data. The
 ## service decides the border exactly.
 static func covers(x: float, y: float) -> bool:

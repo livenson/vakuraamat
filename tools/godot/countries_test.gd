@@ -38,6 +38,17 @@ func _ready() -> void:
 	_check(Locator.in_coverage(506400, 6311650) and Locator.in_coverage(542000, 6589000), "Rīga or Tallinn not covered")
 	_check(not Locator.in_coverage(100000, 100000), "a point far outside every country is covered")
 	_check(Countries.fill("p={x},{y}", {"x": 1, "y": 2}) == "p=1,2", "fill")
+	# plot links: an Estonian plot keeps its pack's own, a Latvian one gets its property's Lursoft card
+	# (by the property number: one property spans several plots), also on an Estonian border tile
+	var lursoft := "https://www.lursoft.lv/real-estate-properties/property/"
+	_check(Countries.parcel_link({"tunnus": "01000090065", "property": "01000090065", "link": null, "pack": "riga_vecpilseta"}) == lursoft + "01000090065",
+			"Torņa iela 4 has no Lursoft link")
+	_check(Countries.parcel_link({"tunnus": "01000010010", "property": "01000010067", "pack": "riga_vecpilseta"}) == lursoft + "01000010067",
+			"a plot does not link to its property's card")
+	_check(Countries.parcel_link({"tunnus": "79514:036:0090", "link": "https://xgis.example/p", "pack": "kvissentali"}) == "https://xgis.example/p",
+			"an Estonian plot lost its own link")
+	_check(Countries.parcel_link({"tunnus": "94010010935", "property": "94019001557", "pack": "kvissentali"}) == lursoft + "94019001557",
+			"a Latvian plot on an Estonian pack is not linked as Latvian")
 	# the history strip: Rīga's years are the tile's own files, Estonia's are WMS campaigns
 	var riga := PlotHistory.epochs("riga_vecpilseta")
 	_check(riga.size() >= 3 and riga.all(func(e): return e.has("texture")), "Rīga's history: %s" % str(riga))

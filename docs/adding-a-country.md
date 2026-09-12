@@ -54,6 +54,7 @@ The game reads it through `Countries` (`scripts/world/countries.gd`).
 | `refine` | `"ground"` if the game should take the pack again while its `dtm_res_m` is over 1. `"flag"` if the ground is fine from the start and the refine pass marks the meta `"refined"` instead |
 | `photos` | the plot page's "over the years" strip. Either `{"wms", "epochs": [{label, layers}], "current_wms", "current_layer"}`, a historical WMS the game asks per plot, or `{"from_tile": true}`, where the refine pass cuts the older photographs over the tile into `ortho_<years>.jpg` and lists them as `history` in `terrain_meta.json` |
 | `building_code` | `pattern`, a regex for the country's building codes, plus `register_key` and `code_key`, the register sheet's strings. The pattern decides which country a building belongs to on a border tile, so it must not match another country's codes |
+| `parcel_code`, `parcel_link` | `parcel_code` is a regex for the country's plot codes; it decides a plot's country on a border tile. `parcel_link` is the link for a plot whose pack gives it none: `{property}` is its property number and `{tunnus}` its code. Latvia links a plot to its property's Lursoft card |
 | `building_links`, `place_links` | the report's links. `{code}` is the building code; `{x}` and `{y}` are the point on the grid |
 
 Add the strings a descriptor names to `assets/i18n/strings.csv` in every column. Then run
