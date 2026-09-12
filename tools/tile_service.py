@@ -330,6 +330,10 @@ def run_job(job):
             stops_thread.start()
         else:
             stops_thread = estonian_registers(sid, ws, stage)
+        # a tile on the Estonian-Latvian border: the other country's registers for its side
+        stage("the other side of the border", 0.66)
+        import cross_border
+        with_deadline(f"{sid}: across the border", 900, cross_border.complete, sid, root=ws)
         if stops_thread is not None and stops_thread.is_alive():
             stage("bus stops (OpenStreetMap)", 0.665)
             stops_thread.join(60)

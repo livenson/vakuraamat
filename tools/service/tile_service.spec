@@ -13,6 +13,7 @@ datas = [
     (os.path.join(ROOT, "assets", "data", "parcel_rules.json"), "assets/data"),
     # Estonia's outline: sources.Latvia tells Valga from Valka by it (the Latvian laser sheets reach over the border)
     (os.path.join(ROOT, "assets", "data", "estonia.json"), "assets/data"),
+    (os.path.join(ROOT, "assets", "data", "latvia.json"), "assets/data"),   # cross_border.py: the Latvian side of a border tile
     (os.path.join(ROOT, "assets", "i18n", "strings.csv"), "assets/i18n"),
 ]
 binaries, hiddenimports = [], []
@@ -31,7 +32,7 @@ a = Analysis(
     hiddenimports=hiddenimports + ["new_site", "gen_era_scenes", "extract_features", "fetch_buildings", "fetch_trees", "fetch_parcels",
                                    "fetch_roads", "fetch_stops", "fetch_departures", "fetch_tenants", "fetch_fields", "market", "fetch_tile",
                                    "validate_site", "register_extra", "emtak", "geo", "paths", "sources",
-                                   "fetch_tile_lv", "fetch_cadastre_lv", "fetch_tenants_lv", "fetch_roads_lv", "geocode_lv"],
+                                   "fetch_tile_lv", "fetch_cadastre_lv", "fetch_tenants_lv", "fetch_roads_lv", "roof_fit", "cross_border", "geocode_lv"],
     hookspath=[],
     runtime_hooks=[],
     excludes=["tkinter", "matplotlib", "IPython"],

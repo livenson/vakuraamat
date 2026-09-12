@@ -6,7 +6,7 @@
 - Time-sensitive downloads are archived in `data_raw/lv/` (step 0).
 - Step 1 is done: the `Latvia` adapter and `tools/pipeline/fetch_tile_lv.py` build a Rīga Old Town
   tile (centre 506400 6311650) in under a minute from a cold cache.
-- Step 2 is done: `tools/pipeline/fetch_cadastre_lv.py` writes the pack's `parcels.json` (838
+- Steps 3–5 and 7 are done too (companies, roads and buses, roofs outside Rīga, the border). Step 2 is done: `tools/pipeline/fetch_cadastre_lv.py` writes the pack's `parcels.json` (838
   units, all valued) and `buildings.json` (775 buildings, 713 dated, 615 with Rīga's LOD2 roofs).
   `sites/riga_vecpilseta` validates, boots in `make test` and is committed on the `latvia` branch.
 
@@ -276,7 +276,26 @@ Resource URLs change when a file is replaced, so fetchers resolve them through t
      be inventing, so Latvian packs have no fields until the classifier is found. Also left
      open: tram and train routes, and tram stops (`railway=tram_stop`).
 6. **Language.** `lv` column, the locale cycle, the neutral use and sector labels, the menu map.
-7. **Streaming across the border.** Walk from Valga into Valka; starter places for Rīga.
+7. **Streaming across the border.** Done 2026-09-12 (`tools/pipeline/cross_border.py`, run by
+   every tile-service job after its own registers):
+   - **Why.** A tile is built by the country its centre lies in, and each country's registers
+     stop at the border. East of Valka the tiles are 16–20 % Estonian: without a merge, Valga's
+     streets would stand empty.
+   - **What it does.** It measures the tile's share of the other country by the menu map's
+     outlines. It runs that country's fetchers (VZD + UR, or Maa-amet + EHR + the e-Business
+     Register) in a scratch copy of the pack, and merges the rows whose centre lies on the other
+     side: parcels, buildings, companies matched exactly to them, and, for an Estonian pack,
+     OpenStreetMap's roads over Latvia.
+   - **Ground.** It needs nothing: LĢIA's laser sheets reach about a kilometre into Estonia,
+     Valga's centre included.
+   - **Result.** The border tile `t620139_6405171` holds 592 Latvian and 144 Estonian buildings
+     (the Estonian ones with Maa-amet's LOD2 roofs), 373 + 87 parcels, 124 + 24 companies.
+     Starting in Valka and walking east, the streamer fetches it from the service and it loads
+     beside Valka; Piiri tn 19, an Estonian care home, stands in it.
+   - **Engine.** The building sheet tells the register by the code (a Latvian designation has 14
+     digits), not by the pack, since a border tile carries both.
+   - **Left open.** Tram and train routes; the timetables on a border tile come from the pack's
+     own country only; starter-place bundles for the Latvian places.
 
 Each step bumps `PACK_VERSION` when it adds something the UI reads, and gets a `THIRD_PARTY.md`
 row for every source in the same commit.

@@ -992,8 +992,10 @@ func _notice_board(root: Node3D, b: FootprintBuilding, poly: PackedVector2Array,
 ## What the registers say about a building, as a page: the register row, the tenants, the plot.
 static func register_sheet(b: FootprintBuilding) -> String:
 	var lines: Array[String] = []
-	# the register the row comes from: Estonia's Building Register (EHR), or Latvia's cadastre
-	var lv := str(Sites.manifest_for(Sites.pack_of(b)).get("country", "ee")) == "lv"
+	# the register the row comes from: Estonia's Building Register (EHR, 9-digit codes) or Latvia's
+	# cadastre (14-digit building designations). Told by the code, not the pack: a tile on the border
+	# carries buildings from both
+	var lv := b.ehr.length() == 14 if b.ehr != "" else str(Sites.manifest_for(Sites.pack_of(b)).get("country", "ee")) == "lv"
 	lines.append(TranslationServer.translate("UI_SHEET_REGISTER_LV" if lv else "UI_SHEET_REGISTER") % (b.address if b.address != "" else str(b.building_id)))
 	var bits: Array[String] = []
 	if b.purpose != "":
