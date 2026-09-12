@@ -47,6 +47,7 @@ LEST97 = 3301
 GROUND = (2, 14)         # ground, water surface
 VEGETATION = (3, 4, 5)   # low, medium, high vegetation
 BUILDING = 6
+BRIDGE = 9
 WATER = 14
 NOISE = (7, 18)          # low and high noise
 ATTRIBUTION = "Map data: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA), {year}, CC BY 4.0"
@@ -235,7 +236,8 @@ def read_las(path):
 
 def grid_points(las_paths, bbox, size):
     """Per metre over an L-EST97 box: (ground, highest return, highest vegetation return, highest
-    building return, ground hits, water level or None). Rows run north to south. Empty cells are NaN."""
+    building return, ground hits, water level or None, bridge deck). Rows run north to south. Empty
+    cells are NaN; the bridge deck is a mask of the cells with a bridge-class return."""
     from pyproj import Transformer
     to_lest = Transformer.from_crs(f"EPSG:{LKS92}", f"EPSG:{LEST97}", always_xy=True)
     xmin, ymin, xmax, ymax = bbox
@@ -245,6 +247,7 @@ def grid_points(las_paths, bbox, size):
     top = np.full(n, -np.inf, np.float32)
     veg = np.full(n, -np.inf, np.float32)
     roof = np.full(n, -np.inf, np.float32)
+    deck = np.zeros(n, np.int32)
     water = []
     for p in las_paths:
         x, y, z, cls = read_las(p)
@@ -263,6 +266,7 @@ def grid_points(las_paths, bbox, size):
         np.maximum.at(veg, cell[v], zz[v])
         r = cc == BUILDING
         np.maximum.at(roof, cell[r], zz[r])
+        deck += np.bincount(cell[cc == BRIDGE], minlength=n).astype(np.int32)
         water.append(zz[cc == WATER])
         log(f"{os.path.basename(p)}: {int(inside.sum()):,} points on the tile, {int(g.sum()):,} ground")
     ground = np.where(gcnt > 0, gsum / np.maximum(gcnt, 1), np.nan).astype(np.float32).reshape(size, size)
@@ -271,7 +275,7 @@ def grid_points(las_paths, bbox, size):
     roof = np.where(np.isfinite(roof), roof, np.nan).reshape(size, size)
     water = np.concatenate(water) if water else np.zeros(0, np.float32)
     level = float(np.median(water)) if water.size >= 100 else None
-    return ground, top, veg, roof, gcnt.reshape(size, size), level
+    return ground, top, veg, roof, gcnt.reshape(size, size), level, deck.reshape(size, size) > 0
 
 
 def roofs_path(raw_dir, tile):
@@ -390,7 +394,7 @@ def fetch_ground(bbox, size, out_dir, raw_dir, tile, span=(0.05, 0.55)):
         _progress(f0, text + (", cached" if os.path.exists(dest) else ""))
         local.append(_download(index[s], dest, label=text, span=(f0, f1)))
     _progress(span[0] + (span[1] - span[0]) * 0.85, "gridding the ground and the canopy")
-    ground, top, veg, roof, hits, level = grid_points(local, bbox, size)
+    ground, top, veg, roof, hits, level, deck = grid_points(local, bbox, size)
     covered = float(np.isfinite(top).mean())
     # a skipped sheet's strip has no returns either, but it is not water: it stays empty and
     # fill_ground bridges it from the ground beside it (canopy and roofs are 0 there, so a building
@@ -417,6 +421,11 @@ def fetch_ground(bbox, size, out_dir, raw_dir, tile, span=(0.05, 0.55)):
     # highest building return per metre, 0 where the laser saw no building
     roofs = np.nan_to_num(roof - heights, nan=0.0)
     geo.write_r32(np.where(roofs > 0.5, roofs, 0.0).astype(np.float32), roofs_path(raw_dir or paths.raw_root(), tile))
+    # the bridge decks, which the water step (water_parcels.py) keeps out of the river it repaints
+    import water_parcels
+    decks = water_parcels.bridges_path(raw_dir or paths.raw_root(), tile)
+    os.makedirs(os.path.dirname(decks), exist_ok=True)
+    geo.write_r32(deck.astype(np.float32), decks)
     zmin, zmax = float(heights.min()), float(heights.max())
     log(f"ground {zmin:.2f}..{zmax:.2f} m, {holes:.0%} of cells filled, points on {covered:.0%} of the tile; canopy up to {canopy.max():.1f} m")
     if covered < 0.5:
@@ -467,7 +476,7 @@ def _cut(bbox, index, sheets, px, what):
             part = np.zeros_like(dst)
             for b in range(3):
                 reproject(data[b], part[b], src_transform=wt, src_crs=src_crs, dst_transform=dst_t, dst_crs=dst_crs,
-                          src_nodata=None, dst_nodata=0, resampling=Resampling.bilinear)
+                          src_nodata=None, dst_nodata=0, resampling=Resampling.cubic)   # bilinear softens at 1:1
             got = part.any(axis=0)
             dst[:, got] = part[:, got]
             log(f"{what} {s}: window {w.width}x{w.height} px")
@@ -498,7 +507,7 @@ def fetch_ortho(bbox, out_jpg, px=4096):
 # ones in 2.5 km quarters (4311-32_1) like the 6th; the years are LĢIA's, and the files' own dates
 # (2006, 2009, 2011, 2014) are when each was finished.
 HISTORY = [("2003-05", 2), ("2007-08", 3), ("2010-11", 4), ("2013-15", 5)]
-HISTORY_PX = 2048        # half a metre to the pixel over a kilometre: what the 2nd-4th cycles have
+HISTORY_MAX_PX = 4096    # 25 cm over a kilometre, the finest cycle (the 5th); the 2nd is 1 m, the 3rd and 4th 0.5 m
 
 
 def cycle_index(v):
@@ -522,9 +531,11 @@ def cycle_index(v):
     return out
 
 
-def add_history(tile_dir, px=HISTORY_PX):
+def add_history(tile_dir, max_px=HISTORY_MAX_PX):
     """Cut each older cycle over a Latvian tile into ortho_<years>.jpg beside its ortho.jpg and list
-    them in terrain_meta.json as "history". The cycles are strip-stored TIFFs without overviews, so a
+    them in terrain_meta.json as "history". Each is cut at its own sheets' resolution (read from the
+    .tfw): one size for all halved the 5th cycle's 25 cm and made the plot strip look worse than the
+    source. The cycles are strip-stored TIFFs without overviews, so a
     cut pulls whole rows (tens of MB a cycle): the tile service does it in the refine pass, after the
     place is playable, the four cycles side by side. A cycle that did not fly over the tile is left out."""
     from concurrent.futures import ThreadPoolExecutor
@@ -539,12 +550,14 @@ def add_history(tile_dir, px=HISTORY_PX):
         sheets = sorted({n for s in wanted for n in (s, s.split("_")[0]) if n in index})
         if not sheets:
             return None
-        dst = _cut(bbox, index, sheets, px, f"cycle {v} ({label})")
+        pixel_m = min(abs(_tfw_transform(index[s][".tfw"]).a) for s in sheets)
+        px = min(max_px, int(round((bbox[2] - bbox[0]) / pixel_m)))
+        dst = _cut(bbox, index, sheets, px, f"cycle {v} ({label}, {pixel_m:g} m)")
         if dst.any(axis=0).mean() < 0.05:
             return None
         name = f"ortho_{label}.jpg"
-        _save_jpg(dst, os.path.join(tile_dir, name), quality=85)
-        return {"label": label, "texture": name, "cycle": v, "sheets": sheets}
+        _save_jpg(dst, os.path.join(tile_dir, name))
+        return {"label": label, "texture": name, "cycle": v, "sheets": sheets, "pixel_m": pixel_m}
 
     with ThreadPoolExecutor(max_workers=len(HISTORY)) as pool:
         got = [h for h in pool.map(one, HISTORY) if h]
