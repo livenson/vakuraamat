@@ -16,8 +16,8 @@ cadastre and buildings, Rīga's LOD2, UR and VID companies, OpenStreetMap roads,
 GTFS, VARIS addresses; docs/latvia-plan.md). Finland has its ground (NLS ground model, laser points
 and orthophotos from the Funet mirror, Helsinki's own inside the city; docs/finland-plan.md), its
 plots (NLS cadastre) and buildings (Ryhti on Helsinki's or the topographic database's footprints),
-OpenStreetMap roads and stops, and its companies (PRH) with their yearly tax (Vero); no timetables or
-address search yet. The rest of the world has a documented plan and no code
+OpenStreetMap roads and stops, its companies (PRH) with their yearly tax (Vero), HSL's timetables,
+Ruokavirasto's fields, and an address search (postcode areas and Ryhti's addresses, geocode_fi.py). The rest of the world has a documented plan and no code
 yet (PLANNED below, docs/custom-sites.md "Other countries").
 """
 import argparse, json, os, sys, threading
@@ -448,15 +448,28 @@ class Finland(DataSource):
         run(f"{sid}: roads", 180, fetch_roads_lv.fetch, sid, root=ws, attribution=fetch_roads_lv.ATTRIBUTION_FI)
         stops = threading.Thread(target=lambda: run(f"{sid}: stops", 120, fetch_stops.fetch, sid, root=ws), daemon=True)
         stops.start()
+        import fetch_fields_fi
+        stage("fields (Ruokavirasto)", 0.66)
+        run(f"{sid}: fields", 120, fetch_fields_fi.fetch, sid, root=ws)
         return stops
 
+    def departures(self, site, root, refresh=False, max_age_days=7):
+        import fetch_departures
+        return fetch_departures.fetch_fi(site, root, refresh, max_age_days)
+
+    def geocode(self, query):
+        import geocode_fi
+        return geocode_fi.search(query)
+
     def refine(self, sid, ws, rstage, run):
-        """The older photographs (the NLS years, Helsinki's back to 1932); the meta is marked "refined"
-        as Latvia's is (the descriptor's "refine": "flag")."""
-        import fetch_tile_fi
+        """The older photographs (the NLS years, Helsinki's back to 1932) and the timetables; the meta
+        is marked "refined" as Latvia's is (the descriptor's "refine": "flag")."""
+        import fetch_departures, fetch_tile_fi
         tile_dir = os.path.join(ws, "assets", "terrain", sid)
         rstage("older orthophotos (Maanmittauslaitos, Helsinki)")
         run(f"{sid}: older orthophotos", 600, fetch_tile_fi.add_history, tile_dir)
+        rstage("bus departures (HSL)")
+        run(f"{sid}: departures", 600, fetch_departures.fetch, sid, root=ws)
         meta_path = os.path.join(tile_dir, "terrain_meta.json")
         meta = json.load(open(meta_path))
         meta["refined"] = True
