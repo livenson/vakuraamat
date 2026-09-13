@@ -10,7 +10,10 @@ Writes, each its own file so ODbL's share-alike stays on it and never reaches th
   sites/<site>/street.json   lamps [[x, z]], signals [[x, z]], crossings [{x, z, kind, marked}],
                              furniture [{kind, x, z, dir}] (bench, bin, bike_rack, bollard, block, gate),
                              barriers [{kind, height, points}] (fence, hedge, wall, retaining_wall, city_wall,
-                             guard_rail), flowerbeds [[[x, z]...]], piers [{area, width, points}]
+                             guard_rail), flowerbeds [[[x, z]...]], piers [{area, width, points}],
+                             parking {spaces [{points, occupied}], cars [{x, z, heading, length}]}: the
+                             mapped bays, taken where the orthophoto shows a car in them, and cars on lots
+                             without mapped bays where it shows a car-sized blob unlike the tarmac
   sites/<site>/rail.json     tracks [{id, kind, gauge, embedded, bridge, points}] (tram, rail, light_rail,
                              narrow_gauge), split where two tracks share a node; stops [{kind, name, x, z}]
   sites/<site>/pois.json     pois [{id, key, type, name, brand, opening_hours, website, level, x, z,
@@ -26,6 +29,8 @@ Writes, each its own file so ODbL's share-alike stays on it and never reaches th
 Coordinates are tile metres (x east from the tile's west edge, z south from its north edge).
 """
 import argparse, json, math, os, re, sys, time, urllib.parse, urllib.request
+
+import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import paths  # noqa: E402
@@ -60,6 +65,7 @@ def query(bb):
   way["natural"="tree_row"]({bb});
   way["landuse"="flowerbed"]({bb});
   way["man_made"="pier"]({bb});
+  way["amenity"~"^(parking|parking_space)$"]({bb});
   way["railway"]({bb});
   node["railway"~"^(tram_stop|halt|station|stop)$"]({bb});
   node["public_transport"="stop_position"]["tram"="yes"]({bb});
@@ -149,6 +155,105 @@ def split_at_shared(ways, pos, inside):
     return out
 
 
+def _ring_pixels(img, ring, scale):
+    """The orthophoto's pixels inside a ring (tile metres), as an (n, 3) array; empty when it has none."""
+    from rasterio.features import rasterize
+    from rasterio.transform import Affine
+    from shapely.geometry import Polygon
+    try:
+        poly = Polygon(ring).buffer(0)
+    except Exception:  # noqa: BLE001 - a broken ring
+        return np.zeros((0, 3))
+    if poly.is_empty:
+        return np.zeros((0, 3))
+    x0, z0, x1, z1 = poly.bounds
+    c0, r0 = max(int(x0 * scale), 0), max(int(z0 * scale), 0)
+    c1, r1 = min(int(x1 * scale) + 1, img.shape[1]), min(int(z1 * scale) + 1, img.shape[0])
+    if c1 <= c0 or r1 <= r0:
+        return np.zeros((0, 3))
+    mask = rasterize([(poly, 1)], out_shape=(r1 - r0, c1 - c0), transform=Affine(1.0 / scale, 0, c0 / scale, 0, 1.0 / scale, r0 / scale)).astype(bool)
+    return img[r0:r1, c0:c1][mask]
+
+
+def _long_axis(ring):
+    """(centre x, z, heading in degrees of the long side, long side's length) of a ring's minimum rectangle."""
+    from shapely.geometry import Polygon
+    r = Polygon(ring).minimum_rotated_rectangle
+    c = list(r.exterior.coords)[:4]
+    sides = [(c[0], c[1]), (c[1], c[2])]
+    (a, b) = max(sides, key=lambda s: math.dist(*s))
+    return r.centroid.x, r.centroid.y, math.degrees(math.atan2(b[0] - a[0], b[1] - a[1])), math.dist(a, b)
+
+
+def parked(bays, lots, ortho_path, size_m, scale=2):
+    """The painted bays (amenity=parking_space) and the parked cars: a bay is taken where the orthophoto
+    shows something in it unlike the tarmac (a busy patch, or a colour far from the bays around it); on
+    a lot with no bays mapped, car-sized blobs unlike its tarmac are cars. Nothing is placed where the
+    photograph shows nothing (playtest 2026-09-13, Pirita: "can parking be better highlighted with some
+    3d models?"). Returns {"spaces": [{points, occupied}], "cars": [{x, z, heading, length}]}."""
+    import geo
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from extract_features import components
+    from shapely.geometry import Point, Polygon
+    out = {"spaces": [], "cars": []}
+    if not bays and not lots:
+        return out
+    img = np.asarray(geo.load_image_rgb(ortho_path, int(size_m * scale)), dtype=np.float32)
+    looks = []
+    for ring in bays:
+        try:
+            inner = list(Polygon(ring).buffer(-0.35).exterior.coords)
+        except Exception:  # noqa: BLE001 - too thin to shrink
+            inner = ring
+        pix = _ring_pixels(img, inner, scale)
+        looks.append((pix.mean(axis=0), float(pix.max(axis=1).std())) if len(pix) >= 6 else (None, 0.0))
+    centres = [Polygon(r).centroid for r in bays]
+    for i, ring in enumerate(bays):
+        col, busy = looks[i]
+        taken = False
+        if col is not None:
+            near = [looks[j][0] for j in range(len(bays)) if looks[j][0] is not None and centres[j].distance(centres[i]) < 60]
+            tarmac = np.median(np.array(near), axis=0)
+            taken = busy > 0.08 or float(np.linalg.norm(col - tarmac)) > 0.14
+        out["spaces"].append({"points": [[round(p[0], 1), round(p[1], 1)] for p in ring], "occupied": taken})
+        if taken:
+            x, z, heading, _ = _long_axis(ring)
+            out["cars"].append({"x": round(x, 1), "z": round(z, 1), "heading": round(heading, 1), "length": 4.4})
+    for ring in lots:
+        try:
+            lot = Polygon(ring).buffer(0)
+        except Exception:  # noqa: BLE001
+            continue
+        if any(lot.contains(c) for c in centres) or lot.area < 60:
+            continue   # its bays are mapped: taken above
+        x0, z0, x1, z1 = lot.bounds
+        c0, r0 = max(int(x0 * scale), 0), max(int(z0 * scale), 0)
+        side = int(max(x1 - x0, z1 - z0) * scale) + 2
+        win = img[r0:r0 + side, c0:c0 + side]
+        pix = _ring_pixels(img, ring, scale)
+        if len(pix) < 40 or win.shape[0] < 4 or win.shape[1] < 4:
+            continue
+        tarmac = np.median(pix, axis=0)
+        unlike = np.linalg.norm(win - tarmac, axis=2) > 0.16
+        square = np.zeros((side, side), bool)
+        square[:unlike.shape[0], :unlike.shape[1]] = unlike
+        for blob in components(square, int(5 * scale * scale)):
+            area = len(blob) / (scale * scale)
+            if area > 18:
+                continue
+            ys, xs = blob[:, 0].astype(float), blob[:, 1].astype(float)
+            cx, cz = (xs.mean() + c0) / scale, (ys.mean() + r0) / scale
+            if not lot.contains(Point(cx, cz)):
+                continue
+            vals, vecs = np.linalg.eigh(np.cov(np.vstack([xs - xs.mean(), ys - ys.mean()])))
+            length = 4.0 * math.sqrt(max(vals[1], 0.01)) / scale
+            if not 3.2 <= length <= 6.5:
+                continue
+            ax = vecs[:, 1]
+            out["cars"].append({"x": round(cx, 1), "z": round(cz, 1), "heading": round(math.degrees(math.atan2(ax[0], ax[1])), 1), "length": round(length, 1)})
+    return out
+
+
 def fetch(site, root=ROOT):
     import geo
     import numpy as np
@@ -200,7 +305,7 @@ def fetch(site, root=ROOT):
         return [round(p[0], 1), round(p[1], 1)]
 
     street = {"lamps": [], "signals": [], "crossings": [], "furniture": [], "barriers": [], "flowerbeds": [], "piers": []}
-    tracks, stops, pois, entrances, trees, rows = [], [], [], [], [], []
+    tracks, stops, pois, entrances, trees, rows, bays, lots = [], [], [], [], [], [], [], []
     for e in els:
         t = e.get("tags", {})
         pts = e.get("_pts") or []
@@ -246,6 +351,10 @@ def fetch(site, root=ROOT):
             if t.get("man_made") == "pier" and any(on_tile(q, MARGIN_M) for q in pts):
                 area = closed and t.get("area") != "no"
                 street["piers"].append({"area": area, "width": number(t.get("width")) or 2.5, "points": [r1(q) for q in (pts[:-1] if area else pts)]})
+            if closed and t.get("amenity") == "parking_space" and on_tile(pts[0]):
+                bays.append([list(q) for q in pts[:-1]])
+            elif closed and t.get("amenity") == "parking" and t.get("parking") not in ("underground", "multi-storey", "rooftop") and on_tile(pts[0]):
+                lots.append([list(q) for q in pts[:-1]])
             if t.get("natural") == "tree_row":
                 rows.append(pts)
             if t.get("railway") in TRACKS and t.get("tunnel") not in ("yes", "building_passage") and (number(t.get("layer")) or 0) >= 0:
@@ -315,6 +424,9 @@ def fetch(site, root=ROOT):
         crown = number(t.get("diameter_crown")) or max(3.0, h * 0.55)
         tree_out.append([round(p[0], 1), round(p[1], 1), round(h, 1), round(crown, 1), 1 if conifer else 0])
 
+    # --- parking: the painted bays, and a car where the photograph shows one -----------------------
+    street["parking"] = parked(bays, lots, os.path.join(tdir, meta["texture"]), float(meta.get("size_m", size_x)))
+
     # --- shops: the building each stands in, its door, the company the names agree on -------------
     bpath = os.path.join(site_dir, "buildings.json")
     blds = json.load(open(bpath)).get("buildings", []) if os.path.exists(bpath) else []
@@ -378,7 +490,8 @@ def fetch(site, root=ROOT):
     json.dump({"source": f"Single trees: {CREDIT}; heights from the tile's canopy model where it sees the crown", "fetched": stamp["fetched"],
                "partial": True, "count": len(tree_out), "trees": tree_out}, open(os.path.join(tdir, "trees_osm.json"), "w"))
     log(f"{site}: {len(street['lamps'])} lamps, {len(street['signals'])} signals, {len(street['crossings'])} crossings, "
-        f"{len(street['furniture'])} furniture, {len(street['barriers'])} barriers, {len(street['flowerbeds'])} flowerbeds, {len(street['piers'])} piers; "
+        f"{len(street['furniture'])} furniture, {len(street['barriers'])} barriers, {len(street['flowerbeds'])} flowerbeds, {len(street['piers'])} piers, "
+        f"{len(street['parking']['spaces'])} parking bays and {len(street['parking']['cars'])} parked cars; "
         f"{len(rail_out)} track pieces, {len(stops)} stops; {len(pois)} shops and offices ({matched} matched to a company); {len(tree_out)} trees")
     return {"street": street, "tracks": rail_out, "pois": pois, "trees": tree_out}
 

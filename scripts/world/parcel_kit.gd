@@ -54,14 +54,15 @@ func _build() -> void:
 		"kiosk":
 			_kiosk()
 		"hedge":
-			if not StreetData.barrier_near(pack, outline):
+			# a garden's picket fence (playtest 2026-09-13, Pirita: the box hedge was "looking ugly ... too thick")
+			if not StreetData.barrier_near(pack, outline) and not _fence_run("garden_fence", 1.1, true):
 				_boundary(0.9, 0.7, Color(0.22, 0.4, 0.18), 1.2, true)
 		"fence":
-			if not StreetData.barrier_near(pack, outline):
+			if not StreetData.barrier_near(pack, outline) and not _fence_run("chain_link_fence", 1.8, false):
 				_boundary(2.0, 0.08, Color(0.45, 0.45, 0.42), 0.4, false)
 		"solar":
 			_solar()
-			if not StreetData.barrier_near(pack, outline):
+			if not StreetData.barrier_near(pack, outline) and not _fence_run("chain_link_fence", 1.8, false):
 				_boundary(1.8, 0.06, Color(0.5, 0.5, 0.48), 0.5, false)
 	if _colors.is_empty():
 		return
@@ -346,6 +347,72 @@ func _park() -> void:
 		if not Geometry2D.is_point_in_polygon(at, polygon):
 			continue
 		_bench(Vector3(at.x, 0, at.y), -atan2(across.y, across.x) + (PI if i % 2 == 0 else 0.0))
+
+
+## The unit's boundary as a run of a vendored fence model (Sketchfab, CC BY): sections fitted to
+## `height` and stretched a little so every edge takes a whole number of them, inset from the line as
+## the hedge was, a gate's gap in the middle of a long garden edge; one MultiMesh and thin colliders.
+## False when the model is not vendored (the boxes below are drawn instead).
+func _fence_run(model: String, height: float, gaps: bool) -> bool:
+	var path := SKETCHFAB + model + ".glb"
+	if not ResourceLoader.exists(path):
+		return false
+	var mesh := MeshMerge.baked(path)
+	var b := mesh.get_aabb()
+	if b.size.y < 0.001:
+		return false
+	var k := height / b.size.y
+	var along_z := b.size.z >= b.size.x
+	var natural := (b.size.z if along_z else b.size.x) * k   # one section's length at this height
+	var centre := b.get_center()
+	# the model in its own space: base at y 0, centred, its length along Z
+	var fit := Transform3D(Basis(), Vector3(-centre.x, -b.position.y, -centre.z))
+	if not along_z:
+		fit = Transform3D(Basis(Vector3.UP, PI / 2.0), Vector3.ZERO) * fit
+	var xforms: Array[Transform3D] = []
+	var body := StaticBody3D.new()
+	body.collision_layer = 1
+	var c := _centroid()
+	var n := polygon.size()
+	for i in n:
+		var a := polygon[i]
+		var e := polygon[(i + 1) % n]
+		var dir := e - a
+		var length := dir.length()
+		if length < 1.0:
+			continue
+		dir /= length
+		var inward := (c - (a + e) / 2.0).normalized() * 0.6
+		var count := maxi(1, roundi(length / natural))
+		var seg := length / count
+		var turn := Basis(Vector3.UP, atan2(dir.x, dir.y))   # local Z along the edge
+		for s in count:
+			if gaps and count >= 5 and s == count / 2:
+				continue   # a gate
+			var mid := a + dir * (seg * (s + 0.5)) + inward
+			var g := _ground(mid)
+			xforms.append(Transform3D(turn * Basis.from_scale(Vector3(k, k, k * seg / natural)), Vector3(mid.x, g, mid.y)) * fit)
+			var shape := CollisionShape3D.new()
+			var box := BoxShape3D.new()
+			box.size = Vector3(0.1, height, seg)
+			shape.shape = box
+			shape.transform = Transform3D(turn, Vector3(mid.x, g + height * 0.5, mid.y))
+			body.add_child(shape)
+	if xforms.is_empty():
+		return true
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = mesh
+	mm.instance_count = xforms.size()
+	for i in xforms.size():
+		mm.set_instance_transform(i, xforms[i])
+	var mmi := MultiMeshInstance3D.new()
+	mmi.name = "Fence"
+	mmi.multimesh = mm
+	mmi.visibility_range_end = RANGE
+	add_child(mmi)
+	add_child(body)
+	return true
 
 
 ## Hedge or fence along the boundary, inset a little; gaps where the boundary is long enough for a gate.

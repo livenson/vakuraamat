@@ -209,6 +209,17 @@ class BuildJob:
 	var _trim := SurfaceTool.new()
 
 	func run() -> void:
+		# The walls' outward side comes from the ring's winding: a ring wound the other way (Finland's
+		# topographic database, Latvia's cadastre, Valka) turned every wall's normal inwards, so its windows
+		# sat 4 cm inside the wall, unseen, and the walls took the light from within (playtest 2026-09-13,
+		# Rovaniemi: "why building has no windows?"). One winding for every source: the job's own copy.
+		var twice_area := 0.0
+		for i in polygon.size():
+			var p := polygon[i]
+			var q := polygon[(i + 1) % polygon.size()]
+			twice_area += p.x * q.y - q.x * p.y
+		if twice_area > 0.0:
+			polygon.reverse()
 		_walls.begin(Mesh.PRIMITIVE_TRIANGLES)
 		_roof.begin(Mesh.PRIMITIVE_TRIANGLES)
 		_windows.begin(Mesh.PRIMITIVE_TRIANGLES)

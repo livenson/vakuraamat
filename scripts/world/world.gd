@@ -636,8 +636,11 @@ func _place_moored(pack: String, root: Node3D) -> void:
 		return
 	for b in parsed:
 		var length := float(b.get("length", 4.0))
-		var name := "canoe" if length < 4.0 else ("rowboat" if length < 5.5 else ("boat" if length < 7.5 else "sailboat"))
-		var hull := _boat(name, clampf(length, 3.0, 9.0))
+		var name := "canoe" if length < 4.0 else ("rowboat" if length < 5.5 else "boat")
+		if length >= 7.5 and hash(Vector2(float(b.x), float(b.z))) % 3 == 0:
+			name = "sailboat"   # a moored yacht's sails are stowed: a marina of raised sails read as a regatta
+
+		var hull := _boat(name, clampf(length, 3.0, 15.0))   # a marina's yachts run to 15 m
 		if hull == null:
 			continue
 		var at := Vector3(float(b.x), 0.0, float(b.z))

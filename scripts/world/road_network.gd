@@ -70,7 +70,8 @@ func _build(terrain: Terrain3D) -> void:
 	var t0 := Time.get_ticks_usec()
 	_slice_start = t0
 	var tools := {}   # "<kind>|<surface texture>" and "<kind>_kerb" -> SurfaceTool; one material each
-	for r in roads:
+	for ri in roads.size():
+		var r: Dictionary = roads[ri]
 		if not await _breathe():
 			return
 		var kind := str(r.get("kind", "road"))
@@ -89,8 +90,12 @@ func _build(terrain: Terrain3D) -> void:
 		var up: float = lift + float(KIND_LIFT.get(kind, 0.0)) + float(TEX_LIFT.get(tex, 0.0))
 		_ribbon(tools[surface_key], pts, half, terrain, up, 0.0)
 		if style.kerb != null:
-			for side_sign in [-1.0, 1.0]:
-				_ribbon(tools[kind + "_kerb"], pts, 0.18, terrain, lift + 0.05, side_sign * (half + 0.18))
+			# the kerb stops short of a junction: drawn on to the road's end it ran across the other
+			# carriageway (playtest 2026-09-13, Pirita: "road intersections are not nice, lines overlap")
+			var kerb := _cut(pts, _junction_trim(ri, pts, true), _junction_trim(ri, pts, false))
+			if kerb.size() >= 2:
+				for side_sign in [-1.0, 1.0]:
+					_ribbon(tools[kind + "_kerb"], kerb, 0.18, terrain, lift + 0.05, side_sign * (half + 0.18))
 	for key in tools:
 		var st: SurfaceTool = tools[key]
 		var mesh: ArrayMesh = st.commit()
@@ -844,6 +849,57 @@ func road_near(p: Vector2, kinds: Array, reach: float) -> Dictionary:
 					best = {"point": q, "dir": ((seg[1] as Vector2) - (seg[0] as Vector2)).normalized(), "width": float(r.get("width", 4.0)),
 						"kind": str(r.get("kind", "road")), "index": seg[2]}
 	return best
+
+
+## How far road `ri`'s kerb keeps back from its start (or end): half the widest road that meets it
+## there across it, within 3 m of the end, and a little more; 0 where only its own continuation (a
+## road running on in the same direction) or nothing meets it.
+func _junction_trim(ri: int, pts: Array[Vector2], at_start: bool) -> float:
+	if pts.size() < 2:
+		return 0.0
+	if _grid.is_empty():
+		_build_grid()
+	var p: Vector2 = pts[0] if at_start else pts[-1]
+	var own: Vector2 = (pts[1] - pts[0]).normalized() if at_start else (pts[-1] - pts[-2]).normalized()
+	var best := 0.0
+	var c := Vector2i(floori(p.x / GRID), floori(p.y / GRID))
+	for dx in range(-1, 2):
+		for dy in range(-1, 2):
+			for seg in _grid.get(c + Vector2i(dx, dy), []):
+				if seg[2] == ri:
+					continue
+				var a: Vector2 = seg[0]
+				var b: Vector2 = seg[1]
+				if Geometry2D.get_closest_point_to_segment(p, a, b).distance_to(p) > 3.0:
+					continue
+				if absf((b - a).normalized().dot(own)) > 0.9:
+					continue   # the same street running on past a split in the data
+				best = maxf(best, float(roads[seg[2]].get("width", 4.0)) * 0.5 + 0.4)
+	return best
+
+
+## `pts` with `from_start` metres taken off its start and `from_end` off its end; [] when nothing is left.
+static func _cut(pts: Array[Vector2], from_start: float, from_end: float) -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	var total := 0.0
+	for i in range(1, pts.size()):
+		total += pts[i - 1].distance_to(pts[i])
+	var lo := from_start
+	var hi := total - from_end
+	if hi - lo < 0.5:
+		return out
+	var acc := 0.0
+	for i in range(1, pts.size()):
+		var a := pts[i - 1]
+		var b := pts[i]
+		var seg := a.distance_to(b)
+		if seg > 0.0 and acc + seg >= lo and acc <= hi:
+			var p0 := a.lerp(b, clampf((lo - acc) / seg, 0.0, 1.0))
+			if out.is_empty() or out[-1].distance_to(p0) > 0.001:
+				out.append(p0)
+			out.append(a.lerp(b, clampf((hi - acc) / seg, 0.0, 1.0)))
+		acc += seg
+	return out
 
 
 func _build_grid() -> void:

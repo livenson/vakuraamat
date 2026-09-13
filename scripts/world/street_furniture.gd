@@ -59,6 +59,9 @@ func build(rn: RoadNetwork, terrain: Terrain3D) -> bool:
 	_furniture(data.get("furniture", []))
 	if not await rn._breathe():
 		return false
+	_parking(data.get("parking", {}))
+	if not await rn._breathe():
+		return false
 	return await _solids(data)
 
 
@@ -284,6 +287,7 @@ static func _lens(colour: String, on: bool) -> StandardMaterial3D:
 ## and 128 m cell. A kind whose model is not vendored draws a plain stand-in.
 func _furniture(list: Array) -> void:
 	var cells: Dictionary = {}   # "<kind>" -> {Vector2i: Array[Transform3D]}
+	var walls := _barrier_grid()
 	for f in list:
 		var kind := str(f.get("kind", ""))
 		if not (kind in MODELS or kind == "block"):
@@ -291,10 +295,16 @@ func _furniture(list: Array) -> void:
 		var p := Vector2(float(f.get("x", 0.0)), float(f.get("z", 0.0)))
 		if not _on_tile(p):
 			continue
+		# a piece mapped against a fence or wall stands clear of it, a bench with its back to it (playtest
+		# 2026-09-13, Helsinki: "bench is going through the fence")
+		var back := _clear_of(walls, p, float(CLEARANCE.get(kind, 0.5)))
+		p = back[0]
 		var face := Vector2.DOWN
 		if f.get("dir") != null:
 			var a := deg_to_rad(float(f.dir))
 			face = Vector2(sin(a), -cos(a))   # the map's direction: 0 = north, clockwise
+		elif back[1] != Vector2.ZERO:
+			face = back[1]
 		else:
 			var r := _rn.road_near(p, ["path", "street", "road", "trail"], 12.0)
 			if not r.is_empty() and (r.point as Vector2).distance_to(p) > 0.2:
@@ -334,6 +344,150 @@ func _furniture(list: Array) -> void:
 				mmi.material_override = mat
 			mmi.visibility_range_end = RANGE
 			add_child(mmi)
+
+
+## The painted bays (a white line round every mapped parking space) and a parked car wherever the
+## photograph shows one (street.json "parking", fetch_osm.parked), from the traffic's own car models at
+## their own lengths, along the bay; one MultiMesh per model and 128 m cell, a box collider each.
+func _parking(p: Dictionary) -> void:
+	var st := SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var n := 0
+	for sp in p.get("spaces", []):
+		var ring: Array = sp.get("points", [])
+		if ring.size() < 3:
+			continue
+		var c := Vector2.ZERO
+		for q in ring:
+			c += Vector2(float(q[0]), float(q[1]))
+		if not _on_tile(c / ring.size()):
+			continue
+		for i in ring.size():
+			var a := Vector2(float(ring[i][0]), float(ring[i][1]))
+			var b := Vector2(float(ring[(i + 1) % ring.size()][0]), float(ring[(i + 1) % ring.size()][1]))
+			_line(st, a, b, 0.1)
+		n += 1
+	if n > 0:
+		var mi := MeshInstance3D.new()
+		mi.name = "ParkingBays"
+		mi.mesh = st.commit()
+		var mat := StandardMaterial3D.new()
+		mat.albedo_color = Color(0.88, 0.88, 0.85)
+		mat.roughness = 0.85
+		mi.material_override = mat
+		mi.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		mi.visibility_range_end = RANGE
+		add_child(mi)
+	var cars: Array = p.get("cars", [])
+	if cars.is_empty():
+		return
+	var names: Array = TrafficAgent.SKETCHFAB_CARS.keys()
+	var cells: Dictionary = {}   # model -> {Vector2i: Array[Transform3D]}
+	var body := StaticBody3D.new()
+	body.collision_layer = 1
+	for car in cars:
+		var at := Vector2(float(car.get("x", 0.0)), float(car.get("z", 0.0)))
+		if not _on_tile(at):
+			continue
+		var model: String = names[absi(hash(at)) % names.size()]
+		var yaw := deg_to_rad(float(car.get("heading", 0.0))) + (PI if absi(hash(at * 3.0)) % 2 == 0 else 0.0)
+		var ground := _rn._on_ground(at, _terrain, 0.0)
+		var cell := Vector2i(floori(at.x / RoadNetwork.LAMP_CELL), floori(at.y / RoadNetwork.LAMP_CELL))
+		cells.get_or_add(model, {}).get_or_add(cell, []).append(Transform3D(Basis(Vector3.UP, yaw), ground))
+		var shape := CollisionShape3D.new()
+		var box := BoxShape3D.new()
+		box.size = Vector3(1.8, 1.4, float(TrafficAgent.SKETCHFAB_CARS[model]))
+		shape.shape = box
+		shape.transform = Transform3D(Basis(Vector3.UP, yaw), ground + Vector3(0, 0.7, 0))
+		body.add_child(shape)
+	for model in cells:
+		var path := TrafficAgent.SKETCHFAB + str(model) + ".glb"
+		if not ResourceLoader.exists(path):
+			continue
+		var mesh := MeshMerge.baked(path)
+		var b := mesh.get_aabb()
+		var k := float(TrafficAgent.SKETCHFAB_CARS[model]) / maxf(maxf(b.size.x, b.size.z), 0.001)
+		var fit := Transform3D(Basis.from_scale(Vector3.ONE * k), Vector3(-(b.position.x + b.size.x * 0.5) * k, -b.position.y * k, -(b.position.z + b.size.z * 0.5) * k))
+		if b.size.x > b.size.z:
+			fit = Transform3D(Basis(Vector3.UP, PI / 2.0), Vector3.ZERO) * fit   # its length along Z, the bay's
+		for cell in cells[model]:
+			var xforms: Array = cells[model][cell]
+			var mm := MultiMesh.new()
+			mm.transform_format = MultiMesh.TRANSFORM_3D
+			mm.mesh = mesh
+			mm.instance_count = xforms.size()
+			for i in xforms.size():
+				mm.set_instance_transform(i, xforms[i] * fit)
+			var mmi := MultiMeshInstance3D.new()
+			mmi.name = "Parked_" + str(model)
+			mmi.multimesh = mm
+			mmi.visibility_range_end = RANGE
+			add_child(mmi)
+	add_child(body)
+
+
+## A flat white strip `w` wide from `a` to `b` on the ground, a hair above the road ribbons.
+func _line(st: SurfaceTool, a: Vector2, b: Vector2, w: float) -> void:
+	var d := (b - a).normalized()
+	var n := Vector2(-d.y, d.x) * w * 0.5
+	var v: Array[Vector3] = []
+	for q: Vector2 in [a - n, a + n, b + n, b - n]:
+		v.append(_rn._on_ground(q, _terrain, _rn.lift + 0.02))
+	for i in [0, 1, 2, 0, 2, 3]:
+		st.set_normal(Vector3.UP)
+		st.add_vertex(v[i])
+
+
+const CLEARANCE := {"bench": 1.0, "bin": 0.5, "bike_rack": 0.6, "bollard": 0.25, "block": 0.7}   # metres from a barrier's face
+
+
+## The mapped barriers' segments by 16 m cell: [a, b, half thickness].
+func _barrier_grid() -> Dictionary:
+	var grid := {}
+	for b in StreetData.of(Sites.pack_of(_rn)).get("barriers", []):
+		var spec: Array = BARRIERS.get(str(b.get("kind", "fence")), BARRIERS.fence)
+		var pts: Array = b.get("points", [])
+		for i in range(1, pts.size()):
+			var a := Vector2(float(pts[i - 1][0]), float(pts[i - 1][1]))
+			var c := Vector2(float(pts[i][0]), float(pts[i][1]))
+			var n := maxi(1, int(a.distance_to(c) / 8.0))
+			var seen := {}
+			for j in n + 1:
+				var q := a.lerp(c, float(j) / n)
+				var cell := Vector2i(floori(q.x / 16.0), floori(q.y / 16.0))
+				if not seen.has(cell):
+					seen[cell] = true
+					grid.get_or_add(cell, []).append([a, c, float(spec[1]) * 0.5])
+	return grid
+
+
+## [position, facing]: `p` moved to `clearance` metres off the face of the nearest mapped barrier when it
+## stands closer, and the way away from that barrier; `p` and Vector2.ZERO when none is that close.
+func _clear_of(grid: Dictionary, p: Vector2, clearance: float) -> Array:
+	var best_d := INF
+	var best_q := p
+	var best_half := 0.0
+	var best_seg: Array = []
+	var c := Vector2i(floori(p.x / 16.0), floori(p.y / 16.0))
+	for dx in range(-1, 2):
+		for dy in range(-1, 2):
+			for s in grid.get(c + Vector2i(dx, dy), []):
+				var q := Geometry2D.get_closest_point_to_segment(p, s[0], s[1])
+				var d := q.distance_to(p)
+				if d < best_d:
+					best_d = d
+					best_q = q
+					best_half = s[2]
+					best_seg = s
+	var need := clearance + best_half
+	if best_seg.is_empty() or best_d >= need:
+		return [p, Vector2.ZERO]
+	var away := p - best_q
+	if away.length() < 0.01:   # on the line itself: off it to one side
+		var along: Vector2 = ((best_seg[1] as Vector2) - (best_seg[0] as Vector2)).normalized()
+		away = Vector2(-along.y, along.x)
+	away = away.normalized()
+	return [best_q + away * need, away]
 
 
 func _stand_in(kind: String) -> Mesh:

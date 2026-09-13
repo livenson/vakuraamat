@@ -21,6 +21,7 @@ var input_enabled := true      # false while a UI panel or dialogue is open
 var riding: Node3D = null      # the parked Bicycle we sit on, or null
 var _pitch := 0.0
 var _bike_view: Node3D = null
+var _bike_sound: BikeSound = null   # the ride's own sound while mounted
 var _ride_speed := 0.0
 
 
@@ -107,6 +108,8 @@ func mount(bike: Node3D) -> void:
 	camera.position.y -= 0.25
 	flying = false
 	_ride_speed = 0.0
+	_bike_sound = BikeSound.new()
+	add_child(_bike_sound)
 	EventBus.notice.emit(tr("NOTICE_BIKE_ON"))
 
 
@@ -123,6 +126,9 @@ func dismount() -> void:
 	if _bike_view:
 		_bike_view.queue_free()
 		_bike_view = null
+	if _bike_sound:
+		_bike_sound.queue_free()
+		_bike_sound = null
 	camera.position.y += 0.25
 	EventBus.notice.emit(tr("NOTICE_BIKE_OFF"))
 
@@ -164,6 +170,9 @@ func _physics_process(delta: float) -> void:
 		var target := (transform.basis * Vector3(input.x * 0.4, 0.0, input.y)).normalized() * current_speed() if input.length() > 0.1 else Vector3.ZERO
 		var horizontal := Vector3(velocity.x, 0, velocity.z).lerp(target, minf(1.0, delta * (2.0 if input.y < 0 else 1.2)))
 		_ride_speed = horizontal.length()
+		if _bike_sound:
+			_bike_sound.speed = _ride_speed
+			_bike_sound.pedalling = input.y < -0.1   # forward held turns the pedals; otherwise it coasts
 		velocity.x = horizontal.x
 		velocity.z = horizontal.z
 		if not is_on_floor():

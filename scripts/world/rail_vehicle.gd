@@ -146,5 +146,9 @@ static func _make_body(path: String, length: float) -> Node3D:
 	var turn := Node3D.new()
 	turn.rotation.y = PI / 2.0 if b.size.x > b.size.z else 0.0   # a model lying along X is turned onto Z
 	turn.add_child(model)
-	MeshMerge.set_range(turn, 800.0)
-	return turn
+	# _place sets the heading on the outer node: set on `turn` itself it undid the quarter turn, and the
+	# trams ran sideways down the street (playtest 2026-09-13, Helsinki: "trams are driving perpendicular")
+	var holder := Node3D.new()
+	holder.add_child(turn)
+	MeshMerge.set_range(holder, 800.0)
+	return holder

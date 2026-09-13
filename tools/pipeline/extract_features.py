@@ -124,11 +124,72 @@ def find_anchors(heights, canopy, ortho, buildings, focus=None):
             {"register": register, "spawn": spawn, "landmark": landmark, "farm": farm, "trade": trade, "field": fld}.items()}
 
 
-def find_boats(ortho_path, size_m, heights, canopy, scale=2):
+def pier_mask(site_dir, px, scale):
+    """The piers and pontoons OpenStreetMap maps on the tile (street.json, fetch_osm.py) as a mask of
+    px x px at 1/scale m a pixel; None when the pack has none."""
+    path = os.path.join(site_dir, "street.json")
+    try:
+        piers = json.load(open(path)).get("piers", []) if os.path.exists(path) else []
+    except (OSError, ValueError):
+        piers = []
+    if not piers:
+        return None
+    from rasterio.features import rasterize
+    from rasterio.transform import Affine
+    from shapely.geometry import LineString, Polygon
+    shapes = []
+    for p in piers:
+        pts = p.get("points") or []
+        try:
+            if p.get("area") and len(pts) >= 3:
+                shapes.append((Polygon(pts).buffer(0.3), 1))
+            elif len(pts) >= 2:
+                shapes.append((LineString(pts).buffer(float(p.get("width") or 2.5) / 2 + 0.3), 1))
+        except Exception:  # noqa: BLE001 - a broken outline
+            continue
+    if not shapes:
+        return None
+    return rasterize(shapes, out_shape=(px, px), transform=Affine(1.0 / scale, 0, 0, 0, 1.0 / scale, 0)).astype(bool)
+
+
+def _erode1(m):
+    """A boolean mask shrunk by one pixel (3 x 3 minimum)."""
+    p = np.pad(m, 1)
+    out = np.ones_like(m)
+    for dy in range(3):
+        for dx in range(3):
+            out &= p[dy:dy + m.shape[0], dx:dx + m.shape[1]]
+    return out
+
+
+def split_hulls(pix, max_px, min_px, steps=4):
+    """Hulls moored side by side read as one bright blob: the blob eroded a pixel at a time until it
+    falls apart into pieces of a hull's size. [(pixels, pixels eroded)]; [] when it never does."""
+    y0, x0 = pix.min(axis=0)
+    h, w = pix.max(axis=0) - (y0, x0) + 1
+    side = int(max(h, w)) + 2
+    local = np.zeros((side, side), bool)
+    local[pix[:, 0] - y0 + 1, pix[:, 1] - x0 + 1] = True
+    for e in range(1, steps + 1):
+        local = _erode1(local)
+        parts = components(local, max(1, min_px // (e + 1)))
+        if not parts:
+            return []
+        if all(len(q) <= max_px for q in parts) and len(parts) >= 2:
+            return [(q + (y0 - 1, x0 - 1), e) for q in parts]
+    return []
+
+
+def find_boats(ortho_path, size_m, heights, canopy, scale=2, piers=None):
     """Moored boats where the orthophoto shows them: bright, unsaturated blobs of a hull's size (2..60 m²)
     with dark, low, treeless water around them (the river is the lowest ground of a tile), read at
     1/scale m per pixel. Returns [{x, z, length, heading}] in tile metres; heading in degrees, the
-    hull's long axis, so the world can turn a model to it."""
+    hull's long axis, so the world can turn a model to it.
+
+    `piers` (pier_mask) marks the mapped pontoons: their decks are not hulls, and a hull moored at one
+    has less open water around it than one on a river (yachts packed along a marina's fingers, playtest
+    2026-09-13, Pirita: "there are many more ships parked, now they are just shown on a floor
+    picture"). Hulls lying side by side, one bright blob in the photograph, are split apart."""
     px = size_m * scale
     img = load_ortho(ortho_path, px)
     r, g, b = img[..., 0], img[..., 1], img[..., 2]
@@ -139,28 +200,61 @@ def find_boats(ortho_path, size_m, heights, canopy, scale=2):
         low &= box_fraction(canopy > 1.5, 4) < 0.05                      # no trees: not a shadow
     low = np.kron(low, np.ones((scale, scale), dtype=bool))
     water = (v < 0.3) & (sat < 0.55) & ((g - np.maximum(r, b)) < 0.06) & low
-    near_water = box_fraction(water, 5 * scale) > 0.3
-    bright = (v > 0.6) & (sat < 0.32) & ~water & near_water
+    pier = piers if piers is not None and piers.shape == water.shape else np.zeros_like(water)
+    berth = box_fraction(pier, 4 * scale) > 0                            # within 4 m of a pontoon
+    near_water = (box_fraction(water, 5 * scale) > 0.3) | (berth & low)
+    bright = (v > 0.6) & (sat < 0.32) & ~water & near_water & ~pier
+    ring_all = box_fraction(water, 3 * scale)
+    # broad water near it: a tile without the sea takes its lowest streets for the river's level, and a
+    # white van on dark asphalt passed for a hull (playtest 2026-09-13, Helsinki: "why is there a boat
+    # here?"). A 24 m square a third water somewhere within 40 m: Kvissentali's river boats have 0.35-0.6
+    # (the Emajõgi's photograph is patched with glare), that street 0.12. A berth at a mapped pier is enough
+    broad = box_fraction(box_fraction(water, 12 * scale) > 0.3, 40 * scale) > 0
     out = []
     m2 = 1.0 / (scale * scale)
     for pix in components(bright, int(2 / m2)):
         area = len(pix) * m2
-        if area > 60:
-            continue
-        ys, xs = pix[:, 0].astype(float), pix[:, 1].astype(float)
-        cy, cx = ys.mean(), xs.mean()
-        # water on the ring 1..3 m out: a hull sits in water, a car or a roof does not
-        ring = box_fraction(water, 3 * scale)[int(cy), int(cx)]
-        if ring < 0.35:
-            continue
-        cov = np.cov(np.vstack([xs - cx, ys - cy]))
-        vals, vecs = np.linalg.eigh(cov)
-        ax = vecs[:, 1]
-        length = 4.0 * math.sqrt(max(vals[1], 0.01)) / scale
-        if length < 2.5 or length > 12.0:
-            continue
-        out.append({"x": round(cx / scale, 1), "z": round(cy / scale, 1), "length": round(length, 1),
-                    "heading": round(math.degrees(math.atan2(ax[0], ax[1])), 1)})
+        if area <= 60:
+            parts = [(pix, 0)]
+        elif area <= 500:
+            parts = split_hulls(pix, int(60 / m2), int(2 / m2))
+        else:
+            parts = []
+        for part, eroded in parts:
+            ys, xs = part[:, 0].astype(float), part[:, 1].astype(float)
+            cy, cx = ys.mean(), xs.mean()
+            iy, ix = min(int(cy), px - 1), min(int(cx), px - 1)
+            # water on the ring 1..3 m out: a hull sits in water, a car or a roof does not; at a
+            # pontoon the neighbours and the deck take most of the ring
+            if ring_all[iy, ix] < (0.12 if berth[iy, ix] else 0.35):
+                continue
+            if not berth[iy, ix] and not broad[iy, ix]:
+                continue
+            if len(part) < 3:
+                continue
+            cov = np.cov(np.vstack([xs - cx, ys - cy]))
+            vals, vecs = np.linalg.eigh(cov)
+            ax = vecs[:, 1]
+            length = 4.0 * math.sqrt(max(vals[1], 0.01)) / scale + 2.0 * eroded / scale
+            if length < 2.5 or length > 16.0:
+                continue
+            out.append({"x": round(cx / scale, 1), "z": round(cy / scale, 1), "length": round(length, 1),
+                        "heading": round(math.degrees(math.atan2(ax[0], ax[1])), 1)})
+    return out
+
+
+def boats(site, root=ROOT):
+    """Only the moored boats, rewritten (boats_2026.json) without touching the rest of the pack."""
+    site_dir = os.path.join(root, "sites", site)
+    m = json.load(open(os.path.join(site_dir, "site.json")))
+    tdir = os.path.join(root, "assets", "terrain", m.get("terrain", {}).get("tile", site))
+    meta = json.load(open(os.path.join(tdir, "terrain_meta.json")))
+    size = int(meta["size_px"])
+    heights = np.fromfile(os.path.join(tdir, meta.get("heightmap", "heightmap.r32")), dtype="<f4").reshape(size, size)
+    canopy = np.fromfile(os.path.join(tdir, meta["canopy"]["file"]), dtype="<f4").reshape(size, size) if meta.get("canopy") else None
+    out = find_boats(os.path.join(tdir, meta["texture"]), size, heights, canopy, piers=pier_mask(site_dir, size * 2, 2))
+    json.dump(out, open(os.path.join(site_dir, "boats_2026.json"), "w"), indent=1)
+    log(f"{site}: {len(out)} moored boats")
     return out
 
 
@@ -275,13 +369,15 @@ def extract(site, dry_run=False, min_building=25, min_pond=80, building_height=2
         if bank.size == 0 or level > float(np.median(bank)) - 0.3:
             continue   # not a depression: a flat dark yard, car park, lawn in shadow
         col = ortho[ys, xs].mean(axis=0)
+        if col[2] < 0.7 * max(col[0], col[1]):
+            continue   # olive or brown: a lawn or bare ground in a hollow, not water (playtest 2026-09-13, "why is there a lake here?")
         ponds.append({"area": int(len(pix)), "x": round(float(xs.min() + xs.max() + 1) / 2, 1), "z": round(float(ys.min() + ys.max() + 1) / 2, 1),
                       "w": w, "d": d, "level": round(level, 2), "color": [round(float(c), 2) for c in col]})
     ponds = [p for p in ponds if not on_industrial_land(p, site_dir) and not covers_buildings(p, site_dir)]
     ponds.sort(key=lambda p: -p["area"])
     log(f"{len(ponds)} still-water patches (>= {min_pond} m²)")
 
-    boats = find_boats(os.path.join(tdir, meta["texture"]), size, heights, canopy)
+    boats = find_boats(os.path.join(tdir, meta["texture"]), size, heights, canopy, piers=pier_mask(site_dir, size * 2, 2))
     log(f"{len(boats)} moored boats")
 
     reg_path = os.path.join(site_dir, "buildings.json")
@@ -313,5 +409,9 @@ if __name__ == "__main__":
     ap.add_argument("--min-building", type=int, default=25, help="smallest roof area in m² (default 25)")
     ap.add_argument("--min-pond", type=int, default=80, help="smallest water patch in m² (default 80)")
     ap.add_argument("--root", default=ROOT, help="project root holding sites/ and assets/terrain/ (default: the repo)")
+    ap.add_argument("--boats-only", action="store_true", help="rewrite boats_2026.json only, nothing else")
     a = ap.parse_args()
-    extract(a.site, a.dry_run, a.min_building, a.min_pond, root=a.root)
+    if a.boats_only:
+        boats(a.site, root=a.root)
+    else:
+        extract(a.site, a.dry_run, a.min_building, a.min_pond, root=a.root)

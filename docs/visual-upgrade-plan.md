@@ -70,6 +70,11 @@ screenshot; 2 because the user named trees as the worst; 3–6 as time allows.
   trains running on the right-hand track and stopping at the tram stops. Latvia and Finland take the
   map's single trees (heights from the canopy model) with the scatter kept off their crowns. Helsinki
   street level 71 fps, from the air 86-92 fps; Pirita 74 fps.
+- [x] 12 playtest round (2026-09-13): mapped parking bays painted, a parked car in each bay and lot spot
+  where the photograph shows one (Pirita: 273 bays, 238 cars); a marina's yachts at the mapped piers
+  (Pirita 52 -> 207 boats), no boats on a sea-less tile's streets, no ponds on olive lawns; picket and
+  chain-link fence models for the parcel kits; kerbs stop at junctions; windows on footprints wound the
+  other way (Rovaniemi, Rīga, Valka); one bus departure in seven driven; an old bicycle's sound.
 
 ## Result
 

@@ -41,3 +41,14 @@ Attribution lines:
 - "Street Bollard" by FameProductions (https://sketchfab.com/FameProductions), CC BY 4.0, via Sketchfab.
 - "Street Trash Bin — Realistic" by vladimirzuev1510 (https://sketchfab.com/vladimirzuev1510), CC BY 4.0, via Sketchfab.
 - "Bike Rack" by pixie-3d (https://sketchfab.com/pixie-3d), CC BY 4.0, via Sketchfab.
+
+| File | Model | Author | URL |
+|---|---|---|---|
+| `garden_fence.glb` | The fence is white / Забор белый (Low poly) | marishka1611 | https://sketchfab.com/3d-models/47a64f7da74041a2938f95d549b42f9a |
+| `chain_link_fence.glb` | Chain Link Fence - A Classic Landscape Element | wojteX | https://sketchfab.com/3d-models/3544d1142d4942ad8f1ff6ab7e2b25da |
+
+Fetched 2026-09-13, CC BY 4.0: the garden plots' picket fence and the industrial and solar plots'
+chain link (`ParcelKit._fence_run`). Attribution lines:
+
+- "The fence is white / Забор белый (Low poly)" by marishka1611 (https://sketchfab.com/marishka1611), CC BY 4.0, via Sketchfab.
+- "Chain Link Fence - A Classic Landscape Element" by wojteX (https://sketchfab.com/wojteX), CC BY 4.0, via Sketchfab.
