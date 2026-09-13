@@ -4,6 +4,7 @@
 [ext_resource type="Shader" path="res://addons/sky_3d/shaders/AtmFog.gdshader" id="2_pl7qg"]
 [ext_resource type="Shader" path="res://assets/shaders/lake.gdshader" id="3_yy4vj"]
 [ext_resource type="Script" path="res://scripts/world/runtime_shaders.gd" id="4_ehb51"]
+[ext_resource type="Shader" path="res://assets/shaders/roof_ortho.gdshader" id="4_pl7qg"]
 
 [sub_resource type="Shader" id="Shader_3dlvk"]
 code = "
@@ -704,7 +705,13 @@ albedo_color = Color(0.6, 0.65, 0.7, 1)
 roughness = 0.9
 metadata/_gltf_primary_texture_coord = 0
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_yy4vj"]
+render_priority = 0
+shader = ExtResource("4_pl7qg")
+shader_parameter/origin = Vector2(0, 0)
+shader_parameter/extent = 1024.0
+
 [resource]
 script = ExtResource("4_ehb51")
-materials = Array[Material]([SubResource("ShaderMaterial_y7uat"), SubResource("ShaderMaterial_acdkg"), SubResource("ShaderMaterial_8jm1x"), SubResource("StandardMaterial3D_07ybk"), SubResource("StandardMaterial3D_1skor"), SubResource("StandardMaterial3D_sn2gk"), SubResource("StandardMaterial3D_31y44"), SubResource("StandardMaterial3D_grbn6"), SubResource("StandardMaterial3D_gr5vn"), SubResource("StandardMaterial3D_wklpl"), SubResource("StandardMaterial3D_tq6il"), SubResource("StandardMaterial3D_pg7b7"), SubResource("StandardMaterial3D_p4xqd"), SubResource("StandardMaterial3D_511oo"), SubResource("ShaderMaterial_7nl3r"), SubResource("ShaderMaterial_hkq5m"), SubResource("StandardMaterial3D_1ympl")])
-sources = PackedStringArray("kvissentali: MeshInstance3D MouseQuad", "kvissentali: sky", "kvissentali: MeshInstance3D _FogMeshI", "kvissentali: MeshInstance3D Detail_chimney", "kvissentali: MeshInstance3D @MeshInstance3D@1119", "kvissentali: MeshInstance3D @MeshInstance3D@1119", "kvissentali: MeshInstance3D @MeshInstance3D@1132", "kvissentali: MeshInstance3D bus_stop_bus_stop_material_0", "kvissentali: MeshInstance3D @MeshInstance3D@603", "kvissentali: MeshInstance3D Merged", "kvissentali: MeshInstance3D Merged", "kvissentali: MeshInstance3D Merged", "kvissentali: MeshInstance3D body", "kvissentali: MeshInstance3D Human_male_casualsuit05_export", "kvissentali: MeshInstance3D Surface", "kvissentali: Terrain3D", "palupera: MeshInstance3D Human_male_elegantsuit01_export")
+materials = Array[Material]([SubResource("ShaderMaterial_y7uat"), SubResource("ShaderMaterial_acdkg"), SubResource("ShaderMaterial_8jm1x"), SubResource("StandardMaterial3D_07ybk"), SubResource("StandardMaterial3D_1skor"), SubResource("StandardMaterial3D_sn2gk"), SubResource("StandardMaterial3D_31y44"), SubResource("StandardMaterial3D_grbn6"), SubResource("StandardMaterial3D_gr5vn"), SubResource("StandardMaterial3D_wklpl"), SubResource("StandardMaterial3D_tq6il"), SubResource("StandardMaterial3D_pg7b7"), SubResource("StandardMaterial3D_p4xqd"), SubResource("StandardMaterial3D_511oo"), SubResource("ShaderMaterial_7nl3r"), SubResource("ShaderMaterial_hkq5m"), SubResource("StandardMaterial3D_1ympl"), SubResource("ShaderMaterial_yy4vj")])
+sources = PackedStringArray("kvissentali: MeshInstance3D MouseQuad", "kvissentali: sky", "kvissentali: MeshInstance3D _FogMeshI", "kvissentali: MeshInstance3D Detail_chimney", "kvissentali: MeshInstance3D @MeshInstance3D@1119", "kvissentali: MeshInstance3D @MeshInstance3D@1119", "kvissentali: MeshInstance3D @MeshInstance3D@1132", "kvissentali: MeshInstance3D bus_stop_bus_stop_material_0", "kvissentali: MeshInstance3D @MeshInstance3D@603", "kvissentali: MeshInstance3D Merged", "kvissentali: MeshInstance3D Merged", "kvissentali: MeshInstance3D Merged", "kvissentali: MeshInstance3D body", "kvissentali: MeshInstance3D Human_male_casualsuit05_export", "kvissentali: MeshInstance3D Surface", "kvissentali: Terrain3D", "palupera: MeshInstance3D Human_male_elegantsuit01_export", "kvissentali: MeshInstance3D @MeshInstance3D@148")

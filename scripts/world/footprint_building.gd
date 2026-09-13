@@ -680,6 +680,7 @@ static var _detail: Dictionary = {}   # kind -> [Mesh, Material]
 
 static func release_details() -> void:
 	_detail.clear()
+	_photo_roofs.clear()   # a tile's photograph is 20 MB: none outlives the world
 
 
 func _detail_mesh(kind: String) -> MeshInstance3D:
@@ -788,7 +789,77 @@ func _wall_material() -> StandardMaterial3D:
 	return _textured("plaster", wall_color.lightened(0.05), 0.6)
 
 
-func _roof_material() -> StandardMaterial3D:
+static var photo_roofs := true   # roofs wear the tile's orthophoto (playtest 2026-09-13); the world's --plain-roofs turns it off
+const PHOTO_ROOF_PX := 2048    # the photograph a roof samples, per tile: 50 cm a pixel over 1024 m
+static var _photo_roofs: Dictionary = {}   # pack id -> ShaderMaterial, or null where the tile has no photograph
+
+
+## The roof as the tile's orthophoto shows it: one material per tile projecting the photograph straight
+## down onto every roof face by its world position. An orthophoto is not a true orthophoto: a tall
+## building leans away from the camera in it, so its roof edge can carry a strip of street or wall.
+func _photo_roof() -> Material:
+	var pack := Sites.pack_of(self)
+	if not _photo_roofs.has(pack):
+		_photo_roofs[pack] = _make_photo_roof(pack, _tile_origin())
+	return _photo_roofs[pack]
+
+
+## Whether this roof takes the photograph: a roof without a measured shape does - an extruded footprint,
+## or a roof fitted to the laser points (its lod2 carries "roof"). A city's own LOD2 model keeps the
+## register's colours: its many steep facets smear the photograph into streaks (Rīga, 2026-09-13).
+func _photo_suits() -> bool:
+	var m := _model()
+	return m.is_empty() or m.has("roof")
+
+
+## The world position of the tile this building stands on: a streamed tile's root, else the origin.
+func _tile_origin() -> Vector3:
+	var n: Node = self
+	while n:
+		if n.has_meta("pack_id") and n is Node3D:
+			return (n as Node3D).global_position
+		n = n.get_parent()
+	return Vector3.ZERO
+
+
+static func _make_photo_roof(pack: String, origin: Vector3) -> Material:
+	var dir := Sites.tile_dir_of(pack)
+	var text := FileAccess.get_file_as_string(dir + "/terrain_meta.json")
+	var meta = JSON.parse_string(text) if text != "" else null
+	if typeof(meta) != TYPE_DICTIONARY:
+		return null
+	var path := dir + "/" + str(meta.get("texture", "ortho.jpg"))
+	var img: Image = null
+	if path.begins_with("res://") and ResourceLoader.exists(path):
+		var tex = load(path)   # a shipped tile: the imported texture (an exported game has no .jpg)
+		if tex is Texture2D:
+			img = (tex as Texture2D).get_image()
+	if img == null and FileAccess.file_exists(path):
+		img = Image.load_from_file(path)   # a downloaded tile
+	if img == null or img.is_empty():
+		print("[roofs] %s: no photograph at %s, the register's colours" % [pack, path])
+		return null
+	if img.is_compressed():
+		img.decompress()
+	# the tile you stand on keeps its photograph whole (25 cm a pixel, 85 MB with mipmaps): at half that
+	# the nearest roofs read soft from the air; a streamed neighbour, seen from further, takes half
+	var px := img.get_width() if pack == Sites.active else PHOTO_ROOF_PX
+	if img.get_width() > px:
+		img.resize(px, px, Image.INTERPOLATE_BILINEAR)
+	img.generate_mipmaps()
+	var m := ShaderMaterial.new()
+	m.shader = preload("res://assets/shaders/roof_ortho.gdshader")
+	m.set_shader_parameter("photo", ImageTexture.create_from_image(img))
+	m.set_shader_parameter("origin", Vector2(origin.x, origin.z))
+	m.set_shader_parameter("extent", float(meta.get("size_m", 1024)))
+	return m
+
+
+func _roof_material() -> Material:
+	if photo_roofs and _photo_suits():
+		var photo := _photo_roof()
+		if photo:
+			return photo
 	var r := roof_cover.to_lower()
 	if "kivi" in r:
 		return _textured("rooftiles", roof_color.lightened(0.35), 0.7, 0.8)

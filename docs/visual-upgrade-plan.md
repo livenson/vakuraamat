@@ -46,6 +46,14 @@ screenshot; 2 because the user named trees as the worst; 3–6 as time allows.
   MultiMeshes, merged far-view building cells, footprint occluders, MetalFX/FSR2 at 0.75, no PCSS sun,
   half-resolution SDFGI. Toomemägi street draw calls 5600 -> ~1100-2200, median frame 14.5 -> 12.4 ms.
   Next: ground-level GPU (SSIL/SSAO quality), a graphics settings panel, the 1 s turn hitch
+- [x] 9 photo roofs (2026-09-13, playtest: "if there is no shape info about roofs, project from the
+  orthophoto"): a roof without a measured LOD2 model - an extruded footprint or a roof fitted to the
+  laser - wears the tile's orthophoto, projected straight down (`assets/shaders/roof_ortho.gdshader`,
+  one material per tile: the active tile's photograph whole, a streamed one's at 2048 px). Steep faces
+  take the photograph blurred to ~8 m, so a slope shows its colour without streaks. LOD2 models (Rīga's,
+  Maa-amet's) keep the register's colours: their many facets smeared it. `--plain-roofs` for before/after.
+  Every Finnish roof and Latvia's fitted roofs change; Helsinki from the air 89-96 fps, Rīga 113 fps.
+  Left: the photograph is not a true orthophoto, so a tall building's roof edge can carry a strip of wall.
 
 ## Result
 

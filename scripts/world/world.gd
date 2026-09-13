@@ -52,6 +52,10 @@ func _ready() -> void:
 		if a.begins_with("--screenshot="):
 			player.input_enabled = false   # deterministic captures: no mouse motion while the ground builds
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		elif a == "--plain-roofs":
+			# the register's roof colours instead of the photograph (before/after checks): read before the
+			# layer builds its first building, which the flags below come too late for
+			FootprintBuilding.photo_roofs = false
 	if (terrain.data == null or terrain.data.region_locations.is_empty()) and TerrainBuilder.has_inputs(tile_dir):
 		await _build_terrain(tile_dir)   # downloaded tile: inputs present, region data not yet built
 	if terrain.data == null or terrain.data.region_locations.is_empty():

@@ -131,7 +131,9 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   `--focus=<tunnus>` (or `--open=focus:<tunnus>`) lights a plot and everything the registers tie it to,
   `--open=hover:<tunnus>` holds the debug map's slip open over one plot,
   `--hour=<h>` sets the time of day (street lights and windows light after
-  18:30), `--fly` starts in the air for a survey.
+  18:30), `--fly` starts in the air for a survey (with `--spawn=x,z,yaw,height,pitch` it stays at that
+  height), `--plain-roofs` draws roofs in the register's colours instead of the tile's photograph
+  (`FootprintBuilding.photo_roofs`; roofs without a measured LOD2 model wear the photograph).
 - Performance numbers: `--bench` (with `--windowed --site=<id>`) turns once at street level, walks at the
   nearest building (the summary's `moved_m`, `to_centre_m`, `above_ground_m` and `user://logs/bench_walk.png`
   show that floors and walls still hold the player), flies 2 km
