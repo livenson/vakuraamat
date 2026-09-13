@@ -35,7 +35,7 @@ MENU_LANGUAGE,Keel / Language,Keel / Language,Valoda / Language
 MENU_FULLSCREEN,Täisekraan,Fullscreen,Pilnekrāns
 MENU_ON,sees,on,ieslēgts
 MENU_OFF,väljas,off,izslēgts
-MENU_CREDIT,"Kaardiandmed: Maa- ja Ruumiamet 2026; Läti: LĢIA, VZD","Map data: Maa- ja Ruumiamet 2026; Latvia: LĢIA, VZD","Kartes dati: Maa- ja Ruumiamet 2026; Latvija: LĢIA, VZD"
+MENU_CREDIT,"Kaardiandmed: Maa- ja Ruumiamet 2026; Läti: LĢIA, VZD; Soome: Maanmittauslaitos, Tilastokeskus","Map data: Maa- ja Ruumiamet 2026; Latvia: LĢIA, VZD; Finland: Maanmittauslaitos, Tilastokeskus","Kartes dati: Maa- ja Ruumiamet 2026; Latvija: LĢIA, VZD; Somija: Maanmittauslaitos, Tilastokeskus"
 UI_CODEX,Mis on tõsi,What's real,Kas ir patiess
 FARM_PLOT,Peenar,Plot,Dobe
 FARM_PLANT,Külva,Sow,Sēt

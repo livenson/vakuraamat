@@ -392,7 +392,7 @@ class Finland(DataSource):
     name = "Finland (Maanmittauslaitos, Helsinki)"
     label = "Maanmittauslaitos"
     crs = 3301
-    bbox = (249000, 6630000, 886000, 7791000)
+    bbox = (249000, 6600000, 886000, 7791000)   # south to Utö and Bogskär, below the outline's skerries
     outline = "finland.json"
     own_tile = True
     attribution = "Map data: Maanmittauslaitos (National Land Survey of Finland)"

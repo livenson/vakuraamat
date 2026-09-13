@@ -238,8 +238,10 @@ To do:
      and Valka are Latvia, and the open Gulf of Finland is nobody's.
    - **Ground.** `fetch_tile_fi.build_tile`: the ground, the canopy, the orthophoto and the
      meta, as above. `add_history` does the older photographs for the refine pass.
-   - **Outline.** `fetch_outline.py --country fi` writes `assets/data/finland.json` (73 rings,
-     20 kB).
+   - **Outline.** `fetch_outline.py --country fi --min-island 40` writes
+     `assets/data/finland.json` (19 rings, 14 kB). The archipelago's many small islands inked the
+     south-west coast black on the menu map; the skerries are still Finnish through the
+     orthophoto-sheet test. The menu's credit line names Maanmittauslaitos and Statistics Finland.
    - **Dependencies.** `laspy` and `lazrs` in `tools/service/requirements.txt` and the sidecar
      spec.
    - **Service.** `Finland.registers` raises until step 2, so the menu cannot make a Finnish place
