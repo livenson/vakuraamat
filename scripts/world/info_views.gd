@@ -147,13 +147,11 @@ func _fills(rows: Array, poly: PackedVector2Array, k: float) -> Array:
 ## Every unit's companies (tenants.json, exact matches), by cadastral number.
 func _rows_by_tunnus(pack: String) -> Dictionary:
 	var rows := {}
-	var path := Sites.path_in(pack, "tenants.json")
-	if FileAccess.file_exists(path):
-		var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
-		if typeof(parsed) == TYPE_DICTIONARY:
-			for t in parsed.get("tenants", []):
-				if t.get("match") == "exact" and t.get("tunnus") != null:
-					rows.get_or_add(str(t.tunnus), []).append(t)
+	var parsed = PackFiles.json(pack, "tenants.json")
+	if typeof(parsed) == TYPE_DICTIONARY:
+		for t in parsed.get("tenants", []):
+			if t.get("match") == "exact" and t.get("tunnus") != null:
+				rows.get_or_add(str(t.tunnus), []).append(t)
 	return rows
 
 

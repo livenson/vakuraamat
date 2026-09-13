@@ -26,11 +26,9 @@ var _timer := 0.0
 
 func _ready() -> void:
 	pack = Sites.pack_of(self)
-	var path := Sites.path_in(pack, "stops.json")
-	if FileAccess.file_exists(path):
-		var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
-		if typeof(parsed) == TYPE_DICTIONARY:
-			_stops = parsed.get("stops", [])
+	var parsed = PackFiles.json(pack, "stops.json")   # the shelters' copy: read-only
+	if typeof(parsed) == TYPE_DICTIONARY:
+		_stops = parsed.get("stops", [])
 	var n := Departures.routes(pack).size()
 	if n > 0:
 		print("[buses] %s: %d routes on the timetable" % [pack, n])

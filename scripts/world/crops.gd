@@ -24,10 +24,7 @@ static var _meshes: Dictionary = {}   # kind -> ArrayMesh (shared between tiles)
 
 ## Plant every field of `pack` under `root`, sampling the ground of `terrain`.
 static func place(pack: String, root: Node3D, terrain: Terrain3D) -> void:
-	var path := Sites.path_in(pack, "fields_2026.json")
-	if not FileAccess.file_exists(path):
-		return
-	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed = PackFiles.json(pack, "fields_2026.json")   # the farm kits' copy: read-only
 	if typeof(parsed) != TYPE_DICTIONARY or not parsed.has("fields"):
 		return
 	var crops := Crops.new()

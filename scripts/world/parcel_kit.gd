@@ -276,10 +276,7 @@ func _bench(at: Vector3, yaw: float) -> void:
 ## field's edge (Sketchfab models, CC BY). Nothing where the register declares no field (forest).
 func _farm() -> void:
 	var pack := Sites.pack_of(self)
-	var path := Sites.path_in(pack, "fields_2026.json")
-	if not FileAccess.file_exists(path):
-		return
-	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed = PackFiles.json(pack, "fields_2026.json")   # once per pack, not once per farmed unit
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return
 	var rng := RandomNumberGenerator.new()

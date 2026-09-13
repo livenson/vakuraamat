@@ -13,12 +13,11 @@ static func of(pack: String, tunnus: String) -> Array:
 	var path := Sites.path_in(pack if pack != "" else Sites.active, "tenants.json")
 	if not _cache.has(path):
 		var by_tunnus := {}
-		if FileAccess.file_exists(path):
-			var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
-			if typeof(parsed) == TYPE_DICTIONARY:
-				for t in parsed.get("tenants", []):
-					if t.get("match") == "exact" and t.get("tunnus") != null:
-						by_tunnus.get_or_add(str(t.tunnus), []).append(t)
+		var parsed = PackFiles.json(pack, "tenants.json")   # one parse shared with Links and the maps
+		if typeof(parsed) == TYPE_DICTIONARY:
+			for t in parsed.get("tenants", []):
+				if t.get("match") == "exact" and t.get("tunnus") != null:
+					by_tunnus.get_or_add(str(t.tunnus), []).append(t)
 		_cache[path] = by_tunnus
 	return _cache[path].get(tunnus, [])
 

@@ -88,8 +88,7 @@ func _ready() -> void:
 	streamer = TileStreamer.new()
 	streamer.name = "Tiles"
 	add_child(streamer)
-	# a tile leaving takes its roof photograph and LOD2 models with it (the tile's entry is still there)
-	streamer.tile_unloaded.connect(func(loc: Vector2i): FootprintBuilding.forget_pack(str(streamer.tiles.get(loc, {}).get("pack", ""))))
+	streamer.tile_unloaded.connect(_forget_tile)
 	streamer.setup(self)
 	fade.color.a = 1.0
 	await get_tree().process_frame
@@ -283,6 +282,19 @@ func _exit_tree() -> void:
 	Pitches.release()
 	RoadNetwork.release()
 	StreetFurniture.release()
+	PlotHistory.forget()   # a decoded tile photograph is 48 MB
+
+
+## A tile leaving takes its roof photograph, LOD2 models, parsed pack files, road graph and decoded
+## plot photographs with it. Its entry in streamer.tiles is still there when tile_unloaded fires.
+func _forget_tile(loc: Vector2i) -> void:
+	var pack := str(streamer.tiles.get(loc, {}).get("pack", ""))
+	if pack == "":
+		return
+	FootprintBuilding.forget_pack(pack)
+	PackFiles.forget_pack(pack)
+	RoadGraph.forget_pack(pack)
+	PlotHistory.forget_pack(pack)
 
 
 func _process(_delta: float) -> void:

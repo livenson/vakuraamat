@@ -123,16 +123,15 @@ static func _owner_index(pack: String) -> Dictionary:
 	if _owners.has(path):
 		return _owners[path]
 	var index := {}
-	if FileAccess.file_exists(path):
-		var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
-		if typeof(parsed) == TYPE_DICTIONARY:
-			for t in parsed.get("tenants", []):
-				if t.get("match") != "exact" or t.get("tunnus") == null:
-					continue
-				for h in t.get("owners", []):
-					var group: Array = index.get_or_add(str(h), [])
-					if not group.has(str(t.tunnus)):
-						group.append(str(t.tunnus))
+	var parsed = PackFiles.json(pack, "tenants.json")   # Tenants' copy: read-only
+	if typeof(parsed) == TYPE_DICTIONARY:
+		for t in parsed.get("tenants", []):
+			if t.get("match") != "exact" or t.get("tunnus") == null:
+				continue
+			for h in t.get("owners", []):
+				var group: Array = index.get_or_add(str(h), [])
+				if not group.has(str(t.tunnus)):
+					group.append(str(t.tunnus))
 	_owners[path] = index
 	return index
 

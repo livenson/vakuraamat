@@ -34,6 +34,10 @@ func forget_caches() -> void:
 	Links.forget()
 	Departures.forget()
 	PlaceSearch.forget()
+	PackFiles.forget()
+	RoadGraph.forget()
+	BookPanel.forget_credits()
+	PlotHistory.forget()
 
 
 ## (Re)load the registries from the active site pack.

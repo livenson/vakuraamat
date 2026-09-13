@@ -24,7 +24,7 @@ var _off := Bench.is_off("traffic")
 
 func _ready() -> void:
 	var pack := Sites.pack_of(self)
-	graph = RoadGraph.from_pack(pack)
+	graph = RoadGraph.shared(pack)   # the street furniture's traffic lights stand on the same one
 	signals = TrafficSignals.of(pack, graph)
 	_rng.seed = hash(pack) + year
 	TrafficAgent.warm()

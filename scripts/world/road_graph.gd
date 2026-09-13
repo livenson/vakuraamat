@@ -10,8 +10,36 @@ var node_edges: Dictionary = {}       # node id -> Array[int]
 var _nodes: PackedVector2Array = PackedVector2Array()
 var _node_cells: Dictionary = {}      # Vector2i (1 m cell) -> Array[int] node ids: _node without a scan of every node
 var _cells: Dictionary = {}           # Vector2i (CELL) -> Array[int] edge ids by midpoint
+static var _shared: Dictionary = {}   # pack id -> RoadGraph (shared)
 
 
+## The one graph of a pack's roads.json, built on first use: the traffic and the street furniture's
+## traffic lights both walk it (TrafficSignals needs their node ids to agree anyway). Read-only for
+## its users; a caller that wants to change a graph makes its own with from_pack.
+static func shared(pack: String = "") -> RoadGraph:
+	var key := pack if pack != "" else Sites.active
+	if not _shared.has(key):
+		var t0 := Time.get_ticks_usec()
+		var g := RoadGraph.new()
+		var parsed = PackFiles.json(key, "roads.json")
+		if typeof(parsed) == TYPE_DICTIONARY:
+			g.build(parsed.get("roads", []))
+		_shared[key] = g
+		PerfLog.mark("road graph %s: %d edges in %d ms" % [key, g.edges.size(), (Time.get_ticks_usec() - t0) / 1000])
+	return _shared[key]
+
+
+## Every shared graph (GameState.forget_caches): a refreshed pack's roads are read again.
+static func forget() -> void:
+	_shared.clear()
+
+
+## One pack's shared graph (World, when its streamed tile leaves).
+static func forget_pack(pack: String) -> void:
+	_shared.erase(pack)
+
+
+## A graph of its own, parsed from the file: for a caller that builds on it or must not share.
 static func from_pack(pack: String = "") -> RoadGraph:
 	var g := RoadGraph.new()
 	var text := FileAccess.get_file_as_string(Sites.path_in(pack if pack != "" else Sites.active, "roads.json"))

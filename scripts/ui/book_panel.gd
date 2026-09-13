@@ -572,7 +572,9 @@ func _fill_values(body: Node) -> void:
 
 ## Every "attribution" line the pack's data files carry, once each: the credits THIRD_PARTY.md says
 ## the game owes (the bus stops' OpenStreetMap credit is an ODbL condition), from the files that
-## drew on each source. The tile's measured trees credit theirs as "source".
+## drew on each source. The tile's measured trees credit theirs as "source". Each file is parsed
+## once a session and only its credit lines are kept (`_credit_lines`): buildings.json alone is
+## 9 MB on a city tile, too much to parse again on every page turn or to hold whole for a sentence.
 func _attributions() -> Array:
 	var seen := {}
 	var files := ["parcels.json", "buildings.json", "tenants.json", "roads.json", "market.json",
@@ -581,14 +583,24 @@ func _attributions() -> Array:
 	paths.append([Sites.tile_dir() + "/trees.json", "source"])
 	paths.append([Sites.tile_dir() + "/trees_osm.json", "source"])
 	for pk in paths:
-		if not FileAccess.file_exists(pk[0]):
-			continue
-		var parsed = JSON.parse_string(FileAccess.get_file_as_string(pk[0]))
-		if typeof(parsed) != TYPE_DICTIONARY:
-			continue
-		for line in _lines_of(parsed.get(pk[1], "")):
+		if not _credit_lines.has(pk[0]):
+			var lines: Array = []
+			if FileAccess.file_exists(pk[0]):
+				var parsed = JSON.parse_string(FileAccess.get_file_as_string(pk[0]))
+				if typeof(parsed) == TYPE_DICTIONARY:
+					lines = _lines_of(parsed.get(pk[1], ""))
+			_credit_lines[pk[0]] = lines
+		for line in _credit_lines[pk[0]]:
 			seen[line] = true
 	return seen.keys()
+
+
+static var _credit_lines: Dictionary = {}   # data file path -> its credit lines, read once a session
+
+
+## The credit lines read so far (GameState.forget_caches): a refreshed pack may credit other sources.
+static func forget_credits() -> void:
+	_credit_lines.clear()
 
 
 ## An "attribution" field as lines. The files write it three ways: one string, a list of them, or a

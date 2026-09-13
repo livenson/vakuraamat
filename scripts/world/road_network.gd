@@ -38,8 +38,7 @@ const LAMP_HEIGHT := 6.0
 
 
 func _ready() -> void:
-	var text := FileAccess.get_file_as_string(Sites.path_in(Sites.pack_of(self), source))
-	var parsed = JSON.parse_string(text) if text != "" else null
+	var parsed = PackFiles.json(Sites.pack_of(self), source)   # shared with the road graph: read-only
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return
 	roads = parsed.get("roads", [])   # nearest() and the codes overlay read these from the start
@@ -495,10 +494,7 @@ const STOP_MODELS := {"rural": "res://assets/vendor/sketchfab/bus_stop_rural.glb
 ## modern one on streets; the timetable board is readable (E) with the stop's name and lines.
 func _bus_stops(terrain: Terrain3D) -> bool:
 	var pack := Sites.pack_of(self)
-	var path := Sites.path_in(pack, "stops.json")
-	if not FileAccess.file_exists(path):
-		return true
-	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed = PackFiles.json(pack, "stops.json")   # the buses read the same copy
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return true
 	var scenes := {}

@@ -174,7 +174,7 @@ func _signals(pack: String) -> void:
 	var data := StreetData.of(pack)
 	if data.get("signals", []).is_empty():
 		return
-	var graph := RoadGraph.from_pack(pack)
+	var graph := RoadGraph.shared(pack)   # the traffic's graph: its node ids are the signals' keys
 	var ts := TrafficSignals.of(pack, graph)
 	for node: int in ts.junctions:
 		var j: Dictionary = ts.junctions[node]
