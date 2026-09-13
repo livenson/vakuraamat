@@ -163,8 +163,23 @@ def mtk_buildings(box, cache):
                 except Exception as e:  # noqa: BLE001 - an older year, or no sheet (the sea)
                     log(f"topographic database {name} ({year}): {e}")
         if os.path.exists(local):
-            rows = geo.features(f"/vsizip/{local}/r_{name}_p.shp", bbox=box)
-            out += [(p, g) for p, g in rows if g is not None and str(p.get("LUOKKA", ""))[:3] == "422"]
+            # the building layer unpacked beside the zip: read inside it, GDAL tried to write the layer's .shx
+            # back into the zip (SHAPE_RESTORE_SHX, which the sheet indexes need, is set for the process) and
+            # the read failed ("Error opening file .../r_M4211R_p.shx for writing"; Tampere, 2026-09-13)
+            import zipfile
+            layer = f"r_{name}_p"
+            d = os.path.join(cache, name)
+            shp = os.path.join(d, layer + ".shp")
+            if not os.path.exists(shp):
+                os.makedirs(d, exist_ok=True)
+                with zipfile.ZipFile(local) as z:
+                    for member in z.namelist():
+                        if os.path.basename(member).startswith(layer + "."):
+                            with z.open(member) as src, open(os.path.join(d, os.path.basename(member)), "wb") as dst:
+                                dst.write(src.read())
+            if os.path.exists(shp):
+                rows = geo.features(shp, bbox=box)
+                out += [(p, g) for p, g in rows if g is not None and str(p.get("LUOKKA", ""))[:3] == "422"]
     log(f"topographic database: {len(out)} building polygons under the tile")
     return out
 

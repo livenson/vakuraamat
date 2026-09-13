@@ -301,6 +301,19 @@ To do:
      - Ryhti marks 204 of the 374 central buildings "Tyhjillään" (vacant). It is the register's
        field, so `status` keeps it.
      - The split-pulse test takes the Alexander II statue for a tree.
+   - **Outside Helsinki (Tampere, 2026-09-13).** The first world made from the menu outside
+     Helsinki failed. Read inside its zip, the topographic sheet's building layer made GDAL try to
+     write `r_<sheet>_p.shx` back into the zip, because `SHAPE_RESTORE_SHX`, set for the sheet
+     indexes, holds for the whole process. The layer's files are now unpacked beside the zip and
+     read from disk.
+     - Tampere's tile: 307 buildings on the topographic footprints, from two sheets. 219 have a
+       Ryhti record, 208 are dated, 60 have pitched roofs. 295 plots, none with a zoning class,
+       which only Helsinki publishes.
+     - Of the 450 Ryhti points under the box, 280 stand in a footprint. Only 16 in the tile miss
+       every footprint, 10 of them by under 5 m. About 127 fall in a footprint another point
+       already took: the topographic database draws joined buildings (row-house parts, blocks) as
+       one outline. The larger building keeps the outline and the others have no footprint of their
+       own.
 3. **Companies and money.** Done 2026-09-13 (`tools/pipeline/fetch_tenants_fi.py`, a stage of the
    service's Finnish job):
    - **Register.** PRH's daily bulk, one 1.45 GB JSON array in a 96 MB zip, is streamed once per
