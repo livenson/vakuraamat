@@ -271,6 +271,9 @@ def run_job(job):
             stops_thread.join(60)
             if stops_thread.is_alive():
                 log(f"{sid}: bus stops still queued at Overpass; the pack goes without them")
+        stage("sports pitches (OpenStreetMap)", 0.668)
+        import fetch_pitches   # every country: the goals, nets and hoops the game stands on them
+        run(f"{sid}: pitches", 120, fetch_pitches.fetch, sid, root=ws)
         stage("buildings, water, boats, anchors", 0.67)
         _, _, anchors = extract_features.extract(sid, root=ws)
         stage("layout", 0.7)

@@ -264,6 +264,7 @@ func _exit_tree() -> void:
 	BuildingDoor.release()
 	ParcelKit.release()
 	FootprintBuilding.release_details()
+	Pitches.release()
 
 
 func _process(_delta: float) -> void:
@@ -597,6 +598,7 @@ func _push_out_of_buildings(layer: Node) -> void:
 ## carves its basin into the terrain and keeps its fish (Pond).
 func place_water(pack: String, root: Node3D) -> void:
 	Crops.place(pack, root, terrain)   # farmed fields (fields_2026.json) get their crops with the water
+	Pitches.place(pack, root, terrain)   # sports pitches (pitches.json): goals, nets and hoops
 	var rel := str(Sites.manifest_for(pack).get("water", ""))
 	if rel == "" or not FileAccess.file_exists(Sites.path_in(pack, rel)):
 		return

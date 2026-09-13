@@ -54,6 +54,12 @@ screenshot; 2 because the user named trees as the worst; 3–6 as time allows.
   Maa-amet's) keep the register's colours: their many facets smeared it. `--plain-roofs` for before/after.
   Every Finnish roof and Latvia's fitted roofs change; Helsinki from the air 89-96 fps, Rīga 113 fps.
   Left: the photograph is not a true orthophoto, so a tall building's roof edge can carry a strip of wall.
+- [x] 10 sports pitches (2026-09-13, playtest in Rovaniemi: "this looks like a football pitch, can you
+  detect from data and add it?"): OpenStreetMap's `leisure=pitch` per tile (`fetch_pitches.py`, every
+  country, a stage of the tile service) into `pitches.json`; `scripts/world/pitches.gd` stands goals at
+  a football pitch's short ends (7.32 m on a full pitch, 5 or 3 m on smaller ones), a net across tennis
+  and volleyball courts and a hoop at each end of a basketball court, from shared boxes and cylinders.
+  Rovaniemi's 110 x 66 m pitch has its two goals on the painted lines.
 
 ## Result
 
