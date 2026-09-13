@@ -9,7 +9,7 @@ SITE ?= palupera
 TILE ?= $(shell python3 -c "import json;print(json.load(open('sites/$(SITE)/site.json'))['terrain']['tile'])")
 CENTER ?= $(shell python3 -c "import json;print(*json.load(open('sites/$(SITE)/site.json'))['terrain']['center'])")
 
-.PHONY: help setup import tile scatter trees props test lint export clean-generated site era-maps features scenes validate tile-service buildings real-trees dev-watch parcels roads market tenants stops departures mcp branding service shaders
+.PHONY: help setup import tile scatter trees props test lint export clean-generated site era-maps features scenes validate tile-service buildings real-trees dev-watch parcels roads market tenants stops departures osm pitches mcp branding service shaders
 
 help:
 	@echo "make setup            install tools (Homebrew: godot, blender, uv, git-lfs), the pipeline's Python venv (.venv-service), pull LFS files, first Godot import"
@@ -30,6 +30,8 @@ help:
 	@echo "make shaders          collect the materials built in code into assets/materials/runtime_shaders.tres for the export's shader baker (opens a window)"
 	@echo "make tenants          match e-Business Register companies to the tile's parcels and buildings into sites/$(SITE)/tenants.json, with the register's general data and the Tax Board's quarters (first run downloads ~460 MB into data_raw/, cached a week)"
 	@echo "make stops            bus stops from OpenStreetMap snapped to the ETAK roads into sites/$(SITE)/stops.json"
+	@echo "make osm              OpenStreetMap's street furniture, barriers, rails, shops and single trees into sites/$(SITE)/street.json, rail.json, pois.json and the tile's trees_osm.json (from the Geofabrik extract when osmium is installed, else Overpass; cached a week)"
+	@echo "make pitches          OpenStreetMap's sports pitches into sites/$(SITE)/pitches.json"
 	@echo "make departures       the real lines and departure times at those stops from the public transport register's GTFS into sites/$(SITE)/departures.json (first run downloads 52 MB into data_raw/, cached a week)"
 	@echo "make mcp              build the Sketchfab MCP server for Claude Code (tools/mcp, token in sketchfab.token)"
 	@echo "make market           derive sites/$(SITE)/market.json (land value medians per purpose; XLSX=<maa-amet export> joins transaction statistics)"
@@ -54,6 +56,12 @@ import:
 
 stops:                          # bus stops from OpenStreetMap snapped to the ETAK roads (sites/<id>/stops.json)
 	$(PYTHON) tools/pipeline/fetch_stops.py --site $(SITE)
+
+osm:                            # OpenStreetMap's street layers (sites/<id>/street.json, rail.json, pois.json, the tile's trees_osm.json)
+	$(PYTHON) tools/pipeline/fetch_osm.py --site $(SITE)
+
+pitches:                        # OpenStreetMap's sports pitches (sites/<id>/pitches.json)
+	$(PYTHON) tools/pipeline/fetch_pitches.py --site $(SITE)
 
 departures:                     # real lines and times at those stops from the register's GTFS (sites/<id>/departures.json)
 	$(PYTHON) tools/pipeline/fetch_departures.py --site $(SITE) $(if $(REFRESH),--refresh)

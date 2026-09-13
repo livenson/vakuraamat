@@ -26,7 +26,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #      so allotment strips no longer fence themselves off one beside the other
 #   3: company health reads a blank Tax Board amount as unpublished, not as zero (municipal
 #      kindergartens and schools were "distressed"), and payroll taxes count as taxes paid
-PACK_VERSION = 3
+#   4: OpenStreetMap's street furniture, barriers, shops with their opening hours, rails and single
+#      trees (fetch_osm.py: street.json, pois.json, rail.json, the tile's trees_osm.json)
+PACK_VERSION = 4
 sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar
@@ -47,6 +49,25 @@ def lv_text(row, name, country):
              "CODEX_DATA_TITLE": "Dati"}
     if key.endswith("_SUBTITLE"):
         return f"{name}: īsta zeme, īstas vērtības."
+    if key.startswith("SITE_"):
+        return name
+    return table.get(key, en)
+
+
+def fi_text(row, name, country):
+    """The Finnish column of a scaffold string ("fi" for the header), as lv_text does the Latvian."""
+    key, en = row[0], row[2]
+    if key == "keys":
+        return "fi"
+    import sources
+    codex = sources.by_id(country).codex(name)
+    if key in codex and "fi" in codex[key]:
+        return codex[key]["fi"]
+    table = {"ERA_2026_NAME": "Vuosi 2026", "LOC_LANDMARK": "Maamerkki", "LOC_FARMSTEAD": "Tila",
+             "EX_LANDMARK_2026": f"{name}: kirjasi alkaa täältä.", "CODEX_REAL_TITLE": "Totta", "CODEX_INVENTED_TITLE": "Keksittyä",
+             "CODEX_DATA_TITLE": "Tiedot"}
+    if key.endswith("_SUBTITLE"):
+        return f"{name}: todellinen maa, todelliset arvot."
     if key.startswith("SITE_"):
         return name
     return table.get(key, en)
@@ -302,7 +323,7 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
     with open(os.path.join(site_dir, "strings.csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f, lineterminator="\n")
         for r in rows:
-            w.writerow(r + [lv_text(r, name, country)])
+            w.writerow(r + [lv_text(r, name, country), fi_text(r, name, country)])
     for fn in ("buildings_2026.json", "water_2026.json"):
         p = os.path.join(site_dir, fn)
         if not os.path.exists(p):

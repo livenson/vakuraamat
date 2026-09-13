@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""A tile's rivers and lakes as the cadastre draws them, cleared of what the flights caught on them.
+"""A tile's rivers, lakes and sea, cleared of what the flights caught on them.
 
     python3 tools/pipeline/water_parcels.py --site riga_vecpilseta [--raw-dir data_raw]
+    python3 tools/pipeline/water_parcels.py --site helsinki_senaatintori --by-level --keep-small
 
 The orthophoto is the ground's colour, and a river is ground like any other: the cruise ships moored
 along Rīga's embankment on the day of the flight were painted on the Daugava (playtest report
@@ -16,6 +17,14 @@ of it at one level; a stream in its valley is left alone), this
     edge is narrower and stays);
   - clears the canopy.
 Bridge decks stay: the laser's bridge class, where the tile has one (bridges_path), is cut out first.
+
+Finland's cadastre draws the sea only in pieces (Helsinki's harbour lies in street parcels), but its
+ground models give the water surface as one flat level, so `by_level` adds the tile's lowest level as
+a body wherever it spreads over SEA_MIN m² (the sea, or the lowest lake). `keep_small` then clears
+only hulls larger than SMALL_HULL m² from the photograph - the ferries and cruise ships - and leaves
+the small boats, which extract_features.find_boats turns into models (playtest reports
+2026-09-13T11-58-00 and -11-58-31: "boats parked on the river could rather be 3d models").
+
 Rewrites the tile's ortho.jpg, heightmap.r32 and canopy.r32 in place and notes "water" in
 terrain_meta.json; a second run finds nothing left to lower. Needs numpy, Pillow, rasterio, shapely.
 """
@@ -33,6 +42,8 @@ OPEN_SHARE = 0.8      # of a parcel's cells within LEVEL_TOL of its level, for i
 LEVEL_TOL = 0.3       # metres
 SHIP_M = 5            # the narrowest raised blob that is lowered
 EDGE_M = 1            # how far in from the parcel's edge the photograph decides where the water is
+SEA_MIN = 20000       # m² of one flat low level for `by_level` to take it for water
+SMALL_HULL = 60       # m²: a hull this small stays in the photograph with `keep_small` (a model goes on it)
 
 
 def log(msg):
@@ -84,10 +95,24 @@ def water_bodies(parcels, heights):
     return out
 
 
-def _paint_photo(path, water, inner):
+def level_bodies(heights):
+    """[("level", mask, level)]: the tile's lowest level where it spreads flat over SEA_MIN m² in one piece
+    (the sea, or the lowest lake), from a ground model that gives the water surface as a level."""
+    from extract_features import components
+    level = float(np.percentile(heights, 2))
+    flat = np.abs(heights - level) < LEVEL_TOL
+    mask = np.zeros(heights.shape, bool)
+    for pix in components(flat, SEA_MIN):
+        mask[pix[:, 0], pix[:, 1]] = True
+    return [("level %.2f m" % level, mask, level)] if mask.any() else []
+
+
+def _paint_photo(path, water, inner, keep_small=False):
     """The photograph over `water` replaced by the water's own tone: a 15 m blur of its calm pixels,
     anything unlike them (a hull, a wake) taken out first. Full strength over `inner`; in the band
-    between, as much as the pixel itself looks like water, so the edge is the photograph's waterline."""
+    between, as much as the pixel itself looks like water, so the edge is the photograph's waterline.
+    `keep_small`: only the hulls over SMALL_HULL m² (and 3 m around them) are painted over; the rest of
+    the water keeps the photograph, small boats included."""
     from PIL import Image, ImageFilter
     img = Image.open(path).convert("RGB")
     size = water.shape[0]
@@ -95,6 +120,15 @@ def _paint_photo(path, water, inner):
     small = np.asarray(img.resize((size, size), Image.BOX)).astype(np.float32)
     calm_small = inner & (np.linalg.norm(small - np.median(small[inner], axis=0), axis=2) < 40)
     tint = np.median(small[calm_small if calm_small.any() else inner], axis=0)
+    if keep_small:
+        from extract_features import components
+        unlike = water & (np.linalg.norm(small - tint, axis=2) > 40)
+        big = np.zeros(water.shape, bool)
+        for pix in components(unlike, SMALL_HULL):
+            big[pix[:, 0], pix[:, 1]] = True
+        water = inner = dilate(big, 3) & water
+        if not water.any():
+            return 0
     a = np.array(img)
     base = a.copy()
     alpha = np.zeros(a.shape[:2], np.float32)
@@ -115,26 +149,26 @@ def _paint_photo(path, water, inner):
         a[rows] = np.round(a[rows] * (1 - al) + tone[rows] * al).astype(np.uint8)
     os.remove(path)
     Image.fromarray(a).save(path, quality=90)
+    return int(inner.sum())
 
 
-def paint(site, root=ROOT, raw_dir=None):
+def paint(site, root=ROOT, raw_dir=None, by_level=False, keep_small=False):
     """Clear the open water of `site`'s tile (see the module doc). Returns the meta note, or None
-    when the tile has no open-water parcel."""
+    when the tile has no open water."""
     site_dir = os.path.join(root, "sites", site)
     tile = json.load(open(os.path.join(site_dir, "site.json"))).get("terrain", {}).get("tile", site)
     tdir = os.path.join(root, "assets", "terrain", tile)
     meta_path = os.path.join(tdir, "terrain_meta.json")
     meta = json.load(open(meta_path))
     ppath = os.path.join(site_dir, "parcels.json")
-    if not os.path.exists(ppath):
-        log(f"{site}: no parcels.json, nothing to go by")
-        return None
     size = int(meta["size_px"])
     hpath = os.path.join(tdir, meta.get("heightmap", "heightmap.r32"))
     heights = np.fromfile(hpath, "<f4").reshape(size, size)
-    bodies = water_bodies(json.load(open(ppath)).get("parcels", []), heights)
+    bodies = water_bodies(json.load(open(ppath)).get("parcels", []), heights) if os.path.exists(ppath) else []
+    if by_level:
+        bodies += level_bodies(heights)
     if not bodies:
-        log(f"{site}: no open-water parcel on the tile")
+        log(f"{site}: no open water on the tile")
         return None
     bpath = bridges_path(raw_dir or paths.raw_root(), tile)
     deck = dilate(np.fromfile(bpath, "<f4").reshape(size, size) > 0, 1) if os.path.exists(bpath) else np.zeros((size, size), bool)
@@ -155,13 +189,15 @@ def paint(site, root=ROOT, raw_dir=None):
         cpath = os.path.join(tdir, meta["canopy"]["file"])
         canopy = np.fromfile(cpath, "<f4").reshape(size, size)
         geo.write_r32(np.where(water, 0.0, canopy).astype(np.float32), cpath)
-    _paint_photo(os.path.join(tdir, meta["texture"]), water, erode(water, EDGE_M) | lowered)
+    painted = _paint_photo(os.path.join(tdir, meta["texture"]), water, erode(water, EDGE_M) | lowered, keep_small)
     note = {"parcels": [t for t, _, _ in bodies], "share": round(float(water.mean()), 3), "lowered_m2": int(lowered.sum()),
-            "bridges": bool(deck.any()), "source": "the cadastre's water-land parcels (tools/pipeline/water_parcels.py)"}
+            "painted_m2": painted, "small_boats_kept": keep_small, "bridges": bool(deck.any()),
+            "source": "the cadastre's water-land parcels" + (" and the ground model's lowest level" if by_level else "") + " (tools/pipeline/water_parcels.py)"}
     meta["water"] = note
     with open(meta_path, "w") as f:
         json.dump(meta, f, indent=2, ensure_ascii=False)
-    log(f"{site}: open water on {note['share']:.0%} of the tile ({', '.join(note['parcels'])}), {note['lowered_m2']} m² lowered to its level")
+    log(f"{site}: open water on {note['share']:.0%} of the tile ({', '.join(note['parcels'])}), {note['lowered_m2']} m² lowered to its level, "
+        f"{painted} m² of photograph painted over")
     return note
 
 
@@ -169,8 +205,10 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--site", required=True)
     ap.add_argument("--raw-dir", help="where the ground step left the bridge decks (default: the pipeline's raw directory)")
+    ap.add_argument("--by-level", action="store_true", help="also take the ground model's lowest flat level for water (Finland)")
+    ap.add_argument("--keep-small", action="store_true", help="paint over the large hulls only, keep the small boats for models")
     a = ap.parse_args(argv)
-    paint(a.site, raw_dir=a.raw_dir)
+    paint(a.site, raw_dir=a.raw_dir, by_level=a.by_level, keep_small=a.keep_small)
 
 
 if __name__ == "__main__":

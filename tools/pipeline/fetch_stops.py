@@ -12,11 +12,9 @@ OpenStreetMap is the source for where a shelter stands and which way it faces; i
 "© OpenStreetMap contributors" (THIRD_PARTY.md). Which buses call there and when is a different question
 with a different answer: fetch_departures.py takes that from the public transport register's GTFS.
 """
-import argparse, json, math, os, sys, time, urllib.parse, urllib.request
+import argparse, json, math, os, sys, time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"]
-UA = {"User-Agent": "vakuraamat-pipeline/0.1 (open-source game; polite, cached)"}
 ATTRIBUTION = "Bussipeatused: © OpenStreetMap contributors (ODbL)"
 KINDS = {"street": 1.0, "road": 1.0, "path": 0.0, "trail": 0.0}   # roads a stop may snap to (weight 0 = never)
 
@@ -32,18 +30,6 @@ def transform(points, s_srs, t_srs):
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     import geo
     return geo.transform_points(points, s_srs.split(":")[1], t_srs.split(":")[1])
-
-
-def overpass(south, west, north, east):
-    q = f'[out:json][timeout:25];node["highway"="bus_stop"]({south:.6f},{west:.6f},{north:.6f},{east:.6f});out body;'
-    last = None
-    for url in OVERPASS:
-        try:
-            req = urllib.request.Request(url, data=urllib.parse.urlencode({"data": q}).encode(), headers=UA)
-            return json.load(urllib.request.urlopen(req, timeout=35)).get("elements", [])   # the public servers queue slots for ~30 s
-        except Exception as e:  # noqa: BLE001 - try the mirror
-            last = e
-    raise RuntimeError(f"Overpass unavailable: {last}")
 
 
 def nearest_segment(p, roads):
@@ -77,7 +63,10 @@ def fetch(site, root=ROOT):
     corners = transform([(xmin, ymin), (xmax, ymin), (xmin, ymax), (xmax, ymax)], "EPSG:3301", "EPSG:4326")
     lons = [c[0] for c in corners]; lats = [c[1] for c in corners]
     try:
-        nodes = overpass(min(lats), min(lons), max(lats), max(lons))
+        import osm_tile   # the tile's one shared Overpass answer (osm_tile.py), cached
+        nodes = [n for n in osm_tile.elements(site, root, 110.0)
+                 if n.get("type") == "node" and n.get("tags", {}).get("highway") == "bus_stop"
+                 and min(lats) <= n["lat"] <= max(lats) and min(lons) <= n["lon"] <= max(lons)]
     except Exception as e:  # noqa: BLE001
         log(str(e))
         return []

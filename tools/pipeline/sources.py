@@ -13,7 +13,11 @@ Implemented: Estonia (Maa-amet DTM 5 m and 1 m, nDSM, orthophoto WMS, in-ADS gaz
 ETAK + Building Register + Geo3D LOD2 buildings, ETAK roads and water, Geo3D single trees, the business
 register, PRIA fields, the national GTFS) and Latvia (LĢIA laser points and orthophoto cycles, VZD
 cadastre and buildings, Rīga's LOD2, UR and VID companies, OpenStreetMap roads, ATD and Rīgas satiksme
-GTFS, VARIS addresses; docs/latvia-plan.md). The rest of the world has a documented plan and no code
+GTFS, VARIS addresses; docs/latvia-plan.md). Finland has its ground (NLS ground model, laser points
+and orthophotos from the Funet mirror, Helsinki's own inside the city; docs/finland-plan.md), its
+plots (NLS cadastre) and buildings (Ryhti on Helsinki's or the topographic database's footprints),
+OpenStreetMap roads and stops, its companies (PRH) with their yearly tax (Vero), HSL's timetables,
+Ruokavirasto's fields, and an address search (postcode areas and Ryhti's addresses, geocode_fi.py). The rest of the world has a documented plan and no code
 yet (PLANNED below, docs/custom-sites.md "Other countries").
 """
 import argparse, json, os, sys, threading
@@ -118,7 +122,7 @@ class DataSource:
 
     def codex(self, name):
         """What the pack is made of, in the codex: {"CODEX_REAL" | "CODEX_INVENTED" | "CODEX_DATA":
-        {"et", "en", "lv"}}."""
+        {"et", "en", "lv", "fi"}}."""
         return {}
 
     # --- places -----------------------------------------------------------------------------------
@@ -238,13 +242,16 @@ class Estonia(DataSource):
         return {
             "CODEX_REAL": {"et": f"Maa: {name}, Maa- ja Ruumiameti kõrgusandmed, ortofoto, hooned, katastriüksused ja maa väärtused, meetri täpsusega.",
                            "en": f"The ground: {name}, from the Land Board's elevation data, orthophoto, buildings, cadastral units and land values, to the metre.",
-                           "lv": f"Zeme: {name}, no Igaunijas Zemes un telpiskās plānošanas departamenta augstuma datiem, ortofoto, ēkām, kadastra vienībām un zemes vērtībām, ar metra precizitāti."},
+                           "lv": f"Zeme: {name}, no Igaunijas Zemes un telpiskās plānošanas departamenta augstuma datiem, ortofoto, ēkām, kadastra vienībām un zemes vērtībām, ar metra precizitāti.",
+                           "fi": f"Maa: {name}, Viron maanmittausviraston korkeustiedoista, ortokuvasta, rakennuksista, kiinteistöistä ja maan arvoista, metrin tarkkuudella."},
             "CODEX_INVENTED": {"et": "Majade seinad ja katused on taastatud ehitisregistri mõõtude ja Maa-ameti LOD2 mudeli järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.",
                                "en": "The walls and roofs are reconstructed from the Building Register's measurements and Maa-amet's LOD2 model; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one.",
-                               "lv": "Sienas un jumti atjaunoti pēc Ēku reģistra mēriem un Maa-amet LOD2 modeļa; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku."},
+                               "lv": "Sienas un jumti atjaunoti pēc Ēku reģistra mēriem un Maa-amet LOD2 modeļa; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku.",
+                               "fi": "Seinät ja katot on rekonstruoitu rakennusrekisterin mittojen ja Maa-ametin LOD2-mallin mukaan; sisätilat, puut, liikenne ja ohikulkijat ovat keksittyjä. Kukaan täällä ei esitä todellista ihmistä."},
             "CODEX_DATA": {"et": "Kaardiandmed: Maa- ja Ruumiamet 2026. %s" % self.CREDIT_ET,
                            "en": "Map data: Maa- ja Ruumiamet 2026. %s" % self.CREDIT_EN,
-                           "lv": "Kartes dati: Maa- ja Ruumiamet 2026. Zemes nodokļa vērtības: kadastrs; uzņēmumi: Igaunijas uzņēmumu reģistra atvērtie dati (CC BY 4.0)."},
+                           "lv": "Kartes dati: Maa- ja Ruumiamet 2026. Zemes nodokļa vērtības: kadastrs; uzņēmumi: Igaunijas uzņēmumu reģistra atvērtie dati (CC BY 4.0).",
+                           "fi": "Karttatiedot: Maa- ja Ruumiamet 2026. Maan verotusarvot: kiinteistörekisteri; yritykset: Viron kaupparekisterin avoin data (CC BY 4.0)."},
         }
 
     def geocode(self, query):
@@ -368,12 +375,15 @@ class Latvia(DataSource):
         return {
             "CODEX_REAL": {"et": f"Maa: {name}, Läti Geoinfoameti (LĢIA) laserpunktidest ja ortofotost, meetri täpsusega.",
                            "en": f"The ground: {name}, from the Latvian Geospatial Information Agency's (LĢIA) laser points and orthophoto, to the metre.",
-                           "lv": f"Zeme: {name}, no Latvijas Ģeotelpiskās informācijas aģentūras (LĢIA) lāzerpunktiem un ortofoto, ar metra precizitāti."},
+                           "lv": f"Zeme: {name}, no Latvijas Ģeotelpiskās informācijas aģentūras (LĢIA) lāzerpunktiem un ortofoto, ar metra precizitāti.",
+                           "fi": f"Maa: {name}, Latvian paikkatietoviraston (LĢIA) laserpisteistä ja ortokuvasta, metrin tarkkuudella."},
             "CODEX_INVENTED": {"et": "Majade seinad ja katused on taastatud registrite mõõtude ja katusemudelite või laserpunktide järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.",
                                "en": "The walls and roofs are reconstructed from the registers' measurements and roof models or laser points; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one.",
-                               "lv": "Sienas un jumti atjaunoti pēc reģistru mēriem un jumtu modeļiem vai lāzerpunktiem; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku."},
+                               "lv": "Sienas un jumti atjaunoti pēc reģistru mēriem un jumtu modeļiem vai lāzerpunktiem; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku.",
+                               "fi": "Seinät ja katot on rekonstruoitu rekisterien mittojen ja kattomallien tai laserpisteiden mukaan; sisätilat, puut, liikenne ja ohikulkijat ovat keksittyjä. Kukaan täällä ei esitä todellista ihmistä."},
             "CODEX_DATA": {"et": self.GROUND_ET, "en": self.GROUND_EN,
-                           "lv": "Kartes dati: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, lāzerskenēšana un ortofoto 2016–2018 (CC BY 4.0)."},
+                           "lv": "Kartes dati: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, lāzerskenēšana un ortofoto 2016–2018 (CC BY 4.0).",
+                           "fi": "Karttatiedot: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, laserkeilaus ja ortokuva 2016–2018 (CC BY 4.0)."},
         }
 
     def geocode(self, query):
@@ -381,10 +391,121 @@ class Latvia(DataSource):
         return geocode_lv.search(query)
 
 
+class Finland(DataSource):
+    """Finland on the game's L-EST97 grid (docs/finland-plan.md). The ground comes key-free from the
+    Funet mirror of the NLS open data, and from Helsinki's own where the city has it. A point is Finnish
+    when it is on Finland's land by the outline, or the NLS has an orthophoto sheet under it (the
+    outer skerries), and not on another country's land."""
+    id = "fi"
+    name = "Finland (Maanmittauslaitos, Helsinki)"
+    label = "Maanmittauslaitos"
+    crs = 3301
+    bbox = (249000, 6600000, 886000, 7791000)   # south to Utö and Bogskär, below the outline's skerries
+    outline = "finland.json"
+    own_tile = True
+    attribution = "Map data: Maanmittauslaitos (National Land Survey of Finland)"
+    GROUND_ET = "Kaardiandmed: Maanmittauslaitos 2026, kõrgusmudel, laserskaneerimine ja ortofoto (CC BY 4.0); Helsingis Helsingi linn (CC BY 4.0)."
+    GROUND_EN = "Map data: Maanmittauslaitos (National Land Survey of Finland) 2026, elevation model, laser scanning and orthophoto (CC BY 4.0); in Helsinki the City of Helsinki (CC BY 4.0)."
+
+    def covers(self, x, y):
+        if not super().covers(x, y):
+            return False
+        try:
+            if any(s is not self and s.on_land(x, y) for s in SOURCES):
+                return False
+            if self.on_land(x, y):
+                return True
+            import fetch_tile_fi
+            return fetch_tile_fi.has_data(x, y)
+        except ImportError:   # a plain python3 without the pipeline's wheels: cannot tell, so not Finland
+            return False
+
+    def build_tile(self, a, raw_dir, out_dir, bbox):
+        import fetch_tile_fi
+        return fetch_tile_fi.build_tile(a, raw_dir, out_dir, bbox)
+
+    def ortho(self, xmin, ymin, xmax, ymax, out_jpg, px):
+        import fetch_tile_fi
+        return fetch_tile_fi.fetch_ortho((xmin, ymin, xmax, ymax), out_jpg, px)
+
+    def estimate(self, box, raw_dir, items, head):
+        """The laser sheets under the tile (the canopy); the ground model and photograph windows are
+        cut over HTTP and estimated together."""
+        import fetch_tile_fi
+        for sheet, year, path in fetch_tile_fi.laser_sheets(fetch_tile_fi.box_in(box, fetch_tile_fi.TM35, margin=0.0)):
+            local = os.path.join(raw_dir, "fi", "laser", sheet + ".laz")
+            cached = os.path.exists(local)
+            items.append({"name": "laser points %s (%d)" % (sheet, year), "bytes": os.path.getsize(local) if cached else head(fetch_tile_fi.MIRROR + path),
+                          "cached": cached})
+        items.append({"name": "ground model, orthophoto", "bytes": 40 * 1024 ** 2, "cached": False})
+        return 0
+
+    def registers(self, sid, ws, stage, run):
+        """The NLS cadastre and Ryhti's buildings on footprints (Helsinki's, else the topographic
+        database's), then OpenStreetMap's roads and stops. Companies are step 3 of docs/finland-plan.md."""
+        import fetch_cadastre_fi, fetch_roads_lv, fetch_stops, fetch_tenants_fi
+        stage("cadastre (Maanmittauslaitos), buildings (Ryhti)", 0.5)
+        ok, _ = run(f"{sid}: cadastre", 900, fetch_cadastre_fi.fetch, sid, root=ws)
+        if not ok:
+            raise RuntimeError("the Finnish cadastre could not be read (see the service log)")
+        import water_parcels
+        # the sea at its level in the ground model, cleared of the ships the photograph caught; the small
+        # boats stay for the feature pass to put models on
+        run(f"{sid}: water", 120, water_parcels.paint, sid, root=ws, by_level=True, keep_small=True)
+        stage("companies (PRH) and taxes (Vero)", 0.62)
+        run(f"{sid}: tenants", 900, fetch_tenants_fi.fetch, sid, root=ws)
+        stage("roads (OpenStreetMap)", 0.64)
+        run(f"{sid}: roads", 180, fetch_roads_lv.fetch, sid, root=ws, attribution=fetch_roads_lv.ATTRIBUTION_FI)
+        stops = threading.Thread(target=lambda: run(f"{sid}: stops", 120, fetch_stops.fetch, sid, root=ws), daemon=True)
+        stops.start()
+        import fetch_fields_fi
+        stage("fields (Ruokavirasto)", 0.66)
+        run(f"{sid}: fields", 120, fetch_fields_fi.fetch, sid, root=ws)
+        return stops
+
+    def departures(self, site, root, refresh=False, max_age_days=7):
+        import fetch_departures
+        return fetch_departures.fetch_fi(site, root, refresh, max_age_days)
+
+    def geocode(self, query):
+        import geocode_fi
+        return geocode_fi.search(query)
+
+    def refine(self, sid, ws, rstage, run):
+        """The older photographs (the NLS years, Helsinki's back to 1932) and the timetables; the meta
+        is marked "refined" as Latvia's is (the descriptor's "refine": "flag")."""
+        import fetch_departures, fetch_tile_fi
+        tile_dir = os.path.join(ws, "assets", "terrain", sid)
+        rstage("older orthophotos (Maanmittauslaitos, Helsinki)")
+        run(f"{sid}: older orthophotos", 600, fetch_tile_fi.add_history, tile_dir)
+        rstage("bus departures (HSL)")
+        run(f"{sid}: departures", 600, fetch_departures.fetch, sid, root=ws)
+        meta_path = os.path.join(tile_dir, "terrain_meta.json")
+        meta = json.load(open(meta_path))
+        meta["refined"] = True
+        with open(meta_path, "w") as f:
+            json.dump(meta, f, indent=2, ensure_ascii=False)
+        return True, 1
+
+    def codex(self, name):
+        return {
+            "CODEX_REAL": {"et": f"Maa: {name}, Soome Maamõõduameti (Maanmittauslaitos) kõrgusmudelist, laserpunktidest ja ortofotost.",
+                           "en": f"The ground: {name}, from the National Land Survey of Finland's elevation model, laser points and orthophoto.",
+                           "lv": f"Zeme: {name}, no Somijas Zemes dienesta (Maanmittauslaitos) augstuma modeļa, lāzerpunktiem un ortofoto.",
+                           "fi": f"Maa: {name}, Maanmittauslaitoksen korkeusmallista, laserpisteistä ja ortokuvasta."},
+            "CODEX_INVENTED": {"et": "Majade seinad ja katused on taastatud registrite mõõtude järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.",
+                               "en": "The walls and roofs are reconstructed from the registers' measurements; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one.",
+                               "lv": "Sienas un jumti atjaunoti pēc reģistru mēriem; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku.",
+                               "fi": "Seinät ja katot on rekonstruoitu rekisterien mittojen mukaan; sisätilat, puut, liikenne ja ohikulkijat ovat keksittyjä. Kukaan täällä ei esitä todellista ihmistä."},
+            "CODEX_DATA": {"et": self.GROUND_ET, "en": self.GROUND_EN,
+                           "lv": "Kartes dati: Maanmittauslaitos 2026, augstuma modelis, lāzerskenēšana un ortofoto (CC BY 4.0); Helsinkos Helsinku pilsēta (CC BY 4.0).",
+                           "fi": "Karttatiedot: Maanmittauslaitos 2026, korkeusmalli, laserkeilaus ja ortokuva (CC BY 4.0); Helsingissä Helsingin kaupunki (CC BY 4.0)."},
+        }
+
+
 # Planned adapters (no code yet). Each needs: a metric CRS, a DEM (ideally lidar 1 m), an orthophoto
 # service, optional canopy, historical maps, buildings, trees, and a geocoder.
 PLANNED = {
-    "fi": "Finland: NLS 2 m DEM and orthophotos (open, API key), NLS topographic DB buildings, National Archives historical maps",
     "nl": "Netherlands: AHN 0.5 m DEM, PDOK orthophoto, BAG buildings with construction year, 3D BAG (LOD2)",
     "dk": "Denmark: Dataforsyningen DEM 0.4 m, orthophoto, BBR buildings",
     "ch": "Switzerland: swissALTI3D 0.5 m, SWISSIMAGE, swissBUILDINGS3D (LOD2)",
@@ -393,9 +514,9 @@ PLANNED = {
     "world": "Fallback: Copernicus GLO-30 DEM + ESA WorldCover 10 m + OSM buildings; too coarse for a walkable 1 km² at this game's scale",
 }
 
-# Tested in order: an adapter whose test is exact (Latvia's laser sheets off other countries' land)
-# goes before one whose test is only a box (Estonia's).
-SOURCES = [Latvia(), Estonia()]
+# Tested in order: an adapter whose test is exact (Latvia's laser sheets off other countries' land,
+# Finland's outline or orthophoto sheets) goes before one whose test is only a box (Estonia's).
+SOURCES = [Latvia(), Finland(), Estonia()]
 
 
 def for_point(x, y, crs=3301):

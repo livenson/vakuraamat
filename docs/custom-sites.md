@@ -30,10 +30,18 @@ have. Saves record their site and switch to it on Continue.
 | `tenants.json` | Business Register companies matched to the plots and buildings | `make tenants` |
 | `market.json` | median land value per m² by purpose | `make market` |
 | `roads.json`, `buildings_2026.json`, `water_2026.json` | ETAK roads, laser building massing, still water | `make roads`, `make features` |
+| `boats_2026.json`, `anchors.json` | moored boats where the orthophoto shows hulls (at the mapped piers too), named spots | `make features` (boats alone: `extract_features.py --boats-only`) |
+| `stops.json`, `departures.json` | OpenStreetMap's bus stops snapped to the roads; the lines and times calling there | `make stops`, `make departures` |
+| `fields_2026.json` | farmed fields with their declared crops | `tools/pipeline/fetch_fields.py` |
+| `pitches.json` | OpenStreetMap's sports pitches, for their goals, nets and hoops | `make pitches` |
+| `street.json`, `rail.json`, `pois.json` | OpenStreetMap's lamps, signals, crossings, benches, fences, flowerbeds, piers and parking (a parked car where the photograph shows one); tram and railway tracks and stops; shops and offices with their opening hours and the company on their building. Each stays its own ODbL file | `make osm` |
 | `strings.csv` | the pack's translation keys (`keys,et,en`); core UI keys stay in `assets/i18n/strings.csv` | hand |
 
 The terrain itself lives in `assets/terrain/<tile>/` (heightmap, canopy, orthophoto committed;
-Terrain3D region data generated) and is referenced by `terrain.tile`. Packs made by the historical
+Terrain3D region data generated) and is referenced by `terrain.tile`. Its `trees.json` holds the
+measured trees (Estonia's Geo3D) and `trees_osm.json` the trees OpenStreetMap maps, used where there
+are no measured ones, with the statistical scatter kept off their crowns. A parcel kit leaves out its
+own hedge, fence or benches where `street.json` has the unit's real ones. Packs made by the historical
 game (they carry a `story`, `objectives` or `ending` in the manifest) are skipped by `Sites.scan`.
 
 ## Making a new pack

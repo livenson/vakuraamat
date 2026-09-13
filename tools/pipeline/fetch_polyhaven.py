@@ -50,9 +50,19 @@ SETS = {
         "thatch": "reed_roof_03",
         "rock": "brick_wall_006",             # fieldstone stands in: rough stone wall
     },
+    # the road surfaces OpenStreetMap and ETAK name (RoadNetwork.SURFACES maps the tags onto these)
+    "roads": {
+        "asphalt": "asphalt_02",
+        "sett": "cobblestone_floor_05",       # squared granite setts, Helsinki's and Rīga's old streets
+        "paving": "concrete_pavement_02",     # concrete slabs and pavers of the pavements
+        "cobble": "cobblestone_01",           # rounded fieldstone, unhewn cobbles
+        "concrete": "concrete_floor_01",
+        "gravel": "gravel_floor_02",
+    },
 }
 TERRAIN_DIR = os.path.join(ROOT, "assets", "terrain", "textures")
 BUILDING_DIR = os.path.join(ROOT, "assets", "textures", "buildings")
+ROAD_DIR = os.path.join(ROOT, "assets", "textures", "roads")
 RECORD = os.path.join(ROOT, "assets", "textures", "POLYHAVEN.json")
 
 
@@ -113,10 +123,14 @@ def pack_terrain(name, maps):
     Image.fromarray(nrm, "RGBA").save(os.path.join(TERRAIN_DIR, f"{name}_nrm_rgh.png"), optimize=True)
 
 
-def pack_building(name, maps):
-    os.makedirs(BUILDING_DIR, exist_ok=True)
-    Image.open(maps["Diffuse"]).convert("RGB").save(os.path.join(BUILDING_DIR, f"{name}_color.jpg"), quality=88)
-    Image.open(maps["nor_gl"]).convert("RGB").save(os.path.join(BUILDING_DIR, f"{name}_normal.jpg"), quality=90)
+def pack_building(name, maps, out_dir=BUILDING_DIR):
+    os.makedirs(out_dir, exist_ok=True)
+    Image.open(maps["Diffuse"]).convert("RGB").save(os.path.join(out_dir, f"{name}_color.jpg"), quality=88)
+    Image.open(maps["nor_gl"]).convert("RGB").save(os.path.join(out_dir, f"{name}_normal.jpg"), quality=90)
+
+
+def pack_road(name, maps):
+    pack_building(name, maps, ROAD_DIR)
 
 
 def main():
@@ -138,7 +152,7 @@ def main():
             except Exception as e:  # noqa: BLE001 - report and continue with the rest
                 log(f"  failed: {e}")
                 continue
-            (pack_terrain if s == "terrain" else pack_building)(name, maps)
+            {"terrain": pack_terrain, "roads": pack_road}.get(s, pack_building)(name, maps)
             record[f"{s}/{name}"] = {"slug": slug, "url": f"https://polyhaven.com/a/{slug}", "resolution": a.res,
                                      "licence": "CC0 1.0", "fetched": datetime.date.today().isoformat()}
     if not a.list:

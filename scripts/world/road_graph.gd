@@ -10,8 +10,36 @@ var node_edges: Dictionary = {}       # node id -> Array[int]
 var _nodes: PackedVector2Array = PackedVector2Array()
 var _node_cells: Dictionary = {}      # Vector2i (1 m cell) -> Array[int] node ids: _node without a scan of every node
 var _cells: Dictionary = {}           # Vector2i (CELL) -> Array[int] edge ids by midpoint
+static var _shared: Dictionary = {}   # pack id -> RoadGraph (shared)
 
 
+## The one graph of a pack's roads.json, built on first use: the traffic and the street furniture's
+## traffic lights both walk it (TrafficSignals needs their node ids to agree anyway). Read-only for
+## its users; a caller that wants to change a graph makes its own with from_pack.
+static func shared(pack: String = "") -> RoadGraph:
+	var key := pack if pack != "" else Sites.active
+	if not _shared.has(key):
+		var t0 := Time.get_ticks_usec()
+		var g := RoadGraph.new()
+		var parsed = PackFiles.json(key, "roads.json")
+		if typeof(parsed) == TYPE_DICTIONARY:
+			g.build(parsed.get("roads", []))
+		_shared[key] = g
+		PerfLog.mark("road graph %s: %d edges in %d ms" % [key, g.edges.size(), (Time.get_ticks_usec() - t0) / 1000])
+	return _shared[key]
+
+
+## Every shared graph (GameState.forget_caches): a refreshed pack's roads are read again.
+static func forget() -> void:
+	_shared.clear()
+
+
+## One pack's shared graph (World, when its streamed tile leaves).
+static func forget_pack(pack: String) -> void:
+	_shared.erase(pack)
+
+
+## A graph of its own, parsed from the file: for a caller that builds on it or must not share.
 static func from_pack(pack: String = "") -> RoadGraph:
 	var g := RoadGraph.new()
 	var text := FileAccess.get_file_as_string(Sites.path_in(pack if pack != "" else Sites.active, "roads.json"))
@@ -35,6 +63,8 @@ func build(roads: Array) -> void:
 			continue
 		var e := {"id": edges.size(), "kind": str(r.get("kind", "road")), "width": float(r.get("width", 4.0)), "pts": pts, "cum": cum,
 				"length": cum[-1], "a": _node(pts[0]), "b": _node(pts[-1]), "name": str(r.get("name", "") if r.get("name") else "")}
+		if r.get("bridge") == true:
+			e.bridge = true   # a rail track over a bridge: Rails lays it straight between the bridge's ends
 		edges.append(e)
 		node_edges[e.a].append(e.id)
 		node_edges[e.b].append(e.id)
@@ -74,6 +104,26 @@ func point_at(e: Dictionary, s: float) -> Vector2:
 	var seg := cum[i] - cum[i - 1]
 	var t := 0.0 if seg <= 0.0 else (s - cum[i - 1]) / seg
 	return pts[i - 1].lerp(pts[i], t)
+
+
+## A node's position (tile metres).
+func node_pos(n: int) -> Vector2:
+	return _nodes[n]
+
+
+## The distance along `e` of its point nearest to `p`.
+func nearest_s(e: Dictionary, p: Vector2) -> float:
+	var pts: PackedVector2Array = e.pts
+	var cum: PackedFloat32Array = e.cum
+	var best := 0.0
+	var best_d := INF
+	for i in range(1, pts.size()):
+		var q := Geometry2D.get_closest_point_to_segment(p, pts[i - 1], pts[i])
+		var d := q.distance_squared_to(p)
+		if d < best_d:
+			best_d = d
+			best = cum[i - 1] + pts[i - 1].distance_to(q)
+	return best
 
 
 func dir_at(e: Dictionary, s: float, forward: bool) -> Vector2:

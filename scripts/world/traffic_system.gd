@@ -14,6 +14,7 @@ extends Node3D
 const ARRIVAL_BUDGET_USEC := 6000
 
 var graph: RoadGraph
+var signals: TrafficSignals        # the mapped traffic lights on the graph (street.json)
 var agents: Array[TrafficAgent] = []
 var _timer := 0.0
 var _first := true
@@ -23,7 +24,8 @@ var _off := Bench.is_off("traffic")
 
 func _ready() -> void:
 	var pack := Sites.pack_of(self)
-	graph = RoadGraph.from_pack(pack)
+	graph = RoadGraph.shared(pack)   # the street furniture's traffic lights stand on the same one
+	signals = TrafficSignals.of(pack, graph)
 	_rng.seed = hash(pack) + year
 	TrafficAgent.warm()
 
@@ -116,6 +118,7 @@ func _spawn(centre: Vector2) -> void:
 		return
 	var e: Dictionary = graph.edges[candidates[_rng.randi() % candidates.size()]]
 	var a := TrafficAgent.new()
+	a.signals = signals
 	add_child(a)
 	a.setup(graph, kind, e, _rng.randf() * e.length, _rng.randf() < 0.5, _rng.randi(), year)
 	agents.append(a)

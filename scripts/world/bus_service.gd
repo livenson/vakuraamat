@@ -15,6 +15,7 @@ class_name BusService
 extends Node3D
 
 const TICK_S := 0.5
+const REAL_SPEED := 7.0   # m/s a city bus makes good in life, stops included (about 25 km/h)
 const ARRIVAL_BUDGET_USEC := 6000   # the first sync after arrival spawned 50 buses in one frame (0.5 s, debug build)
 
 var pack := ""
@@ -25,11 +26,9 @@ var _timer := 0.0
 
 func _ready() -> void:
 	pack = Sites.pack_of(self)
-	var path := Sites.path_in(pack, "stops.json")
-	if FileAccess.file_exists(path):
-		var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
-		if typeof(parsed) == TYPE_DICTIONARY:
-			_stops = parsed.get("stops", [])
+	var parsed = PackFiles.json(pack, "stops.json")   # the shelters' copy: read-only
+	if typeof(parsed) == TYPE_DICTIONARY:
+		_stops = parsed.get("stops", [])
 	var n := Departures.routes(pack).size()
 	if n > 0:
 		print("[buses] %s: %d routes on the timetable" % [pack, n])
@@ -71,7 +70,16 @@ func _sync() -> void:
 			continue
 		# how long a trip is on the road here, in minutes of the world's clock
 		var window := length / BusAgent.SPEED * _game_minutes_per_real_second()
-		for t in Departures.times_of(r, day):
+		# A day passes in 150 real minutes but a bus drives at a bus's speed, so every departure on the
+		# road at once put some seven times as many buses on the street as stand there in life (playtest
+		# 2026-09-13, Pirita, 20 at once: "why are there so many busses?"). One departure in `every` is
+		# driven, which leaves a real street's number of them; the stop's board keeps the whole timetable.
+		var every := maxi(1, roundi(window / (length / REAL_SPEED / 60.0)))
+		var times: Array = Departures.times_of(r, day)
+		for j in times.size():
+			if j % every != 0:
+				continue
+			var t: String = str(times[j])
 			var dep := _minutes(str(t))
 			if dep < 0:
 				continue

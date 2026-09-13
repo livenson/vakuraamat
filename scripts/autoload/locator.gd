@@ -225,9 +225,10 @@ func spawn_local(script_rel: String, port: int, health_url: String) -> bool:
 	return false
 
 
-## Places for a query: "E N" in L-EST97, "lat, lon", or an address / place name via in-ADS.
-## Returns [{name, x, y}].
-func geocode(q: String) -> Array:
+## Places for a query: "E N" in L-EST97, "lat, lon", or an address / place name through the countries'
+## address searches - every country's, or only `country`'s (a descriptor id) when the page has one
+## picked. Returns [{name, x, y}].
+func geocode(q: String, country := "") -> Array:
 	q = q.strip_edges()
 	var nums := q.replace(";", " ").replace(",", " ").split(" ", false)
 	if nums.size() == 2 and nums[0].is_valid_float() and nums[1].is_valid_float():
@@ -239,8 +240,9 @@ func geocode(q: String) -> Array:
 			var p := wgs84_to_lest97(a, b)
 			return [{"name": "%.4f N %.4f E" % [a, b], "x": p.x, "y": p.y}]
 	var out := []
-	for c in Countries.all().values():
-		out.append_array(await _geocode_with(c.get("geocoder", {}), q))
+	for id in Countries.all():
+		if country == "" or id == country:
+			out.append_array(await _geocode_with(Countries.all()[id].get("geocoder", {}), q))
 	return out
 
 
@@ -400,6 +402,9 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 			say.call(tr("MENU_STAGE_INSTALL"), 0.97)
 			if not install_zip(zip_path, id, refresh):
 				error = "could not unpack " + zip_path
+			else:
+				# unpacked into sites/ and tiles/, the zip is not read again (98 of them held 0.87 GB)
+				DirAccess.remove_absolute(ProjectSettings.globalize_path(zip_path))
 	return {"ok": error == "", "id": id, "error": error}
 
 
@@ -440,6 +445,7 @@ func take_refined(id: String) -> bool:
 	var dl := await http(service_url() + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path)
 	if not dl.ok or not install_zip(zip_path, id):
 		return false
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(zip_path))   # installed: not read again
 	if id == Sites.active:
 		Sites.reload_active()   # the pack's own files changed under it (trees, the meta)
 	print("[Locator] %s: the 1 m ground model replaced the 5 m one; the tile is rebuilt on the way in" % id)

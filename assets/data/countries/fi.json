@@ -1,0 +1,23 @@
+{
+  "id": "fi",
+  "name": "Finland",
+  "name_key": "COUNTRY_FI",
+  "search_example": "Aleksanterinkatu 15, Helsinki",
+  "parcel_code": "^\\d{1,3}-\\d{1,3}-\\d{1,4}-\\d{1,4}$",
+  "outline": "res://assets/data/finland.json",
+  "coverage": [249000, 6600000, 886000, 7791000],
+  "geocoder": {
+    "service": "/geocode?country=fi&q={q}"
+  },
+  "refine": "flag",
+  "photos": {
+    "from_tile": true
+  },
+  "building_code": {
+    "pattern": "^1\\d{8}[0-9A-Y]$",
+    "register_key": "UI_SHEET_REGISTER_FI",
+    "code_key": "UI_SHEET_CODE_FI"
+  },
+  "building_links": {},
+  "place_links": {}
+}

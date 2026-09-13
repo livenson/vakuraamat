@@ -209,6 +209,17 @@ class BuildJob:
 	var _trim := SurfaceTool.new()
 
 	func run() -> void:
+		# The walls' outward side comes from the ring's winding: a ring wound the other way (Finland's
+		# topographic database, Latvia's cadastre, Valka) turned every wall's normal inwards, so its windows
+		# sat 4 cm inside the wall, unseen, and the walls took the light from within (playtest 2026-09-13,
+		# Rovaniemi: "why building has no windows?"). One winding for every source: the job's own copy.
+		var twice_area := 0.0
+		for i in polygon.size():
+			var p := polygon[i]
+			var q := polygon[(i + 1) % polygon.size()]
+			twice_area += p.x * q.y - q.x * p.y
+		if twice_area > 0.0:
+			polygon.reverse()
 		_walls.begin(Mesh.PRIMITIVE_TRIANGLES)
 		_roof.begin(Mesh.PRIMITIVE_TRIANGLES)
 		_windows.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -680,6 +691,24 @@ static var _detail: Dictionary = {}   # kind -> [Mesh, Material]
 
 static func release_details() -> void:
 	_detail.clear()
+	_photo_roofs.clear()   # a tile's photograph is 20 MB: none outlives the world
+
+
+## A streamed tile left: its roof photograph (17 MB at 2048 px, never freed before while walking
+## across tiles) and its LOD2 models go with it (World, on TileStreamer.tile_unloaded).
+static func forget_pack(pack: String) -> void:
+	if pack == "":
+		return
+	_photo_roofs.erase(pack)
+	var prefix := Sites.path_in(pack, "")
+	for path in _models.keys():
+		if str(path).begins_with(prefix):
+			_models.erase(path)
+
+
+## Every parsed LOD2 table (GameState.forget_caches): a refreshed pack's roofs are read again.
+static func forget_models() -> void:
+	_models.clear()
 
 
 func _detail_mesh(kind: String) -> MeshInstance3D:
@@ -788,7 +817,77 @@ func _wall_material() -> StandardMaterial3D:
 	return _textured("plaster", wall_color.lightened(0.05), 0.6)
 
 
-func _roof_material() -> StandardMaterial3D:
+static var photo_roofs := true   # roofs wear the tile's orthophoto (playtest 2026-09-13); the world's --plain-roofs turns it off
+const PHOTO_ROOF_PX := 2048    # the photograph a roof samples, per tile: 50 cm a pixel over 1024 m
+static var _photo_roofs: Dictionary = {}   # pack id -> ShaderMaterial, or null where the tile has no photograph
+
+
+## The roof as the tile's orthophoto shows it: one material per tile projecting the photograph straight
+## down onto every roof face by its world position. An orthophoto is not a true orthophoto: a tall
+## building leans away from the camera in it, so its roof edge can carry a strip of street or wall.
+func _photo_roof() -> Material:
+	var pack := Sites.pack_of(self)
+	if not _photo_roofs.has(pack):
+		_photo_roofs[pack] = _make_photo_roof(pack, _tile_origin())
+	return _photo_roofs[pack]
+
+
+## Whether this roof takes the photograph: a roof without a measured shape does - an extruded footprint,
+## or a roof fitted to the laser points (its lod2 carries "roof"). A city's own LOD2 model keeps the
+## register's colours: its many steep facets smear the photograph into streaks (Rīga, 2026-09-13).
+func _photo_suits() -> bool:
+	var m := _model()
+	return m.is_empty() or m.has("roof")
+
+
+## The world position of the tile this building stands on: a streamed tile's root, else the origin.
+func _tile_origin() -> Vector3:
+	var n: Node = self
+	while n:
+		if n.has_meta("pack_id") and n is Node3D:
+			return (n as Node3D).global_position
+		n = n.get_parent()
+	return Vector3.ZERO
+
+
+static func _make_photo_roof(pack: String, origin: Vector3) -> Material:
+	var dir := Sites.tile_dir_of(pack)
+	var text := FileAccess.get_file_as_string(dir + "/terrain_meta.json")
+	var meta = JSON.parse_string(text) if text != "" else null
+	if typeof(meta) != TYPE_DICTIONARY:
+		return null
+	var path := dir + "/" + str(meta.get("texture", "ortho.jpg"))
+	var img: Image = null
+	if path.begins_with("res://") and ResourceLoader.exists(path):
+		var tex = load(path)   # a shipped tile: the imported texture (an exported game has no .jpg)
+		if tex is Texture2D:
+			img = (tex as Texture2D).get_image()
+	if img == null and FileAccess.file_exists(path):
+		img = Image.load_from_file(path)   # a downloaded tile
+	if img == null or img.is_empty():
+		print("[roofs] %s: no photograph at %s, the register's colours" % [pack, path])
+		return null
+	if img.is_compressed():
+		img.decompress()
+	# the tile you stand on keeps its photograph whole (25 cm a pixel, 85 MB with mipmaps): at half that
+	# the nearest roofs read soft from the air; a streamed neighbour, seen from further, takes half
+	var px := img.get_width() if pack == Sites.active else PHOTO_ROOF_PX
+	if img.get_width() > px:
+		img.resize(px, px, Image.INTERPOLATE_BILINEAR)
+	img.generate_mipmaps()
+	var m := ShaderMaterial.new()
+	m.shader = preload("res://assets/shaders/roof_ortho.gdshader")
+	m.set_shader_parameter("photo", ImageTexture.create_from_image(img))
+	m.set_shader_parameter("origin", Vector2(origin.x, origin.z))
+	m.set_shader_parameter("extent", float(meta.get("size_m", 1024)))
+	return m
+
+
+func _roof_material() -> Material:
+	if photo_roofs and _photo_suits():
+		var photo := _photo_roof()
+		if photo:
+			return photo
 	var r := roof_cover.to_lower()
 	if "kivi" in r:
 		return _textured("rooftiles", roof_color.lightened(0.35), 0.7, 0.8)
@@ -873,14 +972,19 @@ const PROPS := "res://assets/vendor/sketchfab/"   # CC BY models, see assets/ven
 const OPEN_HOURS := {"trade": Vector2(9.0, 19.0), "hospitality": Vector2(11.0, 23.0)}
 var _neon_mats: Array = []
 var _neon_hours := Vector2.ZERO
+var _open_week: Array = []   # the map's opening hours (pois.json) parsed; [] = the sector's hours
+var _weekday := 0
 
 
 ## What a company hangs on its building: shops and cafés get a bracket sign with the name beside the
 ## door and a neon OPEN over it (lit in opening hours, see set_open_hour); a farm gets a wooden sign
-## in front of the door. `rows` are the active tenants (tenants.json shape) of this building's plot.
-func set_props(rows: Array) -> void:
+## in front of the door. `rows` are the active tenants (tenants.json shape) of this building's plot,
+## `shops` what OpenStreetMap maps in the building (pois.json): where it has a shop or café, its name
+## is on the sign and its opening hours light the neon.
+func set_props(rows: Array, shops: Array = []) -> void:
 	var dom: Dictionary = MapPalette.dominant(rows)
-	if dom.is_empty():
+	var shop := _shop_of(shops)
+	if dom.is_empty() and shop.is_empty():
 		return
 	if not is_built:
 		await built
@@ -888,6 +992,14 @@ func set_props(rows: Array) -> void:
 	if f.is_empty():
 		return
 	var sector := str(dom.get("sector", ""))
+	var sign_name := str(dom.get("name", ""))
+	if not shop.is_empty():
+		# the map says what the ground floor is and what its sign reads: the register's biggest company
+		# on the plot is as often the landlord or an office upstairs
+		sector = Pois.sector(shop)
+		sign_name = Pois.label(shop)
+		_open_week = OpeningHours.parse(str(shop.opening_hours)) if shop.get("opening_hours") != null else []
+		_weekday = OpeningHours.weekday(Sites.pack_of(self))
 	var n: Vector3 = f.n
 	var t: Vector3 = f.t
 	var yaw := atan2(n.x, n.z)   # a prop's local +Z turned onto the wall's outward normal
@@ -898,7 +1010,7 @@ func set_props(rows: Array) -> void:
 			bracket.rotation.y = yaw
 			add_child(bracket)
 			var board := Label3D.new()
-			board.text = str(dom.get("name", "")).left(28)
+			board.text = sign_name.left(28)
 			board.font_size = 48
 			board.pixel_size = 0.006
 			board.modulate = Color(0.98, 0.95, 0.85)
@@ -946,11 +1058,23 @@ func set_props(rows: Array) -> void:
 			add_child(board)
 
 
-## The neon sign lit in opening hours.
+## The shop or café the map puts in this building: named, not an empty unit, and the one the
+## register's company is matched to when there are several.
+static func _shop_of(shops: Array) -> Dictionary:
+	var best := {}
+	for p in shops:
+		if p.get("vacant") == true or Pois.sector(p) == "" or Pois.label(p) == "":
+			continue
+		if best.is_empty() or (p.get("tenant") != null and best.get("tenant") == null):
+			best = p
+	return best
+
+
+## The neon sign lit in opening hours: the map's for the day where it has them, else the sector's.
 func set_open_hour(hour: float) -> void:
 	if _neon_mats.is_empty():
 		return
-	var on := hour >= _neon_hours.x and hour < _neon_hours.y
+	var on := OpeningHours.is_open(_open_week, _weekday, hour) if not _open_week.is_empty() else (hour >= _neon_hours.x and hour < _neon_hours.y)
 	for m in _neon_mats:
 		m.emission_energy_multiplier = 4.0 if on else 0.0
 		m.albedo_color = Color(1, 1, 1) if on else Color(0.5, 0.5, 0.5)

@@ -199,7 +199,7 @@ func _fill_plots() -> void:
 		grid.add_child(_lbl(_purpose(Parcels.purpose_of(p)), 13))
 		grid.add_child(_num("%d m²" % int(p.get("area", 0))))
 		grid.add_child(_num(BookTheme.money(int(_value(p)))) if _value(p) > 0 else _num("–"))
-		grid.add_child(_lbl(str(p.get("ownership", "")), 13))
+		grid.add_child(_lbl(Parcels.ownership_of(p), 13))
 		grid.add_child(_nav_buttons(tunnus))
 	if rows.size() > MAX_ROWS:
 		body.add_child(_lbl(tr("UI_BOOK_MORE") % (rows.size() - MAX_ROWS), 13))
@@ -221,7 +221,7 @@ func _sort_rows(rows: Array, near: Vector2) -> void:
 		match _sort:
 			"address": return _address_key(str(p.get("address", "")), str(p.get("tunnus", "")))
 			"purpose": return _purpose(Parcels.purpose_of(p))
-			"ownership": return str(p.get("ownership", ""))
+			"ownership": return Parcels.ownership_of(p)
 			"area": return float(p.get("area", 0))
 			"land_value": return _value(p)
 			_: return near.distance_to(Vector2(float(p.x), float(p.z)))
@@ -272,6 +272,9 @@ func _fill_plot() -> void:
 		if p.get("land_value_per_m2") != null:
 			per = "   (%s/m²)" % BookTheme.money(int(round(float(p.land_value_per_m2))))
 		body.add_child(_lbl("%s: %s%s" % [tr("UI_BOOK_COL_VALUE"), BookTheme.money(int(_value(p))), per], 15))
+	# where no land value is published (Finland), the zoning plan's building right says what the plot may carry
+	if p.get("building_right_m2") != null and float(p.building_right_m2) > 0:
+		body.add_child(_lbl(tr("UI_BOOK_BUILDING_RIGHT") % [int(p.building_right_m2), str(p.get("zoning_plan", "") if p.get("zoning_plan") != null else "")], 15))
 	for pair in [["UI_BOOK_COL_OWNERSHIP", "ownership"], ["UI_BOOK_LAND_REGISTRY", "land_registry"], ["UI_BOOK_REGISTERED", "registered"]]:
 		var v := str(p.get(pair[1], "") if p.get(pair[1]) != null else "")
 		if v != "":
@@ -569,22 +572,35 @@ func _fill_values(body: Node) -> void:
 
 ## Every "attribution" line the pack's data files carry, once each: the credits THIRD_PARTY.md says
 ## the game owes (the bus stops' OpenStreetMap credit is an ODbL condition), from the files that
-## drew on each source. The tile's measured trees credit theirs as "source".
+## drew on each source. The tile's measured trees credit theirs as "source". Each file is parsed
+## once a session and only its credit lines are kept (`_credit_lines`): buildings.json alone is
+## 9 MB on a city tile, too much to parse again on every page turn or to hold whole for a sentence.
 func _attributions() -> Array:
 	var seen := {}
 	var files := ["parcels.json", "buildings.json", "tenants.json", "roads.json", "market.json",
-		"stops.json", "departures.json", "fields_2026.json"]
+		"stops.json", "departures.json", "fields_2026.json", "pitches.json", "street.json", "rail.json", "pois.json"]
 	var paths: Array = files.map(func(f): return [Sites.path(f), "attribution"])
 	paths.append([Sites.tile_dir() + "/trees.json", "source"])
+	paths.append([Sites.tile_dir() + "/trees_osm.json", "source"])
 	for pk in paths:
-		if not FileAccess.file_exists(pk[0]):
-			continue
-		var parsed = JSON.parse_string(FileAccess.get_file_as_string(pk[0]))
-		if typeof(parsed) != TYPE_DICTIONARY:
-			continue
-		for line in _lines_of(parsed.get(pk[1], "")):
+		if not _credit_lines.has(pk[0]):
+			var lines: Array = []
+			if FileAccess.file_exists(pk[0]):
+				var parsed = JSON.parse_string(FileAccess.get_file_as_string(pk[0]))
+				if typeof(parsed) == TYPE_DICTIONARY:
+					lines = _lines_of(parsed.get(pk[1], ""))
+			_credit_lines[pk[0]] = lines
+		for line in _credit_lines[pk[0]]:
 			seen[line] = true
 	return seen.keys()
+
+
+static var _credit_lines: Dictionary = {}   # data file path -> its credit lines, read once a session
+
+
+## The credit lines read so far (GameState.forget_caches): a refreshed pack may credit other sources.
+static func forget_credits() -> void:
+	_credit_lines.clear()
 
 
 ## An "attribution" field as lines. The files write it three ways: one string, a list of them, or a

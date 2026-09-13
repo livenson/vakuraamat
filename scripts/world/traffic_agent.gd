@@ -25,6 +25,7 @@ var _wheels: Array[Node3D] = []
 var _t := 0.0
 var _speed_now := 0.0
 var _terrain: Terrain3D
+var signals: TrafficSignals = null   # the lights a car or a cyclist on the carriageway waits at
 const RANGE := 250.0   # agents spawn within 220 m and go at 320: beyond this they are a few pixels
 
 
@@ -113,6 +114,12 @@ func advance(delta: float, others: Array) -> void:
 		want = 0.0
 	elif gap < min_gap * 2.5:
 		want = speed * (gap - min_gap) / (min_gap * 1.5)
+	if signals and kind in ["car", "cart", "bike"] and edge.kind in ["street", "road"]:
+		var line := signals.stop_distance(graph, edge, s, forward)   # a red light ahead: ease to its line
+		if line < 0.8:
+			want = 0.0
+		elif line < 18.0:
+			want = minf(want, speed * line / 18.0)
 	_speed_now = lerpf(_speed_now, want, minf(1.0, delta * 3.0))
 	s += _speed_now * delta * (1.0 if forward else -1.0)
 	if s > edge.length or s < 0.0:

@@ -1,11 +1,12 @@
-# The locator: Estonia and Latvia at a glance on the Locations page, so a suggested place is a spot on
-# the map and not only a name with a coordinate under it. Estonia's coastline is the county division
-# unioned and simplified (assets/data/estonia.json), Latvia's its municipalities (assets/data/latvia.json,
-# both from tools/pipeline/fetch_outline.py, on the same L-EST97 grid), drawn as an engraved plate
-# in the book's ink: land on lighter paper, Peipsi and the gulf as the page itself, Võrtsjärv in the
-# cadastre's blue. Every place the page offers is a mark on it; the world you are in is filled.
-# Hovering a mark names it, clicking it emits `picked`, and hovering a row on the page lights that
-# row's mark (`highlight`).
+# The locator: the covered countries at a glance on the Locations page, so a suggested place is a spot
+# on the map and not only a name with a coordinate under it. Estonia's coastline is the county division
+# unioned and simplified (assets/data/estonia.json), Latvia's its municipalities (latvia.json), Finland's
+# Statistics Finland's (finland.json), all from tools/pipeline/fetch_outline.py on the same L-EST97 grid,
+# drawn as an engraved plate in the book's ink: land on lighter paper, Peipsi and the gulf as the page
+# itself, Võrtsjärv in the cadastre's blue. Every place the page offers is a mark on it; the world you
+# are in is filled. Hovering a mark names it, clicking it emits `picked`, and hovering a row on the page
+# lights that row's mark (`highlight`). The page's country picker frames one country (`frame`): Finland
+# is two and a half times as tall as the Baltic states together and would shrink them to a corner.
 class_name EstoniaMap
 extends Control
 
@@ -18,6 +19,7 @@ signal picked(index: int)    # a mark clicked: the page decides what going there
 var places: Array = []
 
 static var _map: Dictionary = {}
+var _framed: Array = []     # [xmin, ymin, xmax, ymax] the plate shows; empty: every country
 var _bounds := Rect2()
 var _plate := Rect2()
 var _hover := -1
@@ -26,7 +28,8 @@ var _lit := -1              # lit from the page: the row the pointer is on
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	custom_minimum_size = Vector2(380, 340)   # the two countries together are about as tall as wide
+	clip_contents = true   # a framed country's neighbours are cut at the frame
+	custom_minimum_size = Vector2(380, 340)
 	_load()
 	mouse_exited.connect(func():
 		if _hover != -1:
@@ -58,6 +61,20 @@ static func _load() -> Dictionary:
 	return _map
 
 
+## Show one country, its outline's bounds with a margin, or every country with "".
+func frame(country: String) -> void:
+	_framed = []
+	if country != "" and Countries.all().has(country):
+		var path := str(Countries.by_id(country).get("outline", ""))
+		var text := FileAccess.get_file_as_string(path) if path != "" else ""
+		var d = JSON.parse_string(text) if text != "" else null
+		if typeof(d) == TYPE_DICTIONARY and d.get("bounds", []).size() == 4:
+			var b: Array = d.bounds
+			var pad := 0.06 * maxf(float(b[2]) - float(b[0]), float(b[3]) - float(b[1]))
+			_framed = [float(b[0]) - pad, float(b[1]) - pad, float(b[2]) + pad, float(b[3]) + pad]
+	queue_redraw()
+
+
 ## Light the mark of the place at `index` (-1 for none): what a row hover on the page asks for.
 func highlight(index: int) -> void:
 	if index == _lit:
@@ -81,11 +98,15 @@ func _gui_input(event: InputEvent) -> void:
 			accept_event()
 
 
+## The mark nearest the pointer, of those on the plate (a framed country hides the others' marks).
 func _nearest(at: Vector2) -> int:
 	var best := -1
 	var best_d := PICK_RADIUS
 	for i in places.size():
-		var d := at.distance_to(_to_px(places[i]))
+		var p := _to_px(places[i])
+		if not _plate.grow(4).has_point(p):
+			continue
+		var d := at.distance_to(p)
 		if d < best_d:
 			best_d = d
 			best = i
@@ -108,17 +129,16 @@ func _poly(ring: Array) -> PackedVector2Array:
 
 func _draw() -> void:
 	var m := _load()
-	var b: Array = m.get("bounds", [])
+	var b: Array = _framed if not _framed.is_empty() else m.get("bounds", [])
 	if b.size() != 4:
 		return
 	_bounds = Rect2(float(b[0]), float(b[1]), float(b[2]) - float(b[0]), float(b[3]) - float(b[1]))
 	# the plate: the map's own aspect, centred in the space the page gave, with room for the frame
-	var frame := Rect2(Vector2.ZERO, size).grow(-1)
+	var frame_rect := Rect2(Vector2.ZERO, size).grow(-1)
 	var aspect := _bounds.size.x / _bounds.size.y
-	var side := Vector2(minf(frame.size.x, frame.size.y * aspect), minf(frame.size.y, frame.size.x / aspect))
-	_plate = Rect2(frame.position + (frame.size - side) * 0.5, side).grow(-8)
-	draw_rect(frame, BookTheme.PAGE_DARK)
-	draw_rect(frame, Color(BookTheme.INK, 0.6), false, 1.0)
+	var side := Vector2(minf(frame_rect.size.x, frame_rect.size.y * aspect), minf(frame_rect.size.y, frame_rect.size.x / aspect))
+	_plate = Rect2(frame_rect.position + (frame_rect.size - side) * 0.5, side).grow(-8)
+	draw_rect(frame_rect, BookTheme.PAGE_DARK)
 	for ring in m.get("land", []):
 		var pts := _poly(ring)
 		if pts.size() < 3:
@@ -130,11 +150,14 @@ func _draw() -> void:
 		var pts := _poly(ring)
 		if pts.size() >= 3:
 			draw_colored_polygon(pts, Color(BookTheme.BLUE, 0.5))
+	draw_rect(frame_rect, Color(BookTheme.INK, 0.6), false, 1.0)
 	var font := BookTheme.font("plex")
 	var named := _hover if _hover != -1 else _lit
 	for i in places.size():
 		var p: Dictionary = places[i]
 		var at := _to_px(p)
+		if not _plate.grow(4).has_point(at):
+			continue   # another country's place, off the framed plate
 		var kind := str(p.get("kind", "suggested"))
 		var color: Color = BookTheme.INK if kind == "installed" else BookTheme.BLUE
 		var lit := i == named
@@ -146,7 +169,7 @@ func _draw() -> void:
 		else:
 			draw_circle(at, 3.0, Color(BookTheme.PAGE_LIGHT, 0.9))
 			draw_arc(at, 3.0, 0.0, TAU, 20, color, 1.4, true)
-	if named >= 0 and named < places.size():
+	if named >= 0 and named < places.size() and _plate.grow(4).has_point(_to_px(places[named])):
 		_draw_name(font, str(places[named].get("name", "")), _to_px(places[named]))
 
 

@@ -9,6 +9,7 @@ signal reported(path: String)
 const DIR := "user://reports/"
 const FEED := "user://reports/feed.log"
 const MAX_ERRORS := 40
+const KEEP_REPORTS := 150   # the newest are kept; screenshots run to 7 MB and 445 reports held 334 MB
 
 var recent_errors: Array[String] = []
 var _frame: Image = null
@@ -33,6 +34,18 @@ func _ready() -> void:
 	_logger.sink = _remember
 	OS.add_logger(_logger)
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(DIR))
+	_prune()
+
+
+## Only the newest KEEP_REPORTS reports stay (their JSON and screenshot); the feed keeps its lines.
+func _prune() -> void:
+	var names: Array = Array(DirAccess.get_files_at(DIR)).filter(func(f): return str(f).begins_with("report_") and str(f).ends_with(".json"))
+	names.sort()   # the ids are timestamps: oldest first
+	for i in maxi(names.size() - KEEP_REPORTS, 0):
+		var base := DIR + str(names[i]).trim_suffix(".json")
+		for ext in [".json", ".png"]:
+			if FileAccess.file_exists(base + ext):
+				DirAccess.remove_absolute(ProjectSettings.globalize_path(base + ext))
 
 
 func _remember(line: String) -> void:

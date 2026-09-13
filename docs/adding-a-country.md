@@ -4,7 +4,10 @@ A country is two things: an **adapter** in `tools/pipeline/sources.py`, for the 
 tile service, and a **descriptor** in `assets/data/countries/<id>.json`, for the game. No other
 script names a country. Estonia (`ee`) and Latvia (`lv`) are the worked examples. Latvia was
 added on top of Estonia (`docs/latvia-plan.md`) and is the better model for a country whose
-data looks nothing like Estonia's.
+data looks nothing like Estonia's. Finland (`fi`, [finland-plan.md](finland-plan.md)) is being added
+the same way: its ground comes key-free from a mirror of the national files, with a city's own finer
+layers laid over them where they reach. Which countries publish enough open data, and which is the
+nearest next, is in [other-countries-data.md](other-countries-data.md).
 
 Everything is built on one grid, L-EST97 (EPSG:3301). A country with its own grid is reprojected
 into it the way Latvia's LKS-92 data is (`tools/pipeline/geo.py`). The grid is conformal and

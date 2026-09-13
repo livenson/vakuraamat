@@ -111,7 +111,7 @@ def validate(site, rep, root=ROOT):
             rep.err(f"site.json terrain.{k} missing")
     if isinstance(t.get("center"), list) and len(t["center"]) == 2:
         x, y = t["center"]
-        if not (100000 < x < 900000 and 5800000 < y < 7000000):
+        if not (100000 < x < 900000 and 5800000 < y < 7850000):   # north to Utsjoki: Finland is on the same grid
             rep.warn("terrain.center does not look like EPSG:3301 (L-EST97) metres, the grid every country is built on")
     tile_dir = os.path.join(root, "assets/terrain", str(t.get("tile", site)))
     if not os.path.exists(os.path.join(tile_dir, "terrain_meta.json")):
@@ -196,7 +196,9 @@ def validate(site, rep, root=ROOT):
             lv = u.get("land_value")
             if lv is not None and not isinstance(lv, (int, float)):
                 rep.err(f"parcels.json {u.get('tunnus')}: land_value must be a number or null")
-        if units and not any(u.get("land_value") for u in units):
+        # a country that publishes no value per plot says so in the file (Finland: valuation.field null)
+        declared_none = "valuation" in parcels and (parcels["valuation"] or {}).get("field") is None
+        if units and not declared_none and not any(u.get("land_value") for u in units):
             rep.warn("parcels.json has no land_value: re-run make parcels")
     buildings = load_json("buildings.json", ("buildings",))
     tunnus_set = {u.get("tunnus") for u in parcels["parcels"]} if parcels else set()
@@ -205,8 +207,10 @@ def validate(site, rep, root=ROOT):
     if tenants:
         for t in tenants["tenants"]:
             who = f"tenants.json {t.get('registry_code')}"
-            if not (str(t.get("registry_code") or "").isdigit() and t.get("name")):
-                rep.err(f"{who}: needs a numeric registry_code and a name")
+            # numeric in Estonia and Latvia; a Finnish business id (Y-tunnus) carries its check digit after a hyphen
+            code = str(t.get("registry_code") or "")
+            if not ((code.isdigit() or re.fullmatch(r"\d{7}-\d", code)) and t.get("name")):
+                rep.err(f"{who}: needs a numeric registry_code (or a Finnish business id) and a name")
             if t.get("match") not in ("exact", "street", "none"):
                 rep.err(f"{who}: match must be exact, street or none")
             if t.get("tunnus") is not None and t["tunnus"] not in tunnus_set:

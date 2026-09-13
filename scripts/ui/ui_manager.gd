@@ -672,8 +672,9 @@ func _refresh_codes() -> void:
 	if not u.is_empty():
 		lines.append("   " + Countries.parcel_link(u))
 		if u.get("land_value") != null:
-			lines.append("   %s: %s   %s: %s" % [tr("UI_CODES_OWNER"), str(u.get("ownership", "")),
-				tr("UI_BOOK_COL_VALUE"), BookTheme.money(int(u.land_value))])
+			var own := Parcels.ownership_of(u)
+			lines.append("   " + ("%s: %s   " % [tr("UI_CODES_OWNER"), own] if own != "" else "")
+				+ "%s: %s" % [tr("UI_BOOK_COL_VALUE"), BookTheme.money(int(u.land_value))])
 		var rows := Tenants.of(Sites.pack_of(layer), str(u.tunnus))
 		if not rows.is_empty():
 			lines.append("   " + tr("UI_CODES_TENANT") + ":")
@@ -1273,7 +1274,7 @@ func _map_layer(pack: String) -> Dictionary:
 		return _map_layers[pack]
 	var streets: Array = []
 	var longest: Dictionary = {}   # name -> {len, pts}
-	var rd = JSON.parse_string(FileAccess.get_file_as_string(Sites.path_in(pack, "roads.json")))
+	var rd = PackFiles.json(pack, "roads.json")
 	if typeof(rd) == TYPE_DICTIONARY:
 		for r in rd.get("roads", []):
 			var name := str(r.get("name", ""))
@@ -1312,13 +1313,11 @@ func _map_layer(pack: String) -> Dictionary:
 			numbers.append({"text": m.get_string(1), "at": Vector2(float(b.get("x", 0.0)), float(b.get("z", 0.0)))})
 	# parcels with their dominant company (tenants.json, exact matches), for the company layer
 	var by_tunnus := {}
-	var tpath := Sites.path_in(pack, "tenants.json")
-	if FileAccess.file_exists(tpath):
-		var td = JSON.parse_string(FileAccess.get_file_as_string(tpath))
-		if typeof(td) == TYPE_DICTIONARY:
-			for t in td.get("tenants", []):
-				if t.get("match") == "exact" and t.get("tunnus") != null:
-					by_tunnus.get_or_add(str(t.tunnus), []).append(t)
+	var td = PackFiles.json(pack, "tenants.json")
+	if typeof(td) == TYPE_DICTIONARY:
+		for t in td.get("tenants", []):
+			if t.get("match") == "exact" and t.get("tunnus") != null:
+				by_tunnus.get_or_add(str(t.tunnus), []).append(t)
 	var parcels: Array = []
 	for u in Parcels.units(pack):
 		var poly: Array = u.get("polygon", [])

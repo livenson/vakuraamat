@@ -85,7 +85,13 @@ static func describe(u: Dictionary) -> String:
 	if u.is_empty():
 		return ""
 	var purpose := ", ".join(u.get("purpose_text", u.get("purpose", [])))
-	return "%s  %s  %s  %d m²  %s" % [u.get("tunnus", "?"), str(u.get("address", "")), purpose, int(u.get("area", 0)), str(u.get("ownership", ""))]
+	return ("%s  %s  %s  %d m²  %s" % [u.get("tunnus", "?"), str(u.get("address", "")), purpose, int(u.get("area", 0)), ownership_of(u)]).strip_edges()
+
+
+## The unit's form of ownership, "" where the cadastre says none: Finland's and Latvia's registers
+## publish no owner, and str(null) printed "<null>" on the building sheet.
+static func ownership_of(u: Dictionary) -> String:
+	return str(u.ownership) if u.get("ownership") != null else ""
 
 
 # ---------------------------------------------------------------- internals

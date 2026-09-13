@@ -49,9 +49,14 @@ static func of_pack(pack: String) -> Dictionary:
 
 
 ## The country whose building codes look like `code`, or `fallback` when none claims it. Told by the
-## code rather than the pack because a tile on the border carries buildings of both countries.
+## code rather than the pack because a tile on the border carries buildings of both countries. The
+## pack's own country goes first: Estonia's pattern (any number up to 12 digits) would also claim the
+## Finnish identifiers whose check character is a digit.
 static func for_building_code(code: String, fallback: Dictionary) -> Dictionary:
 	if code != "":
+		var own := str(fallback.get("building_code", {}).get("pattern", ""))
+		if own != "" and RegEx.create_from_string(own).search(code) != null:
+			return fallback
 		for c in all().values():
 			var pattern := str(c.get("building_code", {}).get("pattern", ""))
 			if pattern != "" and RegEx.create_from_string(pattern).search(code) != null:

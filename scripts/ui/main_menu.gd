@@ -14,6 +14,7 @@ var _page: Control
 var _status: Label
 var _results: VBoxContainer
 var _query: LineEdit
+var _country: OptionButton   # the Locations page's country picker
 var _suggest_timer: Timer
 var _suggest_serial := 0
 var _result_serial := 0          # the results on the page; a late estimate for older ones is dropped
@@ -240,8 +241,24 @@ func _build_locations_panel() -> void:
 	var srow := HBoxContainer.new()
 	srow.add_theme_constant_override("separation", 8)
 	box.add_child(srow)
+	# the country picker: the search asks only that country's register, the map frames it, the ideas
+	# are its own; "all countries" searches every one. Kept between visits beside the played times.
+	_country = OptionButton.new()
+	_country.custom_minimum_size = Vector2(0, 46)
+	_country.add_theme_font_size_override("font_size", 18)
+	_country.add_item(tr("MENU_COUNTRY_ALL"))
+	_country.set_item_metadata(0, "")
+	for id in Countries.all():
+		_country.add_item(tr(str(Countries.all()[id].get("name_key", id))))
+		_country.set_item_metadata(_country.item_count - 1, id)
+	srow.add_child(_country)
+	var chosen := _saved_country()
+	for i in _country.item_count:
+		if str(_country.get_item_metadata(i)) == chosen:
+			_country.select(i)
+	_country.item_selected.connect(_on_country)
 	_query = LineEdit.new()
-	_query.placeholder_text = tr("MENU_SEARCH_PLACES") + ":   Kvissentali tee, Tartu   /   Doma laukums, Rīga"
+	_query.placeholder_text = tr("MENU_SEARCH_PLACES") + ":   " + _search_examples(chosen)
 	_query.tooltip_text = tr("MENU_LOCATION_HINT")
 	_query.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_query.custom_minimum_size = Vector2(0, 46)
@@ -298,6 +315,7 @@ func _build_locations_panel() -> void:
 	_map.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_map.picked.connect(_on_mark)
 	right.add_child(_map)
+	_map.frame(chosen)
 	_map_actions = []
 	for id in worlds:
 		var terrain: Dictionary = Sites.manifest_for(id).get("terrain", {})
@@ -314,6 +332,8 @@ func _build_locations_panel() -> void:
 	var places = JSON.parse_string(text) if text != "" else []
 	var note_key := "note_" + Lang.current()   # note_et, note_en, note_lv
 	for p in (places if typeof(places) == TYPE_ARRAY else []):
+		if chosen != "" and str(p.get("country", chosen)) != chosen:
+			continue   # the picked country's ideas only
 		var go := _go.bind(str(p.name), float(p.x), float(p.y))
 		var mark := _add_mark(str(p.name), float(p.x), float(p.y), "suggested", go)
 		var b := Button.new()
@@ -625,7 +645,7 @@ func _suggest() -> void:
 	_suggest_serial += 1
 	var serial := _suggest_serial
 	var q := _query.text
-	var results: Array = await Locator.geocode(q)
+	var results: Array = await Locator.geocode(q, _country_id())
 	if serial != _suggest_serial or not is_instance_valid(_results) or _query.text != q:
 		return
 	if not results.is_empty():
@@ -635,8 +655,47 @@ func _suggest() -> void:
 func _search() -> void:
 	_status.text = "..."
 	_suggest_serial += 1   # a submitted search outranks pending suggestions
-	var results: Array = await Locator.geocode(_query.text)
+	var results: Array = await Locator.geocode(_query.text, _country_id())
 	_show_results(results)
+
+
+## The picked country's descriptor id, "" for every country.
+func _country_id() -> String:
+	if not is_instance_valid(_country) or _country.selected < 0:
+		return ""
+	return str(_country.get_item_metadata(_country.selected))
+
+
+## The country picked last time; the first time, the country of the world you are in ("" when none).
+static func _saved_country() -> String:
+	var cfg := ConfigFile.new()
+	if cfg.load(PLAYED) == OK and cfg.has_section_key("menu", "country"):
+		var id := str(cfg.get_value("menu", "country", ""))
+		return id if id == "" or Countries.all().has(id) else ""
+	return str(Countries.of_pack(Sites.active).get("id", "")) if Sites.active != "" else ""
+
+
+## A new pick: remembered, and the page drawn again for it (the map's frame, the ideas), the query kept.
+func _on_country(index: int) -> void:
+	var cfg := ConfigFile.new()
+	cfg.load(PLAYED)
+	cfg.set_value("menu", "country", str(_country.get_item_metadata(index)))
+	cfg.save(PLAYED)
+	var text := _query.text
+	_build_locations_panel()
+	_query.text = text
+	if text.strip_edges().length() >= 3:
+		_search()
+
+
+## The search field's examples: the picked country's, or every country's.
+static func _search_examples(country: String) -> String:
+	var out: Array[String] = []
+	for id in Countries.all():
+		var ex := str(Countries.all()[id].get("search_example", ""))
+		if ex != "" and (country == "" or id == country):
+			out.append(ex)
+	return "   /   ".join(out)
 
 
 func _use_my_location() -> void:

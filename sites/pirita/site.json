@@ -1,6 +1,6 @@
 {
   "id": "pirita",
-  "pipeline": 3,
+  "pipeline": 4,
   "name_key": "SITE_PIRITA",
   "subtitle_key": "SITE_PIRITA_SUBTITLE",
   "description": "Pirita: generated site pack.",

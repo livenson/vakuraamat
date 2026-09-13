@@ -1,0 +1,151 @@
+[gd_resource type="Terrain3DAssets" format=3]
+
+[ext_resource type="PackedScene" path="res://assets/models/trees/pine_lod.tscn" id="1_5lxh6"]
+[ext_resource type="Texture2D" path="res://assets/terrain/textures/meadow_alb_ht.png" id="1_gwk8p"]
+[ext_resource type="PackedScene" path="res://assets/models/trees/spruce_lod.tscn" id="2_a8r12"]
+[ext_resource type="Texture2D" path="res://assets/terrain/textures/meadow_nrm_rgh.png" id="2_tkdma"]
+[ext_resource type="PackedScene" path="res://assets/models/trees/birch_lod.tscn" id="3_q44k1"]
+[ext_resource type="Texture2D" path="res://assets/terrain/textures/field_alb_ht.png" id="3_vfhyh"]
+[ext_resource type="PackedScene" path="res://assets/vegetation/tree_juniper.tscn" id="4_le4kk"]
+[ext_resource type="Texture2D" path="res://assets/terrain/textures/field_nrm_rgh.png" id="4_pgnj5"]
+[ext_resource type="Texture2D" path="res://assets/terrain/textures/forest_floor_alb_ht.png" id="5_dweay"]
+[ext_resource type="PackedScene" path="res://assets/vegetation/tree_juniper_dead.tscn" id="5_m8ipl"]
+[ext_resource type="PackedScene" path="res://assets/vegetation/bush_jello.tscn" id="6_lt1m6"]
+[ext_resource type="Texture2D" path="res://assets/terrain/textures/forest_floor_nrm_rgh.png" id="6_rdtlm"]
+[ext_resource type="PackedScene" path="res://assets/vegetation/bush_brush.tscn" id="7_7qcqq"]
+[ext_resource type="Texture2D" path="res://assets/terrain/textures/gravel_alb_ht.png" id="7_u3hlc"]
+[ext_resource type="PackedScene" path="res://assets/vegetation/grass_card.tscn" id="8_3xyyc"]
+[ext_resource type="Texture2D" path="res://assets/terrain/textures/gravel_nrm_rgh.png" id="8_24ae6"]
+[ext_resource type="PackedScene" path="res://assets/vegetation/grass_tuft.tscn" id="9_nwxfo"]
+[ext_resource type="PackedScene" path="res://assets/vegetation/clover.tscn" id="10_0lu8f"]
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_5lxh6"]
+name = "tree_pine"
+scene_file = ExtResource("1_5lxh6")
+density = 0.01
+last_lod = 1
+last_shadow_lod = 0
+lod0_range = 110.0
+lod1_range = 800.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_a8r12"]
+name = "tree_spruce"
+id = 1
+scene_file = ExtResource("2_a8r12")
+density = 0.2384763
+last_lod = 1
+last_shadow_lod = 0
+lod0_range = 110.0
+lod1_range = 800.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_q44k1"]
+name = "tree_birch"
+id = 2
+scene_file = ExtResource("3_q44k1")
+density = 0.01
+last_lod = 1
+last_shadow_lod = 0
+lod0_range = 110.0
+lod1_range = 800.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_le4kk"]
+name = "tree_juniper"
+id = 3
+scene_file = ExtResource("4_le4kk")
+density = 1.96202
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 180.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_m8ipl"]
+name = "tree_juniper_dead"
+id = 4
+scene_file = ExtResource("5_m8ipl")
+density = 0.042180095
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 150.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_lt1m6"]
+name = "bush_jello"
+id = 5
+scene_file = ExtResource("6_lt1m6")
+density = 6.6125536
+cast_shadows = 0
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 120.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_7qcqq"]
+name = "bush_brush"
+id = 6
+scene_file = ExtResource("7_7qcqq")
+cast_shadows = 0
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 150.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_3xyyc"]
+name = "grass_card"
+id = 7
+scene_file = ExtResource("8_3xyyc")
+cast_shadows = 0
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 80.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_nwxfo"]
+name = "grass_tuft"
+id = 8
+scene_file = ExtResource("9_nwxfo")
+cast_shadows = 0
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 60.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_0lu8f"]
+name = "clover"
+id = 9
+scene_file = ExtResource("10_0lu8f")
+cast_shadows = 0
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 40.0
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_5lxh6"]
+name = "meadow"
+albedo_texture = ExtResource("1_gwk8p")
+normal_texture = ExtResource("2_tkdma")
+uv_scale = 0.2
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_a8r12"]
+name = "field"
+id = 1
+albedo_texture = ExtResource("3_vfhyh")
+normal_texture = ExtResource("4_pgnj5")
+uv_scale = 0.25
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_q44k1"]
+name = "forest_floor"
+id = 2
+albedo_texture = ExtResource("5_dweay")
+normal_texture = ExtResource("6_rdtlm")
+uv_scale = 0.3
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_le4kk"]
+name = "gravel"
+id = 3
+albedo_texture = ExtResource("7_u3hlc")
+normal_texture = ExtResource("8_24ae6")
+uv_scale = 0.8
+
+[sub_resource type="Terrain3DTextureAsset" id="Terrain3DTextureAsset_m8ipl"]
+name = "soil"
+id = 4
+albedo_texture = ExtResource("5_dweay")
+normal_texture = ExtResource("6_rdtlm")
+uv_scale = 0.4
+
+[resource]
+mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_5lxh6"), SubResource("Terrain3DMeshAsset_a8r12"), SubResource("Terrain3DMeshAsset_q44k1"), SubResource("Terrain3DMeshAsset_le4kk"), SubResource("Terrain3DMeshAsset_m8ipl"), SubResource("Terrain3DMeshAsset_lt1m6"), SubResource("Terrain3DMeshAsset_7qcqq"), SubResource("Terrain3DMeshAsset_3xyyc"), SubResource("Terrain3DMeshAsset_nwxfo"), SubResource("Terrain3DMeshAsset_0lu8f")])
+texture_list = Array[Terrain3DTextureAsset]([SubResource("Terrain3DTextureAsset_5lxh6"), SubResource("Terrain3DTextureAsset_a8r12"), SubResource("Terrain3DTextureAsset_q44k1"), SubResource("Terrain3DTextureAsset_le4kk"), SubResource("Terrain3DTextureAsset_m8ipl")])

@@ -46,6 +46,35 @@ screenshot; 2 because the user named trees as the worst; 3–6 as time allows.
   MultiMeshes, merged far-view building cells, footprint occluders, MetalFX/FSR2 at 0.75, no PCSS sun,
   half-resolution SDFGI. Toomemägi street draw calls 5600 -> ~1100-2200, median frame 14.5 -> 12.4 ms.
   Next: ground-level GPU (SSIL/SSAO quality), a graphics settings panel, the 1 s turn hitch
+- [x] 9 photo roofs (2026-09-13, playtest: "if there is no shape info about roofs, project from the
+  orthophoto"): a roof without a measured LOD2 model - an extruded footprint or a roof fitted to the
+  laser - wears the tile's orthophoto, projected straight down (`assets/shaders/roof_ortho.gdshader`,
+  one material per tile: the active tile's photograph whole, a streamed one's at 2048 px). Steep faces
+  take the photograph blurred to ~8 m, so a slope shows its colour without streaks. LOD2 models (Rīga's,
+  Maa-amet's) keep the register's colours: their many facets smeared it. `--plain-roofs` for before/after.
+  Every Finnish roof and Latvia's fitted roofs change; Helsinki from the air 89-96 fps, Rīga 113 fps.
+  Left: the photograph is not a true orthophoto, so a tall building's roof edge can carry a strip of wall.
+- [x] 10 sports pitches (2026-09-13, playtest in Rovaniemi: "this looks like a football pitch, can you
+  detect from data and add it?"): OpenStreetMap's `leisure=pitch` per tile (`fetch_pitches.py`, every
+  country, a stage of the tile service) into `pitches.json`; `scripts/world/pitches.gd` stands goals at
+  a football pitch's short ends (7.32 m on a full pitch, 5 or 3 m on smaller ones), a net across tennis
+  and volleyball courts and a hoop at each end of a basketball court, from shared boxes and cylinders.
+  Rovaniemi's 110 x 66 m pitch has its two goals on the painted lines.
+- [x] 11 OpenStreetMap streets (2026-09-13): one Overpass query per tile (`fetch_osm.py`). Roads wear
+  their surface (Poly Haven asphalt, setts, paving, cobbles, concrete, gravel: Helsinki's and Rīga's sett
+  streets). Lamps stand where the map has them (the 32 m rule only where it has none); marked crossings
+  get zebra bars; signalled junctions and crossings get lights whose phase the cars wait for
+  (`TrafficSignals`); benches, bins, bike racks, bollards, fences, hedges, walls, flowerbeds and piers
+  where mapped, and a parcel kit leaves out its own hedge, fence or benches where the map has them.
+  Tram and railway tracks (flush in the street or on ballast) with trams (Citadis, CC BY) and FLIRT
+  trains running on the right-hand track and stopping at the tram stops. Latvia and Finland take the
+  map's single trees (heights from the canopy model) with the scatter kept off their crowns. Helsinki
+  street level 71 fps, from the air 86-92 fps; Pirita 74 fps.
+- [x] 12 playtest round (2026-09-13): mapped parking bays painted, a parked car in each bay and lot spot
+  where the photograph shows one (Pirita: 273 bays, 238 cars); a marina's yachts at the mapped piers
+  (Pirita 52 -> 207 boats), no boats on a sea-less tile's streets, no ponds on olive lawns; picket and
+  chain-link fence models for the parcel kits; kerbs stop at junctions; windows on footprints wound the
+  other way (Rovaniemi, Rīga, Valka); one bus departure in seven driven; an old bicycle's sound.
 
 ## Result
 

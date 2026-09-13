@@ -26,7 +26,7 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   open source). Prefer CC0/MIT. Nothing from Fab/Megascans. Data files carry `attribution`.
 - Site content lives in `sites/<id>/`: `site.json` (manifest), `layout.json` (positions),
   `scenes.json` (the layer), `data/eras/era_2026.tres`, `parcels.json`, `buildings.json`,
-  `tenants.json`, `market.json`, `roads.json`, `stops.json`, `departures.json`, `fields_2026.json`, `strings.csv`. `make scenes SITE=<id>`
+  `tenants.json`, `market.json`, `roads.json`, `stops.json`, `departures.json`, `fields_2026.json`, `pitches.json` (OSM sports pitches: `Pitches` puts goals, nets and hoops on them), `street.json`, `rail.json`, `pois.json` (OSM street furniture and barriers, tracks and stops, shops with opening hours: `tools/pipeline/fetch_osm.py`; each stays its own file so the ODbL share-alike never reaches the register data), `strings.csv`. `make scenes SITE=<id>`
   regenerates `sites/<id>/scenes/*.tscn`; do not hand-edit those scenes. Engine code (`scripts/`,
   `scenes/`) must not reference a site by name; go through `Sites` (manifest, `data_dir`, `layout`, `tile`).
 - Real names: the companies are real (legal persons only). The register's natural persons are never
@@ -42,7 +42,8 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   and `_num` are the pattern).
 - Countries: an adapter in `tools/pipeline/sources.py` (pipeline, tile service) and a descriptor in
   `assets/data/countries/<id>.json` (game, via `Countries`); no other code names a country. Estonia and
-  Latvia are implemented; `docs/adding-a-country.md` is the checklist.
+  Latvia are implemented, Finland has its ground, plots, buildings, companies, timetables, fields, address search and Finnish as an interface language (`docs/finland-plan.md`);
+  `docs/adding-a-country.md` is the checklist.
 - A pack for a new place is built in two passes. The job ships what the place needs to be walked in
   (the 5 m ground model, 4 MB a sheet against 75 MB for the 1 m one; the register, cadastre, roads,
   tenants), then `refine_job` fetches the 1 m ground, the measured trees and the departures in the
@@ -70,7 +71,15 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   re-fetches the registers and keeps the ground, so it costs seconds, not the twenty minutes a
   forced rebuild does.
 - Service: `tools/tile_service.py` (packs for a point, port 8765) is a loopback Python server the game
-  talks to through `Locator`. It is the only service.
+  talks to through `Locator`. It is the only service. OpenStreetMap comes through `osm_tile.elements`:
+  one union Overpass query per tile, cached in `data_raw/overpass` for 7 days, one request at a time,
+  a stale answer when the servers fail. Before asking Overpass it cuts the tile out of the country's
+  Geofabrik extract in `data_raw/osm` with osmium-tool (`osm_extract.py`, well under a second; the
+  extract downloaded and refreshed in the background, a border tile cut from both countries); without
+  `osmium` (the frozen sidecar) or while the first download runs, Overpass answers. Roads, stops, pitches and `fetch_osm` filter their elements
+  from it (add a new OSM layer to its query, not a query of your own). A finished pack is marked
+  `<id>.ok`; its zip is pruned after 3 days and written again from the workspace on /download. A
+  refresh of a tile that is already refined fetches only the timetables in its refine pass.
 - Core UI strings stay in `assets/i18n/strings.csv`; place strings go in the pack's `strings.csv`
   (imported to `.translation` next to it; `make import` after editing).
 - Generated data is not committed: `assets/terrain/*/data`, tree meshes and impostor atlases. Rebuild
@@ -130,7 +139,9 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   `--focus=<tunnus>` (or `--open=focus:<tunnus>`) lights a plot and everything the registers tie it to,
   `--open=hover:<tunnus>` holds the debug map's slip open over one plot,
   `--hour=<h>` sets the time of day (street lights and windows light after
-  18:30), `--fly` starts in the air for a survey.
+  18:30), `--fly` starts in the air for a survey (with `--spawn=x,z,yaw,height,pitch` it stays at that
+  height), `--plain-roofs` draws roofs in the register's colours instead of the tile's photograph
+  (`FootprintBuilding.photo_roofs`; roofs without a measured LOD2 model wear the photograph).
 - Performance numbers: `--bench` (with `--windowed --site=<id>`) turns once at street level, walks at the
   nearest building (the summary's `moved_m`, `to_centre_m`, `above_ground_m` and `user://logs/bench_walk.png`
   show that floors and walls still hold the player), flies 2 km
@@ -174,6 +185,13 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   `blender --background --python tools/blender/split_glb.py -- <pack.glb> <out_dir> "<name>=<regex>" ...`;
   the download tool needs the output directory to exist. Sketchfab exports are often in cm or with
   a scaled root: never assume metres, fit from bounds.
+- One "Too many mipmaps requested for texture format and dimensions (4294967295)" (with "Attempted to
+  name invalid ID: 0") at every start is Godot 4.7 rendering 3D below full scale for the first time:
+  measured on Pirita, one with `scaling_3d/scale` 0.75 under either bilinear or MetalFX, none at 1.0, and
+  holding the scale at 1 across the window's first resize did not stop it. Harmless; nothing to chase.
+  "instance_reset_physics_interpolation() is deprecated" comes from a compiled addon (Terrain3D 1.0.2).
+  TAA is off in the project: the temporal upscalers anti-alias themselves and the engine disabled TAA
+  beside them with a warning at every start; `--scale3d=` turns it on for the spatial modes.
 - "Resource file not found: res://" and "Error loading resource: ''" right after a pack switch, with no
   GDScript backtrace: Terrain3D reading a downloaded tile's still-empty data directory on its first
   visit. Harmless; the region is built and saved right after.
@@ -183,7 +201,7 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   (or `--fullscreen`; `--locations` for the second page, `--query=<place>` with its results, `--storage` for the storage page, `--creating` / `--failed` for the world-creation
   sheet). Menu strings come from compiled translations: run `godot --headless --import` after editing
   `strings.csv` or the screenshot shows raw keys.
-- Strings: `assets/i18n/strings.csv` (keys, et, en, lv). Add keys with all three languages, never hard-code text; a pack's `strings.csv` may leave `lv` out (the fallback locale is English). The language key and menus cycle through `Lang.LOCALES` (scripts/ui/lang.gd); screenshots take `--locale=lv`.
+- Strings: `assets/i18n/strings.csv` (keys, et, en, lv, fi). Add keys in all four languages, never hard-code text; a pack's `strings.csv` may leave `lv` and `fi` out (the fallback locale is English, and `Sites.display_name` falls back the same way). The language key and menus cycle through `Lang.LOCALES` (scripts/ui/lang.gd); screenshots take `--locale=lv` or `--locale=fi`.
 - UI look: `BookTheme` (scripts/ui/book_theme.gd) is the one theme; new panels set `theme =
   BookTheme.theme()` and use its type variations (HeadLabel, DetailLabel, PrimaryButton, TextButton,
   RowButton) instead of font or colour overrides; euro figures through `BookTheme.money()`, no " · " joins.
@@ -243,6 +261,9 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   skip its pass while `world.filling` and run again on `world.era_filled`, or it will scan a growing
   tree over and over and miss what arrives late. `data/vegetation.ok` marks a tile whose greenery
   stands; the runtime scatter never rewrites `terrain_assets.tres` (`save_assets` false), only `make tile` does.
+  The world fills in any vegetation mesh asset a downloaded tile's file lacks (`TerrainBuilder.ensure_mesh_assets`)
+  and writes that `user://` file back once, whole: without the meshes its saved trees warned "MeshAsset N is null"
+  at every start and drew nothing.
 
 ## Tests
 `tools/godot/*_test.tscn`: parse, geotiff, search, boot (autoloads, the layer, the cadastre, a save

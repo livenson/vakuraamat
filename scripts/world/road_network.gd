@@ -15,6 +15,22 @@ const STYLE := {
 	"trail": {"color": Color(0.42, 0.36, 0.26), "kerb": null, "rough": 1.0},
 }
 
+# The surface a road is paved with, as OpenStreetMap and ETAK name it, onto the Poly Haven textures in
+# assets/textures/roads (tools/pipeline/fetch_polyhaven.py --set roads); "" draws the kind's plain colour.
+const SURFACES := {"asphalt": "asphalt", "Püsikate": "asphalt", "paved": "asphalt", "chipseal": "asphalt",
+	"sett": "sett", "cobblestone": "sett", "cobblestone:flattened": "sett", "stone": "sett", "unhewn_cobblestone": "cobble",
+	"paving_stones": "paving", "paving_stones:lanes": "paving", "bricks": "paving", "brick": "paving",
+	"concrete": "concrete", "concrete:plates": "concrete", "concrete:lanes": "concrete",
+	"gravel": "gravel", "fine_gravel": "gravel", "compacted": "gravel", "unpaved": "gravel", "pebblestone": "gravel", "Kruuskate": "gravel",
+	"dirt": "", "ground": "", "earth": "", "grass": "", "mud": "", "sand": "", "wood": "", "Pinnas": ""}
+const KIND_TEXTURE := {"street": "asphalt", "road": "gravel", "path": "asphalt", "trail": ""}   # when the source names no surface
+const TEXTURE_M := {"asphalt": 3.0, "sett": 2.0, "paving": 1.8, "cobble": 2.4, "concrete": 2.0, "gravel": 2.0}   # metres one repeat covers
+const TINT := {"street|asphalt": Color(0.55, 0.55, 0.57), "path|asphalt": Color(0.82, 0.82, 0.82), "road|gravel": Color(0.95, 0.9, 0.82)}
+const KIND_LIFT := {"street": 0.0, "road": -0.004, "path": -0.008, "trail": -0.012}
+const TEX_LIFT := {"asphalt": 0.001, "concrete": 0.002, "paving": 0.003, "cobble": 0.004, "sett": 0.005}
+const ROAD_TEXTURES := "res://assets/textures/roads/"
+static var _surface_mats: Dictionary = {}   # "<kind>|<texture>" -> StandardMaterial3D, shared by every tile
+
 var roads: Array = []
 var _lamps: Array[OmniLight3D] = []   # street lights, on after dark (set_lit)
 const LAMP_SPACING := 32.0
@@ -22,8 +38,7 @@ const LAMP_HEIGHT := 6.0
 
 
 func _ready() -> void:
-	var text := FileAccess.get_file_as_string(Sites.path_in(Sites.pack_of(self), source))
-	var parsed = JSON.parse_string(text) if text != "" else null
+	var parsed = PackFiles.json(Sites.pack_of(self), source)   # shared with the road graph: read-only
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return
 	roads = parsed.get("roads", [])   # nearest() and the codes overlay read these from the start
@@ -53,40 +68,64 @@ func _build(terrain: Terrain3D) -> void:
 	add_to_group(ARRIVING)
 	var t0 := Time.get_ticks_usec()
 	_slice_start = t0
-	var tools := {}   # "<kind>" and "<kind>_kerb" -> SurfaceTool; one plain material each
-	for r in roads:
+	var tools := {}   # "<kind>|<surface texture>" and "<kind>_kerb" -> SurfaceTool; one material each
+	for ri in roads.size():
+		var r: Dictionary = roads[ri]
 		if not await _breathe():
 			return
 		var kind := str(r.get("kind", "road"))
 		var style: Dictionary = STYLE.get(kind, STYLE.road)
-		for key in [kind, kind + "_kerb"]:
+		var tex := texture_of(kind, r.get("surface"))
+		var surface_key := kind + "|" + tex
+		for key in [surface_key, kind + "_kerb"]:
 			if not tools.has(key):
 				var st := SurfaceTool.new()
 				st.begin(Mesh.PRIMITIVE_TRIANGLES)
 				tools[key] = st
 		var pts := _resample(r.points)
 		var half: float = maxf(float(r.get("width", 3.0)), 1.2) / 2.0
-		_ribbon(tools[kind], pts, half, terrain, lift, 0.0)
+		# a street a hair above a path and setts above asphalt: where two ribbons overlap at a junction,
+		# the one that should show wins instead of the two flickering
+		var up: float = lift + float(KIND_LIFT.get(kind, 0.0)) + float(TEX_LIFT.get(tex, 0.0))
+		_ribbon(tools[surface_key], pts, half, terrain, up, 0.0)
 		if style.kerb != null:
-			for side_sign in [-1.0, 1.0]:
-				_ribbon(tools[kind + "_kerb"], pts, 0.18, terrain, lift + 0.05, side_sign * (half + 0.18))
+			# the kerb stops short of a junction: drawn on to the road's end it ran across the other
+			# carriageway (playtest 2026-09-13, Pirita: "road intersections are not nice, lines overlap")
+			var kerb := _cut(pts, _junction_trim(ri, pts, true), _junction_trim(ri, pts, false))
+			if kerb.size() >= 2:
+				for side_sign in [-1.0, 1.0]:
+					_ribbon(tools[kind + "_kerb"], kerb, 0.18, terrain, lift + 0.05, side_sign * (half + 0.18))
 	for key in tools:
 		var st: SurfaceTool = tools[key]
 		var mesh: ArrayMesh = st.commit()
 		if mesh == null or mesh.get_surface_count() == 0:
 			continue
-		var kind: String = str(key).trim_suffix("_kerb")
+		var kind: String = str(key).trim_suffix("_kerb").get_slice("|", 0)
 		var style: Dictionary = STYLE.get(kind, STYLE.road)
-		var mat := StandardMaterial3D.new()
-		mat.albedo_color = style.kerb if key.ends_with("_kerb") else style.color
-		mat.roughness = style.rough
+		var mat: StandardMaterial3D
+		if key.ends_with("_kerb"):
+			mat = StandardMaterial3D.new()
+			mat.albedo_color = style.kerb
+			mat.roughness = style.rough
+		else:
+			mat = surface_material(kind, str(key).get_slice("|", 1))
 		var mi := MeshInstance3D.new()
 		mi.mesh = mesh
 		mi.material_override = mat
-		mi.name = "Roads_" + key
+		mi.name = "Roads_" + str(key).replace("|", "_")
 		add_child(mi)
 	var lit: bool = await _street_lights(terrain)
 	if not lit:
+		return
+	var street := StreetFurniture.new()   # what the map has along the streets: crossings, lights, benches, fences
+	street.name = "Street"
+	add_child(street)
+	if not await street.build(self, terrain):
+		return
+	var rails := Rails.new()   # tram and railway tracks, and the trams and trains on them
+	rails.name = "Rails"
+	add_child(rails)
+	if not await rails.build(self, terrain):
 		return
 	var stops: bool = await _bus_stops(terrain)
 	if not stops:
@@ -455,10 +494,7 @@ const STOP_MODELS := {"rural": "res://assets/vendor/sketchfab/bus_stop_rural.glb
 ## modern one on streets; the timetable board is readable (E) with the stop's name and lines.
 func _bus_stops(terrain: Terrain3D) -> bool:
 	var pack := Sites.pack_of(self)
-	var path := Sites.path_in(pack, "stops.json")
-	if not FileAccess.file_exists(path):
-		return true
-	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var parsed = PackFiles.json(pack, "stops.json")   # the buses read the same copy
 	if typeof(parsed) != TYPE_DICTIONARY:
 		return true
 	var scenes := {}
@@ -514,8 +550,48 @@ func _bus_stops(terrain: Terrain3D) -> bool:
 	return true
 
 
-## Lamp posts along the streets (asphalt with a kerb): one every LAMP_SPACING metres on the right
-## side, alternating sides on long streets. Dark by day; set_lit turns the lamps on.
+## Where the lamps stand, [position, arm direction (unit, over the road), road direction] each: where
+## OpenStreetMap maps the tile's street lamps (street.json), there and only there, the arm turned to the
+## nearest road; else one every LAMP_SPACING metres along the streets, alternating sides.
+func _lamp_spots() -> Array:
+	var out: Array = []
+	var mapped: Array = StreetData.of(Sites.pack_of(self)).get("lamps", [])
+	if not mapped.is_empty():
+		for q in mapped:
+			var at := Vector2(float(q[0]), float(q[1]))
+			var toward := Vector2(0, 1)
+			var dir := Vector2(1, 0)
+			var r := road_near(at, ["street", "road", "path"], 15.0)
+			if not r.is_empty() and (r.point as Vector2).distance_to(at) > 0.3:
+				toward = ((r.point as Vector2) - at).normalized()
+				dir = r.dir
+			out.append([at, toward, dir])
+		return out
+	var side := 1.0
+	for r in roads:
+		if str(r.get("kind", "road")) != "street":
+			continue
+		if not await _breathe():
+			return []
+		var pts := _resample(r.points)
+		var half: float = maxf(float(r.get("width", 3.0)), 1.2) / 2.0
+		var along := LAMP_SPACING * 0.5
+		var acc := 0.0
+		for i in range(1, pts.size()):
+			var a: Vector2 = pts[i - 1]
+			var c: Vector2 = pts[i]
+			var seg := a.distance_to(c)
+			while acc + seg >= along:
+				var t := (along - acc) / maxf(seg, 0.001)
+				var dir := (c - a).normalized()
+				out.append([a.lerp(c, t) + Vector2(-dir.y, dir.x) * side * (half + 0.9), Vector2(-dir.y, dir.x) * -side, dir])
+				along += LAMP_SPACING
+				side = -side
+			acc += seg
+	return out
+
+
+## Lamp posts where _lamp_spots puts them. Dark by day; set_lit turns the lamps on.
 const LAMP_MODEL := "res://assets/vendor/sketchfab/street_lamp.glb"   # pinokio21, CC BY (THIRD_PARTY.md)
 
 
@@ -540,60 +616,48 @@ func _street_lights(terrain: Terrain3D) -> bool:
 	head_mat.emission = Color(1.0, 0.85, 0.6)
 	head_mat.emission_energy_multiplier = 3.0 if _lit else 0.0
 	_head_mat = head_mat
-	var side := 1.0
 	var cells: Dictionary = {}   # Vector2i -> {poles, heads}: transforms, one MultiMesh each per cell
-	for r in roads:
-		if str(r.get("kind", "road")) != "street":
-			continue
-		if not await _breathe():
+	var spots := await _lamp_spots()
+	if spots.is_empty() and not is_inside_tree():
+		return false
+	for n in spots.size():
+		if n % 50 == 0 and not await _breathe():
 			return false
-		var pts := _resample(r.points)
-		var half: float = maxf(float(r.get("width", 3.0)), 1.2) / 2.0
-		var along := LAMP_SPACING * 0.5
-		var acc := 0.0
-		for i in range(1, pts.size()):
-			var a: Vector2 = pts[i - 1]
-			var c: Vector2 = pts[i]
-			var seg := a.distance_to(c)
-			while acc + seg >= along:
-				var t := (along - acc) / maxf(seg, 0.001)
-				var dir := (c - a).normalized()
-				var at := a.lerp(c, t) + Vector2(-dir.y, dir.x) * side * (half + 0.9)
-				var gp := to_global(Vector3(at.x, 0.0, at.y))
-				var h: float = terrain.data.get_height(gp)
-				if not is_nan(h):
-					var base := Vector3(at.x, h - global_position.y, at.y)
-					var toward := Vector2(-dir.y, dir.x) * -side   # across the road, from the lamp
-					var arm := toward * 0.35   # the head leans over the road
-					if lamp_scene and lamp_bounds.size.y > 0.01:
-						# the vendored lamp: its height fitted to LAMP_HEIGHT, its -X arm turned over the road
-						var k := LAMP_HEIGHT / lamp_bounds.size.y
-						var model_xf := Transform3D(Basis.from_scale(Vector3.ONE * k), Vector3(-(lamp_bounds.position.x + lamp_bounds.size.x) * k, -lamp_bounds.position.y * k, -(lamp_bounds.position.z + lamp_bounds.size.z * 0.5) * k))
-						var turn_xf := Transform3D(Basis(Vector3.UP, atan2(toward.x, toward.y) + PI / 2.0), base)
-						_lamp_cell(cells, at).poles.append(turn_xf * model_xf)
-						arm = toward * maxf(lamp_bounds.size.x * k - 0.2, 0.3)
-						head_mesh.size = Vector3(0.3, 0.08, 0.2)
-					else:
-						_lamp_cell(cells, at).poles.append(Transform3D(Basis(), base + Vector3(0, LAMP_HEIGHT / 2.0, 0)))
-					# the glowing lamp itself, also over the model's head
-					var head_pos := base + Vector3(arm.x, LAMP_HEIGHT - 0.1, arm.y)
-					_lamp_cell(cells, at).heads.append(Transform3D(Basis(Vector3.UP, -atan2(dir.y, dir.x)), head_pos))
-					var lamp := OmniLight3D.new()
-					lamp.position = head_pos - Vector3(0, 0.25, 0)
-					lamp.light_color = Color(1.0, 0.82, 0.55)
-					lamp.light_energy = 2.2
-					lamp.omni_range = 16.0
-					lamp.omni_attenuation = 1.2
-					lamp.shadow_enabled = false
-					lamp.distance_fade_enabled = true   # a street has hundreds: only the near ones light the ground
-					lamp.distance_fade_begin = LIGHT_FADE
-					lamp.distance_fade_length = 30.0
-					lamp.visible = false
-					add_child(lamp)
-					_lamps.append(lamp)
-				along += LAMP_SPACING
-				side = -side
-			acc += seg
+		var at: Vector2 = spots[n][0]
+		var toward: Vector2 = spots[n][1]
+		var dir: Vector2 = spots[n][2]
+		var gp := to_global(Vector3(at.x, 0.0, at.y))
+		var h: float = terrain.data.get_height(gp)
+		if is_nan(h):
+			continue
+		var base := Vector3(at.x, h - global_position.y, at.y)
+		var arm := toward * 0.35   # the head leans over the road
+		if lamp_scene and lamp_bounds.size.y > 0.01:
+			# the vendored lamp: its height fitted to LAMP_HEIGHT, its -X arm turned over the road
+			var k := LAMP_HEIGHT / lamp_bounds.size.y
+			var model_xf := Transform3D(Basis.from_scale(Vector3.ONE * k), Vector3(-(lamp_bounds.position.x + lamp_bounds.size.x) * k, -lamp_bounds.position.y * k, -(lamp_bounds.position.z + lamp_bounds.size.z * 0.5) * k))
+			var turn_xf := Transform3D(Basis(Vector3.UP, atan2(toward.x, toward.y) + PI / 2.0), base)
+			_lamp_cell(cells, at).poles.append(turn_xf * model_xf)
+			arm = toward * maxf(lamp_bounds.size.x * k - 0.2, 0.3)
+			head_mesh.size = Vector3(0.3, 0.08, 0.2)
+		else:
+			_lamp_cell(cells, at).poles.append(Transform3D(Basis(), base + Vector3(0, LAMP_HEIGHT / 2.0, 0)))
+		# the glowing lamp itself, also over the model's head
+		var head_pos := base + Vector3(arm.x, LAMP_HEIGHT - 0.1, arm.y)
+		_lamp_cell(cells, at).heads.append(Transform3D(Basis(Vector3.UP, -atan2(dir.y, dir.x)), head_pos))
+		var lamp := OmniLight3D.new()
+		lamp.position = head_pos - Vector3(0, 0.25, 0)
+		lamp.light_color = Color(1.0, 0.82, 0.55)
+		lamp.light_energy = 2.2
+		lamp.omni_range = 16.0
+		lamp.omni_attenuation = 1.2
+		lamp.shadow_enabled = false
+		lamp.distance_fade_enabled = true   # a street has hundreds: only the near ones light the ground
+		lamp.distance_fade_begin = LIGHT_FADE
+		lamp.distance_fade_length = 30.0
+		lamp.visible = false
+		add_child(lamp)
+		_lamps.append(lamp)
 	var pole_draw: Mesh = MeshMerge.baked(LAMP_MODEL) if lamp_scene and lamp_bounds.size.y > 0.01 else pole_mesh
 	for cell: Vector2i in cells:
 		_lamp_multimesh(pole_draw, null if pole_draw != pole_mesh else pole_mat, cells[cell].poles, POLE_RANGE, true)
@@ -667,16 +731,17 @@ func _ribbon(st: SurfaceTool, pts: Array[Vector2], half: float, terrain: Terrain
 		return
 	var left: Array[Vector3] = []
 	var right: Array[Vector3] = []
+	var normal := Vector2.ZERO
 	for i in pts.size():
 		var dir := (pts[mini(i + 1, pts.size() - 1)] - pts[maxi(i - 1, 0)]).normalized()
-		var normal := Vector2(-dir.y, dir.x)
+		if dir != Vector2.ZERO or normal == Vector2.ZERO:
+			normal = Vector2(-dir.y, dir.x)   # two points on one spot have no direction: keep the last one
 		var p := pts[i] + normal * offset
 		var side := normal * half
-		for s in [p + side, p - side]:
-			var h := terrain.data.get_height(to_global(Vector3(s.x, 0, s.y)))
-			if is_nan(h):
-				h = 0.0
-			(left if s == p + side else right).append(Vector3(s.x, h + up, s.y))
+		# each side to its own list: telling them apart by comparing the points put both into `left`
+		# when the side was zero, and the quads below read past the end of `right`
+		left.append(_on_ground(p + side, terrain, up))
+		right.append(_on_ground(p - side, terrain, up))
 	for i in range(pts.size() - 1):
 		var a := left[i]
 		var b := right[i]
@@ -685,6 +750,14 @@ func _ribbon(st: SurfaceTool, pts: Array[Vector2], half: float, terrain: Terrain
 		for v in [a, b, c, a, c, d]:
 			st.set_normal(Vector3.UP)
 			st.add_vertex(v)
+
+
+## A ribbon's point on the ground, `up` above it (the ground at 0 where the terrain has no height).
+func _on_ground(s: Vector2, terrain: Terrain3D, up: float) -> Vector3:
+	var h := terrain.data.get_height(to_global(Vector3(s.x, 0, s.y)))
+	if is_nan(h):
+		h = 0.0
+	return Vector3(s.x, h + up, s.y)
 
 
 ## Nearest road segment to a tile position: {name, kind, type, width, surface, distance}.
@@ -703,3 +776,139 @@ func nearest(pos: Vector3, max_dist := 12.0) -> Dictionary:
 				best_d = d
 				best = {"name": r.get("name"), "kind": r.kind, "type": r.get("type"), "width": r.get("width"), "surface": r.get("surface"), "distance": snappedf(d, 0.1), "id": r.get("id")}
 	return best
+
+
+## The surface texture a road is drawn with: its surface's, else its kind's; "" for the plain colour.
+static func texture_of(kind: String, surface: Variant) -> String:
+	if surface != null and SURFACES.has(str(surface)):
+		return SURFACES[str(surface)]
+	return str(KIND_TEXTURE.get(kind, ""))
+
+
+## The shared material of a kind of road paved with `tex`: the texture projected from above in world
+## metres (the ribbons have no UVs), tinted per kind; the kind's plain colour when `tex` is "" or the
+## texture is not imported.
+static func surface_material(kind: String, tex: String) -> StandardMaterial3D:
+	var key := kind + "|" + tex
+	if _surface_mats.has(key):
+		return _surface_mats[key]
+	var style: Dictionary = STYLE.get(kind, STYLE.road)
+	var m := StandardMaterial3D.new()
+	m.roughness = style.rough
+	var colour := ROAD_TEXTURES + tex + "_color.jpg"
+	if tex != "" and ResourceLoader.exists(colour):
+		m.albedo_texture = load(colour)
+		m.albedo_color = TINT.get(key, Color.WHITE)
+		var normal := ROAD_TEXTURES + tex + "_normal.jpg"
+		if ResourceLoader.exists(normal):
+			m.normal_enabled = true
+			m.normal_texture = load(normal)
+			m.normal_scale = 0.7
+		m.uv1_triplanar = true
+		m.uv1_world_triplanar = true
+		m.uv1_scale = Vector3.ONE / float(TEXTURE_M.get(tex, 2.0))
+		m.texture_filter = BaseMaterial3D.TEXTURE_FILTER_LINEAR_WITH_MIPMAPS_ANISOTROPIC
+	else:
+		m.albedo_color = style.color
+	_surface_mats[key] = m
+	return m
+
+
+## Released with the world, like the other session caches.
+static func release() -> void:
+	_surface_mats.clear()
+
+
+const GRID := 32.0
+var _grid: Dictionary = {}   # Vector2i (GRID m) -> [[a, b, road index]]: road_near without a scan of every road
+
+
+## The nearest road of `kinds` within `reach` of `p` (tile metres): {point, dir, width, kind, index};
+## {} when there is none.
+func road_near(p: Vector2, kinds: Array, reach: float) -> Dictionary:
+	if _grid.is_empty():
+		_build_grid()
+	var best := {}
+	var best_d := reach
+	var c := Vector2i(floori(p.x / GRID), floori(p.y / GRID))
+	var rr := int(ceil(reach / GRID))
+	for dx in range(-rr, rr + 1):
+		for dy in range(-rr, rr + 1):
+			for seg in _grid.get(c + Vector2i(dx, dy), []):
+				var r: Dictionary = roads[seg[2]]
+				if not (str(r.get("kind", "road")) in kinds):
+					continue
+				var q := Geometry2D.get_closest_point_to_segment(p, seg[0], seg[1])
+				var d := q.distance_to(p)
+				if d < best_d:
+					best_d = d
+					best = {"point": q, "dir": ((seg[1] as Vector2) - (seg[0] as Vector2)).normalized(), "width": float(r.get("width", 4.0)),
+						"kind": str(r.get("kind", "road")), "index": seg[2]}
+	return best
+
+
+## How far road `ri`'s kerb keeps back from its start (or end): half the widest road that meets it
+## there across it, within 3 m of the end, and a little more; 0 where only its own continuation (a
+## road running on in the same direction) or nothing meets it.
+func _junction_trim(ri: int, pts: Array[Vector2], at_start: bool) -> float:
+	if pts.size() < 2:
+		return 0.0
+	if _grid.is_empty():
+		_build_grid()
+	var p: Vector2 = pts[0] if at_start else pts[-1]
+	var own: Vector2 = (pts[1] - pts[0]).normalized() if at_start else (pts[-1] - pts[-2]).normalized()
+	var best := 0.0
+	var c := Vector2i(floori(p.x / GRID), floori(p.y / GRID))
+	for dx in range(-1, 2):
+		for dy in range(-1, 2):
+			for seg in _grid.get(c + Vector2i(dx, dy), []):
+				if seg[2] == ri:
+					continue
+				var a: Vector2 = seg[0]
+				var b: Vector2 = seg[1]
+				if Geometry2D.get_closest_point_to_segment(p, a, b).distance_to(p) > 3.0:
+					continue
+				if absf((b - a).normalized().dot(own)) > 0.9:
+					continue   # the same street running on past a split in the data
+				best = maxf(best, float(roads[seg[2]].get("width", 4.0)) * 0.5 + 0.4)
+	return best
+
+
+## `pts` with `from_start` metres taken off its start and `from_end` off its end; [] when nothing is left.
+static func _cut(pts: Array[Vector2], from_start: float, from_end: float) -> Array[Vector2]:
+	var out: Array[Vector2] = []
+	var total := 0.0
+	for i in range(1, pts.size()):
+		total += pts[i - 1].distance_to(pts[i])
+	var lo := from_start
+	var hi := total - from_end
+	if hi - lo < 0.5:
+		return out
+	var acc := 0.0
+	for i in range(1, pts.size()):
+		var a := pts[i - 1]
+		var b := pts[i]
+		var seg := a.distance_to(b)
+		if seg > 0.0 and acc + seg >= lo and acc <= hi:
+			var p0 := a.lerp(b, clampf((lo - acc) / seg, 0.0, 1.0))
+			if out.is_empty() or out[-1].distance_to(p0) > 0.001:
+				out.append(p0)
+			out.append(a.lerp(b, clampf((hi - acc) / seg, 0.0, 1.0)))
+		acc += seg
+	return out
+
+
+func _build_grid() -> void:
+	for i in roads.size():
+		var pts: Array = roads[i].points
+		for k in range(1, pts.size()):
+			var a := Vector2(float(pts[k - 1][0]), float(pts[k - 1][1]))
+			var b := Vector2(float(pts[k][0]), float(pts[k][1]))
+			var seen := {}
+			var n := maxi(1, int(a.distance_to(b) / (GRID * 0.5)))
+			for j in n + 1:
+				var q := a.lerp(b, float(j) / n)
+				var cell := Vector2i(floori(q.x / GRID), floori(q.y / GRID))
+				if not seen.has(cell):
+					seen[cell] = true
+					_grid.get_or_add(cell, []).append([a, b, i])

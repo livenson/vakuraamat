@@ -2,6 +2,7 @@
   "id": "lv",
   "name": "Latvia",
   "name_key": "COUNTRY_LV",
+  "search_example": "Doma laukums, Rīga",
   "parcel_code": "^\\d{11}$",
   "parcel_link": "https://www.lursoft.lv/real-estate-properties/property/{property}",
   "outline": "res://assets/data/latvia.json",

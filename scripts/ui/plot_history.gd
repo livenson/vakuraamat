@@ -21,6 +21,8 @@ extends RefCounted
 static var _scheme_ok := ""   # remembered for the session once one of them answers
 static var _busy: Dictionary = {}   # base path -> true while that picture is being fetched
 static var _answered := false       # did the last _fetch_image get any picture back at all?
+static var _photo_dir := ""         # the tile whose photographs _photos_decoded holds
+static var _photos_decoded: Dictionary = {}   # file name in _photo_dir -> Image (see _photo)
 const PX := 200                  # thumbnail size, and the WMS request size
 const PAD := 12.0                # metres of context around the plot, so it is not edge to edge
 const MIN_SPAN := 60.0           # a tiny plot still gets a legible square
@@ -82,8 +84,8 @@ static func current(square: Rect2, georef: TerrainGeoref, tile_dir: String, px: 
 	var path := tile_dir + "/" + file
 	if not FileAccess.file_exists(path) or not georef.is_valid():
 		return null
-	var img := Image.new()
-	if img.load_jpg_from_buffer(FileAccess.get_file_as_bytes(path)) != OK:
+	var img := _photo(tile_dir, file)
+	if img == null:
 		return null
 	var size := georef.tile_size_m()
 	if size <= 0.0:
@@ -95,9 +97,39 @@ static func current(square: Rect2, georef: TerrainGeoref, tile_dir: String, px: 
 	region = region.intersection(Rect2i(Vector2i.ZERO, img.get_size()))
 	if region.size.x < 8 or region.size.y < 8:
 		return null
-	var crop := img.get_region(region)
+	var crop := img.get_region(region)   # a copy: the decoded photograph stays as it is
 	crop.resize(px, px, Image.INTERPOLATE_LANCZOS)
 	return ImageTexture.create_from_image(crop)
+
+
+## A tile's photograph, decoded: the one tile last asked for keeps its files decoded (ortho.jpg, and
+## a Finnish or Latvian tile's older cycles beside it), so a plot page, the next plot's page and the
+## large view crop from memory instead of decoding the 4096 px JPEG (48 MB of pixels) every time.
+## Asking for another tile drops them. Called on the main thread only (the book and its viewer).
+## Null when the file will not decode; a failure is not kept, the file may still be arriving.
+static func _photo(tile_dir: String, file: String) -> Image:
+	if tile_dir != _photo_dir:
+		_photos_decoded.clear()
+		_photo_dir = tile_dir
+	if not _photos_decoded.has(file):
+		var img := Image.new()
+		if img.load_jpg_from_buffer(FileAccess.get_file_as_bytes(tile_dir + "/" + file)) != OK:
+			return null
+		_photos_decoded[file] = img
+	return _photos_decoded[file]
+
+
+## Let the decoded photographs go (GameState.forget_caches when a pack is reinstalled under the same
+## path, and the world's exit).
+static func forget() -> void:
+	_photos_decoded.clear()
+	_photo_dir = ""
+
+
+## A streamed tile left: its photographs go too, if they are the ones held.
+static func forget_pack(pack: String) -> void:
+	if pack != "" and _photo_dir == Sites.tile_dir_of(pack):
+		forget()
 
 
 ## Every campaign that covers the plot, oldest first: [{label, texture}]. Fetches what is not

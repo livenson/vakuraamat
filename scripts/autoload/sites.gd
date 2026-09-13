@@ -16,7 +16,7 @@ const DEFAULT_SITE := "palupera"
 ## Which pipeline this build expects a pack to have been built by. Mirrors PACK_VERSION in
 ## tools/new_site.py, which writes it into every pack's site.json; validate_site.py fails if the two
 ## drift. A pack stamped with less than this is rebuilt (Locator.refresh_stale).
-const PACK_VERSION := 3
+const PACK_VERSION := 4
 
 var available: Array[String] = []
 var active := ""
@@ -296,10 +296,14 @@ func display_name(id: String) -> String:
 	var key := name_key(id)
 	if id == active and tr(key) != key:
 		return tr(key)
-	var loc := TranslationServer.get_locale().substr(0, 2)
-	for t in csv_translations(str(_root_of.get(id, ROOT)) + id + "/strings.csv"):
-		if t.locale == loc and t.get_message(key) != "":
-			return t.get_message(key)
+	# the current language, else the fallback (English), else Estonian: a pack's strings.csv may leave a
+	# language out (the Estonian packs have no Latvian or Finnish), and its raw key is no name
+	var tables := csv_translations(str(_root_of.get(id, ROOT)) + id + "/strings.csv")
+	var fallback := str(ProjectSettings.get_setting("internationalization/locale/fallback", "en"))
+	for want in [TranslationServer.get_locale().substr(0, 2), fallback, "et"]:
+		for t in tables:
+			if t.locale == want and t.get_message(key) != "":
+				return t.get_message(key)
 	return key if key != "" else id
 
 

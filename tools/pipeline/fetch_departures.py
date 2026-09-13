@@ -42,6 +42,12 @@ LV_FEEDS = [
      "attribution": "Rīgas satiksme, maršrutu saraksti GTFS (CC0)"},
 ]
 LV_ROUTE_TYPES = {"3", "11", "700", "701", "702", "704", "711", "715", "800"}   # buses and trolleybuses
+# Finland's feeds (docs/finland-plan.md step 4): HSL, the capital region (Helsinki, Espoo, Vantaa, Kerava,
+# Kirkkonummi, Sipoo, Siuntio, Tuusula). Its buses are route types 701, 702 and 704
+FI_FEEDS = [
+    {"id": "fi_hsl", "url": "https://infopalvelut.storage.hsldev.com/gtfs/hsl.zip",
+     "attribution": "Helsingin seudun liikenne (HSL), reittiopas GTFS (CC BY 4.0)"},
+]
 MATCH_M = 25.0        # how far a GTFS stop may sit from the pack's OSM stop and still be the same one
 MARGIN_M = 40.0       # route geometry kept this far outside the tile, so a bus enters and leaves off-screen
 
@@ -230,8 +236,19 @@ def fetch_ee(site, root=ROOT, refresh=False, max_age_days=7):
 
 
 def fetch_lv(site, root=ROOT, refresh=False, max_age_days=7):
-    """The Latvian feeds, each read like the Estonian one and merged: the stops matched to the pack's
-    OpenStreetMap stops, one route per line, direction and variant, buses and trolleybuses only."""
+    """The Latvian feeds (ATD's regional buses, Rīgas satiksme)."""
+    return fetch_feeds(site, LV_FEEDS, LV_ROUTE_TYPES, root, refresh, max_age_days)
+
+
+def fetch_fi(site, root=ROOT, refresh=False, max_age_days=7):
+    """The Finnish feeds (HSL for the capital region; the trams, metro, trains and ferries left out)."""
+    return fetch_feeds(site, FI_FEEDS, LV_ROUTE_TYPES, root, refresh, max_age_days)
+
+
+def fetch_feeds(site, feeds, route_types, root=ROOT, refresh=False, max_age_days=7):
+    """Several feeds, each read like the Estonian one and merged: the stops matched to the pack's
+    OpenStreetMap stops, one route per line, direction and variant, only the given route types (the
+    game drives buses and trolleybuses). Used by Latvia and Finland."""
     import geo
     site_dir = os.path.join(root, "sites", site)
     m = json.load(open(os.path.join(site_dir, "site.json")))
@@ -243,7 +260,7 @@ def fetch_lv(site, root=ROOT, refresh=False, max_age_days=7):
         return None
     pack_stops = json.load(open(stops_path)).get("stops", [])
     all_stops, all_routes, versions, credits = [], [], [], []
-    for feed in LV_FEEDS:
+    for feed in feeds:
         zip_path = os.path.join(paths.raw("gtfs"), feed["id"] + ".zip")
         try:
             download(feed_url(feed), zip_path, max_age_days=max_age_days, refresh=refresh)
@@ -276,7 +293,7 @@ def fetch_lv(site, root=ROOT, refresh=False, max_age_days=7):
                 if r["stop_id"] in mine:
                     calls.setdefault(r["trip_id"], []).append((int(r["stop_sequence"]), r["stop_id"], r["departure_time"][:5]))
             trips = {r["trip_id"]: r for r in rows(zf, "trips.txt") if r["trip_id"] in calls
-                     and routes.get(r["route_id"], {}).get("route_type", "3") in LV_ROUTE_TYPES}
+                     and routes.get(r["route_id"], {}).get("route_type", "3") in route_types}
             calendar = {r["service_id"]: r for r in rows(zf, "calendar.txt")}
             grouped = {}
             for tid, cs in calls.items():
@@ -315,7 +332,7 @@ def fetch_lv(site, root=ROOT, refresh=False, max_age_days=7):
         all_stops += [{"gtfs_id": f"{feed['id']}:{g}", "stop": s, "name": names[g]} for g, s in sorted(mine.items())]
         if used:
             credits.append(feed["attribution"])
-    json.dump({"attribution": "; ".join(credits), "source": "GTFS: " + ", ".join(f["id"] for f in LV_FEEDS), "fetched": time.strftime("%Y-%m-%d"),
+    json.dump({"attribution": "; ".join(credits), "source": "GTFS: " + ", ".join(f["id"] for f in feeds), "fetched": time.strftime("%Y-%m-%d"),
                "feed_version": "; ".join(versions), "stops": all_stops, "routes": all_routes},
               open(os.path.join(site_dir, "departures.json"), "w"), ensure_ascii=False, indent=0)
     lines = sorted({r["line"] for r in all_routes}, key=lambda s: (len(s), s))

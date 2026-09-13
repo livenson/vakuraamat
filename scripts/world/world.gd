@@ -52,6 +52,10 @@ func _ready() -> void:
 		if a.begins_with("--screenshot="):
 			player.input_enabled = false   # deterministic captures: no mouse motion while the ground builds
 			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+		elif a == "--plain-roofs":
+			# the register's roof colours instead of the photograph (before/after checks): read before the
+			# layer builds its first building, which the flags below come too late for
+			FootprintBuilding.photo_roofs = false
 	if (terrain.data == null or terrain.data.region_locations.is_empty()) and TerrainBuilder.has_inputs(tile_dir):
 		await _build_terrain(tile_dir)   # downloaded tile: inputs present, region data not yet built
 	if terrain.data == null or terrain.data.region_locations.is_empty():
@@ -61,6 +65,17 @@ func _ready() -> void:
 	var sp: Array = start.get("spawn", [512, 512])
 	_spawn = Vector3(float(sp[0]), 0.0, float(sp[1]))
 	terrain.set_camera(player.camera)
+	# a downloaded tile's terrain_assets.tres lacks the vegetation meshes its saved trees name (the runtime
+	# scatter never rewrites it): added once Terrain3D holds its assets, and the instancer rebuilt with them
+	var missing := TerrainBuilder.ensure_mesh_assets(terrain.assets)
+	if missing > 0:
+		terrain.instancer.update_mmis(true)
+		# written back once, whole (the file's textures and now its meshes), so the next start finds them
+		# before Terrain3D reads the trees: filled in here only, it warned "MeshAsset 1 is null" at every
+		# start. A shipped tile (res://) is never written; make tile saves those
+		if tile_dir.begins_with("user://"):
+			ResourceSaver.save(terrain.assets, tile_dir + "/terrain_assets.tres")
+		print("[world] %d vegetation mesh assets added to %s" % [missing, tile_dir])
 	var nan := 0
 	for r: Terrain3DRegion in terrain.data.get_regions_active():
 		nan += TerrainBuilder.drop_nan_instances(r)
@@ -73,6 +88,7 @@ func _ready() -> void:
 	streamer = TileStreamer.new()
 	streamer.name = "Tiles"
 	add_child(streamer)
+	streamer.tile_unloaded.connect(_forget_tile)
 	streamer.setup(self)
 	fade.color.a = 1.0
 	await get_tree().process_frame
@@ -163,6 +179,9 @@ func _ready() -> void:
 			var sc := a.trim_prefix("--scale3d=").split(":")
 			get_viewport().scaling_3d_mode = int(sc[0]) as Viewport.Scaling3DMode
 			get_viewport().scaling_3d_scale = float(sc[1]) if sc.size() > 1 else 1.0
+			# the temporal upscalers (FSR2, MetalFX temporal) do their own anti-aliasing and the engine
+			# turns TAA off beside them, warning at every start: TAA only for the spatial modes
+			get_viewport().use_taa = int(sc[0]) in [0, 1, 3]
 		elif a.begins_with("--enter="):
 			_when_filled(2.5, enter_building.bind(a.trim_prefix("--enter=")))
 		elif a.begins_with("--examine="):
@@ -260,6 +279,22 @@ func _exit_tree() -> void:
 	BuildingDoor.release()
 	ParcelKit.release()
 	FootprintBuilding.release_details()
+	Pitches.release()
+	RoadNetwork.release()
+	StreetFurniture.release()
+	PlotHistory.forget()   # a decoded tile photograph is 48 MB
+
+
+## A tile leaving takes its roof photograph, LOD2 models, parsed pack files, road graph and decoded
+## plot photographs with it. Its entry in streamer.tiles is still there when tile_unloaded fires.
+func _forget_tile(loc: Vector2i) -> void:
+	var pack := str(streamer.tiles.get(loc, {}).get("pack", ""))
+	if pack == "":
+		return
+	FootprintBuilding.forget_pack(pack)
+	PackFiles.forget_pack(pack)
+	RoadGraph.forget_pack(pack)
+	PlotHistory.forget_pack(pack)
 
 
 func _process(_delta: float) -> void:
@@ -593,6 +628,7 @@ func _push_out_of_buildings(layer: Node) -> void:
 ## carves its basin into the terrain and keeps its fish (Pond).
 func place_water(pack: String, root: Node3D) -> void:
 	Crops.place(pack, root, terrain)   # farmed fields (fields_2026.json) get their crops with the water
+	Pitches.place(pack, root, terrain)   # sports pitches (pitches.json): goals, nets and hoops
 	var rel := str(Sites.manifest_for(pack).get("water", ""))
 	if rel == "" or not FileAccess.file_exists(Sites.path_in(pack, rel)):
 		return
@@ -628,8 +664,11 @@ func _place_moored(pack: String, root: Node3D) -> void:
 		return
 	for b in parsed:
 		var length := float(b.get("length", 4.0))
-		var name := "canoe" if length < 4.0 else ("rowboat" if length < 5.5 else ("boat" if length < 7.5 else "sailboat"))
-		var hull := _boat(name, clampf(length, 3.0, 9.0))
+		var name := "canoe" if length < 4.0 else ("rowboat" if length < 5.5 else "boat")
+		if length >= 7.5 and hash(Vector2(float(b.x), float(b.z))) % 3 == 0:
+			name = "sailboat"   # a moored yacht's sails are stowed: a marina of raised sails read as a regatta
+
+		var hull := _boat(name, clampf(length, 3.0, 15.0))   # a marina's yachts run to 15 m
 		if hull == null:
 			continue
 		var at := Vector3(float(b.x), 0.0, float(b.z))

@@ -27,9 +27,17 @@ func _ready() -> void:
 func forget_caches() -> void:
 	Parcels.forget()
 	Tenants.forget()
+	Pois.forget()
+	FootprintBuilding.forget_models()
+	StreetData.forget()
+	TrafficSignals.forget()
 	Links.forget()
 	Departures.forget()
 	PlaceSearch.forget()
+	PackFiles.forget()
+	RoadGraph.forget()
+	BookPanel.forget_credits()
+	PlotHistory.forget()
 
 
 ## (Re)load the registries from the active site pack.
