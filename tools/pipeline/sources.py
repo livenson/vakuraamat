@@ -14,8 +14,9 @@ ETAK + Building Register + Geo3D LOD2 buildings, ETAK roads and water, Geo3D sin
 register, PRIA fields, the national GTFS) and Latvia (LĢIA laser points and orthophoto cycles, VZD
 cadastre and buildings, Rīga's LOD2, UR and VID companies, OpenStreetMap roads, ATD and Rīgas satiksme
 GTFS, VARIS addresses; docs/latvia-plan.md). Finland has its ground (NLS ground model, laser points
-and orthophotos from the Funet mirror, Helsinki's own inside the city; docs/finland-plan.md) and no
-registers yet. The rest of the world has a documented plan and no code
+and orthophotos from the Funet mirror, Helsinki's own inside the city; docs/finland-plan.md), its
+plots (NLS cadastre) and buildings (Ryhti on Helsinki's or the topographic database's footprints),
+OpenStreetMap roads and stops, and no companies yet. The rest of the world has a documented plan and no code
 yet (PLANNED below, docs/custom-sites.md "Other countries").
 """
 import argparse, json, os, sys, threading
@@ -433,8 +434,18 @@ class Finland(DataSource):
         return 0
 
     def registers(self, sid, ws, stage, run):
-        """Step 2 of docs/finland-plan.md: the cadastre (NLS INSPIRE), Ryhti's buildings, PRH and Vero."""
-        raise RuntimeError("Finland's registers are not built yet (docs/finland-plan.md, step 2)")
+        """The NLS cadastre and Ryhti's buildings on footprints (Helsinki's, else the topographic
+        database's), then OpenStreetMap's roads and stops. Companies are step 3 of docs/finland-plan.md."""
+        import fetch_cadastre_fi, fetch_roads_lv, fetch_stops
+        stage("cadastre (Maanmittauslaitos), buildings (Ryhti)", 0.5)
+        ok, _ = run(f"{sid}: cadastre", 900, fetch_cadastre_fi.fetch, sid, root=ws)
+        if not ok:
+            raise RuntimeError("the Finnish cadastre could not be read (see the service log)")
+        stage("roads (OpenStreetMap)", 0.64)
+        run(f"{sid}: roads", 180, fetch_roads_lv.fetch, sid, root=ws, attribution=fetch_roads_lv.ATTRIBUTION_FI)
+        stops = threading.Thread(target=lambda: run(f"{sid}: stops", 120, fetch_stops.fetch, sid, root=ws), daemon=True)
+        stops.start()
+        return stops
 
     def refine(self, sid, ws, rstage, run):
         """The older photographs (the NLS years, Helsinki's back to 1932); the meta is marked "refined"

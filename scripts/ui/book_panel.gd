@@ -272,6 +272,9 @@ func _fill_plot() -> void:
 		if p.get("land_value_per_m2") != null:
 			per = "   (%s/m²)" % BookTheme.money(int(round(float(p.land_value_per_m2))))
 		body.add_child(_lbl("%s: %s%s" % [tr("UI_BOOK_COL_VALUE"), BookTheme.money(int(_value(p))), per], 15))
+	# where no land value is published (Finland), the zoning plan's building right says what the plot may carry
+	if p.get("building_right_m2") != null and float(p.building_right_m2) > 0:
+		body.add_child(_lbl(tr("UI_BOOK_BUILDING_RIGHT") % [int(p.building_right_m2), str(p.get("zoning_plan", "") if p.get("zoning_plan") != null else "")], 15))
 	for pair in [["UI_BOOK_COL_OWNERSHIP", "ownership"], ["UI_BOOK_LAND_REGISTRY", "land_registry"], ["UI_BOOK_REGISTERED", "registered"]]:
 		var v := str(p.get(pair[1], "") if p.get(pair[1]) != null else "")
 		if v != "":

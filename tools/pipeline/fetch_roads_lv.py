@@ -25,6 +25,7 @@ import paths  # noqa: E402
 OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"]
 UA = {"User-Agent": "vakuraamat-pipeline/0.1 (open-source game; polite, cached)"}
 ATTRIBUTION = "Ceļi un ielas: © OpenStreetMap contributors (ODbL)"
+ATTRIBUTION_FI = "Tiet ja kadut: © OpenStreetMap contributors (ODbL)"   # the same fetch serves Finland (sources.Finland)
 MARGIN_M = 40.0
 SKIP = {"construction", "proposed", "planned", "platform", "corridor", "raceway", "bus_stop", "elevator", "abandoned", "razed",
         "disused", "rest_area", "services", "emergency_bay"}
@@ -77,7 +78,7 @@ def width_of(tags):
     return WIDTH.get(hw, WIDTH.get(hw.replace("_link", ""), 6.0) if hw.endswith("_link") else 4.0)
 
 
-def fetch(site, root=paths.ROOT):
+def fetch(site, root=paths.ROOT, attribution=ATTRIBUTION):
     site_dir = os.path.join(root, "sites", site)
     m = json.load(open(os.path.join(site_dir, "site.json")))
     meta = json.load(open(os.path.join(root, "assets/terrain", m["terrain"]["tile"], "terrain_meta.json")))
@@ -128,7 +129,7 @@ def fetch(site, root=paths.ROOT):
                         "surface": tags.get("surface"), "name": tags.get("name"), "traffic": tags.get("access") or tags.get("motor_vehicle"),
                         "points": run})
             part += 1
-    json.dump({"attribution": ATTRIBUTION, "source": "OpenStreetMap via Overpass", "fetched": time.strftime("%Y-%m-%d"), "roads": out},
+    json.dump({"attribution": attribution, "source": "OpenStreetMap via Overpass", "fetched": time.strftime("%Y-%m-%d"), "roads": out},
               open(os.path.join(site_dir, "roads.json"), "w"), ensure_ascii=False)
     kinds = {}
     for r in out:

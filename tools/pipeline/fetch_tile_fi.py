@@ -456,8 +456,10 @@ def add_history(tile_dir):
     newest = set(meta.get("source", {}).get("ortho", {}).get("ortho_years", []))
     jobs = []
     if in_helsinki(bbox):
-        step = max(1, len(HEL_HISTORY) // HISTORY_MAX)
-        for layer in HEL_HISTORY[::step][:HISTORY_MAX]:
+        # spread over the whole range, the oldest and the newest included
+        n = min(HISTORY_MAX, len(HEL_HISTORY))
+        picks = sorted({round(i * (len(HEL_HISTORY) - 1) / max(1, n - 1)) for i in range(n)})
+        for layer in [HEL_HISTORY[i] for i in picks]:
             jobs.append((layer.split("_")[0], lambda layer=layer: _helsinki_epoch(bbox, layer, HISTORY_PX), "Helsinki"))
     else:
         years = ortho_sheets(box_in(bbox, TM35, margin=10.0))

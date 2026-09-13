@@ -247,6 +247,7 @@ MENU_MAP_GO,"Täidetud: sinu maailmad, praegune rõngaga. Rõngas: idee. Sinine 
 COUNTRY_EE,Eesti,Estonia,Igaunija
 COUNTRY_LV,Läti,Latvia,Latvija
 COUNTRY_FI,Soome,Finland,Somija
+UI_BOOK_BUILDING_RIGHT,Ehitusõigus: %d m² korrusepinda (detailplaneering %s),Building right: %d m² of floor area (zoning plan %s),Apbūves tiesības: %d m² stāvu platības (detālplānojums %s)
 UI_SHEET_REGISTER_FI,Soome ehitusregister (Ryhti): %s,Finnish building register (Ryhti): %s,Somijas būvju reģistrs (Ryhti): %s
 UI_SHEET_CODE_FI,Püsiv ehitistunnus %s,Permanent building identifier %s,Pastāvīgais būves identifikators %s
 UI_BUS_STOP,Bussipeatus,Bus stop,Autobusa pietura

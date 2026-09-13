@@ -42,7 +42,7 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   and `_num` are the pattern).
 - Countries: an adapter in `tools/pipeline/sources.py` (pipeline, tile service) and a descriptor in
   `assets/data/countries/<id>.json` (game, via `Countries`); no other code names a country. Estonia and
-  Latvia are implemented, Finland has its ground and no registers yet (`docs/finland-plan.md`);
+  Latvia are implemented, Finland has its ground, plots and buildings but no companies yet (`docs/finland-plan.md`);
   `docs/adding-a-country.md` is the checklist.
 - A pack for a new place is built in two passes. The job ships what the place needs to be walked in
   (the 5 m ground model, 4 MB a sheet against 75 MB for the 1 m one; the register, cadastre, roads,

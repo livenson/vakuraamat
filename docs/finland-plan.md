@@ -160,7 +160,7 @@ Details for the register rows:
 | `heightmap.r32` | NLS 2 m model, bilinear to 1 m; Helsinki's 1 m model where it has data | Done (step 1). `dtm_res_m` is 1 where the city's model covers 90 % of the tile, else 2. The descriptor's `"refine": "flag"` means a 2 m ground is not taken for a coarse one. Outside the model is the sea, at 0 m. Tiles meet through Latvia's `blend_edges`. Under buildings, Helsinki's model is a triangulation, flat and faceted |
 | `canopy.r32` | NLS 0.5 p laser points | Done (step 1). Details below the table |
 | `ortho.jpg` | the newest NLS sheet per 6 km square; Helsinki's 5 cm photograph over it inside the city | Done (step 1) |
-| `ortho_<year>.jpg` | the older NLS years (up to 6); in Helsinki the city's (1932, 1943, 1950, 1964, 1976, 1988 …) | Written (`fetch_tile_fi.add_history`, the refine pass); not yet checked in the game |
+| `ortho_<year>.jpg` | the older NLS years (up to 6); in Helsinki six of the city's, spread from 1932 to 2015 | Done (`fetch_tile_fi.add_history`, the refine pass): 8 s for Senaatintori. The plot page's strip shows the block's outline on the same courtyard in every year |
 | `parcels.json` | NLS INSPIRE parcels (+ Helsinki's plot units) | `land_value` null: there is none. In Helsinki, `building_right_m2` and the zoning class instead (a new optional field the book would show) |
 | `market.json` | StatFin `13mt` postcode flat prices | Labelled as statistics, not valuations |
 | `buildings.json` | Ryhti + footprints (Helsinki's, else MTK or OSM) + LOD2 in Helsinki, `roof_fit.py` elsewhere | Details below the table |
@@ -246,12 +246,51 @@ To do:
      spec.
    - **Service.** `Finland.registers` raises until step 2, so the menu cannot make a Finnish place
      yet.
-2. **Cadastre and buildings** (`fetch_cadastre_fi.py`):
-   - NLS parcels, with Helsinki's plot units where the city has them.
-   - Ryhti buildings on footprints: Helsinki's, else the NLS topographic database, else
-     OpenStreetMap.
-   - LOD2 from the Helsinki CityGML, by VTJ-PRT.
-   - `roof_fit.py` elsewhere, on `_surface.r32`.
+2. **Cadastre and buildings.** Done 2026-09-13 (`tools/pipeline/fetch_cadastre_fi.py`, also a
+   stage of the service's Finnish job). Senaatintori's tile takes 5 s.
+   - **Plots.**
+     - The NLS INSPIRE WFS in JSON. A property split into parts (the public areas, `91-2-9901-0`
+       in 4 pieces) is one row: the largest part's outline, the parts' summed area, `parts`.
+     - In Helsinki the city's plot unit is joined by the 14-digit id, else by an overlap over
+       half. It adds the zoning class (AK homes, K business, Y public, L streets, V green,
+       W water, T industry, E utilities: the game's plot classes) and `building_right_m2` with
+       its `zoning_plan`.
+     - `land_value` is null, and the file's `valuation.field` null says so; the validator no
+       longer warns about it.
+     - The book's plot page shows "Building right: 24400 m² of floor area (zoning plan 12936)"
+       where there is one.
+     - Result: 281 plots, 250 with a building right, all but 2 with a class.
+   - **Buildings.**
+     - Ryhti through its OGC API (text fields, `avoimet_rakennukset`, and `open_address` for the
+       Finnish and Swedish addresses, all kept so either finds a building).
+     - Footprints in Helsinki: the city's register polygons joined on the VTJ-PRT. That keeps the
+       361 whole buildings among 4,114 polygons; the rest are stairs, oriels, canopies.
+     - Footprints elsewhere: the NLS topographic database's building polygons (`r_<sheet>_p`,
+       classes `422xx`) from the Funet mirror, each taking the Ryhti point inside it. A 24 km
+       sheet comes as an L and an R zip of 12 km (the 6 km sheets A–D and E–H).
+     - `id` is the VTJ-PRT's nine-digit serial; `ehr` the whole identifier.
+     - `kind`: Helsinki's use code and type first, then Ryhti's 7 classes, then the topographic
+       class.
+     - Also `purpose` (Helsinki's type, e.g. "Liikerakennus", or Ryhti's class), year, storeys,
+       facade, frame, heating, floor area, volume, apartments, the protection flag as `monument`,
+       and the plot as `cadastral`.
+     - Roofs: `roof_fit.py` on `_surface.r32`, which has no building class, so a tree over a
+       roof is part of the fit.
+     - Senaatintori: 344 buildings, 343 with a Ryhti record, 341 dated; 52 pitched roofs, 287 flat.
+   - **Roads and stops.** OpenStreetMap through `fetch_roads_lv.py`, which works for any country
+     (5,931 segments) and now takes the credit as a parameter; 14 bus stops.
+   - **TLS.** The NLS and SYKE certificates chain to Telia Root CA v2, which macOS's
+     `/etc/ssl/cert.pem` lacks. The Finnish fetchers use certifi's roots, as the sidecar does.
+   - **Checks.** `make validate` is clean. In the game, at 95 fps:
+     - the square stands among the blocks at their measured heights;
+     - looking at a building shows "Toimistorakennus · in use since 1858 · 3 floors";
+     - the plot page shows the building right.
+   - **Left open.**
+     - Helsinki's 3D models: the WFS answers "overloaded" or nothing, and only Kalasatama has a
+       zip. The cathedral is a flat block until they can be read.
+     - Ryhti marks 204 of the 374 central buildings "Tyhjillään" (vacant). It is the register's
+       field, so `status` keeps it.
+     - The split-pulse test takes the Alexander II statue for a tree.
 3. **Companies and money** (`fetch_tenants_fi.py`):
    - PRH bulk matched by address to Ryhti's addresses, Vero's tax year by business id.
    - Distress from `companySituations`.

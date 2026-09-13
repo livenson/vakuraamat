@@ -196,7 +196,9 @@ def validate(site, rep, root=ROOT):
             lv = u.get("land_value")
             if lv is not None and not isinstance(lv, (int, float)):
                 rep.err(f"parcels.json {u.get('tunnus')}: land_value must be a number or null")
-        if units and not any(u.get("land_value") for u in units):
+        # a country that publishes no value per plot says so in the file (Finland: valuation.field null)
+        declared_none = "valuation" in parcels and (parcels["valuation"] or {}).get("field") is None
+        if units and not declared_none and not any(u.get("land_value") for u in units):
             rep.warn("parcels.json has no land_value: re-run make parcels")
     buildings = load_json("buildings.json", ("buildings",))
     tunnus_set = {u.get("tunnus") for u in parcels["parcels"]} if parcels else set()
