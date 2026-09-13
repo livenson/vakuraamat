@@ -667,16 +667,17 @@ func _ribbon(st: SurfaceTool, pts: Array[Vector2], half: float, terrain: Terrain
 		return
 	var left: Array[Vector3] = []
 	var right: Array[Vector3] = []
+	var normal := Vector2.ZERO
 	for i in pts.size():
 		var dir := (pts[mini(i + 1, pts.size() - 1)] - pts[maxi(i - 1, 0)]).normalized()
-		var normal := Vector2(-dir.y, dir.x)
+		if dir != Vector2.ZERO or normal == Vector2.ZERO:
+			normal = Vector2(-dir.y, dir.x)   # two points on one spot have no direction: keep the last one
 		var p := pts[i] + normal * offset
 		var side := normal * half
-		for s in [p + side, p - side]:
-			var h := terrain.data.get_height(to_global(Vector3(s.x, 0, s.y)))
-			if is_nan(h):
-				h = 0.0
-			(left if s == p + side else right).append(Vector3(s.x, h + up, s.y))
+		# each side to its own list: telling them apart by comparing the points put both into `left`
+		# when the side was zero, and the quads below read past the end of `right`
+		left.append(_on_ground(p + side, terrain, up))
+		right.append(_on_ground(p - side, terrain, up))
 	for i in range(pts.size() - 1):
 		var a := left[i]
 		var b := right[i]
@@ -685,6 +686,14 @@ func _ribbon(st: SurfaceTool, pts: Array[Vector2], half: float, terrain: Terrain
 		for v in [a, b, c, a, c, d]:
 			st.set_normal(Vector3.UP)
 			st.add_vertex(v)
+
+
+## A ribbon's point on the ground, `up` above it (the ground at 0 where the terrain has no height).
+func _on_ground(s: Vector2, terrain: Terrain3D, up: float) -> Vector3:
+	var h := terrain.data.get_height(to_global(Vector3(s.x, 0, s.y)))
+	if is_nan(h):
+		h = 0.0
+	return Vector3(s.x, h + up, s.y)
 
 
 ## Nearest road segment to a tile position: {name, kind, type, width, surface, distance}.
