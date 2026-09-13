@@ -1,94 +1,57 @@
-# The sound of riding an old bicycle, made as it plays, from no recording: the tyres hissing on the
-# road louder and brighter with the speed; while you pedal, the chain rattling over the ring and a pedal
-# creaking on some turns of the crank; while you coast, the freewheel's pawls ticking over the ratchet,
-# faster the faster you go; now and then a loose mudguard's tink. FirstPersonController makes one on
-# mount, feeds it the speed and whether the pedals turn, and frees it on dismount (playtest 2026-09-13:
-# "when riding on a bicycle, can you add a sound too ... older one").
+# The ride's sound, as if the bicycle were a motorbike (playtest 2026-09-13: "sound is not great. Can
+# you rather find a cool sounds as if this were a motorbike?"): two CC0 recordings from Freesound, cut
+# into seamless loops (assets/audio, THIRD_PARTY.md) - a motorbike idling (lmbubec, 119455) and one on
+# the throttle (overmedium, 651750) - pitched up with the speed and crossfaded from the one to the
+# other, revving a little higher and louder while the throttle (forward) is held. FirstPersonController
+# makes one on mount, feeds it the speed and whether forward is held, and frees it on dismount.
 class_name BikeSound
-extends AudioStreamPlayer
+extends Node
 
-const RATE := 22050.0
-const WHEEL_M := 2.1          # a 28-inch wheel's circumference
-const RATCHET := 18           # an old freewheel's teeth: clicks per wheel turn while coasting
-const GEAR := 2.6             # wheel turns per turn of the crank
-const CHAINRING := 44         # links over the ring per turn of the crank
+const IDLE := "res://assets/audio/moto_idle.wav"
+const THROTTLE := "res://assets/audio/moto_throttle.wav"
+const TOP := 14.0             # m/s, the ride's fastest (FirstPersonController.current_speed, dash)
 
 var speed := 0.0              # metres per second
-var pedalling := false
-var _pb: AudioStreamGeneratorPlayback = null
-var _rng := RandomNumberGenerator.new()
-var _level := 0.0             # the tyres' loudness, following the speed smoothly
-var _hiss := 0.0              # low-passed noise
-var _ratchet := 0.0           # phases, in events
-var _link := 0.0
-var _crank := 0.0
-var _click := 0.0             # envelopes of the short sounds, 1 at their start
-var _click_phase := 0.0
-var _rattle := 0.0
-var _creak := 0.0
-var _creak_phase := 0.0
-var _tink := 0.0
-var _tink_phase := 0.0
+var pedalling := false        # the throttle: forward held
+var _idle: AudioStreamPlayer
+var _throttle: AudioStreamPlayer
+var _rev := 0.0               # 0 idle .. 1 flat out, following the speed smoothly
+var _mix := 0.0               # how much of the throttle recording is heard
 
 
 func _ready() -> void:
-	var gen := AudioStreamGenerator.new()
-	gen.mix_rate = RATE
-	gen.buffer_length = 0.12
-	stream = gen
-	volume_db = -4.0
-	_rng.seed = 1953
-	play()
-	_pb = get_stream_playback() as AudioStreamGeneratorPlayback
+	_idle = _loop(IDLE)
+	_throttle = _loop(THROTTLE)
+	_apply()
 
 
-func _process(_delta: float) -> void:
-	if _pb == null:
-		return
-	var dt := 1.0 / RATE
-	var wheel_hz := speed / WHEEL_M
-	var crank_hz := wheel_hz / GEAR
-	var target := clampf(speed / 3.0, 0.0, 1.0)
-	var bright := 0.02 + 0.06 * clampf(speed / 10.0, 0.0, 1.0)
-	for i in _pb.get_frames_available():
-		_level += (target - _level) * 0.0005
-		# the tyres: noise, low-passed, opening up with the speed
-		_hiss += (_rng.randf() * 2.0 - 1.0 - _hiss) * bright
-		var s := _hiss * 0.9 * _level
-		if pedalling and speed > 0.2:
-			# the chain: a soft knock per link over the ring
-			_link += crank_hz * CHAINRING * dt
-			if _link >= 1.0:
-				_link -= 1.0
-				_rattle = _rng.randf_range(0.2, 0.5)
-			# the crank: an old pedal creaks on the down stroke, not every time
-			_crank += crank_hz * dt
-			if _crank >= 1.0:
-				_crank -= 1.0
-				if _rng.randf() < 0.55:
-					_creak = 1.0
-		elif speed > 0.3:
-			# coasting: the pawls click over the ratchet
-			_ratchet += wheel_hz * RATCHET * dt
-			if _ratchet >= 1.0:
-				_ratchet -= 1.0
-				_click = 1.0
-		if speed > 3.0 and _rng.randf() < 0.25 * dt:
-			_tink = 1.0   # a loose mudguard on a bump
-		if _rattle > 0.001:
-			s += (_rng.randf() * 2.0 - 1.0) * _rattle * 0.25
-			_rattle *= 0.985
-		if _click > 0.001:
-			_click_phase += TAU * 3100.0 * dt
-			s += sin(_click_phase) * _click * 0.45 + (_rng.randf() - 0.5) * _click * 0.25
-			_click *= 0.985   # about 3 ms
-		if _creak > 0.001:
-			_creak_phase += TAU * (780.0 - 180.0 * (1.0 - _creak)) * dt
-			s += sin(_creak_phase) * sin(_creak_phase * 0.5) * _creak * 0.12
-			_creak *= 0.9996   # about a tenth of a second, falling in pitch
-		if _tink > 0.001:
-			_tink_phase += TAU * 2400.0 * dt
-			s += sin(_tink_phase) * _tink * 0.15
-			_tink *= 0.9993
-		s = clampf(s, -1.0, 1.0)
-		_pb.push_frame(Vector2(s, s))
+func _process(delta: float) -> void:
+	var t := clampf(speed / TOP, 0.0, 1.0)
+	_rev = lerpf(_rev, t + (0.18 if pedalling else 0.0), minf(1.0, delta * 3.0))   # the revs lead on the gas
+	_mix = lerpf(_mix, clampf(t * 1.4 + (0.3 if pedalling else 0.0), 0.0, 1.0), minf(1.0, delta * 2.5))
+	_apply()
+
+
+func _apply() -> void:
+	_idle.pitch_scale = 1.0 + 0.6 * _rev
+	_throttle.pitch_scale = 0.8 + 0.7 * _rev
+	_idle.volume_db = linear_to_db(maxf(1.0 - 0.8 * _mix, 0.001)) - 4.0
+	_throttle.volume_db = linear_to_db(maxf(_mix, 0.001)) - 6.0
+
+
+## A player looping one of the recordings, started silent; the mix fades it in.
+func _loop(path: String) -> AudioStreamPlayer:
+	var p := AudioStreamPlayer.new()
+	if ResourceLoader.exists(path):
+		var s: AudioStream = load(path)
+		if s is AudioStreamWAV:
+			# the whole file is the loop: its end was crossfaded into its start when it was cut
+			var w := s as AudioStreamWAV
+			w.loop_mode = AudioStreamWAV.LOOP_FORWARD
+			w.loop_begin = 0
+			w.loop_end = int(w.get_length() * w.mix_rate)
+		p.stream = s
+	add_child(p)
+	if p.stream:
+		p.play()
+	return p
