@@ -3,7 +3,7 @@
 [![Latest release](https://img.shields.io/github/v/release/livenson/vakuraamat?label=download&sort=semver)](https://github.com/livenson/vakuraamat/releases/latest)
 [![Builds](https://img.shields.io/badge/builds-macOS%20%C2%B7%20Windows%20%C2%B7%20Linux-blue)](https://github.com/livenson/vakuraamat/releases/latest)
 
-A digital twin of any square kilometre of Estonia or Latvia, to walk through and ask questions of.
+A digital twin of any square kilometre of Estonia, Latvia or Finland, to walk through and ask questions of.
 The cadastral plots are the real ones, with their official land values; the buildings are the ones
 in the national registers, with the roofs the 3D city models and laser scans measured; the companies
 are the ones registered at each address, with what the tax offices publish about them; the ground
@@ -14,9 +14,14 @@ Built with Godot 4.7, GDScript and Terrain3D from each country's own open data:
   e-Business Register.
 - **Latvia:** LĢIA, the State Land Service (VZD), Rīga's city models, the Enterprise Register and the
   State Revenue Service.
+- **Finland:** the National Land Survey (Maanmittauslaitos), Helsinki's city data, the Ryhti building
+  register, the Trade Register (PRH) with the Tax Administration's figures, HSL's timetables and the
+  Food Authority's fields.
+- **Everywhere:** OpenStreetMap for the streets' furniture, traffic lights, rails, shops and their
+  opening hours.
 
-A country is one adapter and one descriptor, so a third can be added
-([docs/adding-a-country.md](docs/adding-a-country.md)).
+A country is one adapter and one descriptor; Finland was added as the third
+([docs/adding-a-country.md](docs/adding-a-country.md), [docs/finland-plan.md](docs/finland-plan.md)).
 
 **[⬇ Download the latest release](https://github.com/livenson/vakuraamat/releases/latest)** — a
 ready-to-play build for macOS, Windows or Linux. No Godot, no Python, nothing else to install.
@@ -33,6 +38,13 @@ ready-to-play build for macOS, Windows or Linux. No Godot, no Python, nothing el
 |---|---|
 | ![Rīga Old Town from above](docs/screenshots/riga_from_above.jpg) Rīga Old Town from above, the ground coloured by the industries of each plot's companies (I) | ![Over Rīga's rooftops](docs/screenshots/riga_rooftops.jpg) Over Rīga's rooftops: every building from the city's own 3D models |
 | ![The map in Rīga](docs/screenshots/riga_map.jpg) The map (M) in Rīga: every plot striped by the sectors of the companies registered on it | ![A Rīga plot over the years](docs/screenshots/riga_history.jpg) A Rīga plot over the years, in Latvian: LĢIA's orthophotos since 2003 |
+
+**Finland:**
+
+| | |
+|---|---|
+| ![Helsinki's Market Square and harbour](docs/screenshots/helsinki_harbour.jpg) The Market Square and the South Harbour: a tram on its mapped track, the stalls, yachts at the piers, the Allas pool | ![A Helsinki street](docs/screenshots/helsinki_street.jpg) At street level: setts where OpenStreetMap says setts, the mapped lamps and traffic lights, a tram waiting |
+| ![The map in Helsinki](docs/screenshots/helsinki_map.jpg) The map (M) in Finnish: the PRH's companies coloured by industry on the NLS orthophoto | ![A Helsinki building](docs/screenshots/helsinki_sheet.jpg) A building: Ryhti's record, the PRH tenant with Vero's tax, the shops OpenStreetMap maps with today's hours, the plot over the years |
 
 ## Install and run
 
@@ -54,14 +66,15 @@ ready-to-play build for macOS, Windows or Linux. No Godot, no Python, nothing el
    ```
 
    On **Linux**, mark it executable if the unzip did not: `chmod +x Vakuraamat.x86_64`.
-4. Pick a place on the front page. Five worlds ship with the build:
+4. Pick a place on the front page. Six worlds ship with the build:
    - **Kvissentali**, a Tartu suburb;
    - **Palupera**, rural;
    - **Pirita**, Tallinn by the sea;
    - **Rīga Old Town**;
-   - **Valka**, on the Estonian border.
+   - **Valka**, on the Estonian border;
+   - **Helsinki, Senaatintori**, the cathedral square and the harbour.
 
-   *Locations* turns any Estonian or Latvian address into a new square kilometre in a couple of
+   *Locations* turns any Estonian, Latvian or Finnish address into a new square kilometre in a couple of
    minutes over the network: search, press **Go**, and **Cancel** if it takes too long. This works
    because the build carries the whole data pipeline as a sidecar executable. Worlds you make and
    the data they download live under the game's user directory, not in the app.
@@ -72,7 +85,7 @@ What changed in each build is in [CHANGELOG.md](CHANGELOG.md).
 ### Controls
 
 WASD move, E interact, Tab the book, / find, B this plot, J journal, L language (Estonian, English,
-Latvian), M map, I layer, Shift+I one sector, K codes, F fly, T teleport, H home, F8 report, Esc menu.
+Latvian, Finnish), M map, I layer, Shift+I one sector, K codes, F fly, T teleport, H home, F8 report, Esc menu.
 
 ## What you do
 
@@ -97,8 +110,13 @@ Latvian), M map, I layer, Shift+I one sector, K codes, F fly, T teleport, H home
     sector, or by employees, health, founding year or shared owners.
   - **The ground (I)** shows the same layers around you; Shift+I steps through the sectors.
   - **In the book and on the street:** the book has a Companies page;
-  shops hang their signs and neon by the door, and billboards advertise the biggest employers.
-- **Anywhere in Estonia or Latvia:** search *Locations* in the menu for an address and press Go. A new
+  shops hang their signs and neon by the door, lit in the opening hours OpenStreetMap has for them,
+  and billboards advertise the biggest employers.
+- **The street is the mapped one:** roads wear their surface (Helsinki's and Rīga's setts), lamps,
+  benches, fences and bollards stand where OpenStreetMap has them, cars wait at the traffic lights,
+  trams and trains run on the real tracks, parked cars stand in the bays where the photograph shows
+  one, and yachts lie at the marina's piers. The bicycle by the start rides with a motorbike's sound.
+- **Anywhere in Estonia, Latvia or Finland:** search *Locations* in the menu for an address and press Go. A new
   place is playable in a couple of minutes, and you can cancel at any time. The neighbouring tiles
   stream in as you walk, across the border too.
 
@@ -147,15 +165,20 @@ flowchart LR
     LAS[LĢIA laser points and orthophoto cycles]
     VZD[VZD cadastre and buildings, Rīga LOD2 models]
     URVID[Enterprise Register and State Revenue Service]
-    OSMLV[OpenStreetMap roads]
     GTFSLV[ATD and Rīgas satiksme timetables]
     VAR[VZD address register]
   end
+  subgraph finland [Finland's open data]
+    NLS[NLS laser points, orthophotos, topographic database]
+    RYHTI[Ryhti buildings, Helsinki footprints and LOD2]
+    PRH[PRH companies and Vero taxes]
+    HSL[HSL timetables, Ruokavirasto fields]
+  end
+  OSMX[OpenStreetMap: Geofabrik extract cut with osmium, else Overpass]
   EHR[Building Register: year, storeys, materials, addresses]
   ARI[e-Business Register: companies by address, activity, capital, structure]
   EMTA[Tax Board quarterly: taxes, turnover, employees]
   PRIA[PRIA field register WFS: fields and declared crops]
-  OSM[OpenStreetMap: bus stops]
   GTFS[Public transport register: lines, times, route geometry]
   IPAPI[ip-api.com: 'Use my location', city level]
   PH[Poly Haven CC0 textures]
@@ -168,7 +191,15 @@ flowchart LR
   KAT --> FP[fetch_parcels.py] --> PJ[(parcels.json)] --> MK[market.py] --> MJ[(market.json)]
   ARI & EMTA --> FTE[fetch_tenants.py] --> TEJ[(tenants.json)]
   PRIA --> FF[fetch_fields.py] --> FJ[(fields_2026.json)]
-  OSM & RJ --> FS[fetch_stops.py] --> SJ[(stops.json)]
+  OSMX --> OT[osm_tile.py: one cached answer per tile] --> FS[fetch_stops.py] --> SJ[(stops.json)]
+  RJ --> FS
+  OT --> FOSM[fetch_osm.py] --> STJ[(street.json, rail.json, pois.json, trees_osm.json)]
+  OT --> FRL
+  NLS --> FTFI[fetch_tile_fi.py] --> TILE
+  NLS & RYHTI --> FCFI[fetch_cadastre_fi.py] --> PJ & BJ
+  PRH --> FTEFI[fetch_tenants_fi.py] --> TEJ
+  HSL --> FD
+  HSL --> FFFI[fetch_fields_fi.py] --> FJ
   GTFS & SJ --> FD[fetch_departures.py] --> DJ[(departures.json)]
   PJ & BJ --> FTE
   TILE --> EF[extract_features.py] --> WJ[(water and massing)]
@@ -176,7 +207,7 @@ flowchart LR
   LAS --> FTL[fetch_tile_lv.py: one laser sheet per new world] --> TILE
   VZD & LAS --> FCL[fetch_cadastre_lv.py, roof_fit.py] --> PJ & BJ
   URVID --> FTLV[fetch_tenants_lv.py] --> TEJ
-  OSMLV --> FRL[fetch_roads_lv.py] --> RJ
+  FRL[fetch_roads_lv.py: Latvian and Finnish roads] --> RJ
   GTFSLV --> FD
   VAR --> GLV[geocode_lv.py] --> TS
   ADS --> TS[tile_service.py and the country adapters in sources.py: any covered point] --> FT & FTL
@@ -185,7 +216,7 @@ flowchart LR
   TILE & TJ & RJ & BJ --> IMP[import_terrain.gd: control map, scatter, measured trees] --> REG[(Terrain3D region)]
   BJ & RJ & PJ & WJ --> GEN[gen_era_scenes.py] --> SCN[(sites/id/scenes/era_2026.tscn)]
 
-  REG & SCN & TEX & FJ & SJ & SKF --> GAME[Godot: terrain, buildings, interiors, roads, parcels, traffic, crops, bus stops]
+  REG & SCN & TEX & FJ & SJ & SKF & STJ --> GAME[Godot: terrain, buildings, interiors, roads, street furniture, rails, parcels, traffic, crops, bus stops]
   PJ & TEJ & MJ --> BOOK[The book: the cadastre, the companies, the place] --> GAME
   DJ --> BUS[Shelter timetables and the buses that keep them] --> GAME
   HIST & ORTHO --> PH2[plot_history.gd: a plot's square per campaign, fetched live] --> BOOK
@@ -198,14 +229,15 @@ are in [docs/data-pipeline.md](docs/data-pipeline.md). Licences and attribution 
 
 ## Custom locations
 
-Every place is a site pack under `sites/<id>/`. The repository carries five:
+Every place is a site pack under `sites/<id>/`. The repository carries six:
 - **Estonia:** Kvissentali (Tartu), Palupera (rural) and Pirita (Tallinn, by the sea).
 - **Latvia:** Rīga Old Town and Valka (on the border).
+- **Finland:** Helsinki, Senaatintori.
 
 The first visit to Kvissentali or Pirita downloads the tiles around them in one go from the GitHub
 release (`tools/starter_places.py`). `make site` and `make tile` make a pack from an EPSG:3301
 centre; the tile service does the same for any point from inside the game. All countries are built
-on one grid, L-EST97, with Latvian data reprojected onto it.
+on one grid, L-EST97, with Latvian and Finnish data reprojected onto it.
 
 What differs per country is an adapter in `tools/pipeline/sources.py` and a descriptor in
 `assets/data/countries/<id>.json`. See [docs/custom-sites.md](docs/custom-sites.md) and
@@ -221,8 +253,8 @@ What differs per country is an adapter in `tools/pipeline/sources.py` and a desc
   pipeline, world mapping, quirks and the repository layout.
 - [docs/adding-a-country.md](docs/adding-a-country.md): what a third country takes: an adapter in
   `tools/pipeline/sources.py` and a descriptor in `assets/data/countries/<id>.json`, with the checks.
-- [docs/latvia-plan.md](docs/latvia-plan.md): the Latvian sources, how each became pack files, and
-  the step log.
+- [docs/latvia-plan.md](docs/latvia-plan.md), [docs/finland-plan.md](docs/finland-plan.md): each
+  country's sources, how each became pack files, and the step log.
 - [docs/tv-streaming.md](docs/tv-streaming.md): playing on an Android TV over the home network.
 - [docs/historical-imagery.md](docs/historical-imagery.md): the orthophotos back to 1993 and the
   Fotoladu photograph archive, and five ways they could sit in the game; the plot page's pictures
@@ -251,7 +283,15 @@ The Latvian data comes from:
 - ATD and Rīgas satiksme: timetables;
 - OpenStreetMap: roads.
 
-Each Latvian source's licence is in `THIRD_PARTY.md`. The optional "Use
+The Finnish data comes from the National Land Survey (laser points, orthophotos, the cadastre and the
+topographic database), Helsinki (footprints, LOD2 models, zoning), Ryhti (buildings), PRH and the Tax
+Administration (companies), HSL (timetables) and the Food Authority (fields), mostly CC BY 4.0.
+
+Everywhere, the street furniture, barriers, rails, shops with their opening hours and the mapped trees
+come from OpenStreetMap (ODbL: `street.json`, `rail.json`, `pois.json`, `pitches.json` and
+`trees_osm.json` stay under it, each its own file).
+
+Each source's licence is in `THIRD_PARTY.md`. The optional "Use
 my location" asks ip-api.com for a city-level point (free for non-commercial use). Every pack file
 carries its own `attribution`, and the book's *Place* page prints them. Everything vendored is listed
 in `THIRD_PARTY.md`.

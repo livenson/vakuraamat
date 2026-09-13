@@ -15,6 +15,14 @@
 
   Step 7, Finnish as a game language, is done too, waiting for a native speaker's review.
   `sites/helsinki_senaatintori` is a shipped pack with every layer.
+- **Since the steps** (2026-09-13): OpenStreetMap's street layers reach Finland like every country:
+  - the lamps, signals and crossings, and trams on Helsinki's 233 track pieces;
+  - shops with their opening hours (105 matched to a company at Senaatintori);
+  - the map's single trees, with the scatter around them.
+
+  Footprints wound the other way no longer hide their windows (Rovaniemi). Downloaded tiles keep
+  their trees' meshes. The tile service cuts Finnish tiles out of Geofabrik's extract (766 MB;
+  Senaatintori in 2.9 s) instead of asking Overpass.
 - **Step 1**, the adapter and the ground:
   - `sources.Finland`, `tools/pipeline/fetch_tile_fi.py`, `assets/data/finland.json` and the
     `fi` descriptor.
