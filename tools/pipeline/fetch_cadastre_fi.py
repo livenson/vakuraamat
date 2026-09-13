@@ -226,6 +226,29 @@ def outer(g):
     return g if g.geom_type == "Polygon" else None
 
 
+def canopy_from_footprints(tdir, meta, size, polygons, surface):
+    """The canopy again, now that the footprints are known. The split-pulse test alone (fetch_tile_fi)
+    left dense conifers and thinly sampled crowns out (playtest 2026-09-13, Rovaniemi: "a place where
+    trees are but no 3d models"). Off every footprint (and 1.5 m around it) all tall surface is
+    vegetation, whatever its pulses did; on and beside a footprint the split-pulse canopy stays, so a
+    roof is never a tree. The water pass (water_parcels) clears the canopy over the water afterwards."""
+    import geo
+    from rasterio.features import rasterize
+    from shapely.geometry import Polygon
+    shapes = [(Polygon(p).buffer(1.5), 1) for p in polygons if len(p) >= 3]
+    feet = rasterize(shapes, out_shape=(size, size)).astype(bool) if shapes else np.zeros((size, size), bool)
+    cpath = os.path.join(tdir, meta["canopy"]["file"])
+    before = np.fromfile(cpath, "<f4").reshape(size, size)
+    canopy = np.where(feet, before, surface).astype(np.float32)
+    geo.write_r32(canopy, cpath)
+    meta["canopy"]["source"] = ("NLS laser points, highest return above the ground: all of it off the building footprints, "
+                                "on them only where the pulses split (foliage); gaps filled from the neighbours")
+    meta["canopy"]["max_height"] = round(float(canopy.max()), 2)
+    with open(os.path.join(tdir, "terrain_meta.json"), "w") as f:
+        json.dump(meta, f, indent=2, ensure_ascii=False)
+    log(f"canopy over 2 m on {(canopy > 2).mean():.0%} of the tile (was {(before > 2).mean():.0%}), roofs on {feet.mean():.0%} kept out")
+
+
 def fetch(site, root=ROOT):
     import shapely
     from pyproj import Transformer
@@ -450,6 +473,8 @@ def fetch(site, root=ROOT):
             "addresses": sorted(set(fin + swe)), "cadastral": [on] if on else [], "footprint_source": src,
         })
     buildings.sort(key=lambda b: (b["z"], b["x"]))
+    if surface is not None and meta.get("canopy"):
+        canopy_from_footprints(tdir, meta, size, [b["polygon"] for b in buildings], surface)
 
     # --- write --------------------------------------------------------------------------------------
     summary = {"ehak": sorted(codes), "settlements": [], "municipalities": sorted(names.get(c, c) for c in codes), "county": None,

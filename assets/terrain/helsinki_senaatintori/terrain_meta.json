@@ -20,7 +20,7 @@
   "texture_px": 4096,
   "canopy": {
     "file": "canopy.r32",
-    "source": "NLS laser points 2008, highest return above the ground where at least 30% of the high returns nearby came from split pulses (foliage), gaps filled from the neighbours",
+    "source": "NLS laser points, highest return above the ground: all of it off the building footprints, on them only where the pulses split (foliage); gaps filled from the neighbours",
     "max_height": 58.38,
     "format": "float32 little-endian, row-major, row 0 = north; metres above ground; 0 = nothing"
   },
@@ -109,5 +109,18 @@
       "texture": "ortho_2015.jpg",
       "source": "Helsinki"
     }
-  ]
+  ],
+  "water": {
+    "parcels": [
+      "91-3-9909-100",
+      "91-8-9909-100",
+      "level 0.00 m"
+    ],
+    "share": 0.114,
+    "lowered_m2": 0,
+    "painted_m2": 0,
+    "small_boats_kept": true,
+    "bridges": false,
+    "source": "the cadastre's water-land parcels and the ground model's lowest level (tools/pipeline/water_parcels.py)"
+  }
 }

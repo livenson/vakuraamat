@@ -336,7 +336,7 @@ def fetch_canopy(bbox, size, heights, out_dir, raw_dir, tile):
                 kept += int(inside.sum())
         log(f"{sheet} ({year}): {kept:,} points on the tile")
     top = np.where(np.isfinite(top), top, np.nan).reshape(size, size)
-    above = _fill_gaps(top) - heights
+    above = _fill_gaps(_fill_gaps(top)) - heights   # twice: at half a point a square metre one pass left crowns a sieve
     surface = np.where((above > 0.3) & (above < CANOPY_MAX), above, 0.0).astype(np.float32)
     os.makedirs(os.path.dirname(surface_path(raw_dir or paths.raw_root(), tile)), exist_ok=True)
     geo.write_r32(surface, surface_path(raw_dir or paths.raw_root(), tile))

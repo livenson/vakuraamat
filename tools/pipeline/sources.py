@@ -448,6 +448,10 @@ class Finland(DataSource):
         ok, _ = run(f"{sid}: cadastre", 900, fetch_cadastre_fi.fetch, sid, root=ws)
         if not ok:
             raise RuntimeError("the Finnish cadastre could not be read (see the service log)")
+        import water_parcels
+        # the sea at its level in the ground model, cleared of the ships the photograph caught; the small
+        # boats stay for the feature pass to put models on
+        run(f"{sid}: water", 120, water_parcels.paint, sid, root=ws, by_level=True, keep_small=True)
         stage("companies (PRH) and taxes (Vero)", 0.62)
         run(f"{sid}: tenants", 900, fetch_tenants_fi.fetch, sid, root=ws)
         stage("roads (OpenStreetMap)", 0.64)
