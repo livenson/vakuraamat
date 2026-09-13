@@ -1,17 +1,18 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/props/examine_point.tscn" id="1"]
 [ext_resource type="Script" path="res://scripts/world/footprint_building.gd" id="2"]
 [ext_resource type="Script" path="res://scripts/world/road_network.gd" id="3"]
 [ext_resource type="Script" path="res://scripts/world/parcel_kit.gd" id="4"]
 [ext_resource type="Script" path="res://scripts/world/traffic_system.gd" id="5"]
-[ext_resource type="Script" path="res://scripts/interaction/bicycle.gd" id="6"]
-[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/world/bus_service.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/interaction/bicycle.gd" id="7"]
+[ext_resource type="Script" path="res://scripts/era/era_controller.gd" id="8"]
 
 
 
 [node name="era_2026" type="Node3D"]
-script = ExtResource("7")
+script = ExtResource("8")
 era_id = "era_2026"
 
 [node name="Landmark" type="Node3D" parent="."]
@@ -9071,6 +9072,10 @@ density = 1.0
 max_agents = 40
 metadata/no_snap = true
 
+[node name="Buses" type="Node3D" parent="."]
+script = ExtResource("6")
+metadata/no_snap = true
+
 [node name="Bicycle" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 516.0, 0, 517.0)
-script = ExtResource("6")
+script = ExtResource("7")

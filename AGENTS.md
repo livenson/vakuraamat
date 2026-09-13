@@ -42,7 +42,7 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   and `_num` are the pattern).
 - Countries: an adapter in `tools/pipeline/sources.py` (pipeline, tile service) and a descriptor in
   `assets/data/countries/<id>.json` (game, via `Countries`); no other code names a country. Estonia and
-  Latvia are implemented, Finland has its ground, plots, buildings, companies, timetables, fields and address search; Finnish as a language is still to come (`docs/finland-plan.md`);
+  Latvia are implemented, Finland has its ground, plots, buildings, companies, timetables, fields, address search and Finnish as an interface language (`docs/finland-plan.md`);
   `docs/adding-a-country.md` is the checklist.
 - A pack for a new place is built in two passes. The job ships what the place needs to be walked in
   (the 5 m ground model, 4 MB a sheet against 75 MB for the 1 m one; the register, cadastre, roads,
@@ -184,7 +184,7 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   (or `--fullscreen`; `--locations` for the second page, `--query=<place>` with its results, `--storage` for the storage page, `--creating` / `--failed` for the world-creation
   sheet). Menu strings come from compiled translations: run `godot --headless --import` after editing
   `strings.csv` or the screenshot shows raw keys.
-- Strings: `assets/i18n/strings.csv` (keys, et, en, lv). Add keys with all three languages, never hard-code text; a pack's `strings.csv` may leave `lv` out (the fallback locale is English). The language key and menus cycle through `Lang.LOCALES` (scripts/ui/lang.gd); screenshots take `--locale=lv`.
+- Strings: `assets/i18n/strings.csv` (keys, et, en, lv, fi). Add keys in all four languages, never hard-code text; a pack's `strings.csv` may leave `lv` and `fi` out (the fallback locale is English, and `Sites.display_name` falls back the same way). The language key and menus cycle through `Lang.LOCALES` (scripts/ui/lang.gd); screenshots take `--locale=lv` or `--locale=fi`.
 - UI look: `BookTheme` (scripts/ui/book_theme.gd) is the one theme; new panels set `theme =
   BookTheme.theme()` and use its type variations (HeadLabel, DetailLabel, PrimaryButton, TextButton,
   RowButton) instead of font or colour overrides; euro figures through `BookTheme.money()`, no " · " joins.

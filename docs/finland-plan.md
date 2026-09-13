@@ -13,8 +13,8 @@
   - 5: address search;
   - 6: the menu, with a country picker.
 
-  Finnish as a game language (step 7) is next. `sites/helsinki_senaatintori` is a shipped pack with
-  every layer.
+  Step 7, Finnish as a game language, is done too, waiting for a native speaker's review.
+  `sites/helsinki_senaatintori` is a shipped pack with every layer.
 - **Step 1**, the adapter and the ground:
   - `sources.Finland`, `tools/pipeline/fetch_tile_fi.py`, `assets/data/finland.json` and the
     `fi` descriptor.
@@ -392,7 +392,31 @@ To do:
    - **Left open.** The starter bundles: `starter_places.py build` makes Senaatintori's eight
      neighbours on the service, and `publish` uploads them to a GitHub release, which waits for the
      maintainer.
-7. **Finnish as a language.**
+7. **Finnish as a language.** Done 2026-09-13, drafted without a native speaker.
+   - **Strings.** `assets/i18n/strings.csv` has a `fi` column for all 342 keys. The script that
+     wrote it refused a missing key or a `%s`/`%d`/`%%` that differs from the English, and checked
+     the other columns read back unchanged.
+     - Terms: a plot is a tontti, a cadastral unit a kiinteistö, a sector a toimiala, the health
+       verdicts kunnossa / seurannassa / vaikeuksissa.
+     - The building right reads "Rakennusoikeus: 24400 k-m² (asemakaava 12936)".
+   - **Switch.** `Lang.LOCALES` is Estonian → English → Latvian → Finnish, named "Suomi";
+     `project.godot` registers `strings.fi.translation`. Godot starts from the system locale, so a
+     Finnish system opens in Finnish.
+   - **Packs.**
+     - The three adapters' codex texts have Finnish, and `new_site.fi_text` writes a pack's
+       Finnish scaffold column beside `lv_text`'s.
+     - Helsinki's pack strings were rebuilt with it.
+     - The Estonian and Latvian packs have no Finnish column. `Sites.display_name` now falls back
+       to English, then Estonian, instead of showing the raw key: in Finnish the Locations page
+       listed "SITE_RIGA_VECPILSETA". The same was true of the Estonian packs in Latvian.
+   - **Other text.** The suggested places carry `note_fi`. `health_test` checks the health reasons
+     in every language of `Lang.LOCALES`, Finnish included.
+   - **Fonts.** EB Garamond and IBM Plex Sans carry ä, ö and å; nothing to do.
+   - **Left open.**
+     - A native speaker's review, especially the book's voice.
+     - Finnish for the Estonian and Latvian packs' place stories.
+     - Register text stays in the register's language, as in Latvia: Finnish (and Swedish) in
+       Finland, with the game's own labels translated around it.
 
 Each step gets a `THIRD_PARTY.md` row per source in the same commit, and bumps `PACK_VERSION`
 when it adds something the UI reads.

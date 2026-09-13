@@ -3,8 +3,8 @@
 class_name Lang
 extends RefCounted
 
-const LOCALES := ["et", "en", "lv"]
-const NAMES := {"et": "Eesti keel", "en": "English", "lv": "Latviešu valoda"}
+const LOCALES := ["et", "en", "lv", "fi"]
+const NAMES := {"et": "Eesti keel", "en": "English", "lv": "Latviešu valoda", "fi": "Suomi"}
 
 
 ## The locale after the current one (the first when the current one is not in the list).

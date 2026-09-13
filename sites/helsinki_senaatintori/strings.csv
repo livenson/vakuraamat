@@ -1,13 +1,13 @@
-keys,et,en,lv
-SITE_HELSINKI_SENAATINTORI,"Helsinki, Senaatintori","Helsinki, Senaatintori","Helsinki, Senaatintori"
-SITE_HELSINKI_SENAATINTORI_SUBTITLE,"Helsinki, Senaatintori: päris maa, päris väärtused.","Helsinki, Senaatintori: real plots, real values.","Helsinki, Senaatintori: īsta zeme, īstas vērtības."
-ERA_2026_NAME,Aasta 2026,The year 2026,2026. gads
-LOC_LANDMARK,Maamärk,The landmark,Orientieris
-LOC_FARMSTEAD,Talu,The farmstead,Sēta
-EX_LANDMARK_2026,"Helsinki, Senaatintori: siit algab sinu raamat.","Helsinki, Senaatintori: your book starts here.","Helsinki, Senaatintori: šeit sākas tava grāmata."
-CODEX_REAL_TITLE,Päris,Real,Īsts
-CODEX_INVENTED_TITLE,Välja mõeldud,Invented,Izdomāts
-CODEX_DATA_TITLE,Andmed,Data,Dati
-CODEX_REAL,"Maa: Helsinki, Senaatintori, Soome Maamõõduameti (Maanmittauslaitos) kõrgusmudelist, laserpunktidest ja ortofotost.","The ground: Helsinki, Senaatintori, from the National Land Survey of Finland's elevation model, laser points and orthophoto.","Zeme: Helsinki, Senaatintori, no Somijas Zemes dienesta (Maanmittauslaitos) augstuma modeļa, lāzerpunktiem un ortofoto."
-CODEX_INVENTED,"Majade seinad ja katused on taastatud registrite mõõtude järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.","The walls and roofs are reconstructed from the registers' measurements; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one.","Sienas un jumti atjaunoti pēc reģistru mēriem; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku."
-CODEX_DATA,"Kaardiandmed: Maanmittauslaitos 2026, kõrgusmudel, laserskaneerimine ja ortofoto (CC BY 4.0); Helsingis Helsingi linn (CC BY 4.0).","Map data: Maanmittauslaitos (National Land Survey of Finland) 2026, elevation model, laser scanning and orthophoto (CC BY 4.0); in Helsinki the City of Helsinki (CC BY 4.0).","Kartes dati: Maanmittauslaitos 2026, augstuma modelis, lāzerskenēšana un ortofoto (CC BY 4.0); Helsinkos Helsinku pilsēta (CC BY 4.0)."
+keys,et,en,lv,fi
+SITE_HELSINKI_SENAATINTORI,"Helsinki, Senaatintori","Helsinki, Senaatintori","Helsinki, Senaatintori","Helsinki, Senaatintori"
+SITE_HELSINKI_SENAATINTORI_SUBTITLE,"Helsinki, Senaatintori: päris maa, päris väärtused.","Helsinki, Senaatintori: real plots, real values.","Helsinki, Senaatintori: īsta zeme, īstas vērtības.","Helsinki, Senaatintori: todellinen maa, todelliset arvot."
+ERA_2026_NAME,Aasta 2026,The year 2026,2026. gads,Vuosi 2026
+LOC_LANDMARK,Maamärk,The landmark,Orientieris,Maamerkki
+LOC_FARMSTEAD,Talu,The farmstead,Sēta,Tila
+EX_LANDMARK_2026,"Helsinki, Senaatintori: siit algab sinu raamat.","Helsinki, Senaatintori: your book starts here.","Helsinki, Senaatintori: šeit sākas tava grāmata.","Helsinki, Senaatintori: kirjasi alkaa täältä."
+CODEX_REAL_TITLE,Päris,Real,Īsts,Totta
+CODEX_INVENTED_TITLE,Välja mõeldud,Invented,Izdomāts,Keksittyä
+CODEX_DATA_TITLE,Andmed,Data,Dati,Tiedot
+CODEX_REAL,"Maa: Helsinki, Senaatintori, Soome Maamõõduameti (Maanmittauslaitos) kõrgusmudelist, laserpunktidest ja ortofotost.","The ground: Helsinki, Senaatintori, from the National Land Survey of Finland's elevation model, laser points and orthophoto.","Zeme: Helsinki, Senaatintori, no Somijas Zemes dienesta (Maanmittauslaitos) augstuma modeļa, lāzerpunktiem un ortofoto.","Maa: Helsinki, Senaatintori, Maanmittauslaitoksen korkeusmallista, laserpisteistä ja ortokuvasta."
+CODEX_INVENTED,"Majade seinad ja katused on taastatud registrite mõõtude järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.","The walls and roofs are reconstructed from the registers' measurements; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one.","Sienas un jumti atjaunoti pēc reģistru mēriem; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku.","Seinät ja katot on rekonstruoitu rekisterien mittojen mukaan; sisätilat, puut, liikenne ja ohikulkijat ovat keksittyjä. Kukaan täällä ei esitä todellista ihmistä."
+CODEX_DATA,"Kaardiandmed: Maanmittauslaitos 2026, kõrgusmudel, laserskaneerimine ja ortofoto (CC BY 4.0); Helsingis Helsingi linn (CC BY 4.0).","Map data: Maanmittauslaitos (National Land Survey of Finland) 2026, elevation model, laser scanning and orthophoto (CC BY 4.0); in Helsinki the City of Helsinki (CC BY 4.0).","Kartes dati: Maanmittauslaitos 2026, augstuma modelis, lāzerskenēšana un ortofoto (CC BY 4.0); Helsinkos Helsinku pilsēta (CC BY 4.0).","Karttatiedot: Maanmittauslaitos 2026, korkeusmalli, laserkeilaus ja ortokuva (CC BY 4.0); Helsingissä Helsingin kaupunki (CC BY 4.0)."

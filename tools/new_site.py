@@ -52,6 +52,25 @@ def lv_text(row, name, country):
     return table.get(key, en)
 
 
+def fi_text(row, name, country):
+    """The Finnish column of a scaffold string ("fi" for the header), as lv_text does the Latvian."""
+    key, en = row[0], row[2]
+    if key == "keys":
+        return "fi"
+    import sources
+    codex = sources.by_id(country).codex(name)
+    if key in codex and "fi" in codex[key]:
+        return codex[key]["fi"]
+    table = {"ERA_2026_NAME": "Vuosi 2026", "LOC_LANDMARK": "Maamerkki", "LOC_FARMSTEAD": "Tila",
+             "EX_LANDMARK_2026": f"{name}: kirjasi alkaa täältä.", "CODEX_REAL_TITLE": "Totta", "CODEX_INVENTED_TITLE": "Keksittyä",
+             "CODEX_DATA_TITLE": "Tiedot"}
+    if key.endswith("_SUBTITLE"):
+        return f"{name}: todellinen maa, todelliset arvot."
+    if key.startswith("SITE_"):
+        return name
+    return table.get(key, en)
+
+
 def country_of(center):
     """The adapter id covering the centre ("ee", "lv"), "ee" when none does (the old default)."""
     import sources
@@ -302,7 +321,7 @@ def scaffold(site, name=None, center=None, size=1024, eras="2026", tile=None,
     with open(os.path.join(site_dir, "strings.csv"), "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f, lineterminator="\n")
         for r in rows:
-            w.writerow(r + [lv_text(r, name, country)])
+            w.writerow(r + [lv_text(r, name, country), fi_text(r, name, country)])
     for fn in ("buildings_2026.json", "water_2026.json"):
         p = os.path.join(site_dir, fn)
         if not os.path.exists(p):

@@ -31,7 +31,7 @@ func _ready() -> void:
 			if not str(t.get("health", "")) in ["watch", "distressed"]:
 				continue
 			flagged += 1
-			for loc in ["en", "et", "lv"]:
+			for loc in Lang.LOCALES:
 				TranslationServer.set_locale(loc)
 				var why := Tenants.health_reason(t)
 				_check(why != "" and not why.begins_with("HEALTH_"), "%s (%s): no reason in %s" % [t.name, site, loc])

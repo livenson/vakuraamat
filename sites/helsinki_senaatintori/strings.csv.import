@@ -6,10 +6,10 @@ uid="uid://bsd23ka6jrn67"
 
 [deps]
 
-files=["res://sites/helsinki_senaatintori/strings.et.translation", "res://sites/helsinki_senaatintori/strings.en.translation", "res://sites/helsinki_senaatintori/strings.lv.translation"]
+files=["res://sites/helsinki_senaatintori/strings.et.translation", "res://sites/helsinki_senaatintori/strings.en.translation", "res://sites/helsinki_senaatintori/strings.lv.translation", "res://sites/helsinki_senaatintori/strings.fi.translation"]
 
 source_file="res://sites/helsinki_senaatintori/strings.csv"
-dest_files=["res://sites/helsinki_senaatintori/strings.et.translation", "res://sites/helsinki_senaatintori/strings.en.translation", "res://sites/helsinki_senaatintori/strings.lv.translation"]
+dest_files=["res://sites/helsinki_senaatintori/strings.et.translation", "res://sites/helsinki_senaatintori/strings.en.translation", "res://sites/helsinki_senaatintori/strings.lv.translation", "res://sites/helsinki_senaatintori/strings.fi.translation"]
 
 [params]
 

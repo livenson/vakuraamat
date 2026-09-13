@@ -122,7 +122,7 @@ class DataSource:
 
     def codex(self, name):
         """What the pack is made of, in the codex: {"CODEX_REAL" | "CODEX_INVENTED" | "CODEX_DATA":
-        {"et", "en", "lv"}}."""
+        {"et", "en", "lv", "fi"}}."""
         return {}
 
     # --- places -----------------------------------------------------------------------------------
@@ -242,13 +242,16 @@ class Estonia(DataSource):
         return {
             "CODEX_REAL": {"et": f"Maa: {name}, Maa- ja Ruumiameti kõrgusandmed, ortofoto, hooned, katastriüksused ja maa väärtused, meetri täpsusega.",
                            "en": f"The ground: {name}, from the Land Board's elevation data, orthophoto, buildings, cadastral units and land values, to the metre.",
-                           "lv": f"Zeme: {name}, no Igaunijas Zemes un telpiskās plānošanas departamenta augstuma datiem, ortofoto, ēkām, kadastra vienībām un zemes vērtībām, ar metra precizitāti."},
+                           "lv": f"Zeme: {name}, no Igaunijas Zemes un telpiskās plānošanas departamenta augstuma datiem, ortofoto, ēkām, kadastra vienībām un zemes vērtībām, ar metra precizitāti.",
+                           "fi": f"Maa: {name}, Viron maanmittausviraston korkeustiedoista, ortokuvasta, rakennuksista, kiinteistöistä ja maan arvoista, metrin tarkkuudella."},
             "CODEX_INVENTED": {"et": "Majade seinad ja katused on taastatud ehitisregistri mõõtude ja Maa-ameti LOD2 mudeli järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.",
                                "en": "The walls and roofs are reconstructed from the Building Register's measurements and Maa-amet's LOD2 model; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one.",
-                               "lv": "Sienas un jumti atjaunoti pēc Ēku reģistra mēriem un Maa-amet LOD2 modeļa; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku."},
+                               "lv": "Sienas un jumti atjaunoti pēc Ēku reģistra mēriem un Maa-amet LOD2 modeļa; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku.",
+                               "fi": "Seinät ja katot on rekonstruoitu rakennusrekisterin mittojen ja Maa-ametin LOD2-mallin mukaan; sisätilat, puut, liikenne ja ohikulkijat ovat keksittyjä. Kukaan täällä ei esitä todellista ihmistä."},
             "CODEX_DATA": {"et": "Kaardiandmed: Maa- ja Ruumiamet 2026. %s" % self.CREDIT_ET,
                            "en": "Map data: Maa- ja Ruumiamet 2026. %s" % self.CREDIT_EN,
-                           "lv": "Kartes dati: Maa- ja Ruumiamet 2026. Zemes nodokļa vērtības: kadastrs; uzņēmumi: Igaunijas uzņēmumu reģistra atvērtie dati (CC BY 4.0)."},
+                           "lv": "Kartes dati: Maa- ja Ruumiamet 2026. Zemes nodokļa vērtības: kadastrs; uzņēmumi: Igaunijas uzņēmumu reģistra atvērtie dati (CC BY 4.0).",
+                           "fi": "Karttatiedot: Maa- ja Ruumiamet 2026. Maan verotusarvot: kiinteistörekisteri; yritykset: Viron kaupparekisterin avoin data (CC BY 4.0)."},
         }
 
     def geocode(self, query):
@@ -372,12 +375,15 @@ class Latvia(DataSource):
         return {
             "CODEX_REAL": {"et": f"Maa: {name}, Läti Geoinfoameti (LĢIA) laserpunktidest ja ortofotost, meetri täpsusega.",
                            "en": f"The ground: {name}, from the Latvian Geospatial Information Agency's (LĢIA) laser points and orthophoto, to the metre.",
-                           "lv": f"Zeme: {name}, no Latvijas Ģeotelpiskās informācijas aģentūras (LĢIA) lāzerpunktiem un ortofoto, ar metra precizitāti."},
+                           "lv": f"Zeme: {name}, no Latvijas Ģeotelpiskās informācijas aģentūras (LĢIA) lāzerpunktiem un ortofoto, ar metra precizitāti.",
+                           "fi": f"Maa: {name}, Latvian paikkatietoviraston (LĢIA) laserpisteistä ja ortokuvasta, metrin tarkkuudella."},
             "CODEX_INVENTED": {"et": "Majade seinad ja katused on taastatud registrite mõõtude ja katusemudelite või laserpunktide järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.",
                                "en": "The walls and roofs are reconstructed from the registers' measurements and roof models or laser points; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one.",
-                               "lv": "Sienas un jumti atjaunoti pēc reģistru mēriem un jumtu modeļiem vai lāzerpunktiem; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku."},
+                               "lv": "Sienas un jumti atjaunoti pēc reģistru mēriem un jumtu modeļiem vai lāzerpunktiem; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku.",
+                               "fi": "Seinät ja katot on rekonstruoitu rekisterien mittojen ja kattomallien tai laserpisteiden mukaan; sisätilat, puut, liikenne ja ohikulkijat ovat keksittyjä. Kukaan täällä ei esitä todellista ihmistä."},
             "CODEX_DATA": {"et": self.GROUND_ET, "en": self.GROUND_EN,
-                           "lv": "Kartes dati: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, lāzerskenēšana un ortofoto 2016–2018 (CC BY 4.0)."},
+                           "lv": "Kartes dati: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, lāzerskenēšana un ortofoto 2016–2018 (CC BY 4.0).",
+                           "fi": "Karttatiedot: Latvijas Ģeotelpiskās informācijas aģentūra (LĢIA) 2026, laserkeilaus ja ortokuva 2016–2018 (CC BY 4.0)."},
         }
 
     def geocode(self, query):
@@ -481,12 +487,15 @@ class Finland(DataSource):
         return {
             "CODEX_REAL": {"et": f"Maa: {name}, Soome Maamõõduameti (Maanmittauslaitos) kõrgusmudelist, laserpunktidest ja ortofotost.",
                            "en": f"The ground: {name}, from the National Land Survey of Finland's elevation model, laser points and orthophoto.",
-                           "lv": f"Zeme: {name}, no Somijas Zemes dienesta (Maanmittauslaitos) augstuma modeļa, lāzerpunktiem un ortofoto."},
+                           "lv": f"Zeme: {name}, no Somijas Zemes dienesta (Maanmittauslaitos) augstuma modeļa, lāzerpunktiem un ortofoto.",
+                           "fi": f"Maa: {name}, Maanmittauslaitoksen korkeusmallista, laserpisteistä ja ortokuvasta."},
             "CODEX_INVENTED": {"et": "Majade seinad ja katused on taastatud registrite mõõtude järgi; sisemused, puud, liiklus ja möödujad on välja mõeldud. Ükski inimene siin ei kujuta päris inimest.",
                                "en": "The walls and roofs are reconstructed from the registers' measurements; the interiors, the trees, the traffic and the passers-by are invented. No person here depicts a real one.",
-                               "lv": "Sienas un jumti atjaunoti pēc reģistru mēriem; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku."},
+                               "lv": "Sienas un jumti atjaunoti pēc reģistru mēriem; interjeri, koki, satiksme un garāmgājēji ir izdomāti. Neviens cilvēks šeit neattēlo īstu cilvēku.",
+                               "fi": "Seinät ja katot on rekonstruoitu rekisterien mittojen mukaan; sisätilat, puut, liikenne ja ohikulkijat ovat keksittyjä. Kukaan täällä ei esitä todellista ihmistä."},
             "CODEX_DATA": {"et": self.GROUND_ET, "en": self.GROUND_EN,
-                           "lv": "Kartes dati: Maanmittauslaitos 2026, augstuma modelis, lāzerskenēšana un ortofoto (CC BY 4.0); Helsinkos Helsinku pilsēta (CC BY 4.0)."},
+                           "lv": "Kartes dati: Maanmittauslaitos 2026, augstuma modelis, lāzerskenēšana un ortofoto (CC BY 4.0); Helsinkos Helsinku pilsēta (CC BY 4.0).",
+                           "fi": "Karttatiedot: Maanmittauslaitos 2026, korkeusmalli, laserkeilaus ja ortokuva (CC BY 4.0); Helsingissä Helsingin kaupunki (CC BY 4.0)."},
         }
 
 
