@@ -75,6 +75,28 @@ def latvia():
     return parts
 
 
+FI_MUNICIPALITIES = "https://geo.stat.fi/geoserver/tilastointialueet/wfs"
+
+
+def finland():
+    """Finland's municipalities (shapely, on the L-EST97 grid), from Statistics Finland's 1:4.5 M
+    division: the whole country with Åland, the sea cut off at the coast."""
+    import shapely
+    from pyproj import Transformer
+    from shapely.ops import transform
+    d = paths.raw("fi")
+    path = os.path.join(d, "kunta4500k.json")
+    if not os.path.exists(path):
+        q = urllib.parse.urlencode({"service": "WFS", "version": "2.0.0", "request": "GetFeature",
+                                    "typeNames": f"tilastointialueet:kunta4500k_{datetime.date.today().year - 1}",
+                                    "srsName": "EPSG:3067", "outputFormat": "application/json"})
+        log(f"asking Statistics Finland for the municipalities ({FI_MUNICIPALITIES})")
+        with urllib.request.urlopen(urllib.request.Request(f"{FI_MUNICIPALITIES}?{q}", headers=UA), timeout=180) as r, open(path, "wb") as f:
+            f.write(r.read())
+    t = Transformer.from_crs("EPSG:3067", "EPSG:3301", always_xy=True)
+    return [transform(t.transform, shapely.geometry.shape(f["geometry"])).buffer(1) for f in json.load(open(path))["features"]]
+
+
 def lake(name):
     """One named standing water body (ETAK WFS), its map-sheet pieces unioned, or None."""
     import shapely
@@ -106,21 +128,31 @@ def rings(geom, tolerance, min_area):
     return [r for _a, r in out]
 
 
+# --country: (the file under assets/data, the land's parts, its credit, its source)
+COUNTRIES = {
+    "ee": ("estonia.json", counties, ATTRIBUTION, COUNTIES),
+    "lv": ("latvia.json", latvia, "Administratīvās teritorijas: Valsts adrešu reģistrs, VZD (CC BY 4.0)",
+           "data.gov.lv varis-atvertie-dati aw_shp.zip"),
+    "fi": ("finland.json", finland, "Kuntajako 1:4 500 000: Tilastokeskus (CC BY 4.0)", FI_MUNICIPALITIES + " kunta4500k"),
+}
+
+
 def main(argv):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--tolerance", type=float, default=700.0, help="simplification in metres (default 700)")
     ap.add_argument("--min-island", type=float, default=10.0, help="smallest island kept, km² (default 10)")
     ap.add_argument("--no-lakes", action="store_true", help="coastline only")
-    ap.add_argument("--country", choices=["ee", "lv"], default="ee")
+    ap.add_argument("--country", choices=list(COUNTRIES), default="ee")
     ap.add_argument("--out")
     a = ap.parse_args(argv)
-    a.out = a.out or os.path.join(ROOT, "assets", "data", "latvia.json" if a.country == "lv" else "estonia.json")
+    file, parts, attribution, source = COUNTRIES[a.country]
+    a.out = a.out or os.path.join(ROOT, "assets", "data", file)
     from shapely.ops import unary_union
-    land = unary_union(latvia() if a.country == "lv" else counties())
+    land = unary_union(parts())
     log(f"{len(list(land.geoms)) if hasattr(land, 'geoms') else 1} land parts, bounds {tuple(round(v) for v in land.bounds)}")
     out = {
-        "attribution": "Administratīvās teritorijas: Valsts adrešu reģistrs, VZD (CC BY 4.0)" if a.country == "lv" else ATTRIBUTION,
-        "source": "data.gov.lv varis-atvertie-dati aw_shp.zip" if a.country == "lv" else COUNTIES,
+        "attribution": attribution,
+        "source": source,
         "fetched": datetime.date.today().isoformat(),
         "bounds": [round(v) for v in land.bounds],
         "land": rings(land, a.tolerance, a.min_island * 1e6),

@@ -246,6 +246,9 @@ MENU_CANCELLED,Maailma loomine katkestati.,Creating the world was cancelled.,Pas
 MENU_MAP_GO,"Täidetud: sinu maailmad, praegune rõngaga. Rõngas: idee. Sinine täpp: valmis teenuses. Klõpsa märgil, et sinna minna.","Filled: your worlds, the current one ringed. Ring: an idea. Blue dot: ready on the service. Click a mark to go there.","Aizpildīts: tavas pasaules, pašreizējā ar loku. Loks: ideja. Zils punkts: gatava servisā. Noklikšķini uz zīmes, lai dotos turp."
 COUNTRY_EE,Eesti,Estonia,Igaunija
 COUNTRY_LV,Läti,Latvia,Latvija
+COUNTRY_FI,Soome,Finland,Somija
+UI_SHEET_REGISTER_FI,Soome ehitusregister (Ryhti): %s,Finnish building register (Ryhti): %s,Somijas būvju reģistrs (Ryhti): %s
+UI_SHEET_CODE_FI,Püsiv ehitistunnus %s,Permanent building identifier %s,Pastāvīgais būves identifikators %s
 UI_BUS_STOP,Bussipeatus,Bus stop,Autobusa pietura
 UI_BUS_LINES,Liinid: %s,Lines: %s,Maršruti: %s
 UI_MAP_MODE,Kiht,Layer,Slānis

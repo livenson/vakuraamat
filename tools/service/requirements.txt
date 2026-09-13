@@ -6,4 +6,6 @@ rasterio>=1.4
 pyogrio>=0.10
 shapely>=2.0
 pyproj>=3.6
+laspy>=2.5             # Finland's laser points come as LAZ (fetch_tile_fi.py); Latvia's plain LAS is read by hand
+lazrs>=0.6             # laspy's LAZ decompressor (Rust wheel, no system library)
 pyinstaller>=6.10

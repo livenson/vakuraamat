@@ -32,6 +32,14 @@ func _ready() -> void:
 	_check(Countries.for_building_code("101036528", {}).get("id") == "ee", "a 9-digit EHR code is not Estonian")
 	_check(Countries.for_building_code("01000090065001", {}).get("id") == "lv", "a 14-digit designation is not Latvian")
 	_check(Countries.for_building_code("", {"id": "x"}).get("id") == "x", "an empty code does not fall back to the pack's country")
+	# Finland's permanent identifier: 9 digits and a check character, which may be a digit too - then
+	# only the pack's country tells it from an Estonian code
+	var fi := Countries.by_id("fi")
+	_check(Countries.for_building_code("103036806X", {}).get("id") == "fi", "a VTJ-PRT with a letter is not Finnish")
+	_check(Countries.for_building_code("1030368060", fi).get("id") == "fi", "a VTJ-PRT with a digit in a Finnish pack is not Finnish")
+	_check(Countries.for_building_code("101036528", Countries.by_id("ee")).get("id") == "ee", "an EHR code in an Estonian pack is not Estonian")
+	_check(Countries.for_parcel_code("91-8-142-4", {}).get("id") == "fi", "a Finnish property id is not Finnish")
+	_check(Locator.in_coverage(552890, 6670790), "Helsinki not covered")
 	# packs: Latvian by their manifest, Estonian by default (older manifests carry no country)
 	_check(Countries.of_pack("riga_vecpilseta").get("id") == "lv", "Rīga is not Latvian")
 	_check(Countries.of_pack("pirita").get("id") == "ee", "Pirita is not Estonian")

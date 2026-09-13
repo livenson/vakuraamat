@@ -13,7 +13,7 @@ const STREET_WORDS := [
 	[" tänav", " tn"], [" maantee", " mnt"], [" puiestee", " pst"], [" põik", " pk"],
 	[" tee", " tee"], [" allee", " all"],
 ]
-const FOLD := {"õ": "o", "ä": "a", "ö": "o", "ü": "u", "š": "s", "ž": "z"}
+const FOLD := {"õ": "o", "ä": "a", "ö": "o", "ü": "u", "š": "s", "ž": "z", "å": "a"}
 const LIMIT := 40
 
 
