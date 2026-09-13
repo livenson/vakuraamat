@@ -178,6 +178,9 @@ func _ready() -> void:
 			var sc := a.trim_prefix("--scale3d=").split(":")
 			get_viewport().scaling_3d_mode = int(sc[0]) as Viewport.Scaling3DMode
 			get_viewport().scaling_3d_scale = float(sc[1]) if sc.size() > 1 else 1.0
+			# the temporal upscalers (FSR2, MetalFX temporal) do their own anti-aliasing and the engine
+			# turns TAA off beside them, warning at every start: TAA only for the spatial modes
+			get_viewport().use_taa = int(sc[0]) in [0, 1, 3]
 		elif a.begins_with("--enter="):
 			_when_filled(2.5, enter_building.bind(a.trim_prefix("--enter=")))
 		elif a.begins_with("--examine="):

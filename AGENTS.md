@@ -177,6 +177,13 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   `blender --background --python tools/blender/split_glb.py -- <pack.glb> <out_dir> "<name>=<regex>" ...`;
   the download tool needs the output directory to exist. Sketchfab exports are often in cm or with
   a scaled root: never assume metres, fit from bounds.
+- One "Too many mipmaps requested for texture format and dimensions (4294967295)" (with "Attempted to
+  name invalid ID: 0") at every start is Godot 4.7 rendering 3D below full scale for the first time:
+  measured on Pirita, one with `scaling_3d/scale` 0.75 under either bilinear or MetalFX, none at 1.0, and
+  holding the scale at 1 across the window's first resize did not stop it. Harmless; nothing to chase.
+  "instance_reset_physics_interpolation() is deprecated" comes from a compiled addon (Terrain3D 1.0.2).
+  TAA is off in the project: the temporal upscalers anti-alias themselves and the engine disabled TAA
+  beside them with a warning at every start; `--scale3d=` turns it on for the spatial modes.
 - "Resource file not found: res://" and "Error loading resource: ''" right after a pack switch, with no
   GDScript backtrace: Terrain3D reading a downloaded tile's still-empty data directory on its first
   visit. Harmless; the region is built and saved right after.
