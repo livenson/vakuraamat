@@ -182,6 +182,50 @@ def cache_info():
     return {"bytes": total, "packs": packs, "free_bytes": shutil.disk_usage(WORKSPACE).free, "path": WORKSPACE}
 
 
+ZIP_DAYS = 3   # a pack's zip is kept this long after it was written; its workspace can make it again
+
+
+def built(sid):
+    """Whether a pack stands ready: its zip, or its workspace with the mark of a finished build."""
+    return bool(sid) and (os.path.exists(os.path.join(WORKSPACE, sid + ".zip"))
+                          or (os.path.exists(os.path.join(WORKSPACE, sid + ".ok"))
+                              and os.path.exists(os.path.join(WORKSPACE, sid, "sites", sid, "site.json"))))
+
+
+def ensure_zip(sid):
+    """The pack's zip, written again from its workspace when it was pruned. None when it is not built."""
+    zpath = os.path.join(WORKSPACE, sid + ".zip")
+    if os.path.exists(zpath):
+        return zpath
+    if not built(sid):
+        return None
+    log(f"{sid}: zip written again from the workspace")
+    return write_zip(sid, os.path.join(WORKSPACE, sid))
+
+
+def prune_zips():
+    """Every zip older than ZIP_DAYS whose workspace can write it again goes: the workspace holds the
+    same files (137 workspaces beside 131 zips held 1.2 GB twice over, 2026-09-13). A zip from before
+    the .ok marks, with its workspace beside it, is marked built first."""
+    freed, now = 0, time.time()
+    for f in os.listdir(WORKSPACE):
+        if not f.endswith(".zip"):
+            continue
+        sid, zpath = f[:-4], os.path.join(WORKSPACE, f)
+        if not os.path.exists(os.path.join(WORKSPACE, sid, "sites", sid, "site.json")):
+            continue
+        ok = os.path.join(WORKSPACE, sid + ".ok")
+        if not os.path.exists(ok):
+            open(ok, "w").close()
+        with LOCK:
+            running = JOBS.get(sid, {}).get("done") is False
+        if not running and now - os.path.getmtime(zpath) > ZIP_DAYS * 86400:
+            freed += os.path.getsize(zpath)
+            os.remove(zpath)
+    if freed:
+        log(f"pruned zips older than {ZIP_DAYS} days: {freed / 1e6:.0f} MB")
+
+
 def write_zip(sid, ws):
     """The pack the game installs: the site files and the tile's engine files. Written to a .part
     first and moved into place, so the refinement pass can replace it under a client that is
@@ -296,6 +340,7 @@ def run_job(job):
             raise RuntimeError("validation: " + "; ".join(rep.errors[:5]))
         stage("packing", 0.9)
         zpath = write_zip(sid, ws)
+        open(os.path.join(WORKSPACE, sid + ".ok"), "w").close()   # built: the zip may be pruned and made again
         with LOCK:
             job.update(stage="ready", progress=1.0, done=True, zip=zpath, refined=False, refine_stage="queued")
         note_job(time.time() - started)
@@ -305,6 +350,7 @@ def run_job(job):
         spans = [(marks[i + 1][0] - marks[i][0], marks[i][1]) for i in range(len(marks) - 1)]
         log(f"{sid}: stages " + ", ".join(f"{n} {d:.0f}s" for d, n in sorted(spans, reverse=True)[:8] if d >= 1))
         log(f"{sid}: ready ({os.path.getsize(zpath) / 1e6:.1f} MB, {time.time() - started:.0f} s)")
+        prune_zips()
     except Cancelled:
         # the half-built workspace goes; what was downloaded stays in the raw cache, so going there
         # again starts from it
@@ -333,7 +379,17 @@ def refine_job(job, ws):
     try:
         # the country's own pass (sources.py): Estonia's 1 m ground, measured trees and timetables,
         # Latvia's older photographs and timetables; (ok, the ground's resolution in metres)
-        ok, res = sources.for_point(job["x"], job["y"]).refine(sid, ws, rstage, with_deadline)
+        source = sources.for_point(job["x"], job["y"])
+        meta = json.load(open(os.path.join(ws, "assets", "terrain", sid, "terrain_meta.json")))
+        if job.get("refresh") and (meta.get("refined") or float(meta.get("dtm_res_m", 5)) <= 1.0):
+            # a refresh of a tile that has its fine ground, measured trees and older photographs already
+            # (the workspace kept them): only the timetables are worth fetching again. Estonia's refine
+            # rebuilt the 1 m ground and re-scanned a municipality's tree points (79 MB for Harku) each time
+            rstage("bus departures")
+            with_deadline(f"{sid}: departures", 300, source.departures, sid, ws)
+            ok, res = True, float(meta.get("dtm_res_m", 1.0))
+        else:
+            ok, res = source.refine(sid, ws, rstage, with_deadline)
         rstage("packing")
         write_zip(sid, ws)
         if ok:
@@ -393,9 +449,8 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, cache_info())
         if u.path == "/packs":
             packs = []
-            for f in sorted(os.listdir(WORKSPACE)):
-                if f.endswith(".zip"):
-                    sid = f[:-4]
+            for sid in sorted({f[:-4] for f in os.listdir(WORKSPACE) if f.endswith((".zip", ".ok"))} - {""}):
+                if built(sid):
                     mpath = os.path.join(WORKSPACE, sid, "sites", sid, "site.json")
                     if os.path.exists(mpath):
                         m = json.load(open(mpath))
@@ -410,8 +465,7 @@ class Handler(BaseHTTPRequestHandler):
             with LOCK:
                 job = dict(JOBS.get(sid, {}))
             if not job:
-                zpath = os.path.join(WORKSPACE, sid + ".zip")
-                if sid and os.path.exists(zpath):
+                if built(sid):
                     return self._json(200, {"id": sid, "stage": "ready", "progress": 1.0, "done": True, "refined": refined})
                 return self._json(404, {"error": "unknown job"})
             job.pop("zip", None)
@@ -419,8 +473,7 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, job)
         if u.path == "/download":
             sid = qs.get("id", [""])[0]
-            zpath = os.path.join(WORKSPACE, sid + ".zip")
-            if not sid or not os.path.exists(zpath):
+            if not built(sid):
                 return self._json(404, {"error": "not ready"})
             # the zip is only replaced at the packing stage, so while a job runs this file is still
             # the previous build: handing it out would install the very pack the client asked to
@@ -429,6 +482,9 @@ class Handler(BaseHTTPRequestHandler):
                 running = JOBS.get(sid, {})
             if running and not running.get("done"):
                 return self._json(409, {"error": "still building", "stage": running.get("stage", "")})
+            zpath = ensure_zip(sid)   # pruned after ZIP_DAYS: written again from the workspace
+            if zpath is None:
+                return self._json(404, {"error": "not ready"})
             self.send_response(200); self.send_header("Content-Type", "application/zip"); self.send_header("Content-Length", str(os.path.getsize(zpath))); self.end_headers()
             with open(zpath, "rb") as f:
                 shutil.copyfileobj(f, self.wfile)
@@ -471,7 +527,7 @@ class Handler(BaseHTTPRequestHandler):
             job = JOBS.get(sid)
             if job and not job.get("done"):
                 return self._json(202, {"id": sid, "stage": job["stage"]})
-            if os.path.exists(os.path.join(WORKSPACE, sid + ".zip")) and not rebuild:
+            if built(sid) and not rebuild:
                 JOBS[sid] = {"id": sid, "stage": "ready", "progress": 1.0, "done": True}
                 return self._json(202, {"id": sid, "stage": "ready"})
             job = {"id": sid, "name": name, "x": x, "y": y, "focus": focus, "size": size, "eras": eras,
@@ -541,6 +597,7 @@ def main():
     WORKSPACE = os.path.abspath(a.workspace) if a.workspace else os.path.join(paths.raw_root(), "service")
     os.makedirs(WORKSPACE, exist_ok=True)
     open(os.path.join(WORKSPACE, ".gdignore"), "a").close()
+    threading.Thread(target=prune_zips, daemon=True).start()
     srv = ThreadingHTTPServer((a.bind, a.port), Handler)
     log(f"listening on http://{a.bind}:{a.port}  workspace {WORKSPACE}")
     try:

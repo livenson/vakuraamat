@@ -71,7 +71,12 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   re-fetches the registers and keeps the ground, so it costs seconds, not the twenty minutes a
   forced rebuild does.
 - Service: `tools/tile_service.py` (packs for a point, port 8765) is a loopback Python server the game
-  talks to through `Locator`. It is the only service.
+  talks to through `Locator`. It is the only service. OpenStreetMap comes through `osm_tile.elements`:
+  one union Overpass query per tile, cached in `data_raw/overpass` for 7 days, one request at a time,
+  a stale answer when the servers fail; roads, stops, pitches and `fetch_osm` filter their elements
+  from it (add a new OSM layer to its query, not a query of your own). A finished pack is marked
+  `<id>.ok`; its zip is pruned after 3 days and written again from the workspace on /download. A
+  refresh of a tile that is already refined fetches only the timetables in its refine pass.
 - Core UI strings stay in `assets/i18n/strings.csv`; place strings go in the pack's `strings.csv`
   (imported to `.translation` next to it; `make import` after editing).
 - Generated data is not committed: `assets/terrain/*/data`, tree meshes and impostor atlases. Rebuild

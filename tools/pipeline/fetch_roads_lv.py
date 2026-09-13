@@ -16,14 +16,12 @@ often runs through a crossing without ending there, so every way is split at eac
 shares. Lines are cut where they leave the tile by more than 40 m. ODbL: the file carries
 "© OpenStreetMap contributors" like stops.json.
 """
-import argparse, json, os, sys, time, urllib.parse, urllib.request
+import argparse, json, os, sys, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import geo  # noqa: E402
 import paths  # noqa: E402
 
-OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"]
-UA = {"User-Agent": "vakuraamat-pipeline/0.1 (open-source game; polite, cached)"}
 ATTRIBUTION = "Ceļi un ielas: © OpenStreetMap contributors (ODbL)"
 ATTRIBUTION_FI = "Tiet ja kadut: © OpenStreetMap contributors (ODbL)"   # the same fetch serves Finland (sources.Finland)
 MARGIN_M = 40.0
@@ -38,26 +36,6 @@ WIDTH = {"motorway": 14.0, "trunk": 12.0, "primary": 12.0, "secondary": 10.0, "t
 
 def log(msg):
     print(f"[fetch_roads_lv] {msg}", flush=True)
-
-
-def overpass(south, west, north, east, budget=170.0):
-    """The ways under the box. The public servers answer 504 or time out when busy (Turku's roads,
-    2026-09-13), so the mirrors are tried in turn until `budget` seconds are spent, pausing a little
-    after each round: inside the tile service's 180 s for the stage."""
-    q = f'[out:json][timeout:90];way["highway"]({south:.6f},{west:.6f},{north:.6f},{east:.6f});out body geom;'
-    last, t0, i = None, time.time(), 0
-    while budget - (time.time() - t0) > 20:
-        url = OVERPASS[i % len(OVERPASS)]
-        try:
-            req = urllib.request.Request(url, data=urllib.parse.urlencode({"data": q}).encode(), headers=UA)
-            return json.load(urllib.request.urlopen(req, timeout=min(120.0, budget - (time.time() - t0)))).get("elements", [])
-        except Exception as e:  # noqa: BLE001 - the mirror, then another round
-            last = e
-            log(f"{url.split('/')[2]}: {e}")
-        i += 1
-        if i % len(OVERPASS) == 0:
-            time.sleep(10)
-    raise RuntimeError(f"Overpass unavailable: {last}")
 
 
 def kind_of(tags):
@@ -91,12 +69,10 @@ def fetch(site, root=paths.ROOT, attribution=ATTRIBUTION):
     m = json.load(open(os.path.join(site_dir, "site.json")))
     meta = json.load(open(os.path.join(root, "assets/terrain", m["terrain"]["tile"], "terrain_meta.json")))
     xmin, ymin, xmax, ymax = meta["xmin"], meta["ymin"], meta["xmax"], meta["ymax"]
-    corners = geo.transform_points([(xmin - MARGIN_M, ymin - MARGIN_M), (xmax + MARGIN_M, ymin - MARGIN_M),
-                                    (xmin - MARGIN_M, ymax + MARGIN_M), (xmax + MARGIN_M, ymax + MARGIN_M)], 3301, 4326)
-    lons, lats = [c[0] for c in corners], [c[1] for c in corners]
-    ways = [w for w in overpass(min(lats), min(lons), max(lats), max(lons))
-            if w.get("type") == "way" and w.get("geometry") and w.get("tags", {}).get("highway") not in SKIP
-            and w.get("tags", {}).get("area") != "yes"]
+    import osm_tile   # the tile's one shared Overpass answer (osm_tile.py), cached; its box is these 40 m round
+    ways = [w for w in osm_tile.elements(site, root, 170.0)
+            if w.get("type") == "way" and w.get("geometry") and "highway" in w.get("tags", {})
+            and w["tags"]["highway"] not in SKIP and w["tags"].get("area") != "yes"]
     # every node's tile position, and how many ways use it (a crossing is a node two ways share)
     uses, pos = {}, {}
     flat = [(g["lon"], g["lat"]) for w in ways for g in w["geometry"]]

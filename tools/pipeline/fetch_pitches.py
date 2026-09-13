@@ -11,38 +11,17 @@ surface, name, x, z, length, width, heading, polygon [[x, z]...]}]} in tile metr
 long side's direction in degrees (0 = north, clockwise), `length` and `width` the outline's minimum
 rotated rectangle. ODbL: the file carries "© OpenStreetMap contributors", like stops.json.
 """
-import argparse, json, math, os, sys, time, urllib.parse, urllib.request
+import argparse, json, math, os, sys, time
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import paths  # noqa: E402
 
 ROOT = paths.ROOT
-OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"]
-UA = {"User-Agent": "vakuraamat-pipeline/0.1 (open-source game; polite, cached)"}
 ATTRIBUTION = "Pitches: © OpenStreetMap contributors (ODbL)"
 
 
 def log(msg):
     print(f"[fetch_pitches] {msg}", flush=True)
-
-
-def overpass(south, west, north, east, budget=110.0):
-    """The pitch outlines under the box. The mirrors in turn until `budget` seconds are spent (the
-    public servers answer 504 or time out when busy), inside the tile service's 120 s for the stage."""
-    q = f'[out:json][timeout:25];way["leisure"="pitch"]({south:.6f},{west:.6f},{north:.6f},{east:.6f});out body geom;'
-    last, t0, i = None, time.time(), 0
-    while budget - (time.time() - t0) > 15:
-        url = OVERPASS[i % len(OVERPASS)]
-        try:
-            req = urllib.request.Request(url, data=urllib.parse.urlencode({"data": q}).encode(), headers=UA)
-            return json.load(urllib.request.urlopen(req, timeout=min(35.0, budget - (time.time() - t0)))).get("elements", [])
-        except Exception as e:  # noqa: BLE001 - the mirror, then another round
-            last = e
-            log(f"{url.split('/')[2]}: {e}")
-        i += 1
-        if i % len(OVERPASS) == 0:
-            time.sleep(5)
-    raise RuntimeError(f"Overpass unavailable: {last}")
 
 
 def rectangle(pts):
@@ -66,10 +45,10 @@ def fetch(site, root=ROOT):
     m = json.load(open(os.path.join(site_dir, "site.json")))
     meta = json.load(open(os.path.join(root, "assets/terrain", m["terrain"]["tile"], "terrain_meta.json")))
     xmin, ymin, xmax, ymax = meta["xmin"], meta["ymin"], meta["xmax"], meta["ymax"]
-    corners = geo.transform_points([(xmin, ymin), (xmax, ymin), (xmin, ymax), (xmax, ymax)], 3301, 4326)
-    lons = [c[0] for c in corners]; lats = [c[1] for c in corners]
     try:
-        ways = overpass(min(lats), min(lons), max(lats), max(lons))
+        import osm_tile   # the tile's one shared Overpass answer (osm_tile.py), cached
+        ways = [w for w in osm_tile.elements(site, root, 110.0)
+                if w.get("type") == "way" and w.get("tags", {}).get("leisure") == "pitch"]
     except Exception as e:  # noqa: BLE001 - an optional layer
         log(str(e))
         return None

@@ -28,7 +28,7 @@ Writes, each its own file so ODbL's share-alike stays on it and never reaches th
 
 Coordinates are tile metres (x east from the tile's west edge, z south from its north edge).
 """
-import argparse, json, math, os, re, sys, time, urllib.parse, urllib.request
+import argparse, json, math, os, re, sys, time
 
 import numpy as np
 
@@ -36,8 +36,6 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import paths  # noqa: E402
 
 ROOT = paths.ROOT
-OVERPASS = ["https://overpass-api.de/api/interpreter", "https://overpass.kumi.systems/api/interpreter"]
-UA = {"User-Agent": "vakuraamat-pipeline/0.1 (open-source game; polite, cached)"}
 CREDIT = "© OpenStreetMap contributors (ODbL)"
 MARGIN_M = 30.0          # lines are kept this far past the tile's edge, so a fence or a track does not stop short
 POI_AMENITY = "restaurant|cafe|bar|pub|fast_food|pharmacy|bank|ice_cream|nightclub|biergarten|food_court|fuel|car_wash|marketplace|cinema|theatre|dentist|doctors|clinic|veterinary"
@@ -54,49 +52,23 @@ def log(msg):
     print(f"[fetch_osm] {msg}", flush=True)
 
 
-def query(bb):
-    return f"""[out:json][timeout:120];
-(
-  node["highway"~"^(street_lamp|traffic_signals|crossing)$"]({bb});
-  node["amenity"~"^(bench|waste_basket|bicycle_parking)$"]({bb});
-  node["barrier"]({bb});
-  way["barrier"]({bb});
-  node["natural"="tree"]({bb});
-  way["natural"="tree_row"]({bb});
-  way["landuse"="flowerbed"]({bb});
-  way["man_made"="pier"]({bb});
-  way["amenity"~"^(parking|parking_space)$"]({bb});
-  way["railway"]({bb});
-  node["railway"~"^(tram_stop|halt|station|stop)$"]({bb});
-  node["public_transport"="stop_position"]["tram"="yes"]({bb});
-  nwr["shop"]({bb});
-  nwr["amenity"~"^({POI_AMENITY})$"]({bb});
-  nwr["office"]["name"]({bb});
-  nwr["craft"]["name"]({bb});
-  nwr["tourism"~"^(hotel|hostel|guest_house|motel)$"]({bb});
-  nwr["leisure"~"^(fitness_centre|sauna|escape_game|amusement_arcade)$"]["name"]({bb});
-  node["entrance"]({bb});
-);
-out body geom;"""
-
-
-def overpass(bb, budget=170.0):
-    """Everything under the box in one answer. The mirrors in turn until `budget` seconds are spent
-    (the public servers answer 504 or time out when busy), inside the tile service's 180 s."""
-    q = query(bb)
-    last, t0, i = None, time.time(), 0
-    while budget - (time.time() - t0) > 20:
-        url = OVERPASS[i % len(OVERPASS)]
-        try:
-            req = urllib.request.Request(url, data=urllib.parse.urlencode({"data": q}).encode(), headers=UA)
-            return json.load(urllib.request.urlopen(req, timeout=min(130.0, budget - (time.time() - t0)))).get("elements", [])
-        except Exception as e:  # noqa: BLE001 - the mirror, then another round
-            last = e
-            log(f"{url.split('/')[2]}: {e}")
-        i += 1
-        if i % len(OVERPASS) == 0:
-            time.sleep(8)
-    raise RuntimeError(f"Overpass unavailable: {last}")
+def _poi_key(t):
+    """The tag that makes an element a shop, café, office or hotel the way the old query chose them
+    (the shared answer carries everything else under the tile too): any shop; the eating, drinking and
+    service amenities; a named office or craft; a hotel, hostel, guest house or motel; a named gym,
+    sauna, escape room or arcade. None for the rest."""
+    if "shop" in t:
+        return "shop"
+    if re.match(f"^({POI_AMENITY})$", str(t.get("amenity", ""))):
+        return "amenity"
+    for k in ("office", "craft"):
+        if k in t and t.get("name"):
+            return k
+    if t.get("tourism") in ("hotel", "hostel", "guest_house", "motel"):
+        return "tourism"
+    if t.get("leisure") in ("fitness_centre", "sauna", "escape_game", "amusement_arcade") and t.get("name"):
+        return "leisure"
+    return None
 
 
 def number(v):
@@ -265,12 +237,9 @@ def fetch(site, root=ROOT):
     meta = json.load(open(os.path.join(tdir, "terrain_meta.json")))
     xmin, ymin, xmax, ymax = meta["xmin"], meta["ymin"], meta["xmax"], meta["ymax"]
     size_x, size_z = xmax - xmin, ymax - ymin
-    corners = geo.transform_points([(xmin - MARGIN_M, ymin - MARGIN_M), (xmax + MARGIN_M, ymin - MARGIN_M),
-                                    (xmin - MARGIN_M, ymax + MARGIN_M), (xmax + MARGIN_M, ymax + MARGIN_M)], 3301, 4326)
-    lons, lats = [c[0] for c in corners], [c[1] for c in corners]
-    bb = f"{min(lats):.6f},{min(lons):.6f},{max(lats):.6f},{max(lons):.6f}"
     try:
-        els = overpass(bb)
+        import osm_tile   # the tile's one shared Overpass answer (osm_tile.py), cached; its box is 40 m round
+        els = osm_tile.elements(site, root, 170.0)
     except Exception as e:  # noqa: BLE001 - an optional layer: the pack goes without it
         log(str(e))
         return None
@@ -360,8 +329,8 @@ def fetch(site, root=ROOT):
             if t.get("railway") in TRACKS and t.get("tunnel") not in ("yes", "building_passage") and (number(t.get("layer")) or 0) >= 0:
                 tracks.append(e)
         # shops, cafés, offices (a node, or a building or area carrying the tags)
-        key = next((k for k in ("shop", "amenity", "office", "craft", "tourism", "leisure") if k in t), None)
-        if key and (key != "amenity" or re.match(f"^({POI_AMENITY})$", t[key])) and (key != "leisure" or t.get("name")):
+        key = _poi_key(t)
+        if key:
             c = pts[0] if len(pts) == 1 else (sum(q[0] for q in pts) / len(pts), sum(q[1] for q in pts) / len(pts))
             if on_tile(c):
                 pois.append({"id": f"osm{e['type'][0]}{e['id']}", "key": key, "type": t[key], "name": t.get("name"), "brand": t.get("brand"),
