@@ -148,7 +148,7 @@ GitHub release whose notes are this tag's `CHANGELOG.md` entry.
 
 ```mermaid
 flowchart LR
-  subgraph maaamet [Maa-amet open data]
+  subgraph estonia [Estonia's open data]
     DTM[1 m DTM sheets]
     NDSM[nDSM canopy heights]
     ORTHO[Orthophoto WMS]
@@ -160,6 +160,11 @@ flowchart LR
     ADS[in-ADS gazetteer]
     HIST[Historical orthophoto WMS: 1993-2020 campaigns]
     ADM[County outlines, ETAK standing water]
+    EHR[Building Register: year, storeys, materials, addresses]
+    ARI[e-Business Register: companies by address, activity, capital, structure]
+    EMTA[Tax Board quarterly: taxes, turnover, employees]
+    PRIA[PRIA field register WFS: fields and declared crops]
+    GTFS[Public transport register: lines, times, route geometry]
   end
   subgraph latvia [Latvia's open data]
     LAS[LĢIA laser points and orthophoto cycles]
@@ -169,17 +174,16 @@ flowchart LR
     VAR[VZD address register]
   end
   subgraph finland [Finland's open data]
-    NLS[NLS laser points, orthophotos, topographic database]
-    RYHTI[Ryhti buildings, Helsinki footprints and LOD2]
-    PRH[PRH companies and Vero taxes]
-    HSL[HSL timetables, Ruokavirasto fields]
+    NLS[NLS 2 m ground model, laser points, orthophotos since the 2000s, on the Funet mirror]
+    NLSR[NLS cadastre INSPIRE WFS, topographic database buildings]
+    HEL[Helsinki: 1 m ground, 5 cm photograph, photographs since 1932, footprints, plot units with building rights]
+    RYHTI[Ryhti: buildings and addresses]
+    PRH[PRH companies, Vero corporate income tax]
+    HSL[HSL timetables]
+    RUOKA[Ruokavirasto crop parcels]
+    STATFI[Statistics Finland municipalities]
   end
   OSMX[OpenStreetMap: Geofabrik extract cut with osmium, else Overpass]
-  EHR[Building Register: year, storeys, materials, addresses]
-  ARI[e-Business Register: companies by address, activity, capital, structure]
-  EMTA[Tax Board quarterly: taxes, turnover, employees]
-  PRIA[PRIA field register WFS: fields and declared crops]
-  GTFS[Public transport register: lines, times, route geometry]
   IPAPI[ip-api.com: 'Use my location', city level]
   PH[Poly Haven CC0 textures]
   SKF[Sketchfab and Poly Pizza CC BY models: cars, lamps, shelters, trees, farm props]
@@ -195,11 +199,13 @@ flowchart LR
   RJ --> FS
   OT --> FOSM[fetch_osm.py] --> STJ[(street.json, rail.json, pois.json, trees_osm.json)]
   OT --> FRL
-  NLS --> FTFI[fetch_tile_fi.py] --> TILE
-  NLS & RYHTI --> FCFI[fetch_cadastre_fi.py] --> PJ & BJ
+  NLS & HEL --> FTFI[fetch_tile_fi.py: ground, canopy, photograph, older photographs] --> TILE
+  NLSR & HEL & RYHTI & NLS --> FCFI[fetch_cadastre_fi.py, roof_fit.py] --> PJ & BJ
   PRH --> FTEFI[fetch_tenants_fi.py] --> TEJ
   HSL --> FD
-  HSL --> FFFI[fetch_fields_fi.py] --> FJ
+  RUOKA --> FFFI[fetch_fields_fi.py] --> FJ
+  RYHTI --> GFI[geocode_fi.py] --> TS
+  STATFI --> FO
   GTFS & SJ --> FD[fetch_departures.py] --> DJ[(departures.json)]
   PJ & BJ --> FTE
   TILE --> EF[extract_features.py] --> WJ[(water and massing)]
@@ -211,7 +217,7 @@ flowchart LR
   GTFSLV --> FD
   VAR --> GLV[geocode_lv.py] --> TS
   ADS --> TS[tile_service.py and the country adapters in sources.py: any covered point] --> FT & FTL
-  ADM --> FO[fetch_outline.py] --> EST[(assets/data/estonia.json: the menu's locator map)]
+  ADM --> FO[fetch_outline.py] --> EST[(assets/data/estonia.json, latvia.json, finland.json: the menu's locator maps)]
 
   TILE & TJ & RJ & BJ --> IMP[import_terrain.gd: control map, scatter, measured trees] --> REG[(Terrain3D region)]
   BJ & RJ & PJ & WJ --> GEN[gen_era_scenes.py] --> SCN[(sites/id/scenes/era_2026.tscn)]
@@ -283,9 +289,11 @@ The Latvian data comes from:
 - ATD and Rīgas satiksme: timetables;
 - OpenStreetMap: roads.
 
-The Finnish data comes from the National Land Survey (laser points, orthophotos, the cadastre and the
-topographic database), Helsinki (footprints, LOD2 models, zoning), Ryhti (buildings), PRH and the Tax
-Administration (companies), HSL (timetables) and the Food Authority (fields), mostly CC BY 4.0.
+The Finnish data comes from the National Land Survey (the ground model, laser points, orthophotos, the
+cadastre and the topographic database), the City of Helsinki (the 1 m ground, its photographs since
+1932, footprints, plot units with building rights), Ryhti (buildings and addresses), PRH and the Tax
+Administration (companies and their tax), HSL (timetables), the Food Authority (fields) and Statistics
+Finland (the outline), all CC BY 4.0.
 
 Everywhere, the street furniture, barriers, rails, shops with their opening hours and the mapped trees
 come from OpenStreetMap (ODbL: `street.json`, `rail.json`, `pois.json`, `pitches.json` and
