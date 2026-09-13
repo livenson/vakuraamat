@@ -672,8 +672,9 @@ func _refresh_codes() -> void:
 	if not u.is_empty():
 		lines.append("   " + Countries.parcel_link(u))
 		if u.get("land_value") != null:
-			lines.append("   %s: %s   %s: %s" % [tr("UI_CODES_OWNER"), str(u.get("ownership", "")),
-				tr("UI_BOOK_COL_VALUE"), BookTheme.money(int(u.land_value))])
+			var own := Parcels.ownership_of(u)
+			lines.append("   " + ("%s: %s   " % [tr("UI_CODES_OWNER"), own] if own != "" else "")
+				+ "%s: %s" % [tr("UI_BOOK_COL_VALUE"), BookTheme.money(int(u.land_value))])
 		var rows := Tenants.of(Sites.pack_of(layer), str(u.tunnus))
 		if not rows.is_empty():
 			lines.append("   " + tr("UI_CODES_TENANT") + ":")

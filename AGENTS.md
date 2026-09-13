@@ -246,6 +246,9 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   skip its pass while `world.filling` and run again on `world.era_filled`, or it will scan a growing
   tree over and over and miss what arrives late. `data/vegetation.ok` marks a tile whose greenery
   stands; the runtime scatter never rewrites `terrain_assets.tres` (`save_assets` false), only `make tile` does.
+  The world fills in any vegetation mesh asset a downloaded tile's file lacks (`TerrainBuilder.ensure_mesh_assets`)
+  and writes that `user://` file back once, whole: without the meshes its saved trees warned "MeshAsset N is null"
+  at every start and drew nothing.
 
 ## Tests
 `tools/godot/*_test.tscn`: parse, geotiff, search, boot (autoloads, the layer, the cadastre, a save

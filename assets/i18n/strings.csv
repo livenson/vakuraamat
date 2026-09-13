@@ -206,6 +206,7 @@ UI_SHEET_REGISTER_LV,Läti kinnisvarakataster: %s,Latvian real-property cadastre
 UI_SHEET_CODE_LV,Ehitise katastritähis %s,Building cadastral designation %s,Būves kadastra apzīmējums %s,Rakennuksen kiinteistötunnus %s
 UI_SHEET_TENANTS,Üürnikud,Tenants,Nomnieki,Vuokralaiset
 UI_SHEET_OWNER,Katastriüksus %s · omanik %s,Cadastral unit %s · owner %s,Zemes vienība %s · īpašnieks %s,Kiinteistö %s · omistaja %s
+UI_SHEET_UNIT,Katastriüksus %s,Cadastral unit %s,Zemes vienība %s,Kiinteistö %s
 UI_SHEET_NO_TENANTS,Ühtegi ettevõtet ei ole siia registreeritud.,No company is registered at this address.,Šajā adresē nav reģistrēts neviens uzņēmums.,Tähän osoitteeseen ei ole rekisteröity yhtään yritystä.
 UI_SHEET_SHOPS,Kaardil (OpenStreetMap),On the map (OpenStreetMap),Kartē (OpenStreetMap),Kartalla (OpenStreetMap)
 UI_SHOP_VACANT,tühi äripind,an empty shop unit,tukša tirdzniecības telpa,tyhjä liiketila

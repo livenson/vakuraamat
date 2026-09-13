@@ -65,6 +65,17 @@ func _ready() -> void:
 	var sp: Array = start.get("spawn", [512, 512])
 	_spawn = Vector3(float(sp[0]), 0.0, float(sp[1]))
 	terrain.set_camera(player.camera)
+	# a downloaded tile's terrain_assets.tres lacks the vegetation meshes its saved trees name (the runtime
+	# scatter never rewrites it): added once Terrain3D holds its assets, and the instancer rebuilt with them
+	var missing := TerrainBuilder.ensure_mesh_assets(terrain.assets)
+	if missing > 0:
+		terrain.instancer.update_mmis(true)
+		# written back once, whole (the file's textures and now its meshes), so the next start finds them
+		# before Terrain3D reads the trees: filled in here only, it warned "MeshAsset 1 is null" at every
+		# start. A shipped tile (res://) is never written; make tile saves those
+		if tile_dir.begins_with("user://"):
+			ResourceSaver.save(terrain.assets, tile_dir + "/terrain_assets.tres")
+		print("[world] %d vegetation mesh assets added to %s" % [missing, tile_dir])
 	var nan := 0
 	for r: Terrain3DRegion in terrain.data.get_regions_active():
 		nan += TerrainBuilder.drop_nan_instances(r)

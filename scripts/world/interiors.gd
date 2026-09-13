@@ -1047,7 +1047,8 @@ static func register_sheet(b: FootprintBuilding) -> String:
 	var p := Parcels.by_tunnus(b.tunnus)
 	if not p.is_empty():
 		lines.append("")
-		lines.append(TranslationServer.translate("UI_SHEET_OWNER") % [b.tunnus, str(p.get("ownership", ""))])
+		var own := Parcels.ownership_of(p)   # none published in Finland and Latvia: the unit alone, not "owner <null>"
+		lines.append(TranslationServer.translate("UI_SHEET_OWNER") % [b.tunnus, own] if own != "" else TranslationServer.translate("UI_SHEET_UNIT") % b.tunnus)
 	return "\n".join(lines)
 
 

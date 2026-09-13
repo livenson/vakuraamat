@@ -473,6 +473,37 @@ static func apply_ranges(assets: Terrain3DAssets) -> void:
 				break
 
 
+## The mesh asset of scatter rule `i`: its scene (the tree's LOD scene or the plant's), id and ranges.
+static func _mesh_asset(i: int) -> Terrain3DMeshAsset:
+	var r: Dictionary = RULES[i]
+	var ma := Terrain3DMeshAsset.new()
+	ma.name = r.scene
+	ma.id = i
+	var scene_path: String = "res://assets/models/trees/%s_lod.tscn" % r.scene.trim_prefix("tree_") if r.has("lod") else "res://assets/vegetation/%s.tscn" % r.scene
+	ma.scene_file = load(scene_path)
+	_apply_rule(ma, r)
+	return ma
+
+
+## Every scatter rule's mesh asset on `assets`, by index; returns how many were missing. A downloaded
+## tile is scattered in the running game, which never rewrites its terrain_assets.tres (save_assets
+## false), so the trees came back saved in the region data with no meshes to draw them: "MeshAsset 1 is
+## null, skipping" on every start, and no trees on any visit after the first (Rovaniemi's file held 2 of
+## the 11; 11 of 98 downloaded tiles were short).
+static func ensure_mesh_assets(assets: Terrain3DAssets) -> int:
+	if assets == null:
+		return 0
+	var added := 0
+	var have: Array = assets.mesh_list
+	for i in RULES.size():
+		var ma: Terrain3DMeshAsset = have[i] if i < have.size() else null
+		if ma != null and ma.name == str(RULES[i].scene) and ma.scene_file != null:
+			continue
+		assets.set_mesh_asset(i, _mesh_asset(i))
+		added += 1
+	return added
+
+
 static func _apply_rule(ma: Terrain3DMeshAsset, r: Dictionary) -> void:
 	if r.has("lod"):
 		ma.last_lod = 1
@@ -496,14 +527,7 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 	var texture_list: Array = keep_textures if not keep_textures.is_empty() else assets.texture_list.duplicate()
 	var origin := Vector3(loc.x * terrain.region_size, 0.0, loc.y * terrain.region_size)
 	for i in (RULES.size() if loc == Vector2i.ZERO else 0):
-		var r: Dictionary = RULES[i]
-		var ma := Terrain3DMeshAsset.new()
-		ma.name = r.scene
-		ma.id = i
-		var scene_path: String = "res://assets/models/trees/%s_lod.tscn" % r.scene.trim_prefix("tree_") if r.has("lod") else "res://assets/vegetation/%s.tscn" % r.scene
-		ma.scene_file = load(scene_path)
-		_apply_rule(ma, r)
-		assets.set_mesh_asset(i, ma)
+		assets.set_mesh_asset(i, _mesh_asset(i))
 		terrain.instancer.clear_by_mesh(i)
 	if loc == Vector2i.ZERO:
 		# the scatter can run with the world on screen: the ground keeps its textures throughout

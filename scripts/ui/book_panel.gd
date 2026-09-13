@@ -199,7 +199,7 @@ func _fill_plots() -> void:
 		grid.add_child(_lbl(_purpose(Parcels.purpose_of(p)), 13))
 		grid.add_child(_num("%d m²" % int(p.get("area", 0))))
 		grid.add_child(_num(BookTheme.money(int(_value(p)))) if _value(p) > 0 else _num("–"))
-		grid.add_child(_lbl(str(p.get("ownership", "")), 13))
+		grid.add_child(_lbl(Parcels.ownership_of(p), 13))
 		grid.add_child(_nav_buttons(tunnus))
 	if rows.size() > MAX_ROWS:
 		body.add_child(_lbl(tr("UI_BOOK_MORE") % (rows.size() - MAX_ROWS), 13))
@@ -221,7 +221,7 @@ func _sort_rows(rows: Array, near: Vector2) -> void:
 		match _sort:
 			"address": return _address_key(str(p.get("address", "")), str(p.get("tunnus", "")))
 			"purpose": return _purpose(Parcels.purpose_of(p))
-			"ownership": return str(p.get("ownership", ""))
+			"ownership": return Parcels.ownership_of(p)
 			"area": return float(p.get("area", 0))
 			"land_value": return _value(p)
 			_: return near.distance_to(Vector2(float(p.x), float(p.z)))
