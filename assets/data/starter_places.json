@@ -1,10 +1,10 @@
 {
- "tag": "places-2026-09-10",
- "url": "https://github.com/livenson/vakuraamat/releases/download/places-2026-09-10/starter-places.zip",
- "sha256": "f1aed0f33af563943b436df809b145286a3fc8d3c95e7f38d19e0641891a30b8",
- "bytes": 126599505,
- "pipeline": 3,
- "built": "2026-09-10",
+ "tag": "places-2026-09-13",
+ "url": "https://github.com/livenson/vakuraamat/releases/download/places-2026-09-13/starter-places.zip",
+ "sha256": "8c9d292eb1939a1ae1661c311fa916400c59b0b35382040095b2cd82e36564e4",
+ "bytes": 126805590,
+ "pipeline": 4,
+ "built": "2026-09-13",
  "places": {
   "kvissentali": [
    "t656576_6478174",

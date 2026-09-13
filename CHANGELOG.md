@@ -8,6 +8,34 @@ by what it does rather than by the code it touched; the commit list in the relea
 
 The earliest entries were written from the tags' own messages after the fact.
 
+## v0.11.0 — 2026-09-13
+
+**Finland, and streets as they are mapped.**
+
+- **Finnish places.** Search for any address in Finland and walk it; Helsinki's Senate Square and
+  harbour come with the game. The ground, trees and orthophoto come from the National Land Survey;
+  buildings from the Ryhti register on Helsinki's footprints, with roofs fitted to the laser points;
+  plots with their zoning and building rights; companies from the Trade Register with their tax; HSL's
+  timetables at the stops, and the fields with their crops.
+- **Suomeksi.** The interface is now in Finnish as well (L). The Locations page has a country picker
+  and frames the map to the country you choose.
+- **The street is the mapped one, in every country.** Roads wear their surface, so Helsinki and
+  Rīga have setts. Lamps, benches, bins, bollards and bike racks stand where OpenStreetMap has them.
+  Cars stop at the traffic lights, and trams and trains run on the real tracks. The mapped fences,
+  hedges and flowerbeds replace invented ones, and parked cars stand in the bays where the photograph
+  shows one.
+- **Shops are open or closed.** Shop fronts carry their names and are lit during the opening hours
+  the map gives. A building's page lists its shops with today's hours.
+- **More of the real place.** Latvian and Finnish places get the trees the map records. Sports
+  pitches have their goals, nets and hoops, and boats lie at the marinas' piers. Roofs without a
+  measured shape wear the orthophoto.
+- **The bicycle sounds like a motorbike**, its engine rising with the speed.
+- **Fixes from the playtests:** fewer buses, kerbs cut at junctions, thinner fences, windows on
+  every building, no "owner <null>" on Finnish pages, and downloaded places keep their trees.
+- **Lighter on memory:** a place's roof photographs and models are freed when you walk away, and old
+  downloads and reports are cleaned up. Your downloaded places rebuild themselves once on the next
+  visit to pick up the new street layers.
+
 ## v0.10.1 — 2026-09-12
 
 **Fixes from the Rīga playtest.**
