@@ -944,14 +944,19 @@ const PROPS := "res://assets/vendor/sketchfab/"   # CC BY models, see assets/ven
 const OPEN_HOURS := {"trade": Vector2(9.0, 19.0), "hospitality": Vector2(11.0, 23.0)}
 var _neon_mats: Array = []
 var _neon_hours := Vector2.ZERO
+var _open_week: Array = []   # the map's opening hours (pois.json) parsed; [] = the sector's hours
+var _weekday := 0
 
 
 ## What a company hangs on its building: shops and cafés get a bracket sign with the name beside the
 ## door and a neon OPEN over it (lit in opening hours, see set_open_hour); a farm gets a wooden sign
-## in front of the door. `rows` are the active tenants (tenants.json shape) of this building's plot.
-func set_props(rows: Array) -> void:
+## in front of the door. `rows` are the active tenants (tenants.json shape) of this building's plot,
+## `shops` what OpenStreetMap maps in the building (pois.json): where it has a shop or café, its name
+## is on the sign and its opening hours light the neon.
+func set_props(rows: Array, shops: Array = []) -> void:
 	var dom: Dictionary = MapPalette.dominant(rows)
-	if dom.is_empty():
+	var shop := _shop_of(shops)
+	if dom.is_empty() and shop.is_empty():
 		return
 	if not is_built:
 		await built
@@ -959,6 +964,14 @@ func set_props(rows: Array) -> void:
 	if f.is_empty():
 		return
 	var sector := str(dom.get("sector", ""))
+	var sign_name := str(dom.get("name", ""))
+	if not shop.is_empty():
+		# the map says what the ground floor is and what its sign reads: the register's biggest company
+		# on the plot is as often the landlord or an office upstairs
+		sector = Pois.sector(shop)
+		sign_name = Pois.label(shop)
+		_open_week = OpeningHours.parse(str(shop.opening_hours)) if shop.get("opening_hours") != null else []
+		_weekday = OpeningHours.weekday(Sites.pack_of(self))
 	var n: Vector3 = f.n
 	var t: Vector3 = f.t
 	var yaw := atan2(n.x, n.z)   # a prop's local +Z turned onto the wall's outward normal
@@ -969,7 +982,7 @@ func set_props(rows: Array) -> void:
 			bracket.rotation.y = yaw
 			add_child(bracket)
 			var board := Label3D.new()
-			board.text = str(dom.get("name", "")).left(28)
+			board.text = sign_name.left(28)
 			board.font_size = 48
 			board.pixel_size = 0.006
 			board.modulate = Color(0.98, 0.95, 0.85)
@@ -1017,11 +1030,23 @@ func set_props(rows: Array) -> void:
 			add_child(board)
 
 
-## The neon sign lit in opening hours.
+## The shop or café the map puts in this building: named, not an empty unit, and the one the
+## register's company is matched to when there are several.
+static func _shop_of(shops: Array) -> Dictionary:
+	var best := {}
+	for p in shops:
+		if p.get("vacant") == true or Pois.sector(p) == "" or Pois.label(p) == "":
+			continue
+		if best.is_empty() or (p.get("tenant") != null and best.get("tenant") == null):
+			best = p
+	return best
+
+
+## The neon sign lit in opening hours: the map's for the day where it has them, else the sector's.
 func set_open_hour(hour: float) -> void:
 	if _neon_mats.is_empty():
 		return
-	var on := hour >= _neon_hours.x and hour < _neon_hours.y
+	var on := OpeningHours.is_open(_open_week, _weekday, hour) if not _open_week.is_empty() else (hour >= _neon_hours.x and hour < _neon_hours.y)
 	for m in _neon_mats:
 		m.emission_energy_multiplier = 4.0 if on else 0.0
 		m.albedo_color = Color(1, 1, 1) if on else Color(0.5, 0.5, 0.5)

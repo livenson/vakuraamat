@@ -207,6 +207,10 @@ UI_SHEET_CODE_LV,Ehitise katastritähis %s,Building cadastral designation %s,Bū
 UI_SHEET_TENANTS,Üürnikud,Tenants,Nomnieki,Vuokralaiset
 UI_SHEET_OWNER,Katastriüksus %s · omanik %s,Cadastral unit %s · owner %s,Zemes vienība %s · īpašnieks %s,Kiinteistö %s · omistaja %s
 UI_SHEET_NO_TENANTS,Ühtegi ettevõtet ei ole siia registreeritud.,No company is registered at this address.,Šajā adresē nav reģistrēts neviens uzņēmums.,Tähän osoitteeseen ei ole rekisteröity yhtään yritystä.
+UI_SHEET_SHOPS,Kaardil (OpenStreetMap),On the map (OpenStreetMap),Kartē (OpenStreetMap),Kartalla (OpenStreetMap)
+UI_SHOP_VACANT,tühi äripind,an empty shop unit,tukša tirdzniecības telpa,tyhjä liiketila
+UI_SHOP_HOURS,täna avatud %s,open today %s,šodien atvērts %s,auki tänään %s
+UI_SHOP_CLOSED_TODAY,täna suletud,closed today,šodien slēgts,suljettu tänään
 UI_PROMPT_ENTER,Sisene,Enter,Ieiet,Mene sisään
 UI_PROMPT_LEAVE,Välju,Leave,Iziet,Poistu
 UI_BUILDING,Hoone,Building,Ēka,Rakennus

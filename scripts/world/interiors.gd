@@ -91,6 +91,20 @@ func _attach_door(b: FootprintBuilding) -> void:
 	b.add_child(door)
 	door.setup(b, f)
 	_doors.append(door)
+	_shopfront(b)
+
+
+## The tenants' name plate over the building and, for a shop or café, its bracket sign and neon OPEN:
+## the pass the economy's parcel builder ran, lost with it on 2026-09-08 (8849c3f), back with the
+## door pass that already walks every tile's buildings. What the map has in the building (pois.json)
+## names the sign and its opening hours light the neon.
+func _shopfront(b: FootprintBuilding) -> void:
+	var pack := Sites.pack_of(b)
+	var names: Array = Tenants.active_names(pack, b.tunnus) if b.tunnus != "" else []
+	if not names.is_empty():
+		b.set_sign("\n".join(names.slice(0, 2)) + ("\n+%d" % (names.size() - 2) if names.size() > 2 else ""))
+	var rows: Array = Tenants.of(pack, b.tunnus).filter(func(t): return str(t.get("status", "")) == "R") if b.tunnus != "" else []
+	b.set_props(rows, Pois.of_building(pack, b.building_id))
 
 
 ## A tile leaves: forget its doors and interiors; step out if the player was inside one of them.
@@ -1022,6 +1036,14 @@ static func register_sheet(b: FootprintBuilding) -> String:
 		var facts := Tenants.facts(t)
 		if facts != "":
 			lines.append("    " + facts)
+	# what OpenStreetMap has in the building: the shop fronts, today's hours, the empty units
+	var shops := Pois.of_building(Sites.pack_of(b), b.building_id)
+	if not shops.is_empty():
+		lines.append("")
+		lines.append(TranslationServer.translate("UI_SHEET_SHOPS"))
+		var wd := OpeningHours.weekday(Sites.pack_of(b))
+		for s in shops:
+			lines.append("  " + Pois.line(s, wd))
 	var p := Parcels.by_tunnus(b.tunnus)
 	if not p.is_empty():
 		lines.append("")
