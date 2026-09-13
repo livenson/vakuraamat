@@ -1,0 +1,113 @@
+{
+  "name": "helsinki_senaatintori",
+  "country": "fi",
+  "crs": "EPSG:3301",
+  "sheet": "L4133A",
+  "xmin": 552378,
+  "ymin": 6670278,
+  "xmax": 553402,
+  "ymax": 6671302,
+  "size_m": 1024,
+  "size_px": 1024,
+  "resolution_m": 1.0,
+  "dtm_res_m": 1,
+  "heightmap": "heightmap.r32",
+  "heightmap_format": "float32 little-endian, row-major, row 0 = north edge (ymax), metres N2000 (EVRF2007 like EH2000)",
+  "z_min": -0.0,
+  "z_max": 23.798,
+  "z_scale": 1.0,
+  "texture": "ortho.jpg",
+  "texture_px": 4096,
+  "canopy": {
+    "file": "canopy.r32",
+    "source": "NLS laser points 2008, highest return above the ground where at least 30% of the high returns nearby came from split pulses (foliage), gaps filled from the neighbours",
+    "max_height": 58.38,
+    "format": "float32 little-endian, row-major, row 0 = north; metres above ground; 0 = nothing"
+  },
+  "era_maps": {},
+  "world_mapping": "Godot x = easting - xmin; Godot z = ymax - northing (north is -Z); y = height * z_scale; L-EST97 grid, the Finnish sources reprojected from ETRS-TM35FIN (EPSG:3067) and ETRS-GK25 (EPSG:3879)",
+  "source": {
+    "ground": [
+      "NLS 2 m",
+      "Helsinki 1 m 2021 on 100%"
+    ],
+    "dem": "https://www.nic.funet.fi/index/geodata/mml/dem2m/dem2m_direct.vrt",
+    "laser": {
+      "sheets": [
+        "L4133A4",
+        "L4133B3",
+        "L4133C2",
+        "L4133D1"
+      ],
+      "years": [
+        2008
+      ],
+      "coverage": 0.45,
+      "points_per_m2": 0.62,
+      "urls": [
+        "https://www.nic.funet.fi/index/geodata/mml/laserkeilaus/2008_latest/2008/L413/2/L4133A4.laz",
+        "https://www.nic.funet.fi/index/geodata/mml/laserkeilaus/2008_latest/2008/L413/1/L4133B3.laz",
+        "https://www.nic.funet.fi/index/geodata/mml/laserkeilaus/2008_latest/2008/L413/2/L4133C2.laz",
+        "https://www.nic.funet.fi/index/geodata/mml/laserkeilaus/2008_latest/2008/L413/1/L4133D1.laz"
+      ]
+    },
+    "ortho": {
+      "ortho_sheets": [
+        "L4133A",
+        "L4133B",
+        "L4133C",
+        "L4133D"
+      ],
+      "ortho_years": [
+        2023
+      ],
+      "ortho_urls": [
+        "https://www.nic.funet.fi/index/geodata/mml/orto/normal_color_3067/mara_v_25000_50/2023/L41/02m/1/L4133A.jp2",
+        "https://www.nic.funet.fi/index/geodata/mml/orto/normal_color_3067/mara_v_25000_50/2023/L41/02m/1/L4133B.jp2",
+        "https://www.nic.funet.fi/index/geodata/mml/orto/normal_color_3067/mara_v_25000_50/2023/L41/02m/1/L4133C.jp2",
+        "https://www.nic.funet.fi/index/geodata/mml/orto/normal_color_3067/mara_v_25000_50/2023/L41/02m/1/L4133D.jp2"
+      ],
+      "ortho_source": "Helsinki 2025_5cm on 100%, NLS 0.5 m elsewhere",
+      "ortho_wms": "https://kartta.hel.fi/ws/geoserver/avoindata/wms",
+      "ortho_layer": "avoindata:Ortoilmakuva_2025_5cm"
+    },
+    "history": [
+      "https://kartta.hel.fi/ws/geoserver/avoindata/wms"
+    ]
+  },
+  "fetched": "2026-09-13",
+  "attribution": "Map data: Maanmittauslaitos (National Land Survey of Finland) 09/2026, CC BY 4.0; Helsingin kaupunki, kaupunkimittauspalvelut (CC BY 4.0)",
+  "license": "CC BY 4.0 (NLS open data licence; Helsinki Region Infoshare)",
+  "history": [
+    {
+      "label": "1932",
+      "texture": "ortho_1932.jpg",
+      "source": "Helsinki"
+    },
+    {
+      "label": "1950",
+      "texture": "ortho_1950.jpg",
+      "source": "Helsinki"
+    },
+    {
+      "label": "1964",
+      "texture": "ortho_1964.jpg",
+      "source": "Helsinki"
+    },
+    {
+      "label": "1988",
+      "texture": "ortho_1988.jpg",
+      "source": "Helsinki"
+    },
+    {
+      "label": "2001",
+      "texture": "ortho_2001.jpg",
+      "source": "Helsinki"
+    },
+    {
+      "label": "2015",
+      "texture": "ortho_2015.jpg",
+      "source": "Helsinki"
+    }
+  ]
+}

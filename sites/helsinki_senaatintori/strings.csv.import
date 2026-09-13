@@ -1,0 +1,19 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bsd23ka6jrn67"
+
+[deps]
+
+files=["res://sites/helsinki_senaatintori/strings.et.translation", "res://sites/helsinki_senaatintori/strings.en.translation", "res://sites/helsinki_senaatintori/strings.lv.translation"]
+
+source_file="res://sites/helsinki_senaatintori/strings.csv"
+dest_files=["res://sites/helsinki_senaatintori/strings.et.translation", "res://sites/helsinki_senaatintori/strings.en.translation", "res://sites/helsinki_senaatintori/strings.lv.translation"]
+
+[params]
+
+compress=1
+delimiter=0
+unescape_keys=false
+unescape_translations=true

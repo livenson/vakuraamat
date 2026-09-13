@@ -1,0 +1,43 @@
+{
+  "id": "helsinki_senaatintori",
+  "country": "fi",
+  "pipeline": 3,
+  "name_key": "SITE_HELSINKI_SENAATINTORI",
+  "subtitle_key": "SITE_HELSINKI_SENAATINTORI_SUBTITLE",
+  "description": "Helsinki, Senaatintori: generated site pack.",
+  "terrain": {
+    "tile": "helsinki_senaatintori",
+    "center": [
+      552890.0,
+      6670790.0
+    ],
+    "size": 1024,
+    "latitude": 60.1695,
+    "longitude": 24.95249,
+    "utc_offset": 3.0,
+    "date": [
+      2026,
+      9,
+      3
+    ]
+  },
+  "start": {
+    "era": "era_2026",
+    "spawn": [
+      512.0,
+      532.0
+    ],
+    "yaw_deg": 0.0
+  },
+  "water": "water_2026.json",
+  "buildings": "buildings_2026.json",
+  "locations": {
+    "LOC_LANDMARK": "landmark",
+    "LOC_FARMSTEAD": "farm"
+  },
+  "codex": [
+    "CODEX_REAL",
+    "CODEX_INVENTED",
+    "CODEX_DATA"
+  ]
+}
