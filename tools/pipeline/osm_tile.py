@@ -62,20 +62,32 @@ def query(bb):
 out body geom;"""
 
 
-def bbox(site, root=paths.ROOT):
-    """The tile's box in WGS84 with MARGIN_M round it, as Overpass wants it: "south,west,north,east"."""
+def boxes(site, root=paths.ROOT):
+    """The tile's box with MARGIN_M round it: (L-EST97 xmin, ymin, xmax, ymax) and (south, west, north,
+    east) in WGS84."""
     import geo
     m = json.load(open(os.path.join(root, "sites", site, "site.json")))
     meta = json.load(open(os.path.join(root, "assets/terrain", m["terrain"]["tile"], "terrain_meta.json")))
-    xmin, ymin, xmax, ymax = meta["xmin"], meta["ymin"], meta["xmax"], meta["ymax"]
-    c = geo.transform_points([(xmin - MARGIN_M, ymin - MARGIN_M), (xmax + MARGIN_M, ymin - MARGIN_M),
-                              (xmin - MARGIN_M, ymax + MARGIN_M), (xmax + MARGIN_M, ymax + MARGIN_M)], 3301, 4326)
+    box = (meta["xmin"] - MARGIN_M, meta["ymin"] - MARGIN_M, meta["xmax"] + MARGIN_M, meta["ymax"] + MARGIN_M)
+    c = geo.transform_points([(box[0], box[1]), (box[2], box[1]), (box[0], box[3]), (box[2], box[3])], 3301, 4326)
     lons, lats = [p[0] for p in c], [p[1] for p in c]
-    return f"{min(lats):.6f},{min(lons):.6f},{max(lats):.6f},{max(lons):.6f}"
+    return box, (min(lats), min(lons), max(lats), max(lons))
+
+
+def bbox(site, root=paths.ROOT):
+    """The tile's box in WGS84 with MARGIN_M round it, as Overpass wants it: "south,west,north,east"."""
+    return "%.6f,%.6f,%.6f,%.6f" % boxes(site, root)[1]
 
 
 def _cache_path(q):
     return os.path.join(paths.raw("overpass"), hashlib.sha1(q.encode()).hexdigest()[:20] + ".json")
+
+
+def _store(path, d):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path + ".part", "w") as f:
+        json.dump(d, f)
+    os.replace(path + ".part", path)
 
 
 def elements(site, root=paths.ROOT, budget=170.0):
@@ -88,17 +100,25 @@ def elements(site, root=paths.ROOT, budget=170.0):
     with lock:
         if os.path.exists(path) and time.time() - os.path.getmtime(path) < TTL_DAYS * 86400:
             return json.load(open(path)).get("elements", [])
-        last, t0, i = None, time.time(), 0
+        t0 = time.time()
+        try:
+            import osm_extract   # the country extract on disk, cut with osmium-tool, when there is one
+            local = osm_extract.tile_elements(*boxes(site, root))
+        except Exception as e:  # noqa: BLE001 - Overpass answers instead
+            log(f"{site}: the extract could not be cut ({e})")
+            local = None
+        if local is not None:
+            _store(path, {"elements": local, "source": "Geofabrik extract"})
+            log(f"{site}: {len(local)} elements from the country extract in {time.time() - t0:.0f} s")
+            return local
+        last, i = None, 0
         while budget - (time.time() - t0) > 20:
             url = MIRRORS[i % len(MIRRORS)]
             try:
                 with _NET:
                     req = urllib.request.Request(url, data=urllib.parse.urlencode({"data": q}).encode(), headers=UA)
                     d = json.load(urllib.request.urlopen(req, timeout=min(175.0, budget - (time.time() - t0))))
-                os.makedirs(os.path.dirname(path), exist_ok=True)
-                with open(path + ".part", "w") as f:
-                    json.dump(d, f)
-                os.replace(path + ".part", path)
+                _store(path, d)
                 log(f"{site}: {len(d.get('elements', []))} elements from {url.split('/')[2]} in {time.time() - t0:.0f} s")
                 return d.get("elements", [])
             except Exception as e:  # noqa: BLE001 - the mirror, then another round

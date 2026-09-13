@@ -73,7 +73,10 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
 - Service: `tools/tile_service.py` (packs for a point, port 8765) is a loopback Python server the game
   talks to through `Locator`. It is the only service. OpenStreetMap comes through `osm_tile.elements`:
   one union Overpass query per tile, cached in `data_raw/overpass` for 7 days, one request at a time,
-  a stale answer when the servers fail; roads, stops, pitches and `fetch_osm` filter their elements
+  a stale answer when the servers fail. Before asking Overpass it cuts the tile out of the country's
+  Geofabrik extract in `data_raw/osm` with osmium-tool (`osm_extract.py`, well under a second; the
+  extract downloaded and refreshed in the background, a border tile cut from both countries); without
+  `osmium` (the frozen sidecar) or while the first download runs, Overpass answers. Roads, stops, pitches and `fetch_osm` filter their elements
   from it (add a new OSM layer to its query, not a query of your own). A finished pack is marked
   `<id>.ok`; its zip is pruned after 3 days and written again from the workspace on /download. A
   refresh of a tile that is already refined fetches only the timetables in its refine pass.
