@@ -5,7 +5,17 @@
   - Helsinki, Senaatintori: ETRS-TM35FIN E 386392, N 6672050; L-EST97 E 552890, N 6670790.
   - Porvoo old town: TM35 426370, 6695926; L-EST97 591774, 6696463.
   - A rural square near Loppi: TM35 360347, 6734322; L-EST97 524030, 6731856.
-- **Step 1 is done**, the adapter and the ground:
+- **Steps 1–6 are done** (2026-09-13); what each left open is under its step below:
+  - 1: ground;
+  - 2: plots and buildings;
+  - 3: companies;
+  - 4: timetables and fields;
+  - 5: address search;
+  - 6: the menu, with a country picker.
+
+  Finnish as a game language (step 7) is next. `sites/helsinki_senaatintori` is a shipped pack with
+  every layer.
+- **Step 1**, the adapter and the ground:
   - `sources.Finland`, `tools/pipeline/fetch_tile_fi.py`, `assets/data/finland.json` and the
     `fi` descriptor.
   - The Senaatintori tile builds in 81 s from a cold cache.
@@ -333,11 +343,55 @@ To do:
      - The book's Companies page shows Employees and Turnover, both dashes in Finland, and sorts by
        employees first. It needs a Taxes column, which Finland fills.
      - Archive each day's bulk, since a dissolved company drops out of it.
-4. **Roads, stops, departures, fields**: OSM roads and stops; HSL and Waltti GTFS; Ruokavirasto
-   fields.
-5. **Address search**: an index of Ryhti's addresses behind `/geocode?country=fi`, in Finnish
-   and Swedish.
-6. **Menu**: suggested places, the map's framing, the starter bundles.
+4. **Departures and fields.** Done 2026-09-13. Roads and stops came with step 2.
+   - **Departures.** `fetch_departures.fetch_feeds` is Latvia's reader, generalised to a feed list
+     and a set of route types. `fetch_fi` reads HSL's GTFS (79 MB, daily, CC BY 4.0), buses only
+     (route types 701, 702 and 704; trams, metro, trains and ferries left out).
+     - It streams the 990 MB `stop_times.txt` in 10 s.
+     - Senaatintori: 10 stops, 106 routes, 7,210 departures. The service fetches them in the
+       refine pass.
+     - Outside HSL's region nothing is read yet. Porvoo's buses are in no open feed found; the
+       Waltti cities (Turku, Tampere, Oulu …) are their own feeds, to add to `FI_FEEDS`.
+   - **Fields.** `tools/pipeline/fetch_fields_fi.py`, a stage of the service's job: Ruokavirasto's
+     crop parcels of the newest year published (2025; the 2026 layer answers 400 until it is out).
+     The crop's Finnish name comes with each row, so the game's kind is read from it (`kesanto`
+     fallow, `nurmi` grass, `ohra` cereal, `rypsi` rape …). A test tile by Loppi: 4 parcels of
+     feed grass (Rehunurmi).
+5. **Address search.** Done 2026-09-13 (`tools/pipeline/geocode_fi.py`, `Finland.geocode`, the
+   service's `/geocode?country=fi`).
+   - **No index to build.** Ryhti's addresses come only through its API (3.86 M, about 3.5 GB as
+     GeoJSON), and there is no bulk file.
+   - **Places are local:** the municipalities and Statistics Finland's 3,026 postcode areas, in
+     Finnish and Swedish, the joined names split into their districts ("Helsinki keskusta -
+     Etu-Töölö").
+   - **Addresses are live:** a name-prefix filter on Ryhti's WFS (`CQL_FILTER`, about 2 s),
+     narrowed to a post office when the query has a town after a comma.
+   - **Results:**
+     - "Aleksanterinkatu 15, Helsinki" finds the building.
+     - "Kruununhaka" finds the district.
+     - "toolo" finds Taka-, Keski- and Etu-Töölö.
+     - "Alexandersgatan 1" finds the Swedish addresses of Loviisa and Kaskinen.
+6. **Menu.** Done 2026-09-13, except the starter bundles.
+   - **Suggestions.** Five Finnish places in `assets/data/suggested_places.json`, with notes in
+     Estonian, English and Latvian: Porvoo's old town, Turku cathedral, Old Rauma, Tampere's
+     Tammerkoski and Suomenlinna. Every suggestion now carries its `country`, by the adapters'
+     exact test (14 Estonian, 6 Latvian, 5 Finnish). Helsinki Senaatintori is a shipped pack.
+   - **Country picker.** A picker beside the Locations search: all countries, Estonia, Latvia,
+     Finland. It is remembered in `user://played.cfg` (`[menu] country`); the first time it is the
+     current world's country.
+     - The search asks only that country's register (`Locator.geocode(q, country)`), which is also
+       quicker than asking three one after another.
+     - The field's example is the country's (`search_example` in the descriptors).
+     - The ideas are that country's.
+     - The map frames the country (`EstoniaMap.frame`): its outline's bounds with a margin,
+       neighbours clipped, other countries' marks hidden.
+     - "All countries" shows the whole plate, where Finland is two and a half times as tall as the
+       Baltic states.
+   - **Strings.** `MENU_OUTSIDE_ESTONIA` names the three countries; the search hint explains the
+     picker.
+   - **Left open.** The starter bundles: `starter_places.py build` makes Senaatintori's eight
+     neighbours on the service, and `publish` uploads them to a GitHub release, which waits for the
+     maintainer.
 7. **Finnish as a language.**
 
 Each step gets a `THIRD_PARTY.md` row per source in the same commit, and bumps `PACK_VERSION`

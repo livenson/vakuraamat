@@ -6,7 +6,8 @@
   "x": 681863,
   "y": 6500230,
   "address": "Tartu maakond, Peipsiääre vald, Alatskivi alevik, Lossi tn 6",
-  "note_lv": "Alatskivi pils pie Peipusa ezera"
+  "note_lv": "Alatskivi pils pie Peipusa ezera",
+  "country": "ee"
  },
  {
   "name": "Elva",
@@ -15,7 +16,8 @@
   "x": 642048,
   "y": 6456199,
   "address": "Tartu maakond, Elva vald",
-  "note_lv": "Elva, dzelzceļa pilsētiņa priedēs"
+  "note_lv": "Elva, dzelzceļa pilsētiņa priedēs",
+  "country": "ee"
  },
  {
   "name": "Haapsalu linnus",
@@ -24,7 +26,8 @@
   "x": 480467,
   "y": 6531438,
   "address": "Lääne maakond, Haapsalu linn, Kabrametsa küla, Linnuste",
-  "note_lv": "Hāpsalu, bīskapa pils"
+  "note_lv": "Hāpsalu, bīskapa pils",
+  "country": "ee"
  },
  {
   "name": "Karula",
@@ -33,7 +36,8 @@
   "x": 641268,
   "y": 6403488,
   "address": "Valga maakond, Valga vald, Lüllemäe küla",
-  "note_lv": "Karula, paugurainā zeme (Lüllemäe)"
+  "note_lv": "Karula, paugurainā zeme (Lüllemäe)",
+  "country": "ee"
  },
  {
   "name": "Kolga mõis",
@@ -42,7 +46,8 @@
   "x": 591280,
   "y": 6596017,
   "address": "Harju maakond, Kuusalu vald, Kolga alevik, Kolga mõis",
-  "note_lv": "Kolga muiža, Harjumā"
+  "note_lv": "Kolga muiža, Harjumā",
+  "country": "ee"
  },
  {
   "name": "Kuressaare linnus",
@@ -51,7 +56,8 @@
   "x": 410578,
   "y": 6457165,
   "address": "Saare maakond, Saaremaa vald, Kuressaare linn, Linnuse tee",
-  "note_lv": "Kuresāres pils, Sāmsalā"
+  "note_lv": "Kuresāres pils, Sāmsalā",
+  "country": "ee"
  },
  {
   "name": "Mooste mõis",
@@ -60,7 +66,8 @@
   "x": 687928,
   "y": 6451254,
   "address": "Põlva maakond, Põlva vald, Mooste alevik, Mõisahoovi tee",
-  "note_lv": "Mooste muiža, Pelvas apriņķī"
+  "note_lv": "Mooste muiža, Pelvas apriņķī",
+  "country": "ee"
  },
  {
   "name": "Otepää",
@@ -69,7 +76,8 @@
   "x": 647311,
   "y": 6437896,
   "address": "Valga maakond, Otepää vald",
-  "note_lv": "Otepē, augstiene"
+  "note_lv": "Otepē, augstiene",
+  "country": "ee"
  },
  {
   "name": "Palmse mõis",
@@ -78,7 +86,8 @@
   "x": 610747,
   "y": 6598853,
   "address": "Lääne-Viru maakond, Haljala vald, Palmse küla, Palmse mõisakompleks",
-  "note_lv": "Palmse muiža, Lahemā"
+  "note_lv": "Palmse muiža, Lahemā",
+  "country": "ee"
  },
  {
   "name": "Rõuge",
@@ -87,7 +96,8 @@
   "x": 674253,
   "y": 6402333,
   "address": "Võru maakond, Rõuge vald",
-  "note_lv": "Rõuge, dziļās ielejas"
+  "note_lv": "Rõuge, dziļās ielejas",
+  "country": "ee"
  },
  {
   "name": "Sagadi mõis",
@@ -96,7 +106,8 @@
   "x": 617728,
   "y": 6601021,
   "address": "Lääne-Viru maakond, Haljala vald, Sagadi küla, 17193 Sagadi mõisa tee",
-  "note_lv": "Sagadi muiža, Lahemā"
+  "note_lv": "Sagadi muiža, Lahemā",
+  "country": "ee"
  },
  {
   "name": "Toomemägi",
@@ -105,7 +116,8 @@
   "x": 658789,
   "y": 6474299,
   "address": "Tartu maakond, Tartu linn, Tartu linn, Lossi tn 25",
-  "note_lv": "Tartu, Doma kalns"
+  "note_lv": "Tartu, Doma kalns",
+  "country": "ee"
  },
  {
   "name": "Vihula mõis",
@@ -114,7 +126,8 @@
   "x": 623452,
   "y": 6603039,
   "address": "Lääne-Viru maakond, Haljala vald, Vihula küla, Vihula mõis",
-  "note_lv": "Vihula muiža, Lahemā"
+  "note_lv": "Vihula muiža, Lahemā",
+  "country": "ee"
  },
  {
   "name": "Viljandi lossimäed",
@@ -123,7 +136,8 @@
   "x": 593579,
   "y": 6469861,
   "address": "Viljandi maakond, Viljandi linn, Ranna pst",
-  "note_lv": "Viljandi, pilskalni"
+  "note_lv": "Viljandi, pilskalni",
+  "country": "ee"
  },
  {
   "name": "Rīga, Alberta iela",
@@ -184,5 +198,55 @@
   "y": 6247844,
   "address": "Līvāni, Līvānu novads",
   "note_lv": "Līvāni, neliela pilsēta pie Daugavas (Latvija)"
+ },
+ {
+  "name": "Porvoo, vanha kaupunki",
+  "note_en": "Porvoo's old town, wooden houses and red storehouses on the river",
+  "note_et": "Porvoo vanalinn, puumajad ja punased jõeäärsed aidad",
+  "x": 591774,
+  "y": 6696463,
+  "address": "Porvoo",
+  "note_lv": "Porvo vecpilsēta, koka mājas un sarkanās noliktavas pie upes",
+  "country": "fi"
+ },
+ {
+  "name": "Turku, tuomiokirkko",
+  "note_en": "Turku Cathedral by the Aura river",
+  "note_et": "Turu toomkirik Aura jõe ääres",
+  "x": 405231,
+  "y": 6703173,
+  "address": "Turku",
+  "note_lv": "Turku katedrāle pie Auras upes",
+  "country": "fi"
+ },
+ {
+  "name": "Vanha Rauma",
+  "note_en": "Old Rauma, a wooden town on the UNESCO list",
+  "note_et": "Vana-Rauma, UNESCO nimekirjas puulinn",
+  "x": 365762,
+  "y": 6779797,
+  "address": "Rauma",
+  "note_lv": "Vecā Rauma, UNESCO sarakstā iekļauta koka pilsēta",
+  "country": "fi"
+ },
+ {
+  "name": "Tampere, Tammerkoski",
+  "note_en": "Tampere by the Tammerkoski rapids and their mills",
+  "note_et": "Tampere Tammerkoski kärestike ja vabrikute ääres",
+  "x": 487256,
+  "y": 6818579,
+  "address": "Tampere",
+  "note_lv": "Tampere pie Tammerkoski krācēm un fabrikām",
+  "country": "fi"
+ },
+ {
+  "name": "Suomenlinna",
+  "note_en": "Suomenlinna, the sea fortress off Helsinki",
+  "note_et": "Suomenlinna, Helsingi merekindlus",
+  "x": 554907,
+  "y": 6668133,
+  "address": "Helsinki, Suomenlinna",
+  "note_lv": "Suomenlinna, jūras cietoksnis pie Helsinkiem",
+  "country": "fi"
  }
 ]

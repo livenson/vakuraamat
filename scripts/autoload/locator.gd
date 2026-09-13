@@ -225,9 +225,10 @@ func spawn_local(script_rel: String, port: int, health_url: String) -> bool:
 	return false
 
 
-## Places for a query: "E N" in L-EST97, "lat, lon", or an address / place name via in-ADS.
-## Returns [{name, x, y}].
-func geocode(q: String) -> Array:
+## Places for a query: "E N" in L-EST97, "lat, lon", or an address / place name through the countries'
+## address searches - every country's, or only `country`'s (a descriptor id) when the page has one
+## picked. Returns [{name, x, y}].
+func geocode(q: String, country := "") -> Array:
 	q = q.strip_edges()
 	var nums := q.replace(";", " ").replace(",", " ").split(" ", false)
 	if nums.size() == 2 and nums[0].is_valid_float() and nums[1].is_valid_float():
@@ -239,8 +240,9 @@ func geocode(q: String) -> Array:
 			var p := wgs84_to_lest97(a, b)
 			return [{"name": "%.4f N %.4f E" % [a, b], "x": p.x, "y": p.y}]
 	var out := []
-	for c in Countries.all().values():
-		out.append_array(await _geocode_with(c.get("geocoder", {}), q))
+	for id in Countries.all():
+		if country == "" or id == country:
+			out.append_array(await _geocode_with(Countries.all()[id].get("geocoder", {}), q))
 	return out
 
 

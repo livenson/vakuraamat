@@ -80,9 +80,10 @@ MENU_SEARCH,Otsi,Search,Meklēt
 MENU_USE_MY_LOCATION,Kasuta minu asukohta,Use my location,Izmantot manu atrašanās vietu
 MENU_BACK,Tagasi,Back,Atpakaļ
 MENU_CREATE_WORLD,Loo maailm,Create the world,Radīt pasauli
-MENU_LOCATION_HINT,"Aadress, koht või koordinaadid (L-EST97 ""E N"" või ""lat, lon""). Läti kohti otsib Läti aadressiregistrist kohalik teenus.","An address, a place, or coordinates (L-EST97 ""E N"" or ""lat, lon""). Latvian places are searched in Latvia's address register by the local service.","Adrese, vieta vai koordinātas (L-EST97 ""E N"" vai ""lat, lon""). Latvijas vietas meklē Latvijas adrešu reģistrā vietējais serviss."
+MENU_LOCATION_HINT,"Aadress, koht või koordinaadid (L-EST97 ""E N"" või ""lat, lon""). Läti ja Soome kohti otsib nende aadressiregistritest kohalik teenus. Riigivalik piirab otsingu ja kaardi ühe riigiga.","An address, a place, or coordinates (L-EST97 ""E N"" or ""lat, lon""). Latvian and Finnish places are searched in their address registers by the local service. The country picker keeps the search and the map to one country.","Adrese, vieta vai koordinātas (L-EST97 ""E N"" vai ""lat, lon""). Latvijas un Somijas vietas to adrešu reģistros meklē vietējais serviss. Valsts izvēle ierobežo meklēšanu un karti ar vienu valsti."
 MENU_SERVICE_DOWN,Kaarditeenus ei vasta (%s) ja seda ei õnnestunud käivitada. Käivita mäng skriptiga tools/play.sh,The tile service is not answering (%s) and could not be started. Launch the game with tools/play.sh,"Karšu serviss neatbild (%s), un to neizdevās palaist. Palaid spēli ar tools/play.sh"
-MENU_OUTSIDE_ESTONIA,See koht ei ole Eestis ega Lätis. Praegu on andmed ainult nende kahe kohta.,That point is outside Estonia and Latvia. Data is only available for those two so far.,"Šī vieta nav ne Igaunijā, ne Latvijā. Pagaidām dati ir tikai par šīm divām."
+MENU_OUTSIDE_ESTONIA,"See koht ei ole Eestis, Lätis ega Soomes. Praegu on andmed ainult nende kolme kohta.","That point is outside Estonia, Latvia and Finland. Data is only available for those three so far.","Šī vieta nav ne Igaunijā, ne Latvijā, ne Somijā. Pagaidām dati ir tikai par šīm trim."
+MENU_COUNTRY_ALL,Kõik riigid,All countries,Visas valstis
 MENU_NO_RESULTS,Midagi ei leitud.,Nothing found.,Nekas netika atrasts.
 MENU_WORLD_READY,Maailm on valmis.,The world is ready.,Pasaule ir gatava.
 MENU_LOCATION_NAME,Nimi,Name,Nosaukums
