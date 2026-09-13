@@ -309,6 +309,21 @@ To do:
      - Tampere's tile: 307 buildings on the topographic footprints, from two sheets. 219 have a
        Ryhti record, 208 are dated, 60 have pitched roofs. 295 plots, none with a zoning class,
        which only Helsinki publishes.
+     - **Nine more places through the service (2026-09-13).** Porvoo, Turku, Old Rauma, Espoo
+       Tapiola, Suomenlinna, Mariehamn, Oulu, Rovaniemi and a forest tile by Loppi all built
+       without an error, validated without one, and refined, in 40–200 s a job.
+       - Porvoo: 814 buildings (597 in Ryhti), 740 companies, 14 HSL routes. HSL's feed does
+         reach Porvoo, against the probe's note.
+       - Mariehamn (Åland) and Rovaniemi work like the south.
+       - Problems found:
+         - Overpass answered 504 or timed out, so Turku had no roads and Espoo, Oulu and Loppi no
+           stops. `fetch_roads_lv` and `fetch_stops` now retry the mirrors within the stage's
+           deadline instead of giving up after one pass.
+         - `validate_site` took Oulu and Rovaniemi for off the grid: its northing limit was
+           7,000,000, and is now 7,850,000.
+         - No fields came back anywhere, correctly: the towns have none and the Loppi point is
+           forest (380 crop parcels lie within 5 km). The 2026 parcel layer answers 400 until it
+           is published, and the 2025 one is used.
      - Of the 450 Ryhti points under the box, 280 stand in a footprint. Only 16 in the tile miss
        every footprint, 10 of them by under 5 m. About 127 fall in a footprint another point
        already took: the topographic database draws joined buildings (row-house parts, blocks) as

@@ -34,15 +34,23 @@ def transform(points, s_srs, t_srs):
     return geo.transform_points(points, s_srs.split(":")[1], t_srs.split(":")[1])
 
 
-def overpass(south, west, north, east):
+def overpass(south, west, north, east, budget=110.0):
+    """The bus stops under the box. The public servers queue slots for ~30 s and time out when busy
+    (Espoo, Oulu and Loppi had no stops, 2026-09-13), so the mirrors are tried in turn until `budget`
+    seconds are spent, pausing a little after each round: inside the tile service's 120 s."""
     q = f'[out:json][timeout:25];node["highway"="bus_stop"]({south:.6f},{west:.6f},{north:.6f},{east:.6f});out body;'
-    last = None
-    for url in OVERPASS:
+    last, t0, i = None, time.time(), 0
+    while budget - (time.time() - t0) > 15:
+        url = OVERPASS[i % len(OVERPASS)]
         try:
             req = urllib.request.Request(url, data=urllib.parse.urlencode({"data": q}).encode(), headers=UA)
-            return json.load(urllib.request.urlopen(req, timeout=35)).get("elements", [])   # the public servers queue slots for ~30 s
-        except Exception as e:  # noqa: BLE001 - try the mirror
+            return json.load(urllib.request.urlopen(req, timeout=min(35.0, budget - (time.time() - t0)))).get("elements", [])
+        except Exception as e:  # noqa: BLE001 - the mirror, then another round
             last = e
+            log(f"{url.split('/')[2]}: {e}")
+        i += 1
+        if i % len(OVERPASS) == 0:
+            time.sleep(5)
     raise RuntimeError(f"Overpass unavailable: {last}")
 
 

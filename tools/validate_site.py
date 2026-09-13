@@ -111,7 +111,7 @@ def validate(site, rep, root=ROOT):
             rep.err(f"site.json terrain.{k} missing")
     if isinstance(t.get("center"), list) and len(t["center"]) == 2:
         x, y = t["center"]
-        if not (100000 < x < 900000 and 5800000 < y < 7000000):
+        if not (100000 < x < 900000 and 5800000 < y < 7850000):   # north to Utsjoki: Finland is on the same grid
             rep.warn("terrain.center does not look like EPSG:3301 (L-EST97) metres, the grid every country is built on")
     tile_dir = os.path.join(root, "assets/terrain", str(t.get("tile", site)))
     if not os.path.exists(os.path.join(tile_dir, "terrain_meta.json")):

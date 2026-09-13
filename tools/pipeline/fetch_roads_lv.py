@@ -40,15 +40,23 @@ def log(msg):
     print(f"[fetch_roads_lv] {msg}", flush=True)
 
 
-def overpass(south, west, north, east):
+def overpass(south, west, north, east, budget=170.0):
+    """The ways under the box. The public servers answer 504 or time out when busy (Turku's roads,
+    2026-09-13), so the mirrors are tried in turn until `budget` seconds are spent, pausing a little
+    after each round: inside the tile service's 180 s for the stage."""
     q = f'[out:json][timeout:90];way["highway"]({south:.6f},{west:.6f},{north:.6f},{east:.6f});out body geom;'
-    last = None
-    for url in OVERPASS:
+    last, t0, i = None, time.time(), 0
+    while budget - (time.time() - t0) > 20:
+        url = OVERPASS[i % len(OVERPASS)]
         try:
             req = urllib.request.Request(url, data=urllib.parse.urlencode({"data": q}).encode(), headers=UA)
-            return json.load(urllib.request.urlopen(req, timeout=120)).get("elements", [])
-        except Exception as e:  # noqa: BLE001 - try the mirror
+            return json.load(urllib.request.urlopen(req, timeout=min(120.0, budget - (time.time() - t0)))).get("elements", [])
+        except Exception as e:  # noqa: BLE001 - the mirror, then another round
             last = e
+            log(f"{url.split('/')[2]}: {e}")
+        i += 1
+        if i % len(OVERPASS) == 0:
+            time.sleep(10)
     raise RuntimeError(f"Overpass unavailable: {last}")
 
 
