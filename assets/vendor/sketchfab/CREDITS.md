@@ -23,3 +23,21 @@ All CC BY (Creative Commons Attribution); fetched 2026-09-06 through the Sketchf
 | `hanging_sign.glb` | Hanging Sign | JK3Ds | https://sketchfab.com/3d-models/309064650ba44519b968854943fbb790 |
 | `wooden_sign.glb` | Low Poly Sign Board, Stylized Wooden Sign | gamelancer835 | https://sketchfab.com/3d-models/47606ca864584360aa594ccbf7b668b7 |
 | `kiosk.glb` | Low-Poly Russian kiosk | VovaRice | https://sketchfab.com/3d-models/bf81455b1fb141e4be2954be84f121d8 |
+| `tram.glb` | ALSTOM TRAM CITADIS Reims | MiguelNevesRamos | https://sketchfab.com/3d-models/27c5de51daaa45e59f3ae05b985e0af5 |
+| `train.glb` | STADLER FLIRT3 - OC Transpo (reoriented: the export's leftover placement rotation snapped to the axes, no rescale) | Void.com | https://sketchfab.com/3d-models/083f9797ff144a1a8a68031f22b85fbb |
+| `traffic_light.glb` | LowPoly Traffic Light - Low Poly Free ! | matrixxy | https://sketchfab.com/3d-models/0098d2e06af641a2b74b42dffc11daf3 |
+| `pedestrian_light.glb` | Pedestrian Traffic Light | ASA21 | https://sketchfab.com/3d-models/2f720ea69cb2407ba8598c02305ce524 |
+| `bollard.glb` | Street Bollard | FameProductions (Faheem Yusuf) | https://sketchfab.com/3d-models/9b9db79ae21c4e118423efae658e7fb7 |
+| `litter_bin.glb` | Street Trash Bin — Realistic | vladimirzuev1510 | https://sketchfab.com/3d-models/f8781236845a4c53849d2bc23dcf767b |
+| `bike_rack.glb` | Bike Rack | pixie-3d | https://sketchfab.com/3d-models/4c4f9aad327d45018af1813dca7680bc |
+
+The seven rows above were fetched 2026-09-13, all CC BY 4.0 (http://creativecommons.org/licenses/by/4.0/).
+Attribution lines:
+
+- "ALSTOM TRAM CITADIS Reims" by MiguelNevesRamos (https://sketchfab.com/MiguelNevesRamos), CC BY 4.0, via Sketchfab.
+- "STADLER FLIRT3 - OC Transpo" by Void.com (https://sketchfab.com/Void.com), CC BY 4.0, via Sketchfab; reoriented.
+- "LowPoly Traffic Light - Low Poly Free !" by matrixxy (https://sketchfab.com/matrixxy), CC BY 4.0, via Sketchfab.
+- "Pedestrian Traffic Light" by ASA21 (https://sketchfab.com/ASA21), CC BY 4.0, via Sketchfab.
+- "Street Bollard" by FameProductions (https://sketchfab.com/FameProductions), CC BY 4.0, via Sketchfab.
+- "Street Trash Bin — Realistic" by vladimirzuev1510 (https://sketchfab.com/vladimirzuev1510), CC BY 4.0, via Sketchfab.
+- "Bike Rack" by pixie-3d (https://sketchfab.com/pixie-3d), CC BY 4.0, via Sketchfab.

@@ -1,7 +1,7 @@
 {
   "id": "valka",
   "country": "lv",
-  "pipeline": 3,
+  "pipeline": 4,
   "name_key": "SITE_VALKA",
   "subtitle_key": "SITE_VALKA_SUBTITLE",
   "description": "Valka: generated site pack.",

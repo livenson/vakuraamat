@@ -35,6 +35,8 @@ func build(roads: Array) -> void:
 			continue
 		var e := {"id": edges.size(), "kind": str(r.get("kind", "road")), "width": float(r.get("width", 4.0)), "pts": pts, "cum": cum,
 				"length": cum[-1], "a": _node(pts[0]), "b": _node(pts[-1]), "name": str(r.get("name", "") if r.get("name") else "")}
+		if r.get("bridge") == true:
+			e.bridge = true   # a rail track over a bridge: Rails lays it straight between the bridge's ends
 		edges.append(e)
 		node_edges[e.a].append(e.id)
 		node_edges[e.b].append(e.id)
@@ -74,6 +76,26 @@ func point_at(e: Dictionary, s: float) -> Vector2:
 	var seg := cum[i] - cum[i - 1]
 	var t := 0.0 if seg <= 0.0 else (s - cum[i - 1]) / seg
 	return pts[i - 1].lerp(pts[i], t)
+
+
+## A node's position (tile metres).
+func node_pos(n: int) -> Vector2:
+	return _nodes[n]
+
+
+## The distance along `e` of its point nearest to `p`.
+func nearest_s(e: Dictionary, p: Vector2) -> float:
+	var pts: PackedVector2Array = e.pts
+	var cum: PackedFloat32Array = e.cum
+	var best := 0.0
+	var best_d := INF
+	for i in range(1, pts.size()):
+		var q := Geometry2D.get_closest_point_to_segment(p, pts[i - 1], pts[i])
+		var d := q.distance_squared_to(p)
+		if d < best_d:
+			best_d = d
+			best = cum[i - 1] + pts[i - 1].distance_to(q)
+	return best
 
 
 func dir_at(e: Dictionary, s: float, forward: bool) -> Vector2:

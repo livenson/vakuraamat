@@ -1,7 +1,7 @@
 {
   "id": "helsinki_senaatintori",
   "country": "fi",
-  "pipeline": 3,
+  "pipeline": 4,
   "name_key": "SITE_HELSINKI_SENAATINTORI",
   "subtitle_key": "SITE_HELSINKI_SENAATINTORI_SUBTITLE",
   "description": "Helsinki, Senaatintori: generated site pack.",

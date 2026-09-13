@@ -60,6 +60,16 @@ screenshot; 2 because the user named trees as the worst; 3–6 as time allows.
   a football pitch's short ends (7.32 m on a full pitch, 5 or 3 m on smaller ones), a net across tennis
   and volleyball courts and a hoop at each end of a basketball court, from shared boxes and cylinders.
   Rovaniemi's 110 x 66 m pitch has its two goals on the painted lines.
+- [x] 11 OpenStreetMap streets (2026-09-13): one Overpass query per tile (`fetch_osm.py`). Roads wear
+  their surface (Poly Haven asphalt, setts, paving, cobbles, concrete, gravel: Helsinki's and Rīga's sett
+  streets). Lamps stand where the map has them (the 32 m rule only where it has none); marked crossings
+  get zebra bars; signalled junctions and crossings get lights whose phase the cars wait for
+  (`TrafficSignals`); benches, bins, bike racks, bollards, fences, hedges, walls, flowerbeds and piers
+  where mapped, and a parcel kit leaves out its own hedge, fence or benches where the map has them.
+  Tram and railway tracks (flush in the street or on ballast) with trams (Citadis, CC BY) and FLIRT
+  trains running on the right-hand track and stopping at the tram stops. Latvia and Finland take the
+  map's single trees (heights from the canopy model) with the scatter kept off their crowns. Helsinki
+  street level 71 fps, from the air 86-92 fps; Pirita 74 fps.
 
 ## Result
 

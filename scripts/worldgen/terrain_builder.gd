@@ -350,8 +350,8 @@ func classify(img: Image, canopy: Image = null) -> Image:
 ## Trees from trees.json ([x, z, height, crown, conifer]) as instances of the rule whose species fits:
 ## conifers become pines (tall) or spruces, deciduous trees birches; junipers for small conifers.
 ## Returns true when the tile had measured trees.
-func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Array, rng: RandomNumberGenerator, batches: Array, colors: Array, origin: Vector3 = Vector3.ZERO, mask: Image = null) -> bool:
-	var path := tile_dir + "/trees.json"
+func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Array, rng: RandomNumberGenerator, batches: Array, colors: Array, origin: Vector3 = Vector3.ZERO, mask: Image = null, file := "trees.json") -> bool:
+	var path := tile_dir + "/" + file
 	if not FileAccess.file_exists(path):
 		return false
 	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
@@ -389,8 +389,28 @@ func _place_measured_trees(terrain: Terrain3D, tile_dir: String, exclusions: Arr
 		var v: float = rng.randf_range(0.8, 1.05)
 		colors[i].append(Color(v * rng.randf_range(0.92, 1.1), v, v * rng.randf_range(0.85, 1.0)))
 		placed += 1
-	print("[terrain_builder] %d measured trees placed from trees.json" % placed)
+	print("[terrain_builder] %d measured trees placed from %s" % [placed, file])
 	return placed > 0
+
+
+## A size x size mask, 1 where a tree of a trees file covers the texel with its crown: the statistical
+## scatter keeps off the crowns of the mapped trees.
+static func _crowns(path: String, size: int, size_m: float) -> PackedByteArray:
+	var out := PackedByteArray()
+	out.resize(size * size)
+	var parsed = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return out
+	var k := size / maxf(size_m, 1.0)
+	for t in parsed.get("trees", []):
+		var cx := float(t[0]) * k
+		var cz := float(t[1]) * k
+		var r := maxf(float(t[3]) * 0.5 * k, 1.0)
+		for y in range(maxi(int(cz - r), 0), mini(int(cz + r) + 1, size)):
+			for x in range(maxi(int(cx - r), 0), mini(int(cx + r) + 1, size)):
+				if Vector2(x - cx, y - cz).length() <= r:
+					out[y * size + x] = 1
+	return out
 
 
 ## Scatter trees, bushes and grass by land-cover class and canopy height; save into the region file.
@@ -505,6 +525,11 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 	# Measured single trees (Maa-amet Geo3D, tools/pipeline/fetch_trees.py) replace the statistical
 	# tree rules where the dataset covers the tile; bushes and grass stay statistical.
 	var measured := _place_measured_trees(terrain, tile_dir, exclusions, rng, batches, colors, origin, mask)
+	# no laser trees (Latvia, Finland): the trees OpenStreetMap maps where they stand (trees_osm.json),
+	# and the statistical trees everywhere else, kept off their crowns
+	var crowns := PackedByteArray()
+	if not measured and _place_measured_trees(terrain, tile_dir, exclusions, rng, batches, colors, origin, mask, "trees_osm.json"):
+		crowns = _crowns(tile_dir + "/trees_osm.json", size, float(meta.get("size_m", size)))
 	for y in size:
 		for x in size:
 			var id := Terrain3DUtil.get_base(Terrain3DUtil.as_uint(ctrl.get_pixel(x, y).r))
@@ -515,6 +540,8 @@ func scatter(terrain: Terrain3D, tile_dir: String, exclusions: Array, seed_value
 				var r: Dictionary = RULES[i]
 				if measured and MODEL_HEIGHT.has(r.scene):
 					continue   # trees come from the measurements
+				if not crowns.is_empty() and MODEL_HEIGHT.has(r.scene) and crowns[y * size + x] != 0:
+					continue   # a mapped tree stands here
 				if not (id in r.ids):
 					continue
 				if canopy and r.has("height") and (h < r.height.x or h >= r.height.y):

@@ -26,7 +26,9 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 #      so allotment strips no longer fence themselves off one beside the other
 #   3: company health reads a blank Tax Board amount as unpublished, not as zero (municipal
 #      kindergartens and schools were "distressed"), and payroll taxes count as taxes paid
-PACK_VERSION = 3
+#   4: OpenStreetMap's street furniture, barriers, shops with their opening hours, rails and single
+#      trees (fetch_osm.py: street.json, pois.json, rail.json, the tile's trees_osm.json)
+PACK_VERSION = 4
 sys.path.insert(0, os.path.join(ROOT, "tools", "pipeline"))
 import paths  # noqa: E402
 ROOT = paths.ROOT   # the bundle directory when frozen into the tile-service sidecar

@@ -274,6 +274,9 @@ def run_job(job):
         stage("sports pitches (OpenStreetMap)", 0.668)
         import fetch_pitches   # every country: the goals, nets and hoops the game stands on them
         run(f"{sid}: pitches", 120, fetch_pitches.fetch, sid, root=ws)
+        stage("streets, trees, shops and rails (OpenStreetMap)", 0.669)
+        import fetch_osm   # every country: lamps, signals, crossings, benches, fences, mapped trees, shop hours, tracks
+        run(f"{sid}: OpenStreetMap layers", 180, fetch_osm.fetch, sid, root=ws)
         stage("buildings, water, boats, anchors", 0.67)
         _, _, anchors = extract_features.extract(sid, root=ws)
         stage("layout", 0.7)

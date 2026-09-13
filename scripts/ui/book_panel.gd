@@ -576,9 +576,10 @@ func _fill_values(body: Node) -> void:
 func _attributions() -> Array:
 	var seen := {}
 	var files := ["parcels.json", "buildings.json", "tenants.json", "roads.json", "market.json",
-		"stops.json", "departures.json", "fields_2026.json"]
+		"stops.json", "departures.json", "fields_2026.json", "pitches.json", "street.json", "rail.json", "pois.json"]
 	var paths: Array = files.map(func(f): return [Sites.path(f), "attribution"])
 	paths.append([Sites.tile_dir() + "/trees.json", "source"])
+	paths.append([Sites.tile_dir() + "/trees_osm.json", "source"])
 	for pk in paths:
 		if not FileAccess.file_exists(pk[0]):
 			continue

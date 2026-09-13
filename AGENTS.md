@@ -26,7 +26,7 @@ present-day economy game (buying, renting, a shared SpacetimeDB town ledger) end
   open source). Prefer CC0/MIT. Nothing from Fab/Megascans. Data files carry `attribution`.
 - Site content lives in `sites/<id>/`: `site.json` (manifest), `layout.json` (positions),
   `scenes.json` (the layer), `data/eras/era_2026.tres`, `parcels.json`, `buildings.json`,
-  `tenants.json`, `market.json`, `roads.json`, `stops.json`, `departures.json`, `fields_2026.json`, `pitches.json` (OSM sports pitches: `Pitches` puts goals, nets and hoops on them), `strings.csv`. `make scenes SITE=<id>`
+  `tenants.json`, `market.json`, `roads.json`, `stops.json`, `departures.json`, `fields_2026.json`, `pitches.json` (OSM sports pitches: `Pitches` puts goals, nets and hoops on them), `street.json`, `rail.json`, `pois.json` (OSM street furniture and barriers, tracks and stops, shops with opening hours: `tools/pipeline/fetch_osm.py`; each stays its own file so the ODbL share-alike never reaches the register data), `strings.csv`. `make scenes SITE=<id>`
   regenerates `sites/<id>/scenes/*.tscn`; do not hand-edit those scenes. Engine code (`scripts/`,
   `scenes/`) must not reference a site by name; go through `Sites` (manifest, `data_dir`, `layout`, `tile`).
 - Real names: the companies are real (legal persons only). The register's natural persons are never

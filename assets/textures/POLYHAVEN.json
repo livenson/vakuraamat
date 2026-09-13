@@ -69,6 +69,48 @@
   "slug": "wood_planks_grey",
   "url": "https://polyhaven.com/a/wood_planks_grey"
  },
+ "roads/asphalt": {
+  "fetched": "2026-09-13",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "asphalt_02",
+  "url": "https://polyhaven.com/a/asphalt_02"
+ },
+ "roads/cobble": {
+  "fetched": "2026-09-13",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "cobblestone_01",
+  "url": "https://polyhaven.com/a/cobblestone_01"
+ },
+ "roads/concrete": {
+  "fetched": "2026-09-13",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "concrete_floor_01",
+  "url": "https://polyhaven.com/a/concrete_floor_01"
+ },
+ "roads/gravel": {
+  "fetched": "2026-09-13",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "gravel_floor_02",
+  "url": "https://polyhaven.com/a/gravel_floor_02"
+ },
+ "roads/paving": {
+  "fetched": "2026-09-13",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "concrete_pavement_02",
+  "url": "https://polyhaven.com/a/concrete_pavement_02"
+ },
+ "roads/sett": {
+  "fetched": "2026-09-13",
+  "licence": "CC0 1.0",
+  "resolution": "1k",
+  "slug": "cobblestone_floor_05",
+  "url": "https://polyhaven.com/a/cobblestone_floor_05"
+ },
  "terrain/field": {
   "fetched": "2026-09-05",
   "licence": "CC0 1.0",

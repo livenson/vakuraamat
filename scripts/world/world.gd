@@ -265,6 +265,8 @@ func _exit_tree() -> void:
 	ParcelKit.release()
 	FootprintBuilding.release_details()
 	Pitches.release()
+	RoadNetwork.release()
+	StreetFurniture.release()
 
 
 func _process(_delta: float) -> void:

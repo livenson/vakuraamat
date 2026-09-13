@@ -37,24 +37,32 @@ func _build() -> void:
 		set_meta("no_snap", true)
 		if get_parent():
 			get_parent().set_meta("no_snap", true)
+	# where OpenStreetMap has the unit's real fence, hedge or benches (street.json), the kit leaves its
+	# own out: StreetFurniture draws what the map has
+	var pack := Sites.pack_of(self)
+	var outline := _tile_outline()
 	match kit:
 		"playground":
 			_playground()
 		"court":
 			_court()
 		"park":
-			_park()
+			if not StreetData.furniture_in(pack, outline, "bench"):
+				_park()
 		"farm":
 			_farm()
 		"kiosk":
 			_kiosk()
 		"hedge":
-			_boundary(0.9, 0.7, Color(0.22, 0.4, 0.18), 1.2, true)
+			if not StreetData.barrier_near(pack, outline):
+				_boundary(0.9, 0.7, Color(0.22, 0.4, 0.18), 1.2, true)
 		"fence":
-			_boundary(2.0, 0.08, Color(0.45, 0.45, 0.42), 0.4, false)
+			if not StreetData.barrier_near(pack, outline):
+				_boundary(2.0, 0.08, Color(0.45, 0.45, 0.42), 0.4, false)
 		"solar":
 			_solar()
-			_boundary(1.8, 0.06, Color(0.5, 0.5, 0.48), 0.5, false)
+			if not StreetData.barrier_near(pack, outline):
+				_boundary(1.8, 0.06, Color(0.5, 0.5, 0.48), 0.5, false)
 	if _colors.is_empty():
 		return
 	var mi := MeshInstance3D.new()
@@ -92,6 +100,16 @@ func _box(center: Vector3, size: Vector3, col: Color, yaw := 0.0, tilt := 0.0) -
 			_st.set_normal(n)
 			_st.set_color(col)
 			_st.add_vertex(v)
+
+
+## The unit's outline in tile metres, the frame street.json is in.
+func _tile_outline() -> PackedVector2Array:
+	var origin := StreetData.tile_origin(self)
+	var out := PackedVector2Array()
+	for p in polygon:
+		var g := to_global(Vector3(p.x, 0.0, p.y)) - origin
+		out.append(Vector2(g.x, g.z))
+	return out
 
 
 func _centroid() -> Vector2:
