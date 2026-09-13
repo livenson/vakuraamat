@@ -16,7 +16,8 @@ cadastre and buildings, Rīga's LOD2, UR and VID companies, OpenStreetMap roads,
 GTFS, VARIS addresses; docs/latvia-plan.md). Finland has its ground (NLS ground model, laser points
 and orthophotos from the Funet mirror, Helsinki's own inside the city; docs/finland-plan.md), its
 plots (NLS cadastre) and buildings (Ryhti on Helsinki's or the topographic database's footprints),
-OpenStreetMap roads and stops, and no companies yet. The rest of the world has a documented plan and no code
+OpenStreetMap roads and stops, and its companies (PRH) with their yearly tax (Vero); no timetables or
+address search yet. The rest of the world has a documented plan and no code
 yet (PLANNED below, docs/custom-sites.md "Other countries").
 """
 import argparse, json, os, sys, threading
@@ -436,11 +437,13 @@ class Finland(DataSource):
     def registers(self, sid, ws, stage, run):
         """The NLS cadastre and Ryhti's buildings on footprints (Helsinki's, else the topographic
         database's), then OpenStreetMap's roads and stops. Companies are step 3 of docs/finland-plan.md."""
-        import fetch_cadastre_fi, fetch_roads_lv, fetch_stops
+        import fetch_cadastre_fi, fetch_roads_lv, fetch_stops, fetch_tenants_fi
         stage("cadastre (Maanmittauslaitos), buildings (Ryhti)", 0.5)
         ok, _ = run(f"{sid}: cadastre", 900, fetch_cadastre_fi.fetch, sid, root=ws)
         if not ok:
             raise RuntimeError("the Finnish cadastre could not be read (see the service log)")
+        stage("companies (PRH) and taxes (Vero)", 0.62)
+        run(f"{sid}: tenants", 900, fetch_tenants_fi.fetch, sid, root=ws)
         stage("roads (OpenStreetMap)", 0.64)
         run(f"{sid}: roads", 180, fetch_roads_lv.fetch, sid, root=ws, attribution=fetch_roads_lv.ATTRIBUTION_FI)
         stops = threading.Thread(target=lambda: run(f"{sid}: stops", 120, fetch_stops.fetch, sid, root=ws), daemon=True)

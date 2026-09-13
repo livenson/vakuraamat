@@ -291,10 +291,48 @@ To do:
      - Ryhti marks 204 of the 374 central buildings "Tyhjillään" (vacant). It is the register's
        field, so `status` keeps it.
      - The split-pulse test takes the Alexander II statue for a tree.
-3. **Companies and money** (`fetch_tenants_fi.py`):
-   - PRH bulk matched by address to Ryhti's addresses, Vero's tax year by business id.
-   - Distress from `companySituations`.
-   - Archive each day's bulk file, since dissolved companies drop out of it.
+3. **Companies and money.** Done 2026-09-13 (`tools/pipeline/fetch_tenants_fi.py`, a stage of the
+   service's Finnish job):
+   - **Register.** PRH's daily bulk, one 1.45 GB JSON array in a 96 MB zip, is streamed once per
+     download into a slim file of what a tile needs: 440,753 companies with a street address, in
+     12 s. It is refreshed after a week.
+   - **Matching.** A company's visiting address, else its postal one, against the tile's building
+     addresses: every Finnish and Swedish form Ryhti gives, by street and house number (`13 A` is
+     `13a` then `13`; `16-18` also covers 17). The municipality code must be one of the tile's.
+     Plot addresses are tried next, then "street" for a number outside the tile.
+   - **Kept.**
+     - Legal persons doing business. The open bulk has no sole traders at all.
+     - Housing companies (asunto-osakeyhtiö) and mutual property companies are left out: they
+       own the building rather than trade in it. The stats count them: 565 and 957 in
+       Senaatintori's tile.
+     - Dissolved companies (`endDate`) are skipped.
+   - **Figures.**
+     - `taxes` is Vero's tax charged for `taxes_year` (2024, the newest year, published
+       2025-11-11), found by name on vero.fi's open-data page. `taxable_income` sits beside it.
+     - No staff count is published, so `employees` is null. `turnover` is null until the XBRL
+       statements are read.
+     - `link` is the company's YTJ page.
+     - The sector comes from the TOL 2008 code, NACE with a fifth digit like EMTAK, with its
+       Finnish text.
+   - **Health.** From the register's situations alone:
+     - bankruptcy (`KONK`) and liquidation (`SELTILA`) are distressed;
+     - restructuring (`SANE`) is watch.
+   - **Validator.** It accepts a Finnish business id (`0112038-9`) as `registry_code`.
+   - **Result, Senaatintori.** 21 s for 8,462 companies: 5,576 exact, 2,886 on the tile's
+     streets.
+     - 6,464 are in Vero's file, 2,643 of them paying tax.
+     - 247 distressed, 3 on watch.
+     - Largest sectors: services 2,351, finance 2,334 (holding companies), property 742,
+       media 714, trade 603.
+     - The biggest taxpayers are Solidium, Small Giant Games, SEB's Helsinki branch, Mandatum and
+       Nordea Life.
+     - Kämp Oy is at Ludviginkatu 6 in hospitality. The file is 7.4 MB, against Rīga's 4.5 MB.
+   - **Left open.**
+     - Turnover from the XBRL statements (2.5 % of companies, coded facts).
+     - The map's employees mode has nothing to size by.
+     - The book's Companies page shows Employees and Turnover, both dashes in Finland, and sorts by
+       employees first. It needs a Taxes column, which Finland fills.
+     - Archive each day's bulk, since a dissolved company drops out of it.
 4. **Roads, stops, departures, fields**: OSM roads and stops; HSL and Waltti GTFS; Ruokavirasto
    fields.
 5. **Address search**: an index of Ryhti's addresses behind `/geocode?country=fi`, in Finnish

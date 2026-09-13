@@ -207,8 +207,10 @@ def validate(site, rep, root=ROOT):
     if tenants:
         for t in tenants["tenants"]:
             who = f"tenants.json {t.get('registry_code')}"
-            if not (str(t.get("registry_code") or "").isdigit() and t.get("name")):
-                rep.err(f"{who}: needs a numeric registry_code and a name")
+            # numeric in Estonia and Latvia; a Finnish business id (Y-tunnus) carries its check digit after a hyphen
+            code = str(t.get("registry_code") or "")
+            if not ((code.isdigit() or re.fullmatch(r"\d{7}-\d", code)) and t.get("name")):
+                rep.err(f"{who}: needs a numeric registry_code (or a Finnish business id) and a name")
             if t.get("match") not in ("exact", "street", "none"):
                 rep.err(f"{who}: match must be exact, street or none")
             if t.get("tunnus") is not None and t["tunnus"] not in tunnus_set:
