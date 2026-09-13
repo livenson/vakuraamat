@@ -402,6 +402,9 @@ func fetch_pack(id: String, name: String, x: float, y: float, size: int = 1024, 
 			say.call(tr("MENU_STAGE_INSTALL"), 0.97)
 			if not install_zip(zip_path, id, refresh):
 				error = "could not unpack " + zip_path
+			else:
+				# unpacked into sites/ and tiles/, the zip is not read again (98 of them held 0.87 GB)
+				DirAccess.remove_absolute(ProjectSettings.globalize_path(zip_path))
 	return {"ok": error == "", "id": id, "error": error}
 
 
@@ -442,6 +445,7 @@ func take_refined(id: String) -> bool:
 	var dl := await http(service_url() + "/download?id=" + id, HTTPClient.METHOD_GET, "", zip_path)
 	if not dl.ok or not install_zip(zip_path, id):
 		return false
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(zip_path))   # installed: not read again
 	if id == Sites.active:
 		Sites.reload_active()   # the pack's own files changed under it (trees, the meta)
 	print("[Locator] %s: the 1 m ground model replaced the 5 m one; the tile is rebuilt on the way in" % id)

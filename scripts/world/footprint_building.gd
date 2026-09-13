@@ -694,6 +694,23 @@ static func release_details() -> void:
 	_photo_roofs.clear()   # a tile's photograph is 20 MB: none outlives the world
 
 
+## A streamed tile left: its roof photograph (17 MB at 2048 px, never freed before while walking
+## across tiles) and its LOD2 models go with it (World, on TileStreamer.tile_unloaded).
+static func forget_pack(pack: String) -> void:
+	if pack == "":
+		return
+	_photo_roofs.erase(pack)
+	var prefix := Sites.path_in(pack, "")
+	for path in _models.keys():
+		if str(path).begins_with(prefix):
+			_models.erase(path)
+
+
+## Every parsed LOD2 table (GameState.forget_caches): a refreshed pack's roofs are read again.
+static func forget_models() -> void:
+	_models.clear()
+
+
 func _detail_mesh(kind: String) -> MeshInstance3D:
 	if not _detail.has(kind):
 		var mesh: Mesh

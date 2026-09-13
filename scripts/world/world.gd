@@ -88,6 +88,8 @@ func _ready() -> void:
 	streamer = TileStreamer.new()
 	streamer.name = "Tiles"
 	add_child(streamer)
+	# a tile leaving takes its roof photograph and LOD2 models with it (the tile's entry is still there)
+	streamer.tile_unloaded.connect(func(loc: Vector2i): FootprintBuilding.forget_pack(str(streamer.tiles.get(loc, {}).get("pack", ""))))
 	streamer.setup(self)
 	fade.color.a = 1.0
 	await get_tree().process_frame

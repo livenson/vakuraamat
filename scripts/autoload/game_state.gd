@@ -28,6 +28,7 @@ func forget_caches() -> void:
 	Parcels.forget()
 	Tenants.forget()
 	Pois.forget()
+	FootprintBuilding.forget_models()
 	StreetData.forget()
 	TrafficSignals.forget()
 	Links.forget()
